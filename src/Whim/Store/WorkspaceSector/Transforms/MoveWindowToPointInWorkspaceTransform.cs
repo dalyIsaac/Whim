@@ -7,11 +7,11 @@ namespace Whim;
 internal record MoveWindowToPointInWorkspaceTransform(WorkspaceId WorkspaceId, HWND WindowHandle, IPoint<double> Point)
 	: BaseWorkspaceWindowTransform(WorkspaceId, WindowHandle, DefaultToLastFocusedWindow: false)
 {
-	private protected override Result<ImmutableWorkspace> WindowOperation(
+	private protected override Result<Workspace> WindowOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector rootSector,
-		ImmutableWorkspace workspace,
+		Workspace workspace,
 		IWindow window
 	)
 	{

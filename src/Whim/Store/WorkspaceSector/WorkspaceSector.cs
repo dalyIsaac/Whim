@@ -17,8 +17,8 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 
 	public ImmutableArray<WorkspaceId> WorkspaceOrder { get; set; } = ImmutableArray<WorkspaceId>.Empty;
 
-	public ImmutableDictionary<WorkspaceId, ImmutableWorkspace> Workspaces { get; set; } =
-		ImmutableDictionary<WorkspaceId, ImmutableWorkspace>.Empty;
+	public ImmutableDictionary<WorkspaceId, Workspace> Workspaces { get; set; } =
+		ImmutableDictionary<WorkspaceId, Workspace>.Empty;
 
 	public Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; } =
 		() => new CreateLeafLayoutEngine[] { (id) => new ColumnLayoutEngine(id) };
@@ -53,7 +53,7 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 	{
 		foreach (WorkspaceId id in WorkspacesToLayout)
 		{
-			if (Workspaces.TryGetValue(id, out ImmutableWorkspace workspace))
+			if (Workspaces.TryGetValue(id, out Workspace? workspace))
 			{
 				_internalCtx.DeferWorkspacePosManager.DoLayout(this, workspace);
 			}
@@ -84,9 +84,10 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 		_events.Clear();
 	}
 
-	public void TriggerWorkspaceLayoutStarted(ImmutableWorkspace workspace) =>
+	// TODO: Are these necessary?
+	public void TriggerWorkspaceLayoutStarted(Workspace workspace) =>
 		WorkspaceLayoutStarted?.Invoke(this, new WorkspaceLayoutStartedEventArgs { Workspace = workspace });
 
-	public void TriggerWorkspaceLayoutCompleted(ImmutableWorkspace workspace) =>
+	public void TriggerWorkspaceLayoutCompleted(Workspace workspace) =>
 		WorkspaceLayoutCompleted?.Invoke(this, new WorkspaceLayoutCompletedEventArgs { Workspace = workspace });
 }

@@ -15,17 +15,17 @@ namespace Whim;
 public record ActivateLayoutEngineTransform(Guid WorkspaceId, Pred<ILayoutEngine> LayoutEnginePredicate)
 	: BaseWorkspaceTransform(WorkspaceId)
 {
-	private protected override Result<ImmutableWorkspace> WorkspaceOperation(
+	private protected override Result<Workspace> WorkspaceOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceSector sector,
-		ImmutableWorkspace workspace
+		Workspace workspace
 	)
 	{
 		int layoutEngineIdx = workspace.LayoutEngines.GetMatchingIndex(LayoutEnginePredicate);
 		if (layoutEngineIdx == -1)
 		{
-			return Result.FromException<ImmutableWorkspace>(new WhimException("Provided layout engine not found"));
+			return Result.FromException<Workspace>(new WhimException("Provided layout engine not found"));
 		}
 
 		return WorkspaceUtils.SetActiveLayoutEngine(sector, workspace, layoutEngineIdx);

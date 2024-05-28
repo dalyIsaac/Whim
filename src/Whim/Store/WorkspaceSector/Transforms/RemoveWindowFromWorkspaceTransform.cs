@@ -12,11 +12,11 @@ namespace Whim;
 public record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, HWND WindowHandle)
 	: BaseWorkspaceWindowTransform(WorkspaceId, WindowHandle, false)
 {
-	private protected override Result<ImmutableWorkspace> WindowOperation(
+	private protected override Result<Workspace> WindowOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector rootSector,
-		ImmutableWorkspace workspace,
+		Workspace workspace,
 		IWindow window
 	)
 	{
@@ -34,11 +34,7 @@ public record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, HWND W
 	/// <param name="workspace"></param>
 	/// <param name="window"></param>
 	/// <returns></returns>
-	private static ImmutableWorkspace ResetLastFocusedWindow(
-		IInternalContext internalCtx,
-		ImmutableWorkspace workspace,
-		IWindow window
-	)
+	private static Workspace ResetLastFocusedWindow(IInternalContext internalCtx, Workspace workspace, IWindow window)
 	{
 		if (!window.Handle.Equals(workspace.LastFocusedWindowHandle))
 		{
@@ -69,7 +65,7 @@ public record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, HWND W
 		return workspace;
 	}
 
-	private static ImmutableWorkspace RemoveWindowFromLayoutEngines(ImmutableWorkspace workspace, IWindow window)
+	private static Workspace RemoveWindowFromLayoutEngines(Workspace workspace, IWindow window)
 	{
 		for (int idx = 0; idx < workspace.LayoutEngines.Count; idx++)
 		{

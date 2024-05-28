@@ -22,11 +22,11 @@ public record PerformCustomLayoutEnginePayloadActionTransform<T>(
 	LayoutEngineCustomAction<T> PayloadAction
 ) : BaseWorkspaceTransform(WorkspaceId)
 {
-	private protected override Result<ImmutableWorkspace> WorkspaceOperation(
+	private protected override Result<Workspace> WorkspaceOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector rootSector,
-		ImmutableWorkspace workspace
+		Workspace workspace
 	)
 	{
 		bool hasChanged = false;

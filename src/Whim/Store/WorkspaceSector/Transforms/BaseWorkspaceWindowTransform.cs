@@ -25,11 +25,11 @@ public abstract record BaseWorkspaceWindowTransform(
 	bool SkipDoLayout = false
 ) : BaseWorkspaceTransform(WorkspaceId, SkipDoLayout)
 {
-	private protected override Result<ImmutableWorkspace> WorkspaceOperation(
+	private protected override Result<Workspace> WorkspaceOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector rootSector,
-		ImmutableWorkspace workspace
+		Workspace workspace
 	)
 	{
 		Result<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(
@@ -40,7 +40,7 @@ public abstract record BaseWorkspaceWindowTransform(
 		);
 		if (!result.TryGet(out IWindow validWindow))
 		{
-			return Result.FromException<ImmutableWorkspace>(result.Error!);
+			return Result.FromException<Workspace>(result.Error!);
 		}
 
 		return WindowOperation(ctx, internalCtx, rootSector, workspace, validWindow);
@@ -57,11 +57,11 @@ public abstract record BaseWorkspaceWindowTransform(
 	/// <returns>
 	/// The updated workspace.
 	/// </returns>
-	private protected abstract Result<ImmutableWorkspace> WindowOperation(
+	private protected abstract Result<Workspace> WindowOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector rootSector,
-		ImmutableWorkspace workspace,
+		Workspace workspace,
 		IWindow window
 	);
 }

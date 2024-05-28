@@ -7,7 +7,7 @@ namespace Whim;
 /// Focus the provided <paramref name="Window"/> in the workspace with given <paramref name="WorkspaceId"/>.
 /// If <paramref name="Window"/> is <c>null</c>, focus the last focused window.
 ///
-/// NOTE: This does not update the workspace's <see cref="ImmutableWorkspace.LastFocusedWindow"/>.
+/// NOTE: This does not update the workspace's <see cref="Workspace.LastFocusedWindow"/>.
 /// Instead, it calls <see cref="IWindow.Focus"/>. If there is no last focused window, the monitor's
 /// desktop will be focused.
 /// </summary>
@@ -15,11 +15,11 @@ namespace Whim;
 /// <param name="Window"></param>
 public record FocusWindowTransform(Guid WorkspaceId, IWindow? Window = null) : BaseWorkspaceTransform(WorkspaceId)
 {
-	private protected override Result<ImmutableWorkspace> WorkspaceOperation(
+	private protected override Result<Workspace> WorkspaceOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceSector sector,
-		ImmutableWorkspace workspace
+		Workspace workspace
 	)
 	{
 		IWindow? lastFocusedWindow = Window ?? workspace.LastFocusedWindow;
@@ -35,7 +35,7 @@ public record FocusWindowTransform(Guid WorkspaceId, IWindow? Window = null) : B
 		Result<IMonitor> monitorResult = ctx.Store.Pick(Pickers.PickMonitorByWorkspace(workspace.Id));
 		if (!monitorResult.TryGet(out IMonitor monitor))
 		{
-			return Result.FromException<ImmutableWorkspace>(monitorResult.Error!);
+			return Result.FromException<Workspace>(monitorResult.Error!);
 		}
 
 		ctx.Store.Dispatch(new FocusMonitorDesktopTransform(monitor));

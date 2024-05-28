@@ -8,11 +8,7 @@ internal static class WorkspaceUtils
 	public static WorkspaceId OrActiveWorkspace(this WorkspaceId WorkspaceId, IContext ctx) =>
 		WorkspaceId == default ? ctx.WorkspaceManager.ActiveWorkspace.Id : WorkspaceId;
 
-	public static ImmutableWorkspace SetActiveLayoutEngine(
-		WorkspaceSector sector,
-		ImmutableWorkspace workspace,
-		int layoutEngineIdx
-	)
+	public static Workspace SetActiveLayoutEngine(WorkspaceSector sector, Workspace workspace, int layoutEngineIdx)
 	{
 		int previousLayoutEngineIdx = workspace.ActiveLayoutEngineIndex;
 		workspace = workspace with { ActiveLayoutEngineIndex = layoutEngineIdx };
@@ -40,7 +36,7 @@ internal static class WorkspaceUtils
 	/// <returns></returns>
 	public static Result<IWindow> GetValidWorkspaceWindow(
 		IContext ctx,
-		ImmutableWorkspace workspace,
+		Workspace workspace,
 		HWND windowHandle,
 		bool defaultToLastFocusedWindow
 	)

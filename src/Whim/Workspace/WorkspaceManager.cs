@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using DotNext;
 
 namespace Whim;
 
@@ -73,10 +72,9 @@ internal class WorkspaceManager : IWorkspaceManager
 	}
 
 	public bool Contains(IWorkspace workspace) =>
-		_context.Store.Pick(new GetAllWorkspacesPicker()).Any(w => w.Id == workspace.Id);
+		_context.Store.Pick(Pickers.PickAllWorkspaces()).Any(w => w.Id == workspace.Id);
 
-	public IEnumerator<IWorkspace> GetEnumerator() =>
-		_context.Store.Pick(new GetAllMutableWorkspacesPicker()).GetEnumerator();
+	public IEnumerator<IWorkspace> GetEnumerator() => _context.Store.Pick(Pickers.PickAllWorkspaces()).GetEnumerator();
 
 	public void Initialize()
 	{
@@ -109,15 +107,8 @@ internal class WorkspaceManager : IWorkspaceManager
 	public bool Remove(string workspaceName) =>
 		_context.Store.Dispatch(new RemoveWorkspaceByNameTransform(workspaceName)).IsSuccessful;
 
-	public IWorkspace? TryGet(string workspaceName)
-	{
-		Result<ImmutableWorkspace> result = _context.Store.Pick(new GetWorkspaceByNamePicker(workspaceName));
-		if (result.TryGet(out ImmutableWorkspace workspace))
-		{
-			return _context.Store.Pick(new GetMutableWorkspaceByIdPicker(workspace.Id));
-		}
-		return null;
-	}
+	public IWorkspace? TryGet(string workspaceName) =>
+		_context.Store.Pick(Pickers.GetWorkspaceById(workspaceName)).TryGet(out Workspace workspace) ? workspace : null;
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

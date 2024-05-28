@@ -14,11 +14,11 @@ namespace Whim;
 public record SwapWindowInDirectionTransform(Guid WorkspaceId, HWND WindowHandle, Direction Direction)
 	: BaseWorkspaceWindowTransform(WorkspaceId, WindowHandle, true)
 {
-	private protected override Result<ImmutableWorkspace> WindowOperation(
+	private protected override Result<Workspace> WindowOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector rootSector,
-		ImmutableWorkspace workspace,
+		Workspace workspace,
 		IWindow window
 	)
 	{

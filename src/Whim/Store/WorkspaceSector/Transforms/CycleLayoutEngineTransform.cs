@@ -14,11 +14,11 @@ namespace Whim;
 /// </param>
 public record CycleLayoutEngineTransform(Guid WorkspaceId, bool Reverse = false) : BaseWorkspaceTransform(WorkspaceId)
 {
-	private protected override Result<ImmutableWorkspace> WorkspaceOperation(
+	private protected override Result<Workspace> WorkspaceOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceSector sector,
-		ImmutableWorkspace workspace
+		Workspace workspace
 	)
 	{
 		int delta = Reverse ? -1 : 1;

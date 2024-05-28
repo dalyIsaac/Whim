@@ -18,9 +18,9 @@ namespace Whim;
 public record AddWorkspaceTransform(
 	string? Name = null,
 	IEnumerable<CreateLeafLayoutEngine>? CreateLeafLayoutEngines = null
-) : Transform<ImmutableWorkspace>
+) : Transform<Workspace>
 {
-	internal override Result<ImmutableWorkspace> Execute(
+	internal override Result<Workspace> Execute(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector
@@ -31,7 +31,7 @@ public record AddWorkspaceTransform(
 
 		if (engineCreators.Length == 0)
 		{
-			return Result.FromException<ImmutableWorkspace>(new WhimException("No engine creators were provided"));
+			return Result.FromException<Workspace>(new WhimException("No engine creators were provided"));
 		}
 
 		// Create the layout engines.
@@ -53,7 +53,7 @@ public record AddWorkspaceTransform(
 			}
 		}
 
-		ImmutableWorkspace workspace = new() { Name = Name ?? $"Workspace {sector.Workspaces.Count + 1}" };
+		Workspace workspace = new() { Name = Name ?? $"Workspace {sector.Workspaces.Count + 1}" };
 		sector.Workspaces = sector.Workspaces.Add(workspace.Id, workspace);
 		sector.QueueEvent(new WorkspaceAddedEventArgs() { Workspace = workspace });
 

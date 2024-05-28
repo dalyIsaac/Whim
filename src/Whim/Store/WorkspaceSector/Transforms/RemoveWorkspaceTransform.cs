@@ -12,7 +12,7 @@ public abstract record BaseRemoveWorkspaceTransform() : Transform
 	/// </summary>
 	/// <param name="workspace"></param>
 	/// <returns></returns>
-	public abstract bool ShouldRemove(ImmutableWorkspace workspace);
+	public abstract bool ShouldRemove(Workspace workspace);
 
 	internal override Result<Unit> Execute(
 		IContext ctx,
@@ -27,8 +27,8 @@ public abstract record BaseRemoveWorkspaceTransform() : Transform
 			return Result.FromException<Unit>(new WhimException("There must be a workspace for each monitor"));
 		}
 
-		ImmutableWorkspace? workspaceToRemove = null;
-		foreach (ImmutableWorkspace workspace in sector.Workspaces.Values)
+		Workspace? workspaceToRemove = null;
+		foreach (Workspace workspace in sector.Workspaces.Values)
 		{
 			if (ShouldRemove(workspace))
 			{
@@ -65,7 +65,7 @@ public abstract record BaseRemoveWorkspaceTransform() : Transform
 public record RemoveWorkspaceByIdTransform(WorkspaceId Id) : BaseRemoveWorkspaceTransform()
 {
 	/// <inheritdoc />
-	public override bool ShouldRemove(ImmutableWorkspace workspace) => workspace.Id == Id;
+	public override bool ShouldRemove(Workspace workspace) => workspace.Id == Id;
 }
 
 /// <summary>
@@ -75,15 +75,15 @@ public record RemoveWorkspaceByIdTransform(WorkspaceId Id) : BaseRemoveWorkspace
 public record RemoveWorkspaceByNameTransform(string Name) : BaseRemoveWorkspaceTransform()
 {
 	/// <inheritdoc />
-	public override bool ShouldRemove(ImmutableWorkspace workspace) => workspace.Name == Name;
+	public override bool ShouldRemove(Workspace workspace) => workspace.Name == Name;
 }
 
 /// <summary>
 /// Removes the provided <paramref name="Workspace"/>.
 /// </summary>
 /// <param name="Workspace"></param>
-public record RemoveWorkspaceTransform(ImmutableWorkspace Workspace) : BaseRemoveWorkspaceTransform()
+public record RemoveWorkspaceTransform(Workspace Workspace) : BaseRemoveWorkspaceTransform()
 {
 	/// <inheritdoc />
-	public override bool ShouldRemove(ImmutableWorkspace workspace) => workspace == Workspace;
+	public override bool ShouldRemove(Workspace workspace) => workspace == Workspace;
 }

@@ -15,11 +15,11 @@ namespace Whim;
 internal record MinimizeWindowEndTransform(Guid WorkspaceId, HWND WindowHandle)
 	: BaseWorkspaceWindowTransform(WorkspaceId, WindowHandle, DefaultToLastFocusedWindow: false, SkipDoLayout: true)
 {
-	private protected override Result<ImmutableWorkspace> WindowOperation(
+	private protected override Result<Workspace> WindowOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector rootSector,
-		ImmutableWorkspace workspace,
+		Workspace workspace,
 		IWindow window
 	) =>
 		workspace with

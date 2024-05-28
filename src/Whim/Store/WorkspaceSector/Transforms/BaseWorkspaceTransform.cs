@@ -19,24 +19,24 @@ public abstract record BaseWorkspaceTransform(WorkspaceId WorkspaceId, bool Skip
 	/// <returns>
 	/// The updated workspace.
 	/// </returns>
-	private protected abstract Result<ImmutableWorkspace> WorkspaceOperation(
+	private protected abstract Result<Workspace> WorkspaceOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector rootSector,
-		ImmutableWorkspace workspace
+		Workspace workspace
 	);
 
 	internal override Result<bool> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		WorkspaceSector sector = rootSector.WorkspaceSector;
 
-		if (!sector.Workspaces.TryGetValue(WorkspaceId, out ImmutableWorkspace? workspace))
+		if (!sector.Workspaces.TryGetValue(WorkspaceId, out Workspace? workspace))
 		{
 			return Result.FromException<bool>(StoreExceptions.WorkspaceNotFound(WorkspaceId));
 		}
 
-		Result<ImmutableWorkspace> newWorkspaceResult = WorkspaceOperation(ctx, internalCtx, rootSector, workspace);
-		if (!newWorkspaceResult.TryGet(out ImmutableWorkspace newWorkspace))
+		Result<Workspace> newWorkspaceResult = WorkspaceOperation(ctx, internalCtx, rootSector, workspace);
+		if (!newWorkspaceResult.TryGet(out Workspace newWorkspace))
 		{
 			return Result.FromException<bool>(newWorkspaceResult.Error!);
 		}

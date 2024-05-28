@@ -10,11 +10,11 @@ namespace Whim;
 /// <param name="Window"></param>
 public record AddWindowToWorkspaceTransform(Guid WorkspaceId, IWindow Window) : BaseWorkspaceTransform(WorkspaceId)
 {
-	private protected override Result<ImmutableWorkspace> WorkspaceOperation(
+	private protected override Result<Workspace> WorkspaceOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
 		WorkspaceSector sector,
-		ImmutableWorkspace workspace
+		Workspace workspace
 	)
 	{
 		workspace = workspace with { Windows = workspace.Windows.Add(Window) };
