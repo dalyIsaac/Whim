@@ -100,8 +100,8 @@ internal class Context : IContext
 
 		NotificationManager.Initialize();
 		MonitorManager.Initialize();
-		WindowManager.Initialize();
 		WorkspaceManager.Initialize();
+		WindowManager.Initialize();
 
 		Butler.Initialize();
 
