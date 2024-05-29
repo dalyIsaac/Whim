@@ -5,10 +5,11 @@ namespace Whim.FocusIndicator;
 /// <summary>
 /// An empty window that can be used on its own or navigated to within a Frame.
 /// </summary>
-internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
+internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window, System.IDisposable
 {
 	private readonly IContext _context;
 	public FocusIndicatorConfig FocusIndicatorConfig { get; }
+	private readonly WindowBackdropController _backdropController;
 	private readonly IWindow _window;
 
 	public FocusIndicatorWindow(IContext context, FocusIndicatorConfig focusIndicatorConfig)
@@ -18,7 +19,7 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 		_window = this.InitializeBorderlessWindow(context, "Whim.FocusIndicator", "FocusIndicatorWindow");
 
 		this.SetIsShownInSwitchers(false);
-		this.SetSystemBackdrop();
+		_backdropController = new(this);
 
 		Title = FocusIndicatorConfig.Title;
 	}
@@ -57,5 +58,10 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window
 			windowState.Window.Handle,
 			SET_WINDOW_POS_FLAGS.SWP_NOREDRAW | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
 		);
+	}
+
+	public void Dispose()
+	{
+		_backdropController.Dispose();
 	}
 }

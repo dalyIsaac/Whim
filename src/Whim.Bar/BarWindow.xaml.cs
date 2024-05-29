@@ -5,11 +5,12 @@ namespace Whim.Bar;
 /// <summary>
 /// An empty window that can be used on its own or navigated to within a Frame.
 /// </summary>
-public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
+public sealed partial class BarWindow : Microsoft.UI.Xaml.Window, System.IDisposable
 {
 	private readonly IContext _context;
 	private readonly BarConfig _barConfig;
 	private readonly IMonitor _monitor;
+	private readonly WindowBackdropController _backdropController;
 
 	/// <summary>
 	/// The current window state.
@@ -46,7 +47,7 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 		Title = "Whim Bar";
 		_context.NativeManager.HideCaptionButtons(WindowState.Window.Handle);
 		this.SetIsShownInSwitchers(false);
-		this.SetSystemBackdrop();
+		_backdropController = new(this);
 
 		// Set up the bar.
 		LeftPanel.Children.AddRange(_barConfig.LeftComponents.Select(c => c(_context, _monitor, this)));
@@ -71,5 +72,11 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window
 			Width = _monitor.WorkingArea.Width,
 			Height = (int)(_barConfig.Height * scale)
 		};
+	}
+
+	/// <inheritdoc />
+	public void Dispose()
+	{
+		_backdropController.Dispose();
 	}
 }
