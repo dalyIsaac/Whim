@@ -93,8 +93,8 @@ public class CommandPalettePlugin : ICommandPalettePlugin
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_commandPaletteWindow?.Close();
 				_commandPaletteWindow?.Dispose();
+				_commandPaletteWindow?.Close();
 				_commandPaletteWindow = null;
 			}
 

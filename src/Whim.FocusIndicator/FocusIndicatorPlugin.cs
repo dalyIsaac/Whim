@@ -186,6 +186,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 				_context.WindowManager.WindowFocused -= WindowManager_WindowFocused;
 				_context.WorkspaceManager.WorkspaceLayoutStarted -= WorkspaceManager_WorkspaceLayoutStarted;
 				_context.WorkspaceManager.WorkspaceLayoutCompleted -= WorkspaceManager_WorkspaceLayoutCompleted;
+				_focusIndicatorWindow?.Dispose();
 				_focusIndicatorWindow?.Close();
 			}
 

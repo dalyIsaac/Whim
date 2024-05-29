@@ -210,20 +210,12 @@ public class WindowBackdropController : IDisposable
 	/// </summary>
 	private void DisposeWindowItems()
 	{
-		if (_micaController != null)
-		{
-			_micaController.Dispose();
-			_micaController = null;
-		}
-
-		if (_acrylicController != null)
-		{
-			_acrylicController.Dispose();
-			_acrylicController = null;
-		}
+		_micaController?.Dispose();
+		_acrylicController?.Dispose();
 
 		_window.Activated -= Window_Activated;
 		_window.Closed -= Window_Closed;
+		((FrameworkElement)_window.Content).ActualThemeChanged -= Window_ThemeChanged;
 	}
 
 	/// <inheritdoc/>

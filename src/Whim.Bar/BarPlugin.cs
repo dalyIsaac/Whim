@@ -102,6 +102,7 @@ public class BarPlugin : IBarPlugin
 			{
 				foreach (BarWindow barWindow in _monitorBarMap.Values)
 				{
+					barWindow.Dispose();
 					barWindow.Close();
 				}
 
