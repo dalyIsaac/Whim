@@ -223,7 +223,7 @@ public class WindowBackdropController : IDisposable
 		}
 
 		_window.Activated -= Window_Activated;
-		_window.Closed -= Window_Closed; 
+		_window.Closed -= Window_Closed;
 	}
 
 	/// <inheritdoc/>
