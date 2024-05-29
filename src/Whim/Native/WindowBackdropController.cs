@@ -16,12 +16,12 @@ public enum BackdropType
 	None,
 
 	/// <summary>
-	/// Acrylic backdrop.
+	/// Acrylic backdrop - see <see href="https://learn.microsoft.com/en-us/windows/apps/design/style/acrylic"/>.
 	/// </summary>
 	Acrylic,
 
 	/// <summary>
-	/// Acrylic backdrop with thin edges.
+	/// A more transparent Acrylic backdrop - based on the <see cref="Acrylic"/> backdrop.
 	/// </summary>
 	AcrylicThin,
 
