@@ -91,7 +91,7 @@ public partial class App : Application
 
 		if (e.Reason == ExitReason.User)
 		{
-			Exit();
+			Current.Exit();
 		}
 		else if (e.Reason == ExitReason.Restart || e.Reason == ExitReason.Update)
 		{
