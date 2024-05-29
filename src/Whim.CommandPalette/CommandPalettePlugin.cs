@@ -94,6 +94,8 @@ public class CommandPalettePlugin : ICommandPalettePlugin
 			{
 				// dispose managed state (managed objects)
 				_commandPaletteWindow?.Close();
+				_commandPaletteWindow?.Dispose();
+				_commandPaletteWindow = null;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

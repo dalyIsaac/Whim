@@ -28,7 +28,7 @@ public sealed partial class ExceptionWindow : Microsoft.UI.Xaml.Window
 
 		Message = exitEventArgs.Message ?? "Unknown error occurred";
 
-		_backdropController = new(this);
+		_backdropController = new(this, new WindowBackdropConfig(BackdropType.Mica, AlwaysShowBackdrop: false));
 	}
 
 	private void Quit_Click(object sender, RoutedEventArgs e)

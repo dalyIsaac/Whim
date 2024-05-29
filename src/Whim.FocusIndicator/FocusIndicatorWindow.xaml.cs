@@ -19,7 +19,7 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window, S
 		_window = this.InitializeBorderlessWindow(context, "Whim.FocusIndicator", "FocusIndicatorWindow");
 
 		this.SetIsShownInSwitchers(false);
-		_backdropController = new(this);
+		_backdropController = new(this, focusIndicatorConfig.Backdrop);
 
 		Title = FocusIndicatorConfig.Title;
 	}

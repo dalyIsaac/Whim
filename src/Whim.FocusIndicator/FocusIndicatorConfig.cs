@@ -22,6 +22,12 @@ public class FocusIndicatorConfig : INotifyPropertyChanged
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 
+	/// <summary>
+	/// The backdrop/material to use for the bar. This does not update during runtime and must be set before Whim is initialized.
+	/// This can be used to customize the transparency of the focus indicator.
+	/// </summary>
+	public WindowBackdropConfig Backdrop { get; set; } = new(BackdropType.Mica, AlwaysShowBackdrop: true);
+
 	private Color _color = Colors.Transparent;
 
 	/// <summary>

@@ -64,6 +64,12 @@ public class BarConfig : INotifyPropertyChanged
 	}
 
 	/// <summary>
+	/// The backdrop/material to use for the bar. This does not update during runtime and must be set before Whim is initialized.
+	/// This can be used to customize the transparency of the bar.
+	/// </summary>
+	public WindowBackdropConfig Backdrop { get; set; } = new(BackdropType.Mica, AlwaysShowBackdrop: true);
+
+	/// <summary>
 	/// Creates a new bar configuration.
 	/// </summary>
 	/// <param name="leftComponents">The components to display on the left side of the bar.</param>

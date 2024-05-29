@@ -26,15 +26,34 @@ public enum BackdropType
 	AcrylicThin,
 
 	/// <summary>
-	/// Mica backdrop.
+	/// Mica backdrop - see <see href="https://learn.microsoft.com/en-us/windows/apps/design/style/mica"/>.
+	/// Unsupported on Windows 10 - Whim will fall back to <see cref="Acrylic"/>.
 	/// </summary>
 	Mica,
 
 	/// <summary>
-	/// Mica backdrop with thin edges.
+	/// A Mica variant which looks different to <see cref="Mica"/> - see <see href="https://learn.microsoft.com/en-us/windows/apps/design/style/mica"/>
+	/// Unsupported on Windows 10 - Whim will fall back to <see cref="Acrylic"/>.
 	/// </summary>
 	MicaAlt
 }
+
+/// <summary>
+/// WinUI supports different backdrops/materials, depending on the OS version. To see the different
+/// materials available, see
+/// <see href="https://learn.microsoft.com/en-us/windows/apps/design/signature-experiences/materials"/>.
+/// The different materials support differing levels and style of transparency.
+///
+/// This config lets you specify which backdrop to use for a given Whim window.
+/// </summary>
+/// <param name="Backdrop">
+/// The backdrop type to use.
+/// </param>
+/// <param name="AlwaysShowBackdrop">
+/// By default, WinUI will disable the backdrop when the window loses focus. Whim overrides this setting.
+/// Set this to <see langword="false"/> to disable the backdrop when the window loses focus.
+/// </param>
+public record WindowBackdropConfig(BackdropType Backdrop, bool AlwaysShowBackdrop = true);
 
 /// <summary>
 /// Manages the system backdrop for a <see cref="Microsoft.UI.Xaml.Window"/>.
@@ -42,7 +61,7 @@ public enum BackdropType
 public class WindowBackdropController : IDisposable
 {
 	private readonly Microsoft.UI.Xaml.Window _window;
-	private readonly bool _respectFocus;
+	private readonly WindowBackdropConfig _config;
 	private bool _disposedValue;
 	private SystemBackdropConfiguration? _backdropConfiguration;
 	private DesktopAcrylicController? _acrylicController;
@@ -54,19 +73,19 @@ public class WindowBackdropController : IDisposable
 	/// <param name="window">
 	/// The <see cref="Microsoft.UI.Xaml.Window"/> to manage the backdrop for.
 	/// </param>
-	/// <param name="respectFocus">
-	/// Whether the backdrop should be hidden when the window loses focus.
+	/// <param name="config">
+	/// The configuration for the backdrop.
 	/// </param>
-	public WindowBackdropController(Microsoft.UI.Xaml.Window window, bool respectFocus = false)
+	public WindowBackdropController(Microsoft.UI.Xaml.Window window, WindowBackdropConfig config)
 	{
 		_window = window;
-		_respectFocus = respectFocus;
+		_config = config;
 
 		// Default to Mica for now.
-		TrySetBackdrop(BackdropType.AcrylicThin);
+		TrySetBackdrop();
 	}
 
-	private void TrySetBackdrop(BackdropType backdrop)
+	private void TrySetBackdrop()
 	{
 		if (_disposedValue)
 		{
@@ -74,11 +93,13 @@ public class WindowBackdropController : IDisposable
 			return;
 		}
 
-		if (backdrop == BackdropType.None)
+		if (_config.Backdrop == BackdropType.None)
 		{
 			Logger.Debug("No backdrop set");
 			return;
 		}
+
+		BackdropType backdrop = _config.Backdrop;
 
 		bool isAcrylic = backdrop == BackdropType.Acrylic || backdrop == BackdropType.AcrylicThin;
 		bool isMica = backdrop == BackdropType.Mica || backdrop == BackdropType.MicaAlt;
@@ -119,7 +140,7 @@ public class WindowBackdropController : IDisposable
 
 	private void Window_Activated(object sender, WindowActivatedEventArgs e)
 	{
-		if (_respectFocus && _backdropConfiguration != null)
+		if (!_config.AlwaysShowBackdrop && _backdropConfiguration != null)
 		{
 			_backdropConfiguration.IsInputActive = e.WindowActivationState != WindowActivationState.Deactivated;
 		}
@@ -202,8 +223,7 @@ public class WindowBackdropController : IDisposable
 		}
 
 		_window.Activated -= Window_Activated;
-		_window.Closed -= Window_Closed;
-		((FrameworkElement)_window.Content).ActualThemeChanged -= Window_ThemeChanged;
+		_window.Closed -= Window_Closed; 
 	}
 
 	/// <inheritdoc/>
