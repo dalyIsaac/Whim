@@ -26,6 +26,15 @@ public class CommandPaletteConfig
 	public int YPositionPercent { get; set; } = 20;
 
 	/// <summary>
+	/// The backdrop/material to use for the command palette. Changes to this property during runtime will
+	/// not be reflected in the UI - any changes must be done in the csx config <i>prior</i> to initializing Whim.
+	/// Switching between different backdrops can influence the transparency - for more see <see cref="BackdropType"/>.
+	///
+	/// Defaults to <see cref="BackdropType.Mica"/>, and to always show the backdrop.
+	/// </summary>
+	public WindowBackdropConfig Backdrop { get; set; } = new(BackdropType.Mica, AlwaysShowBackdrop: true);
+
+	/// <summary>
 	/// The configuration for command palette activation. <br/>
 	///
 	/// Defaults to a <see cref="MenuVariantConfig"/> where <see cref="MenuVariantConfig.Commands"/>

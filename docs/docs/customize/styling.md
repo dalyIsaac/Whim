@@ -43,7 +43,8 @@ For example, the following resource file defines a custom `background` color of 
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Style x:Key="bar:root_panel" TargetType="RelativePanel">
-        <Setter Property="Background" Value="#2e3440" />
+        <!-- The color is a hex color, with the final two bytes being alpha (transparency). -->
+        <Setter Property="Background" Value="#2e344080" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="Padding" Value="2" />
     </Style>
