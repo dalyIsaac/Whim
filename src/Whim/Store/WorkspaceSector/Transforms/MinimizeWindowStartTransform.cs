@@ -25,7 +25,7 @@ internal record MinimizeWindowStartTransform(Guid WorkspaceId, HWND WindowHandle
 	{
 		// If the window is already in the workspace, minimize it in just the active layout engine.
 		// If it isn't, then we assume it was provided during startup and minimize it in all layouts.
-		if (workspace.WindowHandles.Contains(window.Handle))
+		if (workspace.WindowPositions.ContainsKey(window.Handle))
 		{
 			// _layoutEngines[_activeLayoutEngineIndex] = _layoutEngines[_activeLayoutEngineIndex]
 			// 	.MinimizeWindowStart(window);
@@ -39,7 +39,10 @@ internal record MinimizeWindowStartTransform(Guid WorkspaceId, HWND WindowHandle
 			};
 		}
 
-		workspace = workspace with { WindowHandles = workspace.WindowHandles.Add(window.Handle) };
+		workspace = workspace with
+		{
+			WindowPositions = workspace.WindowPositions.Add(window.Handle, new WindowPosition())
+		};
 
 		for (int idx = 0; idx < workspace.LayoutEngines.Count; idx++)
 		{

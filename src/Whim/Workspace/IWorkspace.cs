@@ -49,9 +49,9 @@ public interface IWorkspace : IDisposable
 	ImmutableList<ILayoutEngine> LayoutEngines { get; }
 
 	/// <summary>
-	/// Map of windows to their <see cref="IWindowState"/>s.
+	/// Map of windows to their <see cref="WindowPosition"/>s.
 	/// </summary>
-	ImmutableDictionary<HWND, IWindowState> WindowStates { get; }
+	ImmutableDictionary<HWND, WindowPosition> WindowPositions { get; }
 
 	/// <summary>
 	/// The name of the workspace. When the <c>Name</c> is set, the

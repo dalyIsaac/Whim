@@ -155,7 +155,7 @@ public partial record Workspace : IInternalWorkspace
 	}
 
 	/// <inheritdoc/>
-	public bool ContainsWindow(IWindow window) => LatestWorkspace.WindowHandles.Contains(window.Handle);
+	public bool ContainsWindow(IWindow window) => LatestWorkspace.WindowPositions.ContainsKey(window.Handle);
 
 	/// <inheritdoc/>
 	public bool PerformCustomLayoutEngineAction(LayoutEngineCustomAction action) =>

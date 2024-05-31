@@ -56,7 +56,7 @@ internal static class WorkspaceUtils
 			return Result.FromException<IWindow>(new WhimException("No windows in workspace"));
 		}
 
-		if (!workspace.WindowHandles.Contains(windowHandle))
+		if (!workspace.WindowPositions.ContainsKey(windowHandle))
 		{
 			return Result.FromException<IWindow>(new WhimException("Window not in workspace"));
 		}

@@ -15,7 +15,7 @@ internal record MoveWindowToPointInWorkspaceTransform(WorkspaceId WorkspaceId, H
 		IWindow window
 	)
 	{
-		if (workspace.WindowHandles.Contains(window.Handle))
+		if (workspace.WindowPositions.ContainsKey(window.Handle))
 		{
 			// The window is already in the workspace, so move it in just the active layout engine.
 			return workspace with
@@ -36,7 +36,7 @@ internal record MoveWindowToPointInWorkspaceTransform(WorkspaceId WorkspaceId, H
 
 		return workspace with
 		{
-			WindowHandles = workspace.WindowHandles.Add(window.Handle),
+			WindowPositions = workspace.WindowPositions.Add(window.Handle),
 			LayoutEngines = newLayoutEngines.ToImmutable()
 		};
 	}

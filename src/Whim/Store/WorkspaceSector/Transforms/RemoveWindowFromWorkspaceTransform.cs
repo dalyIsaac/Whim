@@ -20,7 +20,7 @@ public record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, HWND W
 		IWindow window
 	)
 	{
-		workspace = workspace with { WindowHandles = workspace.WindowHandles.Remove(window.Handle) };
+		workspace = workspace with { WindowPositions = workspace.WindowPositions.Remove(window.Handle) };
 
 		workspace = ResetLastFocusedWindow(internalCtx, workspace, window);
 		workspace = RemoveWindowFromLayoutEngines(workspace, window);
@@ -42,18 +42,20 @@ public record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, HWND W
 		}
 
 		// Find the next window to focus.
-		foreach (HWND nextWindowHandle in workspace.WindowHandles)
+		foreach ((HWND handle, WindowPosition pos) in workspace.WindowPositions)
 		{
-			if (nextWindowHandle.Equals(window))
+			if (handle.Equals(window.Handle))
 			{
 				continue;
 			}
 
-			if (!nextWindowHandle.IsMinimized(internalCtx))
+			if (pos.WindowSize == WindowSize.Minimized)
 			{
-				workspace = workspace with { LastFocusedWindowHandle = nextWindowHandle };
-				break;
+				continue;
 			}
+
+			workspace = workspace with { LastFocusedWindowHandle = handle };
+			break;
 		}
 
 		// If there are no other windows, set the last focused window to null.

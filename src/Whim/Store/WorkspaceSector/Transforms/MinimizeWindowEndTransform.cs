@@ -12,7 +12,7 @@ namespace Whim;
 /// </summary>
 /// <param name="WorkspaceId"></param>
 /// <param name="WindowHandle"></param>
-internal record MinimizeWindowEndTransform(Guid WorkspaceId, HWND WindowHandle)
+internal record MinimizeWindowEndTransform(WorkspaceId WorkspaceId, HWND WindowHandle)
 	: BaseWorkspaceWindowTransform(WorkspaceId, WindowHandle, DefaultToLastFocusedWindow: false, SkipDoLayout: true)
 {
 	private protected override Result<Workspace> WindowOperation(
@@ -24,7 +24,7 @@ internal record MinimizeWindowEndTransform(Guid WorkspaceId, HWND WindowHandle)
 	) =>
 		workspace with
 		{
-			WindowHandles = workspace.WindowHandles.Add(window.Handle),
+			WindowPositions = workspace.WindowPositions.Add(window.Handle, new WindowPosition()),
 
 			// Restore in just the active layout engine. MinimizeWindowEnd is not called as part of
 			// Whim starting up.

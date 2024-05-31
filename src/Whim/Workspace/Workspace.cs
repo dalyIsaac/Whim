@@ -27,8 +27,8 @@ public sealed partial record Workspace : IWorkspace
 	public ImmutableList<ILayoutEngine> LayoutEngines { get; internal init; } = ImmutableList<ILayoutEngine>.Empty;
 
 	/// <inheritdoc />
-	public ImmutableDictionary<HWND, IWindowState> WindowStates { get; internal init; } =
-		ImmutableDictionary<HWND, IWindowState>.Empty;
+	public ImmutableDictionary<HWND, WindowPosition> WindowPositions { get; internal init; } =
+		ImmutableDictionary<HWND, WindowPosition>.Empty;
 
 	/// <summary>
 	/// Internal-only implementation of a copy constructor.
@@ -44,6 +44,6 @@ public sealed partial record Workspace : IWorkspace
 		PreviousLayoutEngineIndex = workspace.PreviousLayoutEngineIndex;
 		LastFocusedWindowHandle = workspace.LastFocusedWindowHandle;
 		LayoutEngines = workspace.LayoutEngines;
-		WindowStates = workspace.WindowStates;
+		WindowPositions = workspace.WindowPositions;
 	}
 }

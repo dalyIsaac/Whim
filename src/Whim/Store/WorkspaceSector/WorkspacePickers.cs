@@ -93,7 +93,7 @@ public static partial class Pickers
 
 	internal static IEnumerable<IWindow> GetWorkspaceWindows(IRootSector rootSector, IWorkspace workspace)
 	{
-		foreach (HWND hwnd in workspace.WindowStates.Keys)
+		foreach (HWND hwnd in workspace.WindowPositions.Keys)
 		{
 			if (PickWindowByHandle(hwnd)(rootSector).TryGet(out IWindow window))
 			{
