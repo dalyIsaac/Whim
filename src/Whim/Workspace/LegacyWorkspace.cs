@@ -13,7 +13,7 @@ public partial record Workspace : IInternalWorkspace
 	/// The latest instance of <see cref="IWorkspace"/> for the given <see cref="WorkspaceId"/>.
 	/// This is used for compatibility with the old <see cref="Workspace"/> implementation.
 	/// </summary>
-	private Workspace LatestWorkspace => _context.Store.Pick(Pickers.PickWorkspaceById(Id))!.Value!;
+	private Workspace LatestWorkspace => (Workspace)_context.Store.Pick(Pickers.PickWorkspaceById(Id)).Value;
 
 	/// <inheritdoc/>
 	public string Name
@@ -121,17 +121,7 @@ public partial record Workspace : IInternalWorkspace
 	public override string ToString() => Name;
 
 	/// <inheritdoc/>
-	public void Deactivate()
-	{
-		Logger.Debug($"Deactivating workspace {Name}");
-
-		foreach (IWindow window in Windows)
-		{
-			window.Hide();
-		}
-
-		_windowStates.Clear();
-	}
+	public void Deactivate() => _context.Store.Dispatch(new DeactivateWorkspaceTransform(Id));
 
 	/// <inheritdoc/>
 	public IWindowState? TryGetWindowState(IWindow window)
@@ -178,7 +168,7 @@ public partial record Workspace : IInternalWorkspace
 				Logger.Debug($"Disposing workspace {Name}");
 
 				// dispose managed state (managed objects)
-				bool isWorkspaceActive = _context.Store.Pick(Pickers.GetMonitorForWorkspace(this)).IsSuccessful;
+				bool isWorkspaceActive = _context.Store.Pick(Pickers.PickMonitorByWorkspace(Id)).IsSuccessful;
 
 				// If the workspace isn't active on the monitor, show all the windows in as minimized.
 				if (!isWorkspaceActive)

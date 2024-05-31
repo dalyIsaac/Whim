@@ -1,4 +1,3 @@
-using System;
 using DotNext;
 
 namespace Whim;
@@ -8,7 +7,8 @@ namespace Whim;
 /// </summary>
 /// <param name="WorkspaceId"></param>
 /// <param name="Window"></param>
-public record AddWindowToWorkspaceTransform(Guid WorkspaceId, IWindow Window) : BaseWorkspaceTransform(WorkspaceId)
+public record AddWindowToWorkspaceTransform(WorkspaceId WorkspaceId, IWindow Window)
+	: BaseWorkspaceTransform(WorkspaceId)
 {
 	private protected override Result<Workspace> WorkspaceOperation(
 		IContext ctx,
