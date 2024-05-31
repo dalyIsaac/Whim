@@ -28,6 +28,6 @@ public record ActivateLayoutEngineTransform(Guid WorkspaceId, Pred<ILayoutEngine
 			return Result.FromException<Workspace>(new WhimException("Provided layout engine not found"));
 		}
 
-		return WorkspaceUtils.SetActiveLayoutEngine(sector, workspace, layoutEngineIdx);
+		return WorkspaceUtils.SetActiveLayoutEngine(rootSector.WorkspaceSector, workspace, layoutEngineIdx);
 	}
 }

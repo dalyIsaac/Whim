@@ -53,7 +53,8 @@ public record AddWorkspaceTransform(
 			}
 		}
 
-		Workspace workspace = new() { Name = Name ?? $"Workspace {sector.Workspaces.Count + 1}" };
+		Workspace workspace =
+			new(ctx, internalCtx, WorkspaceId.NewGuid()) { Name = Name ?? $"Workspace {sector.Workspaces.Count + 1}" };
 		sector.Workspaces = sector.Workspaces.Add(workspace.Id, workspace);
 		sector.QueueEvent(new WorkspaceAddedEventArgs() { Workspace = workspace });
 

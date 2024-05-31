@@ -38,7 +38,7 @@ public record FocusWindowTransform(WorkspaceId WorkspaceId, IWindow? Window = nu
 			return Result.FromException<Workspace>(monitorResult.Error!);
 		}
 
-		ctx.Store.Dispatch(new FocusMonitorDesktopTransform(monitor));
+		ctx.Store.Dispatch(new FocusMonitorDesktopTransform(monitor.Handle));
 		return workspace;
 	}
 }
