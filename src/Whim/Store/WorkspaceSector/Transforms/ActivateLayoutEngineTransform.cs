@@ -18,7 +18,7 @@ public record ActivateLayoutEngineTransform(Guid WorkspaceId, Pred<ILayoutEngine
 	private protected override Result<Workspace> WorkspaceOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
-		WorkspaceSector sector,
+		MutableRootSector rootSector,
 		Workspace workspace
 	)
 	{

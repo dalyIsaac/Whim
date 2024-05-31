@@ -1,4 +1,3 @@
-using System;
 using DotNext;
 
 namespace Whim;
@@ -13,12 +12,13 @@ namespace Whim;
 /// </summary>
 /// <param name="WorkspaceId"></param>
 /// <param name="Window"></param>
-public record FocusWindowTransform(Guid WorkspaceId, IWindow? Window = null) : BaseWorkspaceTransform(WorkspaceId)
+public record FocusWindowTransform(WorkspaceId WorkspaceId, IWindow? Window = null)
+	: BaseWorkspaceTransform(WorkspaceId)
 {
 	private protected override Result<Workspace> WorkspaceOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
-		WorkspaceSector sector,
+		MutableRootSector rootSector,
 		Workspace workspace
 	)
 	{

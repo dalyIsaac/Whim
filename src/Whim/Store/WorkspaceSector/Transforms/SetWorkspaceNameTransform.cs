@@ -12,17 +12,19 @@ namespace Whim;
 /// <param name="Name">
 /// The new name of the workspace.
 /// </param>
-public record SetWorkspaceNameTransform(Guid Id, string Name) : BaseWorkspaceTransform(Id)
+public record SetWorkspaceNameTransform(WorkspaceId Id, string Name) : BaseWorkspaceTransform(Id)
 {
 	private protected override Result<Workspace> WorkspaceOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
-		WorkspaceSector sector,
+		MutableRootSector rootSector,
 		Workspace workspace
 	)
 	{
 		Workspace newWorkspace = workspace with { Name = Name };
-		sector.QueueEvent(new WorkspaceRenamedEventArgs() { PreviousName = workspace.Name, Workspace = newWorkspace });
+		rootSector.WorkspaceSector.QueueEvent(
+			new WorkspaceRenamedEventArgs() { PreviousName = workspace.Name, Workspace = newWorkspace }
+		);
 		return newWorkspace;
 	}
 }

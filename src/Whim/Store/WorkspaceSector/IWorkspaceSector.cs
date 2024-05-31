@@ -18,6 +18,9 @@ public interface IWorkspaceSector
 	/// </summary>
 	ImmutableDictionary<WorkspaceId, Workspace> Workspaces { get; }
 
+	/// <summary>
+	/// Creates the default layout engines to add to a workspace.
+	/// </summary>
 	Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; }
 
 	ImmutableList<CreateProxyLayoutEngine> ProxyLayoutEngines { get; }

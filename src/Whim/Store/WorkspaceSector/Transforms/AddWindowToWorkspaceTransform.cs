@@ -13,7 +13,7 @@ public record AddWindowToWorkspaceTransform(Guid WorkspaceId, IWindow Window) : 
 	private protected override Result<Workspace> WorkspaceOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
-		WorkspaceSector sector,
+		MutableRootSector rootSector,
 		Workspace workspace
 	)
 	{
