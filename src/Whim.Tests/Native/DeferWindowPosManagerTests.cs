@@ -12,7 +12,7 @@ public class DeferWindowPosManagerCustomization : ICustomization
 	{
 		fixture.Register(
 			() =>
-				new SetWindowPosState(
+				new DeferWindowPosState(
 					new WindowState()
 					{
 						Rectangle = new Rectangle<int>(),
@@ -52,17 +52,17 @@ public class DeferWindowPosManagerTests
 	internal void RecoverLayout_DeferWorkspaceLayout(
 		IContext ctx,
 		IInternalContext internalCtx,
-		SetWindowPosState setWindowPosState,
-		SetWindowPosState minimizedSetWindowPosState,
+		DeferWindowPosState deferWindowPosState,
+		DeferWindowPosState minimizedDeferWindowPosState,
 		IWorkspace workspace
 	)
 	{
 		// Given a window is provided, and a workspace is found for it
-		minimizedSetWindowPosState.WindowState.WindowSize = WindowSize.Minimized;
+		minimizedDeferWindowPosState.WindowState.WindowSize = WindowSize.Minimized;
 		DeferWindowPosManager manager = CreateSut(ctx, internalCtx);
-		manager.DeferLayout(new() { setWindowPosState }, new() { minimizedSetWindowPosState });
+		manager.DeferLayout(new() { deferWindowPosState }, new() { minimizedDeferWindowPosState });
 
-		ctx.Butler.Pantry.GetWorkspaceForWindow(setWindowPosState.WindowState.Window).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(deferWindowPosState.WindowState.Window).Returns(workspace);
 
 		// When RecoverLayout is called
 		manager.RecoverLayout();
@@ -76,19 +76,22 @@ public class DeferWindowPosManagerTests
 	internal void RecoverLayout_DeferWorkspaceLayout_WorkspaceAlreadyDeferred(
 		IContext ctx,
 		IInternalContext internalCtx,
-		SetWindowPosState setWindowPosState1,
-		SetWindowPosState setWindowPosState2,
-		SetWindowPosState minimizedSetWindowPosState,
+		DeferWindowPosState deferWindowPosState1,
+		DeferWindowPosState deferWindowPosState2,
+		DeferWindowPosState minimizedDeferWindowPosState,
 		IWorkspace workspace
 	)
 	{
 		// Given two windows are provided for the same workspace
 		DeferWindowPosManager manager = CreateSut(ctx, internalCtx);
-		manager.DeferLayout(new() { setWindowPosState1, setWindowPosState2 }, new() { minimizedSetWindowPosState });
+		manager.DeferLayout(
+			new() { deferWindowPosState1, deferWindowPosState2 },
+			new() { minimizedDeferWindowPosState }
+		);
 
-		ctx.Butler.Pantry.GetWorkspaceForWindow(setWindowPosState1.WindowState.Window).Returns(workspace);
-		ctx.Butler.Pantry.GetWorkspaceForWindow(setWindowPosState2.WindowState.Window).Returns(workspace);
-		ctx.Butler.Pantry.GetWorkspaceForWindow(minimizedSetWindowPosState.WindowState.Window).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(deferWindowPosState1.WindowState.Window).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(deferWindowPosState2.WindowState.Window).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(minimizedDeferWindowPosState.WindowState.Window).Returns(workspace);
 
 		// When RecoverLayout is called
 		manager.RecoverLayout();
@@ -102,16 +105,16 @@ public class DeferWindowPosManagerTests
 	internal void RecoverLayout_DeferWindowLayout(
 		IContext ctx,
 		IInternalContext internalCtx,
-		SetWindowPosState setWindowPosState
+		DeferWindowPosState deferWindowPosState
 	)
 	{
 		// Given a window is provided, no workspace is found for the window, and the window is
 		// ignored by the FilterManager
 		DeferWindowPosManager manager = CreateSut(ctx, internalCtx);
-		manager.DeferLayout(new() { setWindowPosState }, new());
+		manager.DeferLayout(new() { deferWindowPosState }, new());
 
-		ctx.Butler.Pantry.GetWorkspaceForWindow(setWindowPosState.WindowState.Window).Returns((IWorkspace?)null);
-		ctx.FilterManager.ShouldBeIgnored(setWindowPosState.WindowState.Window).Returns(true);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(deferWindowPosState.WindowState.Window).Returns((IWorkspace?)null);
+		ctx.FilterManager.ShouldBeIgnored(deferWindowPosState.WindowState.Window).Returns(true);
 
 		// When RecoverLayout is called
 		manager.RecoverLayout();
@@ -124,16 +127,16 @@ public class DeferWindowPosManagerTests
 	internal void RecoverLayout_DoNotLayoutWindow(
 		IContext ctx,
 		IInternalContext internalCtx,
-		SetWindowPosState setWindowPosState
+		DeferWindowPosState deferWindowPosState
 	)
 	{
 		// Given a window is provided, no workspace is found for the window, and the window is
 		// not ignored by the FilterManager
 		DeferWindowPosManager manager = CreateSut(ctx, internalCtx);
-		manager.DeferLayout(new() { setWindowPosState }, new());
+		manager.DeferLayout(new() { deferWindowPosState }, new());
 
-		ctx.Butler.Pantry.GetWorkspaceForWindow(setWindowPosState.WindowState.Window).Returns((IWorkspace?)null);
-		ctx.FilterManager.ShouldBeIgnored(setWindowPosState.WindowState.Window).Returns(false);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(deferWindowPosState.WindowState.Window).Returns((IWorkspace?)null);
+		ctx.FilterManager.ShouldBeIgnored(deferWindowPosState.WindowState.Window).Returns(false);
 
 		// When RecoverLayout is called
 		manager.RecoverLayout();

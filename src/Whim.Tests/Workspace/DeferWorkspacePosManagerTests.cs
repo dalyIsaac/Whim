@@ -125,7 +125,7 @@ public class DeferWorkspacePosManagerTests
 		// Then
 		triggers.WorkspaceLayoutStarted.Received(1).Invoke(Arg.Any<WorkspaceEventArgs>());
 		triggers.WorkspaceLayoutCompleted.Received(1).Invoke(Arg.Any<WorkspaceEventArgs>());
-		ctx.NativeManager.Received(1).DeferWindowPos(Arg.Is<IEnumerable<SetWindowPosState>>(x => x.Count() == 2));
+		ctx.NativeManager.Received(1).DeferWindowPos(Arg.Is<IEnumerable<DeferWindowPosState>>(x => x.Count() == 2));
 
 		Assert.DoesNotContain((HWND)3, windowStatesDict.Keys);
 		Assert.Equal(2, windowStatesDict.Count);

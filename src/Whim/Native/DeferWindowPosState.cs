@@ -6,7 +6,7 @@ namespace Whim;
 /// <summary>
 /// The positioning state of a window.
 /// </summary>
-public record SetWindowPosState : WindowPosition
+public record DeferWindowPosState : WindowPosition
 {
 	/// <summary>
 	/// The handle of the window to set the position for.
@@ -43,7 +43,7 @@ public record SetWindowPosState : WindowPosition
 	/// The flags to use when setting the window position. This overrides the default flags Whim sets,
 	/// except when the window is maximized or minimized.
 	/// </param>
-	public SetWindowPosState(
+	public DeferWindowPosState(
 		HWND handle,
 		WindowSize windowSize,
 		IRectangle<int> rect,

@@ -19,8 +19,8 @@ public sealed class DeferWindowPosHandle : IDisposable
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
 
-	private readonly List<SetWindowPosState> _windowStates = new();
-	private readonly List<SetWindowPosState> _minimizedWindowStates = new();
+	private readonly List<DeferWindowPosState> _windowStates = new();
+	private readonly List<DeferWindowPosState> _minimizedWindowStates = new();
 
 	private bool _forceTwoPasses;
 
@@ -63,12 +63,12 @@ public sealed class DeferWindowPosHandle : IDisposable
 	internal DeferWindowPosHandle(
 		IContext context,
 		IInternalContext internalContext,
-		IEnumerable<SetWindowPosState> windowStates
+		IEnumerable<DeferWindowPosState> windowStates
 	)
 		: this(context, internalContext)
 	{
 		// Add each window state to the appropriate list.
-		foreach (SetWindowPosState windowState in windowStates)
+		foreach (DeferWindowPosState windowState in windowStates)
 		{
 			DeferWindowPos(windowState);
 		}
@@ -85,7 +85,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 	/// with non-100% scaling. Regardless of this, some windows need this even for windows with
 	/// 100% scaling.
 	/// </param>
-	public void DeferWindowPos(SetWindowPosState posState, bool forceTwoPasses = false)
+	public void DeferWindowPos(DeferWindowPosState posState, bool forceTwoPasses = false)
 	{
 		Logger.Debug($"Adding window {posState.Handle} after {posState.HandleInsertAfter} with flags {posState.Flags}");
 
@@ -148,7 +148,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 		// which has no guarantees.
 		// However, calling `Parallel.ForEach` separately for minimized windows didn't result in the desired focus
 		// behaviour.
-		SetWindowPosState[] allStates = new SetWindowPosState[_windowStates.Count + _minimizedWindowStates.Count];
+		DeferWindowPosState[] allStates = new DeferWindowPosState[_windowStates.Count + _minimizedWindowStates.Count];
 		_windowStates.CopyTo(allStates);
 		_minimizedWindowStates.CopyTo(allStates, _windowStates.Count);
 
@@ -170,7 +170,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 		Logger.Debug("Finished setting window position");
 	}
 
-	private void SetWindowPos(SetWindowPosState source)
+	private void SetWindowPos(DeferWindowPosState source)
 	{
 		IRectangle<int>? offset = _context.NativeManager.GetWindowOffset(source.Handle);
 		if (offset is null)

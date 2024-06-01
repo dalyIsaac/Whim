@@ -140,7 +140,7 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 			IRectangle<int> rect = loc.Rectangle;
 
 			windowPositions = windowPositions.SetItem(hwnd, new WindowPosition(loc.WindowSize, rect));
-			handle.DeferWindowPos(new SetWindowPosState(hwnd, loc.WindowSize, rect));
+			handle.DeferWindowPos(new DeferWindowPosState(hwnd, loc.WindowSize, rect));
 
 			Logger.Debug($"Window {loc.Window} has rectangle {loc.Rectangle}");
 		}
