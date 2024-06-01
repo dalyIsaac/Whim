@@ -14,10 +14,19 @@ public class WorkspaceEventArgs : EventArgs
 	public required IWorkspace Workspace { get; init; }
 }
 
+/// <summary>
+/// Event arguments for when a workspace has been added.
+/// </summary>
 public class WorkspaceAddedEventArgs : WorkspaceEventArgs { }
 
+/// <summary>
+/// Event arguments for when a workspace has been removed.
+/// </summary>
 public class WorkspaceRemovedEventArgs : WorkspaceEventArgs { }
 
+/// <summary>
+/// Event arguments for when a workspace has been renamed.
+/// </summary>
 public class WorkspaceRenamedEventArgs : WorkspaceEventArgs
 {
 	/// <summary>
@@ -26,6 +35,12 @@ public class WorkspaceRenamedEventArgs : WorkspaceEventArgs
 	public required string PreviousName { get; init; }
 }
 
+/// <summary>
+/// Event arguments for when a workspace has started performing a layout.
+/// </summary>
 public class WorkspaceLayoutStartedEventArgs : WorkspaceEventArgs { }
 
+/// <summary>
+/// Event arguments for when a workspace has completed performing a layout.
+/// </summary>
 public class WorkspaceLayoutCompletedEventArgs : WorkspaceEventArgs { }

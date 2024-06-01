@@ -16,8 +16,6 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 {
 	private readonly IContext _ctx;
 
-	private readonly IInternalContext _internalCtx;
-
 	public bool HasInitialized { get; set; }
 
 	public ImmutableList<WorkspaceToCreate> WorkspacesToCreate { get; set; } = ImmutableList<WorkspaceToCreate>.Empty;
@@ -53,10 +51,9 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 
 	public event EventHandler<WorkspaceLayoutCompletedEventArgs>? WorkspaceLayoutCompleted;
 
-	public WorkspaceSector(IContext ctx, IInternalContext internalCtx)
+	public WorkspaceSector(IContext ctx)
 	{
 		_ctx = ctx;
-		_internalCtx = internalCtx;
 	}
 
 	// TODO: Add to StoreTests

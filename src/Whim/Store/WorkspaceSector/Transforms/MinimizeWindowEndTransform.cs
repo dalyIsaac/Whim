@@ -1,4 +1,3 @@
-using System;
 using DotNext;
 using Windows.Win32.Foundation;
 

@@ -15,8 +15,8 @@ internal class MutableRootSector : SectorBase, IDisposable
 	{
 		MonitorSector = new MonitorSector(ctx, internalCtx);
 		WindowSector = new WindowSector(ctx, internalCtx);
-		WorkspaceSector = new WorkspaceSector(ctx, internalCtx);
-		MapSector = new MapSector(ctx);
+		WorkspaceSector = new WorkspaceSector(ctx);
+		MapSector = new MapSector();
 	}
 
 	public override void Initialize()

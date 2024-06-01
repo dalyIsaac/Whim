@@ -110,7 +110,6 @@ internal record InitializeWorkspacesTransform : Transform
 
 			if (idx < workspaceSector.Workspaces.Count)
 			{
-				// TODO: Create workspace
 				ctx.Store.Dispatch(new AddWorkspaceTransform($"Workspace {idx}"));
 			}
 

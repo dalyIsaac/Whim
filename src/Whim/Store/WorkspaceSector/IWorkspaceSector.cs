@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Whim;
@@ -24,6 +23,9 @@ public interface IWorkspaceSector
 	/// </summary>
 	Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; }
 
+	/// <summary>
+	/// A proxy layout ie used by plugins to add layout functionality to all workspaces.
+	/// </summary>
 	ImmutableList<ProxyLayoutEngineCreator> ProxyLayoutEngineCreators { get; }
 
 	/// <summary>
