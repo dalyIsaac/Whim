@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Whim;
@@ -23,7 +24,7 @@ public interface IWorkspaceSector
 	/// </summary>
 	Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; }
 
-	ImmutableList<CreateProxyLayoutEngine> ProxyLayoutEngines { get; }
+	ImmutableList<ProxyLayoutEngineCreator> ProxyLayoutEngineCreators { get; }
 
 	/// <summary>
 	/// The ID of the workspace which is currently active.

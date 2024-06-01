@@ -5,19 +5,9 @@ using System.Linq;
 
 namespace Whim;
 
-internal record WorkspaceToCreate(string Name, IEnumerable<CreateLeafLayoutEngine>? LayoutEngines);
-
 internal class WorkspaceManager : IWorkspaceManager
 {
-	private bool _initialized;
 	private readonly IContext _context;
-	private readonly IInternalContext _internalContext;
-
-	/// <summary>
-	/// Stores the workspaces to create, when <see cref="Initialize"/> is called.
-	/// The workspaces will have been created prior to <see cref="Initialize"/>.
-	/// </summary>
-	private readonly List<WorkspaceToCreate> _workspacesToCreate = new();
 
 	public event EventHandler<WorkspaceEventArgs>? WorkspaceAdded;
 
@@ -34,8 +24,6 @@ internal class WorkspaceManager : IWorkspaceManager
 	public Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; } =
 		() => new CreateLeafLayoutEngine[] { (id) => new ColumnLayoutEngine(id) };
 
-	private readonly List<CreateProxyLayoutEngine> _proxyLayoutEngines = new();
-
 	public IWorkspace? this[string workspaceName] => TryGet(workspaceName);
 
 	public IWorkspace ActiveWorkspace
@@ -48,28 +36,20 @@ internal class WorkspaceManager : IWorkspaceManager
 				.Store.Pick(Pickers.PickWorkspaceByMonitor(activeMonitor.Handle))
 				.TryGet(out IWorkspace workspace)
 				? workspace
-				: _context.Store.Pick(new GetAllMutableWorkspacesPicker())[0];
+				: _context.Store.Pick(Pickers.PickAllWorkspaces()).First();
 		}
 	}
 
-	private bool _disposedValue;
-
-	public WorkspaceManager(IContext context, IInternalContext internalContext)
+	public WorkspaceManager(IContext context)
 	{
 		_context = context;
-		_internalContext = internalContext;
 	}
 
-	public IWorkspace? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null)
-	{
-		_context.Store.Dispatch(new AddWorkspaceTransform(name, createLayoutEngines));
-	}
+	public IWorkspace? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null) =>
+		_context.Store.Dispatch(new AddWorkspaceTransform(name, createLayoutEngines)).OrDefault();
 
-	public void AddProxyLayoutEngine(CreateProxyLayoutEngine proxyLayoutEngine)
-	{
-		Logger.Debug($"Adding proxy layout engine: {proxyLayoutEngine}");
-		_proxyLayoutEngines.Add(proxyLayoutEngine);
-	}
+	public void AddProxyLayoutEngine(ProxyLayoutEngineCreator proxyLayoutEngineCreator) =>
+		_context.Store.Dispatch(new AddProxyLayoutEngineTransform(proxyLayoutEngineCreator));
 
 	public bool Contains(IWorkspace workspace) =>
 		_context.Store.Pick(Pickers.PickAllWorkspaces()).Any(w => w.Id == workspace.Id);
@@ -78,28 +58,31 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public void Initialize()
 	{
-		Logger.Debug("Initializing workspace manager");
-		_initialized = true;
-
-		// Create the workspaces.
-		foreach (WorkspaceToCreate workspaceToCreate in _workspacesToCreate)
-		{
-			CreateWorkspace(workspaceToCreate.Name, workspaceToCreate.LayoutEngines);
-		}
-
-		// Assign workspaces to monitors.
-		int idx = 0;
-		foreach (IMonitor monitor in _context.MonitorManager)
-		{
-			// Get the workspace for this monitor. If the user hasn't provided enough workspaces, try create a new one.
-			IWorkspace? workspace =
-				(idx < _workspaces.Count ? _workspaces[idx] : CreateWorkspace($"Workspace {idx + 1}"))
-				?? throw new InvalidOperationException($"Could not create workspace");
-
-			_context.Store.Dispatch(new ActivateWorkspaceTransform(workspace, monitor));
-			idx++;
-		}
+		_context.Store.WorkspaceEvents.WorkspaceAdded += WorkspaceSector_WorkspaceAdded;
+		_context.Store.WorkspaceEvents.WorkspaceRemoved += WorkspaceSector_WorkspaceRemoved;
+		_context.Store.WorkspaceEvents.ActiveLayoutEngineChanged += WorkspaceSector_ActiveLayoutEngineChanged;
+		_context.Store.WorkspaceEvents.WorkspaceRenamed += WorkspaceSector_WorkspaceRenamed;
+		_context.Store.WorkspaceEvents.WorkspaceLayoutStarted += WorkspaceSector_WorkspaceLayoutStarted;
+		_context.Store.WorkspaceEvents.WorkspaceLayoutCompleted += WorkspaceSector_WorkspaceLayoutCompleted;
 	}
+
+	private void WorkspaceSector_WorkspaceAdded(object? sender, WorkspaceEventArgs args) =>
+		WorkspaceAdded?.Invoke(sender, args);
+
+	private void WorkspaceSector_WorkspaceRemoved(object? sender, WorkspaceEventArgs args) =>
+		WorkspaceRemoved?.Invoke(sender, args);
+
+	private void WorkspaceSector_ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs args) =>
+		ActiveLayoutEngineChanged?.Invoke(sender, args);
+
+	private void WorkspaceSector_WorkspaceRenamed(object? sender, WorkspaceRenamedEventArgs args) =>
+		WorkspaceRenamed?.Invoke(sender, args);
+
+	private void WorkspaceSector_WorkspaceLayoutStarted(object? sender, WorkspaceEventArgs args) =>
+		WorkspaceLayoutStarted?.Invoke(sender, args);
+
+	private void WorkspaceSector_WorkspaceLayoutCompleted(object? sender, WorkspaceEventArgs args) =>
+		WorkspaceLayoutCompleted?.Invoke(sender, args);
 
 	public bool Remove(IWorkspace workspace) =>
 		_context.Store.Dispatch(new RemoveWorkspaceByIdTransform(workspace.Id)).IsSuccessful;
@@ -108,35 +91,9 @@ internal class WorkspaceManager : IWorkspaceManager
 		_context.Store.Dispatch(new RemoveWorkspaceByNameTransform(workspaceName)).IsSuccessful;
 
 	public IWorkspace? TryGet(string workspaceName) =>
-		_context.Store.Pick(Pickers.GetWorkspaceById(workspaceName)).TryGet(out Workspace workspace) ? workspace : null;
+		_context.Store.Pick(Pickers.PickWorkspaceByName(workspaceName)).TryGet(out IWorkspace workspace)
+			? workspace
+			: null;
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-	protected void Dispose(bool disposing)
-	{
-		if (!_disposedValue)
-		{
-			if (disposing)
-			{
-				Logger.Debug("Disposing workspace manager");
-
-				// dispose managed state (managed objects)
-				foreach (IWorkspace workspace in _workspaces)
-				{
-					workspace.Dispose();
-				}
-			}
-
-			// free unmanaged resources (unmanaged objects) and override finalizer
-			// set large fields to null
-			_disposedValue = true;
-		}
-	}
-
-	public void Dispose()
-	{
-		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-		Dispose(disposing: true);
-		GC.SuppressFinalize(this);
-	}
 }

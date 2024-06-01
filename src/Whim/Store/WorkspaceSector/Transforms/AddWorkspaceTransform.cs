@@ -6,6 +6,8 @@ namespace Whim;
 
 /// <summary>
 /// Create a workspace with the given <paramref name="Name"/> and layout engines.
+/// If this transform is called prior to initialization, then <see cref="IWorkspace"/> creation is deferred.
+/// <see langword="null"/> is returned by the transform if the workspace creation was deferred.
 /// </summary>
 /// <param name="Name">
 /// The name of the workspace. Defaults to <see langword="null"/>, which will generate the name
@@ -18,20 +20,27 @@ namespace Whim;
 public record AddWorkspaceTransform(
 	string? Name = null,
 	IEnumerable<CreateLeafLayoutEngine>? CreateLeafLayoutEngines = null
-) : Transform<Workspace>
+) : Transform<IWorkspace?>
 {
-	internal override Result<Workspace> Execute(
+	internal override Result<IWorkspace?> Execute(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector
 	)
 	{
 		WorkspaceSector sector = mutableRootSector.WorkspaceSector;
+
+		if (!sector.HasInitialized)
+		{
+			sector.WorkspacesToCreate = sector.WorkspacesToCreate.Add(new(Name, CreateLeafLayoutEngines));
+			return null;
+		}
+
 		CreateLeafLayoutEngine[] engineCreators = CreateLeafLayoutEngines?.ToArray() ?? sector.CreateLayoutEngines();
 
 		if (engineCreators.Length == 0)
 		{
-			return Result.FromException<Workspace>(new WhimException("No engine creators were provided"));
+			return Result.FromException<IWorkspace?>(new WhimException("No engine creators were provided"));
 		}
 
 		// Create the layout engines.
@@ -45,7 +54,7 @@ public record AddWorkspaceTransform(
 		for (int engineIdx = 0; engineIdx < engineCreators.Length; engineIdx++)
 		{
 			ILayoutEngine currentEngine = layoutEngines[engineIdx];
-			foreach (CreateProxyLayoutEngine createProxyLayoutEngineFn in sector.ProxyLayoutEngines)
+			foreach (ProxyLayoutEngineCreator createProxyLayoutEngineFn in sector.ProxyLayoutEngineCreators)
 			{
 				ILayoutEngine proxy = createProxyLayoutEngineFn(currentEngine);
 				layoutEngines[engineIdx] = proxy;
@@ -56,8 +65,9 @@ public record AddWorkspaceTransform(
 		Workspace workspace =
 			new(ctx, internalCtx, WorkspaceId.NewGuid()) { Name = Name ?? $"Workspace {sector.Workspaces.Count + 1}" };
 		sector.Workspaces = sector.Workspaces.Add(workspace.Id, workspace);
+		sector.WorkspaceOrder = sector.WorkspaceOrder.Add(workspace.Id);
 		sector.QueueEvent(new WorkspaceAddedEventArgs() { Workspace = workspace });
 
-		return Result.FromValue(workspace);
+		return workspace;
 	}
 }

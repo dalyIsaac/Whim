@@ -28,10 +28,7 @@ internal class MapSector : SectorBase, IMapSector, IMapSectorEvents
 	}
 
 	// TODO: Add to StoreTests
-	public override void Initialize()
-	{
-		_ctx.Store.Dispatch(new InitializeFromSavedStateTransform());
-	}
+	public override void Initialize() { }
 
 	public override void DispatchEvents()
 	{

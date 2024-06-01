@@ -11,12 +11,12 @@ using static Whim.TestUtils.StoreTestUtils;
 namespace Whim.Tests;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
-public class InitializeFromSavedStateTransformTests
+public class InitializeWorkspacesTransformTests
 {
 	private static Result<Unit> AssertDoesNotRaise(
 		IContext ctx,
 		MutableRootSector rootSector,
-		InitializeFromSavedStateTransform sut
+		InitializeWorkspacesTransform sut
 	)
 	{
 		Result<Unit>? result = null;
@@ -31,7 +31,7 @@ public class InitializeFromSavedStateTransformTests
 	private static (Result<Unit>, List<WindowAddedEventArgs>) AssertRaises(
 		IContext ctx,
 		MutableRootSector rootSector,
-		InitializeFromSavedStateTransform sut
+		InitializeWorkspacesTransform sut
 	)
 	{
 		Result<Unit>? result = null;
@@ -58,7 +58,7 @@ public class InitializeFromSavedStateTransformTests
 	internal void NoSavedWorkspaces(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given there are no saved workspaces
-		InitializeFromSavedStateTransform sut = new();
+		InitializeWorkspacesTransform sut = new();
 
 		// When
 		var result = AssertDoesNotRaise(ctx, rootSector, sut);
@@ -75,7 +75,7 @@ public class InitializeFromSavedStateTransformTests
 		SavedWorkspace workspace = new("test", new List<SavedWindow>());
 		AddWorkspacesToSavedState(internalCtx, workspace);
 
-		InitializeFromSavedStateTransform sut = new();
+		InitializeWorkspacesTransform sut = new();
 
 		// When the map transform is dispatched
 		var result = AssertDoesNotRaise(ctx, rootSector, sut);
@@ -96,7 +96,7 @@ public class InitializeFromSavedStateTransformTests
 
 		ctx.WindowManager.CreateWindow(window.Handle).Returns(Result.FromException<IWindow>(new Exception("nope")));
 
-		InitializeFromSavedStateTransform sut = new();
+		InitializeWorkspacesTransform sut = new();
 
 		// When the map transform is dispatched
 		var result = AssertDoesNotRaise(ctx, rootSector, sut);
@@ -146,7 +146,7 @@ public class InitializeFromSavedStateTransformTests
 		internalCtx.CoreNativeManager.IsStandardWindow(Arg.Any<HWND>()).Returns(true);
 		internalCtx.CoreNativeManager.HasNoVisibleOwner(Arg.Any<HWND>()).Returns(true);
 
-		InitializeFromSavedStateTransform sut = new();
+		InitializeWorkspacesTransform sut = new();
 
 		// When the map transform is dispatched
 		var (result, evs) = AssertRaises(ctx, rootSector, sut);

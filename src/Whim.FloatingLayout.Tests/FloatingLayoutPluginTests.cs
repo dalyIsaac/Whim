@@ -94,7 +94,7 @@ public class FloatingLayoutPluginTests
 		plugin.PreInitialize();
 
 		// Then
-		context.WorkspaceManager.Received(1).AddProxyLayoutEngine(Arg.Any<CreateProxyLayoutEngine>());
+		context.WorkspaceManager.Received(1).AddProxyLayoutEngine(Arg.Any<ProxyLayoutEngineCreator>());
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
@@ -107,7 +107,7 @@ public class FloatingLayoutPluginTests
 		plugin.PostInitialize();
 
 		// Then
-		context.WorkspaceManager.DidNotReceive().AddProxyLayoutEngine(Arg.Any<CreateProxyLayoutEngine>());
+		context.WorkspaceManager.DidNotReceive().AddProxyLayoutEngine(Arg.Any<ProxyLayoutEngineCreator>());
 	}
 
 	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]

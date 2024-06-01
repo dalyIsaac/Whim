@@ -4,16 +4,27 @@ using System.Collections.Immutable;
 
 namespace Whim;
 
+/// <summary>
+/// A workspace's name and layout engines.
+/// </summary>
+/// <param name="Name"></param>
+/// <param name="LayoutEngines"></param>
+internal record WorkspaceToCreate(string? Name, IEnumerable<CreateLeafLayoutEngine>? LayoutEngines);
+
 internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorEvents
 {
 	private readonly IContext _ctx;
 
 	private readonly IInternalContext _internalCtx;
 
+	public bool HasInitialized { get; set; }
+
+	public ImmutableList<WorkspaceToCreate> WorkspacesToCreate { get; set; } = ImmutableList<WorkspaceToCreate>.Empty;
+
 	/// <summary>
 	/// The IDs of the workspaces that should be laid out.
 	/// </summary>
-	public HashSet<Guid> WorkspacesToLayout { get; set; } = new();
+	public ImmutableHashSet<WorkspaceId> WorkspacesToLayout { get; set; } = ImmutableHashSet<WorkspaceId>.Empty;
 
 	public ImmutableArray<WorkspaceId> WorkspaceOrder { get; set; } = ImmutableArray<WorkspaceId>.Empty;
 
@@ -23,8 +34,8 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 	public Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; } =
 		() => new CreateLeafLayoutEngine[] { (id) => new ColumnLayoutEngine(id) };
 
-	public ImmutableList<CreateProxyLayoutEngine> ProxyLayoutEngines { get; set; } =
-		ImmutableList<CreateProxyLayoutEngine>.Empty;
+	public ImmutableList<ProxyLayoutEngineCreator> ProxyLayoutEngineCreators { get; set; } =
+		ImmutableList<ProxyLayoutEngineCreator>.Empty;
 
 	public WorkspaceId ActiveWorkspaceId { get; set; }
 

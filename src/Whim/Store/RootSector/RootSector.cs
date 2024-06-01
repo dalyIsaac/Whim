@@ -24,7 +24,7 @@ public class RootSector : IRootSector, IDisposable
 
 	internal RootSector(IContext ctx, IInternalContext internalCtx)
 	{
-		MutableRootSector = new MutableRootSector(ctx, internalCtx);
+		MutableRootSector = new(ctx, internalCtx);
 		_listener = new(ctx, internalCtx);
 	}
 
