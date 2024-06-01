@@ -12,7 +12,7 @@ namespace Whim;
 /// <param name="LayoutEngines"></param>
 internal record WorkspaceToCreate(string? Name, IEnumerable<CreateLeafLayoutEngine>? LayoutEngines);
 
-internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorEvents
+internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorEvents, IDisposable
 {
 	private readonly IContext _ctx;
 
@@ -149,5 +149,13 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 		}
 
 		Workspaces = Workspaces.SetItem(workspace.Id, workspace with { WindowPositions = windowPositions });
+	}
+
+	public void Dispose()
+	{
+		foreach (Workspace workspace in Workspaces.Values)
+		{
+			workspace.Dispose();
+		}
 	}
 }

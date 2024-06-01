@@ -45,6 +45,7 @@ internal class MutableRootSector : SectorBase, IDisposable
 				// dispose managed state (managed objects)
 				MonitorSector.Dispose();
 				WindowSector.Dispose();
+				WorkspaceSector.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

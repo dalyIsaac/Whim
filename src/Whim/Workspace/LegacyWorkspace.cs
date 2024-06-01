@@ -159,39 +159,27 @@ public partial record Workspace : IInternalWorkspace
 			.Store.Dispatch(new PerformCustomLayoutEnginePayloadActionTransform<T>(Id, action))
 			.TryGet(out bool isChanged) && isChanged;
 
-	// TODO: Remove entirely
-	protected virtual void Dispose(bool disposing)
-	{
-		if (!_disposedValue)
-		{
-			if (disposing)
-			{
-				Logger.Debug($"Disposing workspace {Name}");
-
-				// dispose managed state (managed objects)
-				bool isWorkspaceActive = _context.Store.Pick(Pickers.PickMonitorByWorkspace(Id)).IsSuccessful;
-
-				// If the workspace isn't active on the monitor, show all the windows in as minimized.
-				if (!isWorkspaceActive)
-				{
-					foreach (IWindow window in Windows)
-					{
-						window.ShowMinimized();
-					}
-				}
-			}
-
-			// free unmanaged resources (unmanaged objects) and override finalizer
-			// set large fields to null
-			_disposedValue = true;
-		}
-	}
-
 	/// <inheritdoc/>
 	public void Dispose()
 	{
-		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-		Dispose(disposing: true);
-		GC.SuppressFinalize(this);
+		if (_disposedValue)
+		{
+			return;
+		}
+
+		Logger.Debug($"Disposing workspace {Name}");
+
+		bool isWorkspaceActive = _context.Store.Pick(Pickers.PickMonitorByWorkspace(Id)).IsSuccessful;
+
+		// If the workspace isn't active on the monitor, show all the windows in as minimized.
+		if (!isWorkspaceActive)
+		{
+			foreach (IWindow window in Windows)
+			{
+				window.ShowMinimized();
+			}
+		}
+
+		_disposedValue = true;
 	}
 }
