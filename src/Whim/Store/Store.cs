@@ -26,6 +26,9 @@ public class Store : IStore
 	/// <inheritdoc />
 	public IMapSectorEvents MapEvents => _root.MutableRootSector.MapSector;
 
+	/// <inheritdoc />
+	public IWorkspaceSectorEvents WorkspaceEvents => _root.MutableRootSector.WorkspaceSector;
+
 	internal Store(IContext ctx, IInternalContext internalCtx)
 	{
 		_ctx = ctx;
