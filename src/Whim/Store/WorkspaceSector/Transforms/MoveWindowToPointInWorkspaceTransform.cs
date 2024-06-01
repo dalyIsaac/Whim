@@ -36,7 +36,8 @@ internal record MoveWindowToPointInWorkspaceTransform(WorkspaceId WorkspaceId, H
 
 		return workspace with
 		{
-			WindowPositions = workspace.WindowPositions.Add(window.Handle),
+			// TODO: merge move window to point?
+			WindowPositions = workspace.WindowPositions.SetItem(window.Handle, new WindowPosition(WindowSize.Normal)),
 			LayoutEngines = newLayoutEngines.ToImmutable()
 		};
 	}

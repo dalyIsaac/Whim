@@ -17,7 +17,12 @@ public record AddWindowToWorkspaceTransform(WorkspaceId WorkspaceId, IWindow Win
 		Workspace workspace
 	)
 	{
-		workspace = workspace with { Windows = workspace.Windows.Add(Window) };
+		workspace = workspace with
+		{
+			// We add the window with a dummy window position. When the workspace gets laid out, then the WindowPosition
+			// will become populated correctly.
+			WindowPositions = workspace.WindowPositions.Add(Window.Handle, new WindowPosition())
+		};
 
 		for (int idx = 0; idx < workspace.LayoutEngines.Count; idx++)
 		{

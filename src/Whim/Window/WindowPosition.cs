@@ -1,9 +1,5 @@
 ﻿namespace Whim;
 
-// <summary>
-//
-// </summary>
-
 /// <summary>
 /// A window's position at a point in time.
 /// </summary>

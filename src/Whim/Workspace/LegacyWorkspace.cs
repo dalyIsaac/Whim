@@ -126,23 +126,24 @@ public partial record Workspace : IInternalWorkspace
 	/// <inheritdoc/>
 	public IWindowState? TryGetWindowState(IWindow window)
 	{
-		_windowStates.TryGetValue(window.Handle, out IWindowState? rect);
-		return rect;
+		// _windowStates.TryGetValue(window.Handle, out IWindowState? rect);
+		// return rect;
+
+		if (WindowPositions.TryGetValue(window.Handle, out WindowPosition? pos))
+		{
+			return new WindowState
+			{
+				Window = window,
+				Rectangle = pos.LastWindowRectangle,
+				WindowSize = pos.WindowSize
+			};
+		}
+
+		return null;
 	}
 
 	/// <inheritdoc/>
-	public void DoLayout()
-	{
-		Logger.Debug($"Workspace {Name}");
-
-		if (_disposedValue)
-		{
-			Logger.Debug($"Workspace {Name} is disposed, skipping layout");
-			return;
-		}
-
-		_internalContext.DeferWorkspacePosManager.DoLayout(this, _triggers, _windowStates);
-	}
+	public void DoLayout() => _context.Store.Dispatch(new DoWorkspaceLayoutTransform(Id));
 
 	/// <inheritdoc/>
 	public bool ContainsWindow(IWindow window) => LatestWorkspace.WindowPositions.ContainsKey(window.Handle);

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using Windows.Win32.Foundation;
 
 namespace Whim;
 
@@ -37,6 +38,7 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 	public ImmutableList<ProxyLayoutEngineCreator> ProxyLayoutEngineCreators { get; set; } =
 		ImmutableList<ProxyLayoutEngineCreator>.Empty;
 
+	// TODO
 	public WorkspaceId ActiveWorkspaceId { get; set; }
 
 	public event EventHandler<WorkspaceAddedEventArgs>? WorkspaceAdded;
@@ -66,10 +68,15 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 		{
 			if (Workspaces.TryGetValue(id, out Workspace? workspace))
 			{
-				_internalCtx.DeferWorkspacePosManager.DoLayout(this, workspace);
+				DoLayout(workspace);
+			}
+			else
+			{
+				Logger.Error($"Could not find workspace with id {id}");
 			}
 		}
-		WorkspacesToLayout.Clear();
+
+		WorkspacesToLayout = WorkspacesToLayout.Clear();
 
 		foreach (EventArgs eventArgs in _events)
 		{
@@ -95,10 +102,52 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 		_events.Clear();
 	}
 
-	// TODO: Are these necessary?
-	public void TriggerWorkspaceLayoutStarted(Workspace workspace) =>
-		WorkspaceLayoutStarted?.Invoke(this, new WorkspaceLayoutStartedEventArgs { Workspace = workspace });
+	private void DoLayout(Workspace workspace)
+	{
+		Logger.Debug($"Layout {workspace}");
 
-	public void TriggerWorkspaceLayoutCompleted(Workspace workspace) =>
-		WorkspaceLayoutCompleted?.Invoke(this, new WorkspaceLayoutCompletedEventArgs { Workspace = workspace });
+		// Get the monitor for this workspace
+		if (!_ctx.Store.Pick(Pickers.PickMonitorByWorkspace(workspace.Id)).TryGet(out IMonitor monitor))
+		{
+			Logger.Debug($"No active monitors found for workspace {workspace}.");
+			return;
+		}
+
+		Logger.Debug($"Starting layout for workspace {workspace}");
+
+		_ctx.NativeManager.TryEnqueue(
+			() => WorkspaceLayoutStarted?.Invoke(this, new WorkspaceLayoutStartedEventArgs { Workspace = workspace })
+		);
+
+		// Execute the layout task, and update the window states before the completed event.
+		SetWindowPositions(workspace, monitor);
+
+		// triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = workspace });
+		_ctx.NativeManager.TryEnqueue(
+			() =>
+				WorkspaceLayoutCompleted?.Invoke(this, new WorkspaceLayoutCompletedEventArgs { Workspace = workspace })
+		);
+	}
+
+	private void SetWindowPositions(Workspace workspace, IMonitor monitor)
+	{
+		Logger.Debug($"Setting window positions for workspace {workspace}");
+
+		ImmutableDictionary<HWND, WindowPosition> windowPositions = workspace.WindowPositions;
+
+		using DeferWindowPosHandle handle = _ctx.NativeManager.DeferWindowPos();
+
+		foreach (IWindowState loc in workspace.ActiveLayoutEngine.DoLayout(monitor.WorkingArea, monitor))
+		{
+			HWND hwnd = loc.Window.Handle;
+			IRectangle<int> rect = loc.Rectangle;
+
+			windowPositions = windowPositions.SetItem(hwnd, new WindowPosition(loc.WindowSize, rect));
+			handle.DeferWindowPos(new SetWindowPosState(hwnd, loc.WindowSize, rect));
+
+			Logger.Debug($"Window {loc.Window} has rectangle {loc.Rectangle}");
+		}
+
+		Workspaces = Workspaces.SetItem(workspace.Id, workspace with { WindowPositions = windowPositions });
+	}
 }

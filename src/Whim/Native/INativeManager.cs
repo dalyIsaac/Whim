@@ -119,7 +119,7 @@ public interface INativeManager
 	/// </summary>
 	/// <param name="windowStates">The initial window states to set.</param>
 	/// <returns></returns>
-	DeferWindowPosHandle DeferWindowPos(IEnumerable<WindowPosState> windowStates);
+	DeferWindowPosHandle DeferWindowPos(IEnumerable<SetWindowPosState> windowStates);
 
 	/// <summary>
 	/// Retrieves the path to the executable file of the UWP app associated with the given <paramref name="window"/>.
