@@ -61,15 +61,18 @@ public static partial class Pickers
 	/// </summary>
 	/// <returns></returns>
 	public static PurePicker<IWorkspace> PickActiveWorkspace() =>
-		(IRootSector rootSector) => rootSector.WorkspaceSector.Workspaces[rootSector.WorkspaceSector.ActiveWorkspaceId];
+		static (IRootSector rootSector) =>
+			rootSector.WorkspaceSector.Workspaces[
+				rootSector.MapSector.MonitorWorkspaceMap[rootSector.MonitorSector.ActiveMonitorHandle]
+			];
 
 	/// <summary>
 	/// Get the id of the active workspace.
 	/// </summary>
 	/// <returns></returns>
 	public static PurePicker<WorkspaceId> PickActiveWorkspaceId() =>
-		(IRootSector rootSector) =>
-			rootSector.WorkspaceSector.Workspaces[rootSector.WorkspaceSector.ActiveWorkspaceId].Id;
+		static (IRootSector rootSector) =>
+			rootSector.MapSector.MonitorWorkspaceMap[rootSector.MonitorSector.ActiveMonitorHandle];
 
 	/// <summary>
 	/// Get the active layout engine in the provided workspace.

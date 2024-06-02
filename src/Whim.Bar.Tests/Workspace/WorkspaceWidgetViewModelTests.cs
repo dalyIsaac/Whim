@@ -20,6 +20,7 @@ public class WorkspaceWidgetViewModelCustomization : ICustomization
 	}
 }
 
+// TODO: Assert workspace name
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WorkspaceWidgetViewModelTests
 {
@@ -230,12 +231,7 @@ public class WorkspaceWidgetViewModelTests
 			{
 				context.WorkspaceManager.WorkspaceRenamed += Raise.Event<EventHandler<WorkspaceRenamedEventArgs>>(
 					context.WorkspaceManager,
-					new WorkspaceRenamedEventArgs()
-					{
-						Workspace = workspace,
-						PreviousName = "Old Name",
-						CurrentName = "New Name"
-					}
+					new WorkspaceRenamedEventArgs() { Workspace = workspace, PreviousName = "Old Name", }
 				);
 			}
 		);
@@ -261,12 +257,7 @@ public class WorkspaceWidgetViewModelTests
 
 		context.WorkspaceManager.WorkspaceRenamed += Raise.Event<EventHandler<WorkspaceRenamedEventArgs>>(
 			context.WorkspaceManager,
-			new WorkspaceRenamedEventArgs()
-			{
-				Workspace = renamedWorkspace,
-				PreviousName = "Old Name",
-				CurrentName = "New Name"
-			}
+			new WorkspaceRenamedEventArgs() { Workspace = renamedWorkspace, PreviousName = "Old Name", }
 		);
 
 		// Then

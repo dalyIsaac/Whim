@@ -181,19 +181,19 @@ public sealed class DeferWindowPosHandle : IDisposable
 		IRectangle<int> rect = source.LastWindowRectangle.Add(offset);
 		SET_WINDOW_POS_FLAGS uFlags = source.Flags ?? DefaultFlags;
 
-		if (source.WindowSize == WindowSize.Maximized)
+		switch (source.WindowSize)
 		{
-			uFlags = uFlags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
-			_context.NativeManager.ShowWindowMaximized(source.Handle);
-		}
-		else if (source.WindowSize == WindowSize.Minimized)
-		{
-			uFlags = uFlags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
-			_context.NativeManager.MinimizeWindow(source.Handle);
-		}
-		else
-		{
-			_context.NativeManager.ShowWindowNoActivate(source.Handle);
+			case WindowSize.Maximized:
+				uFlags = uFlags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
+				_context.NativeManager.ShowWindowMaximized(source.Handle);
+				break;
+			case WindowSize.Minimized:
+				uFlags = uFlags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
+				_context.NativeManager.MinimizeWindow(source.Handle);
+				break;
+			default:
+				_context.NativeManager.ShowWindowNoActivate(source.Handle);
+				break;
 		}
 
 		Logger.Verbose($"Setting window position for {source.Handle} to {rect} with flags {uFlags}");

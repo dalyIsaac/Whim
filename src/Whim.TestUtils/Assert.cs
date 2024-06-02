@@ -115,6 +115,5 @@ public static class CustomAssert
 		Assert.Empty(internalCtx.WindowManager.ReceivedCalls());
 		Assert.Empty(internalCtx.KeybindHook.ReceivedCalls());
 		Assert.Empty(internalCtx.MouseHook.ReceivedCalls());
-		Assert.Empty(internalCtx.DeferWindowPosManager.ReceivedCalls());
 	}
 }

@@ -27,9 +27,4 @@ public interface IWorkspaceSector
 	/// A proxy layout ie used by plugins to add layout functionality to all workspaces.
 	/// </summary>
 	ImmutableList<ProxyLayoutEngineCreator> ProxyLayoutEngineCreators { get; }
-
-	/// <summary>
-	/// The ID of the workspace which is currently active.
-	/// </summary>
-	WorkspaceId ActiveWorkspaceId { get; }
 }
