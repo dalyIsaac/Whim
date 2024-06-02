@@ -9,7 +9,7 @@
 //
 // namespace Whim.Tests;
 //
-// public class MergeWorkspaceWIndowsTransformTests
+// public class MergeWorkspaceWindowsTransformTests
 // {
 // 	[Theory, AutoSubstituteData<StoreCustomization>]
 // 	internal void SourceWorkspaceNotFound(IContext ctx)
