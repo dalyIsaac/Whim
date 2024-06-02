@@ -20,7 +20,6 @@ internal class MapSector : SectorBase, IMapSector, IMapSectorEvents
 
 	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
 
-	// TODO: Add to StoreTests
 	public override void Initialize() { }
 
 	public override void DispatchEvents()

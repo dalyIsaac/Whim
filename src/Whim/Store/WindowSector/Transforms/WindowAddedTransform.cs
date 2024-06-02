@@ -88,7 +88,6 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 		MapSector mapSector = mutableRootSector.MapSector;
 		IWorkspace? workspace = TryGetWorkspaceFromRouter(ctx, mutableRootSector, window);
 
-		// TODO: With WorkspaceSector, this can be updated.
 		// Check the workspace exists. If it doesn't, clear the workspace.
 		if (workspace != null && !ctx.WorkspaceManager.Contains(workspace))
 		{
@@ -121,7 +120,7 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 	}
 
 	/// <summary>
-	/// Try get the workspace based on routing preferences.
+	/// Try to get the workspace based on routing preferences.
 	/// </summary>
 	/// <param name="ctx"></param>
 	/// <param name="rootSector"></param>
