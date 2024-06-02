@@ -66,8 +66,8 @@ public class ActivateWorkspaceTransformTests
 	internal void MonitorNotFound(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the monitor doesn't exist
-		IWorkspace workspace = CreateWorkspace(ctx);
-		AddWorkspacesToManager(ctx, workspace);
+		Workspace workspace = CreateWorkspace(ctx);
+		AddWorkspacesToManager(ctx, rootSector, workspace);
 
 		ActivateWorkspaceTransform sut = new(workspace.Id);
 
@@ -82,7 +82,7 @@ public class ActivateWorkspaceTransformTests
 	internal void WorkspaceAlreadyActivatedOnMonitor(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the workspace is already activated on the monitor
-		IWorkspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace(ctx);
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, workspace);
 
@@ -99,9 +99,9 @@ public class ActivateWorkspaceTransformTests
 	internal void LayoutOldWorkspace(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the target monitor has an old workspace
-		IWorkspace workspace1 = CreateWorkspace(ctx);
-		IWorkspace workspace2 = CreateWorkspace(ctx);
-		IWorkspace workspace3 = CreateWorkspace(ctx);
+		Workspace workspace1 = CreateWorkspace(ctx);
+		Workspace workspace2 = CreateWorkspace(ctx);
+		Workspace workspace3 = CreateWorkspace(ctx);
 
 		IMonitor monitor1 = CreateMonitor((HMONITOR)1);
 		IMonitor monitor2 = CreateMonitor((HMONITOR)2);
@@ -137,16 +137,16 @@ public class ActivateWorkspaceTransformTests
 	internal void DeactivateOldWorkspace(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the target monitor has an old workspace, and the new workspace wasn't previously activated
-		IWorkspace workspace1 = CreateWorkspace(ctx);
-		IWorkspace workspace2 = CreateWorkspace(ctx);
-		IWorkspace workspace3 = CreateWorkspace(ctx);
+		Workspace workspace1 = CreateWorkspace(ctx);
+		Workspace workspace2 = CreateWorkspace(ctx);
+		Workspace workspace3 = CreateWorkspace(ctx);
 
 		IMonitor monitor1 = CreateMonitor((HMONITOR)1);
 		IMonitor monitor2 = CreateMonitor((HMONITOR)2);
 
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor1, workspace1);
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor2, workspace2);
-		AddWorkspacesToManager(ctx, workspace3);
+		AddWorkspacesToManager(ctx, rootSector, workspace3);
 
 		ActivateWorkspaceTransform sut = new(workspace3.Id, monitor1.Handle);
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NSubstitute;
+using Windows.Web.AtomPub;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 
@@ -31,8 +32,7 @@ internal static class StoreTestUtils
 			workspace.Id
 		);
 
-		rootSector.WorkspaceSector.Workspaces = rootSector.WorkspaceSector.Workspaces.Add(workspace.Id, workspace);
-		ctx.WorkspaceManager.GetEnumerator().Returns(_ => new List<IWorkspace>() { workspace }.GetEnumerator());
+		AddWorkspacesToManager(ctx, rootSector, workspace);
 	}
 
 	private static int _workspaceCounter = 1;
@@ -65,12 +65,17 @@ internal static class StoreTestUtils
 		return window;
 	}
 
-	public static void AddWorkspacesToManager(IContext ctx, params IWorkspace[] newWorkspaces)
+	public static void AddWorkspacesToManager(IContext ctx, MutableRootSector rootSector, params Workspace[] newWorkspaces)
 	{
 		List<IWorkspace> workspaces = ctx.WorkspaceManager.ToList();
 		workspaces.AddRange(newWorkspaces);
 
 		ctx.WorkspaceManager.GetEnumerator().Returns(_ => workspaces.GetEnumerator());
+
+		foreach (Workspace w in newWorkspaces)
+		{
+			rootSector.WorkspaceSector.Workspaces = rootSector.WorkspaceSector.Workspaces.Add(w.Id, w);
+		}
 	}
 
 	public static void AddWindowToSector(MutableRootSector rootSector, IWindow window)
@@ -82,7 +87,7 @@ internal static class StoreTestUtils
 		IContext ctx,
 		MutableRootSector rootSector,
 		IWindow window,
-		IWorkspace workspace
+		Workspace workspace
 	)
 	{
 		rootSector.MapSector.WindowWorkspaceMap = rootSector.MapSector.WindowWorkspaceMap.SetItem(
@@ -91,14 +96,14 @@ internal static class StoreTestUtils
 		);
 		AddWindowToSector(rootSector, window);
 
-		AddWorkspacesToManager(ctx, workspace);
+		AddWorkspacesToManager(ctx, rootSector, workspace);
 	}
 
 	public static void PopulateMonitorWorkspaceMap(
 		IContext ctx,
 		MutableRootSector rootSector,
 		IMonitor monitor,
-		IWorkspace workspace
+		Workspace workspace
 	)
 	{
 		rootSector.MapSector.MonitorWorkspaceMap = rootSector.MapSector.MonitorWorkspaceMap.SetItem(
@@ -107,14 +112,14 @@ internal static class StoreTestUtils
 		);
 		rootSector.MonitorSector.Monitors = rootSector.MonitorSector.Monitors.Add(monitor);
 
-		AddWorkspacesToManager(ctx, workspace);
+		AddWorkspacesToManager(ctx, rootSector, workspace);
 	}
 
 	public static void PopulateThreeWayMap(
 		IContext ctx,
 		MutableRootSector rootSector,
 		IMonitor monitor,
-		IWorkspace workspace,
+		Workspace workspace,
 		IWindow window
 	)
 	{
@@ -130,7 +135,7 @@ internal static class StoreTestUtils
 
 		rootSector.MonitorSector.Monitors = rootSector.MonitorSector.Monitors.Add(monitor);
 
-		AddWorkspacesToManager(ctx, workspace);
+		AddWorkspacesToManager(ctx, rootSector, workspace);
 	}
 
 	public static void SetupMonitorAtPoint(IContext ctx, IPoint<int> point, IMonitor monitor)
