@@ -58,7 +58,7 @@ public class MoveWindowEdgesInDirectionTransformTests
 		// Given there is no monitor for the window
 		IWindow window = CreateWindow((HWND)10);
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
-		IWorkspace workspace = CreateWorkspace();
+		IWorkspace workspace = CreateWorkspace(ctx);
 
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, workspace);
 
@@ -77,7 +77,7 @@ public class MoveWindowEdgesInDirectionTransformTests
 		// Given there is a workspace for the window
 		IWindow window = CreateWindow((HWND)10);
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
-		IWorkspace workspace = CreateWorkspace();
+		IWorkspace workspace = CreateWorkspace(ctx);
 		Point<int> pixelDeltas = new(10, 10);
 
 		PopulateThreeWayMap(ctx, rootSector, monitor, workspace, window);

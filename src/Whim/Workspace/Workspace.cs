@@ -9,25 +9,25 @@ namespace Whim;
 public sealed partial record Workspace : IWorkspace
 {
 	/// <inheritdoc />
-	public WorkspaceId Id { get; internal init; } = WorkspaceId.NewGuid();
+	public WorkspaceId Id { get; internal set; } = WorkspaceId.NewGuid();
 
 	/// <inheritdoc />
-	public string BackingName { get; internal init; } = string.Empty;
+	public string BackingName { get; internal set; } = string.Empty;
 
 	/// <inheritdoc />
-	public int ActiveLayoutEngineIndex { get; internal init; }
+	public int ActiveLayoutEngineIndex { get; internal set; }
 
 	/// <inheritdoc />
-	public int PreviousLayoutEngineIndex { get; internal init; }
+	public int PreviousLayoutEngineIndex { get; internal set; }
 
 	/// <inheritdoc />
-	public HWND LastFocusedWindowHandle { get; internal init; }
+	public HWND LastFocusedWindowHandle { get; internal set; }
 
 	/// <inheritdoc />
-	public ImmutableList<ILayoutEngine> LayoutEngines { get; internal init; } = ImmutableList<ILayoutEngine>.Empty;
+	public ImmutableList<ILayoutEngine> LayoutEngines { get; internal set; } = ImmutableList<ILayoutEngine>.Empty;
 
 	/// <inheritdoc />
-	public ImmutableDictionary<HWND, WindowPosition> WindowPositions { get; internal init; } =
+	public ImmutableDictionary<HWND, WindowPosition> WindowPositions { get; internal set; } =
 		ImmutableDictionary<HWND, WindowPosition>.Empty;
 
 	/// <summary>
@@ -37,7 +37,6 @@ public sealed partial record Workspace : IWorkspace
 	internal Workspace(Workspace workspace)
 	{
 		_context = workspace._context;
-		_internalContext = workspace._internalContext;
 		Id = workspace.Id;
 		BackingName = workspace.BackingName;
 		ActiveLayoutEngineIndex = workspace.ActiveLayoutEngineIndex;

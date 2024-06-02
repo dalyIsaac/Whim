@@ -70,7 +70,7 @@ public class MoveWindowToWorkspaceTransformTests
 	internal void WindowNotFound_SpecifiedHandle(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given a random window id
-		IWorkspace workspace = CreateWorkspace();
+		IWorkspace workspace = CreateWorkspace(ctx);
 		IWindow window = CreateWindow((HWND)10);
 
 		AddWorkspacesToManager(ctx, workspace);
@@ -88,7 +88,7 @@ public class MoveWindowToWorkspaceTransformTests
 	internal void WindowNotFound_Default(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given a random window id
-		IWorkspace workspace = CreateWorkspace();
+		IWorkspace workspace = CreateWorkspace(ctx);
 
 		AddWorkspacesToManager(ctx, workspace);
 
@@ -105,7 +105,7 @@ public class MoveWindowToWorkspaceTransformTests
 	internal void WorkspaceForWindowNotFound(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given a window which isn't in a workspace
-		IWorkspace workspace = CreateWorkspace();
+		IWorkspace workspace = CreateWorkspace(ctx);
 		IWindow window = CreateWindow((HWND)10);
 
 		AddWorkspacesToManager(ctx, workspace);
@@ -124,7 +124,7 @@ public class MoveWindowToWorkspaceTransformTests
 	internal void WindowAlreadyOnWorkspace(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the window is already on the workspace
-		IWorkspace workspace = CreateWorkspace();
+		IWorkspace workspace = CreateWorkspace(ctx);
 		IWindow window = CreateWindow((HWND)10);
 
 		PopulateThreeWayMap(ctx, rootSector, CreateMonitor((HMONITOR)1), workspace, window);
@@ -142,8 +142,8 @@ public class MoveWindowToWorkspaceTransformTests
 	internal void Success_BothWorkspacesLayout(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the window switches workspaces, and both workspaces are visible
-		IWorkspace workspace1 = CreateWorkspace();
-		IWorkspace workspace2 = CreateWorkspace();
+		IWorkspace workspace1 = CreateWorkspace(ctx);
+		IWorkspace workspace2 = CreateWorkspace(ctx);
 
 		IWindow window = CreateWindow((HWND)10);
 
@@ -170,8 +170,8 @@ public class MoveWindowToWorkspaceTransformTests
 	internal void Success_SingleWorkspaceLayout(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the window gets activated on a hidden workspace
-		IWorkspace workspace1 = CreateWorkspace();
-		IWorkspace workspace2 = CreateWorkspace();
+		IWorkspace workspace1 = CreateWorkspace(ctx);
+		IWorkspace workspace2 = CreateWorkspace(ctx);
 
 		IWindow window = CreateWindow((HWND)10);
 

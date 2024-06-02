@@ -13,7 +13,7 @@ internal static class StoreTestUtils
 		IContext ctx,
 		MutableRootSector rootSector,
 		IWindow window,
-		IWorkspace workspace
+		Workspace workspace
 	)
 	{
 		if (workspace.Id == default)
@@ -30,22 +30,21 @@ internal static class StoreTestUtils
 			window.Handle,
 			workspace.Id
 		);
+
+		rootSector.WorkspaceSector.Workspaces = rootSector.WorkspaceSector.Workspaces.Add(workspace.Id, workspace);
 		ctx.WorkspaceManager.GetEnumerator().Returns(_ => new List<IWorkspace>() { workspace }.GetEnumerator());
 	}
 
 	private static int _workspaceCounter = 1;
 
-	public static IWorkspace CreateWorkspace()
+	public static Workspace CreateWorkspace(IContext ctx)
 	{
-		IWorkspace workspace = Substitute.For<IWorkspace, IInternalWorkspace>();
-
 		byte[] bytes = new byte[16];
 		BitConverter.GetBytes(_workspaceCounter).CopyTo(bytes, 0);
 		Guid workspaceId = new(bytes);
-		workspace.Id.Returns(workspaceId);
 		_workspaceCounter++;
 
-		return workspace;
+		return new Workspace(ctx, workspaceId);
 	}
 
 	public static IMonitor CreateMonitor(HMONITOR handle)

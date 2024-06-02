@@ -31,7 +31,7 @@ public class MergeWorkspaceWIndowsTransformTests
 	internal void TargetWorkspaceNotFound(IContext ctx)
 	{
 		// Given
-		IWorkspace workspace = CreateWorkspace();
+		IWorkspace workspace = CreateWorkspace(ctx);
 		Guid targetWorkspaceId = Guid.NewGuid();
 
 		AddWorkspacesToManager(ctx, workspace);
@@ -49,8 +49,8 @@ public class MergeWorkspaceWIndowsTransformTests
 	internal void Success(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the source and target workspaces
-		IWorkspace sourceWorkspace = CreateWorkspace();
-		IWorkspace targetWorkspace = CreateWorkspace();
+		IWorkspace sourceWorkspace = CreateWorkspace(ctx);
+		IWorkspace targetWorkspace = CreateWorkspace(ctx);
 
 		HMONITOR monitorHandle = (HMONITOR)1;
 		IMonitor monitor = CreateMonitor(monitorHandle);

@@ -44,7 +44,7 @@ public class WindowMinimizeEndedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Success(IContext ctx, MutableRootSector rootSector, IWorkspace workspace, IWindow window)
+	internal void Success(IContext ctx, MutableRootSector rootSector, Workspace workspace, IWindow window)
 	{
 		// Given the window is in a workspace
 		StoreTestUtils.SetupWindowWorkspaceMapping(ctx, rootSector, window, workspace);

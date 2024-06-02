@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,7 +6,6 @@ namespace Whim;
 public partial record Workspace : IInternalWorkspace
 {
 	private readonly IContext _context;
-	private readonly IInternalContext _internalContext;
 
 	/// <summary>
 	/// The latest instance of <see cref="IWorkspace"/> for the given <see cref="WorkspaceId"/>.
@@ -33,10 +31,9 @@ public partial record Workspace : IInternalWorkspace
 	/// <inheritdoc/>
 	public IEnumerable<IWindow> Windows => _context.Store.Pick(Pickers.PickAllWindowsInWorkspace(Id)).Value!;
 
-	internal Workspace(IContext context, IInternalContext internalContext, Guid id)
+	internal Workspace(IContext context, WorkspaceId id)
 	{
 		_context = context;
-		_internalContext = internalContext;
 		Id = id;
 	}
 

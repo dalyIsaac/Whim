@@ -79,7 +79,7 @@ public class MoveWindowToAdjacentWorkspaceTransformTests
 	{
 		// Given there are no adjacent workspaces
 		IWindow window = CreateWindow((HWND)10);
-		PopulateWindowWorkspaceMap(ctx, rootSector, window, CreateWorkspace());
+		PopulateWindowWorkspaceMap(ctx, rootSector, window, CreateWorkspace(ctx));
 
 		MoveWindowToAdjacentWorkspaceTransform sut = new(window.Handle);
 
@@ -96,8 +96,8 @@ public class MoveWindowToAdjacentWorkspaceTransformTests
 		// Given
 		IWindow window = CreateWindow((HWND)10);
 
-		IWorkspace workspace1 = CreateWorkspace();
-		IWorkspace workspace2 = CreateWorkspace();
+		IWorkspace workspace1 = CreateWorkspace(ctx);
+		IWorkspace workspace2 = CreateWorkspace(ctx);
 
 		PopulateThreeWayMap(ctx, rootSector, CreateMonitor((HMONITOR)10), workspace1, window);
 		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor((HMONITOR)11), workspace2);

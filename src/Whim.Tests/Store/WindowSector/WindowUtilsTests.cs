@@ -9,7 +9,7 @@ namespace Whim.Tests;
 
 public class WindowUtilsTests
 {
-	private static void Setup_TryGetWindowState(IWindow window, IWorkspace workspace, IRectangle<int>? rect = null)
+	private static void Setup_TryGetWindowState(IWindow window, Workspace workspace, IRectangle<int>? rect = null)
 	{
 		workspace
 			.TryGetWindowState(window)
@@ -52,7 +52,7 @@ public class WindowUtilsTests
 		IContext ctx,
 		MutableRootSector rootSector,
 		IWindow window,
-		IWorkspace workspace
+		Workspace workspace
 	)
 	{
 		// Given we can't get the window position from the native manager
@@ -79,7 +79,7 @@ public class WindowUtilsTests
 		IContext ctx,
 		MutableRootSector rootSector,
 		IWindow window,
-		IWorkspace workspace
+		Workspace workspace
 	)
 	{
 		// Given the new window position
@@ -181,7 +181,7 @@ public class WindowUtilsTests
 		IContext ctx,
 		MutableRootSector rootSector,
 		IWindow window,
-		IWorkspace workspace
+		Workspace workspace
 	)
 	{
 		// Given the new window position

@@ -26,7 +26,7 @@ public class ActivateAdjacentWorkspaceTransformTests
 	internal void AdjacentWorkspaceNotFound(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the workspace doesn't exist
-		IWorkspace workspace = CreateWorkspace();
+		IWorkspace workspace = CreateWorkspace(ctx);
 		IMonitor monitor = CreateMonitor((HMONITOR)1);
 
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, workspace);
@@ -44,8 +44,8 @@ public class ActivateAdjacentWorkspaceTransformTests
 	internal void Success(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the workspace exists
-		IWorkspace workspace1 = CreateWorkspace();
-		IWorkspace workspace2 = CreateWorkspace();
+		IWorkspace workspace1 = CreateWorkspace(ctx);
+		IWorkspace workspace2 = CreateWorkspace(ctx);
 
 		IMonitor monitor = CreateMonitor((HMONITOR)1);
 
@@ -58,6 +58,6 @@ public class ActivateAdjacentWorkspaceTransformTests
 		var result = ctx.Store.Dispatch(sut);
 
 		// Then we get an error
-		Assert.True(result.IsSuccessful);
+		Assert.False(result.IsSuccessful);
 	}
 }

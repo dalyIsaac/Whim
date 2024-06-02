@@ -58,9 +58,9 @@ public class MonitorsChangedTransformTests
 
 	private static IWorkspace[] SetupWorkspaces(IContext ctx, MutableRootSector rootSector)
 	{
-		IWorkspace workspace1 = CreateWorkspace();
-		IWorkspace workspace2 = CreateWorkspace();
-		IWorkspace workspace3 = CreateWorkspace();
+		IWorkspace workspace1 = CreateWorkspace(ctx);
+		IWorkspace workspace2 = CreateWorkspace(ctx);
+		IWorkspace workspace3 = CreateWorkspace(ctx);
 		AddWorkspacesToManager(ctx, workspace1, workspace2, workspace3);
 
 		ctx.WorkspaceManager.Add().Returns(_ => workspace1, _ => workspace2, _ => workspace3);

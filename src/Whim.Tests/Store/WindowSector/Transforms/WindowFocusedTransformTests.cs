@@ -41,7 +41,7 @@ public class WindowFocusedTransformTests
 		ImmutableArray<IMonitor> monitors = Setup_Monitors(rootSector);
 
 		window.Handle.Returns((HWND)2);
-		IWorkspace workspace = CreateWorkspace();
+		IWorkspace workspace = CreateWorkspace(ctx);
 
 		PopulateThreeWayMap(ctx, rootSector, monitors[1], workspace, window);
 
@@ -144,9 +144,9 @@ public class WindowFocusedTransformTests
 	{
 		// Given the window's workspace is not tracked by the map sector, but the window is tracked
 		IWindow window = CreateWindow((HWND)1);
-		IWorkspace workspace = CreateWorkspace();
-		IWorkspace workspace1 = CreateWorkspace();
-		IWorkspace workspace2 = CreateWorkspace();
+		IWorkspace workspace = CreateWorkspace(ctx);
+		IWorkspace workspace1 = CreateWorkspace(ctx);
+		IWorkspace workspace2 = CreateWorkspace(ctx);
 
 		Setup_Monitors(rootSector);
 
@@ -176,10 +176,10 @@ public class WindowFocusedTransformTests
 	{
 		// Given the window's workspace is tracked by the map sector
 		IWindow window = CreateWindow((HWND)1);
-		IWorkspace workspace1 = CreateWorkspace();
-		IWorkspace workspace2 = CreateWorkspace();
-		IWorkspace workspace3 = CreateWorkspace();
-		IWorkspace workspace4 = CreateWorkspace();
+		IWorkspace workspace1 = CreateWorkspace(ctx);
+		IWorkspace workspace2 = CreateWorkspace(ctx);
+		IWorkspace workspace3 = CreateWorkspace(ctx);
+		IWorkspace workspace4 = CreateWorkspace(ctx);
 
 		Setup_Monitors(rootSector);
 

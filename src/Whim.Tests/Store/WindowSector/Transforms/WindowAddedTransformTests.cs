@@ -131,7 +131,7 @@ public class WindowAddedTransformTests
 	{
 		// Given the window is routed to a workspace
 		HWND hwnd = (HWND)1;
-		IWorkspace workspace = CreateWorkspace();
+		IWorkspace workspace = CreateWorkspace(ctx);
 
 		Setup(ctx, internalCtx, hwnd);
 		ctx.WorkspaceManager.Contains(workspace).Returns(true);
@@ -159,7 +159,7 @@ public class WindowAddedTransformTests
 	{
 		// Given the window is routed to an active workspace
 		HWND hwnd = (HWND)1;
-		IWorkspace workspace = CreateWorkspace();
+		IWorkspace workspace = CreateWorkspace(ctx);
 
 		Setup(ctx, internalCtx, hwnd);
 		ctx.WorkspaceManager.Contains(workspace).Returns(true);
@@ -189,7 +189,7 @@ public class WindowAddedTransformTests
 		// Given the window is routed to last tracked active workspace
 		HWND hwnd = (HWND)1;
 		HMONITOR monitorHandle = (HMONITOR)1;
-		IWorkspace workspace = CreateWorkspace();
+		IWorkspace workspace = CreateWorkspace(ctx);
 
 		Setup(ctx, internalCtx, hwnd);
 		ctx.WorkspaceManager.Contains(workspace).Returns(true);
@@ -218,7 +218,7 @@ public class WindowAddedTransformTests
 		// Given the window has a workspace
 		HWND hwnd = (HWND)1;
 		HMONITOR monitorHandle = (HMONITOR)1;
-		IWorkspace workspace = CreateWorkspace();
+		IWorkspace workspace = CreateWorkspace(ctx);
 
 		Setup(ctx, internalCtx, hwnd);
 		ctx.WorkspaceManager.Contains(workspace).Returns(true);
@@ -247,7 +247,7 @@ public class WindowAddedTransformTests
 	{
 		// Given the window is not routed, so we use the active workspace
 		HWND hwnd = (HWND)1;
-		IWorkspace workspace = CreateWorkspace();
+		IWorkspace workspace = CreateWorkspace(ctx);
 
 		Setup(ctx, internalCtx, hwnd);
 		ctx.WorkspaceManager.Contains(workspace).Returns(true);
@@ -272,7 +272,7 @@ public class WindowAddedTransformTests
 	{
 		// Given the window is minimized
 		HWND hwnd = (HWND)1;
-		IWorkspace workspace = CreateWorkspace();
+		IWorkspace workspace = CreateWorkspace(ctx);
 
 		internalCtx.CoreNativeManager.IsWindowMinimized(hwnd).Returns((BOOL)true);
 
@@ -299,7 +299,7 @@ public class WindowAddedTransformTests
 	{
 		// Given the window is not minimized
 		HWND hwnd = (HWND)1;
-		IWorkspace workspace = CreateWorkspace();
+		IWorkspace workspace = CreateWorkspace(ctx);
 
 		internalCtx.CoreNativeManager.IsWindowMinimized(hwnd).Returns((BOOL)false);
 

@@ -60,7 +60,7 @@ public class MoveWindowToMonitorTransformTests
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
 
 		AddWindowToSector(rootSector, window);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, CreateWorkspace());
+		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, CreateWorkspace(ctx));
 
 		MoveWindowToMonitorTransform sut = new(monitor.Handle, window.Handle);
 
@@ -78,7 +78,7 @@ public class MoveWindowToMonitorTransformTests
 		IWindow window = CreateWindow((HWND)10);
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
 
-		PopulateThreeWayMap(ctx, rootSector, monitor, CreateWorkspace(), window);
+		PopulateThreeWayMap(ctx, rootSector, monitor, CreateWorkspace(ctx), window);
 
 		MoveWindowToMonitorTransform sut = new(monitor.Handle, window.Handle);
 
@@ -97,8 +97,8 @@ public class MoveWindowToMonitorTransformTests
 		IMonitor originalMonitor = CreateMonitor((HMONITOR)10);
 		IMonitor newMonitor = CreateMonitor((HMONITOR)11);
 
-		PopulateThreeWayMap(ctx, rootSector, originalMonitor, CreateWorkspace(), window);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, newMonitor, CreateWorkspace());
+		PopulateThreeWayMap(ctx, rootSector, originalMonitor, CreateWorkspace(ctx), window);
+		PopulateMonitorWorkspaceMap(ctx, rootSector, newMonitor, CreateWorkspace(ctx));
 
 		MoveWindowToMonitorTransform sut = new(newMonitor.Handle, window.Handle);
 

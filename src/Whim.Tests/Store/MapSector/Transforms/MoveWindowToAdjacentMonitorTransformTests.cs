@@ -39,8 +39,8 @@ public class MoveWindowToAdjacentMonitorTransformTests
 
 		IWindow window = CreateWindow((HWND)10);
 
-		PopulateThreeWayMap(ctx, rootSector, originalMonitor, CreateWorkspace(), window);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, newMonitor, CreateWorkspace());
+		PopulateThreeWayMap(ctx, rootSector, originalMonitor, CreateWorkspace(ctx), window);
+		PopulateMonitorWorkspaceMap(ctx, rootSector, newMonitor, CreateWorkspace(ctx));
 		rootSector.MonitorSector.ActiveMonitorHandle = originalMonitor.Handle;
 
 		MoveWindowToAdjacentMonitorTransform sut = new(window.Handle);

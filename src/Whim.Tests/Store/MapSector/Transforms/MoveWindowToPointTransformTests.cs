@@ -33,7 +33,7 @@ public class MoveWindowToPointTransformTests
 		// Given there is no workspace for the window
 		IWindow window = CreateWindow((HWND)10);
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
-		IWorkspace workspace = CreateWorkspace();
+		IWorkspace workspace = CreateWorkspace(ctx);
 		Point<int> point = new(10, 10);
 
 		AddWindowToSector(rootSector, window);
@@ -55,7 +55,7 @@ public class MoveWindowToPointTransformTests
 		// Given there is a workspace for the window
 		IWindow window = CreateWindow((HWND)10);
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
-		IWorkspace workspace = CreateWorkspace();
+		IWorkspace workspace = CreateWorkspace(ctx);
 		Point<int> point = new(10, 10);
 
 		AddWindowToSector(rootSector, window);
@@ -80,10 +80,10 @@ public class MoveWindowToPointTransformTests
 		// Given there is a workspace for the window
 		IWindow window = CreateWindow((HWND)10);
 		IMonitor sourceMonitor = CreateMonitor((HMONITOR)10);
-		IWorkspace sourceWorkspace = CreateWorkspace();
+		IWorkspace sourceWorkspace = CreateWorkspace(ctx);
 
 		IMonitor targetMonitor = CreateMonitor((HMONITOR)11);
-		IWorkspace targetWorkspace = CreateWorkspace();
+		IWorkspace targetWorkspace = CreateWorkspace(ctx);
 
 		Point<int> point = new(10, 10);
 

@@ -16,9 +16,9 @@ public class MapPickersTests
 	internal void PickAllActiveWorkspaces(IContext ctx, MutableRootSector root)
 	{
 		// Given there are three active workspaces
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), CreateWorkspace());
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)2), CreateWorkspace());
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)3), CreateWorkspace());
+		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), CreateWorkspace(ctx));
+		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)2), CreateWorkspace(ctx));
+		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)3), CreateWorkspace(ctx));
 
 		// When we get the workspaces
 		var result = ctx.Store.Pick(Pickers.PickAllActiveWorkspaces());
@@ -31,9 +31,9 @@ public class MapPickersTests
 	internal void PickWorkspaceById_Failure(IContext ctx, MutableRootSector root)
 	{
 		// Given there are three workspaces
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), CreateWorkspace());
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)2), CreateWorkspace());
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)3), CreateWorkspace());
+		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), CreateWorkspace(ctx));
+		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)2), CreateWorkspace(ctx));
+		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)3), CreateWorkspace(ctx));
 
 		Guid workspaceId = Guid.NewGuid();
 
@@ -48,9 +48,9 @@ public class MapPickersTests
 	internal void PickWorkspaceById_Success(IContext ctx, MutableRootSector root)
 	{
 		// Given there are three workspaces
-		var workspace1 = CreateWorkspace();
-		var workspace2 = CreateWorkspace();
-		var workspace3 = CreateWorkspace();
+		var workspace1 = CreateWorkspace(ctx);
+		var workspace2 = CreateWorkspace(ctx);
+		var workspace3 = CreateWorkspace(ctx);
 
 		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), workspace1);
 		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)2), workspace2);
@@ -70,7 +70,7 @@ public class MapPickersTests
 		// Given there is a workspace
 		HMONITOR handle = (HMONITOR)1;
 
-		var workspace = CreateWorkspace();
+		var workspace = CreateWorkspace(ctx);
 		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor(handle), workspace);
 
 		// When we get the workspace
@@ -87,7 +87,7 @@ public class MapPickersTests
 		// Given there is a workspace
 		HWND handle = (HWND)1;
 
-		var workspace = CreateWorkspace();
+		var workspace = CreateWorkspace(ctx);
 		PopulateWindowWorkspaceMap(ctx, root, CreateWindow(handle), workspace);
 
 		// When we get the workspace
@@ -102,8 +102,8 @@ public class MapPickersTests
 	internal void PickMonitorByWorkspace_Failure(IContext ctx, MutableRootSector root)
 	{
 		// Given we have an untracked workspace
-		var untrackedWorkspace = CreateWorkspace();
-		var workspace = CreateWorkspace();
+		var untrackedWorkspace = CreateWorkspace(ctx);
+		var workspace = CreateWorkspace(ctx);
 		root.MapSector.MonitorWorkspaceMap = root.MapSector.MonitorWorkspaceMap.SetItem((HMONITOR)1, workspace.Id);
 
 		// When we get the monitor
@@ -117,7 +117,7 @@ public class MapPickersTests
 	internal void PickMonitorByWorkspace_Success(IContext ctx, MutableRootSector root)
 	{
 		// Given we have a tracked workspace
-		var workspace = CreateWorkspace();
+		var workspace = CreateWorkspace(ctx);
 		root.MapSector.MonitorWorkspaceMap = root.MapSector.MonitorWorkspaceMap.SetItem((HMONITOR)1, workspace.Id);
 
 		IMonitor monitor = CreateMonitor((HMONITOR)1);
@@ -138,7 +138,7 @@ public class MapPickersTests
 		HWND hwnd = (HWND)10;
 		HWND untrackedHwnd = (HWND)20;
 
-		PopulateThreeWayMap(ctx, root, CreateMonitor((HMONITOR)1), CreateWorkspace(), CreateWindow(untrackedHwnd));
+		PopulateThreeWayMap(ctx, root, CreateMonitor((HMONITOR)1), CreateWorkspace(ctx), CreateWindow(untrackedHwnd));
 
 		// When we get the monitor
 		var result = ctx.Store.Pick(Pickers.PickMonitorByWindow(hwnd));
@@ -157,8 +157,8 @@ public class MapPickersTests
 		IMonitor monitor1 = CreateMonitor((HMONITOR)1);
 		IMonitor monitor2 = CreateMonitor((HMONITOR)2);
 
-		PopulateThreeWayMap(ctx, root, monitor1, CreateWorkspace(), CreateWindow(hwnd1));
-		PopulateThreeWayMap(ctx, root, monitor2, CreateWorkspace(), CreateWindow(hwnd2));
+		PopulateThreeWayMap(ctx, root, monitor1, CreateWorkspace(ctx), CreateWindow(hwnd1));
+		PopulateThreeWayMap(ctx, root, monitor2, CreateWorkspace(ctx), CreateWindow(hwnd2));
 
 		// When we get the monitor
 		var result = ctx.Store.Pick(Pickers.PickMonitorByWindow(hwnd1));
@@ -172,8 +172,8 @@ public class MapPickersTests
 	internal void PickAdjacentWorkspace_CouldNotFindWorkspace(IContext ctx, MutableRootSector root)
 	{
 		// Given we have an untracked workspace
-		var untrackedWorkspace = CreateWorkspace();
-		var workspace = CreateWorkspace();
+		var untrackedWorkspace = CreateWorkspace(ctx);
+		var workspace = CreateWorkspace(ctx);
 		root.MapSector.MonitorWorkspaceMap = root.MapSector.MonitorWorkspaceMap.SetItem((HMONITOR)1, workspace.Id);
 
 		// When we get the workspace
@@ -187,7 +187,7 @@ public class MapPickersTests
 	internal void PickAdjacentWorkspace_NoAdjacentWorkspaces(IContext ctx, MutableRootSector root)
 	{
 		// Given we have a tracked workspace
-		var workspace = CreateWorkspace();
+		var workspace = CreateWorkspace(ctx);
 		root.MapSector.MonitorWorkspaceMap = root.MapSector.MonitorWorkspaceMap.SetItem((HMONITOR)1, workspace.Id);
 
 		// When we get the workspace
@@ -217,10 +217,10 @@ public class MapPickersTests
 	)
 	{
 		// Given we have four workspaces
-		PopulateThreeWayMap(ctx, root, CreateMonitor((HMONITOR)1), CreateWorkspace(), CreateWindow((HWND)1));
-		PopulateThreeWayMap(ctx, root, CreateMonitor((HMONITOR)2), CreateWorkspace(), CreateWindow((HWND)2));
-		PopulateThreeWayMap(ctx, root, CreateMonitor((HMONITOR)3), CreateWorkspace(), CreateWindow((HWND)3));
-		PopulateThreeWayMap(ctx, root, CreateMonitor((HMONITOR)4), CreateWorkspace(), CreateWindow((HWND)4));
+		PopulateThreeWayMap(ctx, root, CreateMonitor((HMONITOR)1), CreateWorkspace(ctx), CreateWindow((HWND)1));
+		PopulateThreeWayMap(ctx, root, CreateMonitor((HMONITOR)2), CreateWorkspace(ctx), CreateWindow((HWND)2));
+		PopulateThreeWayMap(ctx, root, CreateMonitor((HMONITOR)3), CreateWorkspace(ctx), CreateWindow((HWND)3));
+		PopulateThreeWayMap(ctx, root, CreateMonitor((HMONITOR)4), CreateWorkspace(ctx), CreateWindow((HWND)4));
 
 		IWorkspace[] workspaces = ctx.WorkspaceManager.ToArray();
 		ctx.WorkspaceManager.ActiveWorkspace.Returns(workspaces[activeIdx]);

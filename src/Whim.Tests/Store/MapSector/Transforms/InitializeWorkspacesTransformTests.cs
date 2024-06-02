@@ -122,9 +122,9 @@ public class InitializeWorkspacesTransformTests
 		SavedWorkspace savedWorkspace1 = new("test1", new List<SavedWindow>() { savedWindow1, savedWindow2 });
 		SavedWorkspace savedWorkspace2 = new("test2", new List<SavedWindow>() { savedWindow3 });
 
-		IWorkspace workspace1 = CreateWorkspace();
+		IWorkspace workspace1 = CreateWorkspace(ctx);
 		workspace1.Name.Returns(savedWorkspace1.Name);
-		IWorkspace workspace2 = CreateWorkspace();
+		IWorkspace workspace2 = CreateWorkspace(ctx);
 		workspace2.Name.Returns(savedWorkspace2.Name);
 
 		AddWorkspacesToSavedState(internalCtx, savedWorkspace1, savedWorkspace2);
