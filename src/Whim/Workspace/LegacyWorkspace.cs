@@ -16,7 +16,7 @@ public partial record Workspace : IInternalWorkspace
 	/// <inheritdoc/>
 	public string Name
 	{
-		get => LatestWorkspace.Name;
+		get => LatestWorkspace.BackingName;
 		set => _context.Store.Dispatch(new SetWorkspaceNameTransform(Id, value));
 	}
 

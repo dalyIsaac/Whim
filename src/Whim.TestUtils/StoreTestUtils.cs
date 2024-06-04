@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NSubstitute;
-using Windows.Web.AtomPub;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 
@@ -10,31 +9,6 @@ namespace Whim.TestUtils;
 
 internal static class StoreTestUtils
 {
-	public static void SetupWindowWorkspaceMapping(
-		IContext ctx,
-		MutableRootSector rootSector,
-		IWindow window,
-		Workspace workspace
-	)
-	{
-		if (workspace.Id == default)
-		{
-			workspace.Id.Returns(Guid.NewGuid());
-		}
-
-		if (window.Handle == default)
-		{
-			window.Handle.Returns((HWND)2);
-		}
-
-		rootSector.MapSector.WindowWorkspaceMap = rootSector.MapSector.WindowWorkspaceMap.SetItem(
-			window.Handle,
-			workspace.Id
-		);
-
-		AddWorkspacesToManager(ctx, rootSector, workspace);
-	}
-
 	private static int _workspaceCounter = 1;
 
 	public static Workspace CreateWorkspace(IContext ctx)
@@ -65,7 +39,11 @@ internal static class StoreTestUtils
 		return window;
 	}
 
-	public static void AddWorkspacesToManager(IContext ctx, MutableRootSector rootSector, params Workspace[] newWorkspaces)
+	public static void AddWorkspacesToManager(
+		IContext ctx,
+		MutableRootSector rootSector,
+		params Workspace[] newWorkspaces
+	)
 	{
 		List<IWorkspace> workspaces = ctx.WorkspaceManager.ToList();
 		workspaces.AddRange(newWorkspaces);
