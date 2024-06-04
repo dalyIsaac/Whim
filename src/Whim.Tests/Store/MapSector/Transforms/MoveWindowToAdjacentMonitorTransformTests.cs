@@ -36,18 +36,18 @@ public class MoveWindowToAdjacentMonitorTransformTests
 	// 	// Given there are two adjacent monitors
 	// 	IMonitor originalMonitor = CreateMonitor((HMONITOR)10);
 	// 	IMonitor newMonitor = CreateMonitor((HMONITOR)11);
-	   
+
 	// 	IWindow window = CreateWindow((HWND)10);
-	   
+
 	// 	PopulateThreeWayMap(ctx, rootSector, originalMonitor, CreateWorkspace(ctx), window);
 	// 	PopulateMonitorWorkspaceMap(ctx, rootSector, newMonitor, CreateWorkspace(ctx));
 	// 	rootSector.MonitorSector.ActiveMonitorHandle = originalMonitor.Handle;
-	   
+
 	// 	MoveWindowToAdjacentMonitorTransform sut = new(window.Handle);
-	   
+
 	// 	// When we dispatch the transform
 	// 	var result = ctx.Store.Dispatch(sut);
-	   
+
 	// 	// Then
 	// 	Assert.True(result.IsSuccessful);
 	// }

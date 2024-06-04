@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using NSubstitute;
 using Windows.Win32.Foundation;
@@ -18,7 +19,13 @@ internal static class StoreTestUtils
 		Guid workspaceId = new(bytes);
 		_workspaceCounter++;
 
-		return new Workspace(ctx, workspaceId);
+		ILayoutEngine engine = Substitute.For<ITestLayoutEngine>();
+
+		return new Workspace(ctx, workspaceId)
+		{
+			LayoutEngines = ImmutableList.Create(engine),
+			ActiveLayoutEngineIndex = 0
+		};
 	}
 
 	public static IMonitor CreateMonitor(HMONITOR handle)
@@ -53,6 +60,7 @@ internal static class StoreTestUtils
 		foreach (Workspace w in newWorkspaces)
 		{
 			rootSector.WorkspaceSector.Workspaces = rootSector.WorkspaceSector.Workspaces.Add(w.Id, w);
+			rootSector.WorkspaceSector.WorkspaceOrder = rootSector.WorkspaceSector.WorkspaceOrder.Add(w.Id);
 		}
 	}
 
@@ -90,6 +98,11 @@ internal static class StoreTestUtils
 		);
 		rootSector.MonitorSector.Monitors = rootSector.MonitorSector.Monitors.Add(monitor);
 
+		if (rootSector.MonitorSector.Monitors.Length == 1)
+		{
+			rootSector.MonitorSector.ActiveMonitorHandle = monitor.Handle;
+		}
+
 		AddWorkspacesToManager(ctx, rootSector, workspace);
 	}
 
@@ -101,21 +114,12 @@ internal static class StoreTestUtils
 		IWindow window
 	)
 	{
-		rootSector.MapSector.MonitorWorkspaceMap = rootSector.MapSector.MonitorWorkspaceMap.SetItem(
-			monitor.Handle,
-			workspace.Id
-		);
-		rootSector.MapSector.WindowWorkspaceMap = rootSector.MapSector.WindowWorkspaceMap.SetItem(
-			window.Handle,
-			workspace.Id
-		);
-		rootSector.WindowSector.Windows = rootSector.WindowSector.Windows.Add(window.Handle, window);
-
-		rootSector.MonitorSector.Monitors = rootSector.MonitorSector.Monitors.Add(monitor);
-
+		PopulateWindowWorkspaceMap(ctx, rootSector, window, workspace);
+		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, workspace);
 		AddWorkspacesToManager(ctx, rootSector, workspace);
 	}
 
+	// TODO: Remove
 	public static void SetupMonitorAtPoint(IContext ctx, IPoint<int> point, IMonitor monitor)
 	{
 		ctx.MonitorManager.GetMonitorAtPoint(point).Returns(monitor);

@@ -96,15 +96,15 @@ public class MoveWindowToMonitorTransformTests
 	// 	IWindow window = CreateWindow((HWND)10);
 	// 	IMonitor originalMonitor = CreateMonitor((HMONITOR)10);
 	// 	IMonitor newMonitor = CreateMonitor((HMONITOR)11);
-	   
+
 	// 	PopulateThreeWayMap(ctx, rootSector, originalMonitor, CreateWorkspace(ctx), window);
 	// 	PopulateMonitorWorkspaceMap(ctx, rootSector, newMonitor, CreateWorkspace(ctx));
-	   
+
 	// 	MoveWindowToMonitorTransform sut = new(newMonitor.Handle, window.Handle);
-	   
+
 	// 	// When
 	// 	var result = ctx.Store.Dispatch(sut);
-	   
+
 	// 	// Then
 	// 	Assert.True(result.IsSuccessful);
 	// }

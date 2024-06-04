@@ -23,7 +23,7 @@ public partial record Workspace : IInternalWorkspace
 	private bool _disposedValue;
 
 	/// <inheritdoc/>
-	public IWindow? LastFocusedWindow => _context.Store.Pick(Pickers.PickLastFocusedWindow(Id)).Value!;
+	public IWindow? LastFocusedWindow => _context.Store.Pick(Pickers.PickLastFocusedWindow(Id)).OrDefault();
 
 	/// <inheritdoc/>
 	public ILayoutEngine ActiveLayoutEngine => _context.Store.Pick(Pickers.PickActiveLayoutEngine(Id)).Value!;

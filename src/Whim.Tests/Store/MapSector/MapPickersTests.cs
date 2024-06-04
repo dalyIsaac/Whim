@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Immutable;
 using System.Linq;
 using NSubstitute;
 using Whim.TestUtils;
@@ -217,21 +218,28 @@ public class MapPickersTests
 	)
 	{
 		// Given we have four workspaces
-		PopulateThreeWayMap(ctx, root, CreateMonitor((HMONITOR)1), CreateWorkspace(ctx), CreateWindow((HWND)1));
-		PopulateThreeWayMap(ctx, root, CreateMonitor((HMONITOR)2), CreateWorkspace(ctx), CreateWindow((HWND)2));
-		PopulateThreeWayMap(ctx, root, CreateMonitor((HMONITOR)3), CreateWorkspace(ctx), CreateWindow((HWND)3));
-		PopulateThreeWayMap(ctx, root, CreateMonitor((HMONITOR)4), CreateWorkspace(ctx), CreateWindow((HWND)4));
+		AddWorkspacesToManager(
+			ctx,
+			root,
+			CreateWorkspace(ctx),
+			CreateWorkspace(ctx),
+			CreateWorkspace(ctx),
+			CreateWorkspace(ctx)
+		);
 
-		IWorkspace[] workspaces = ctx.WorkspaceManager.ToArray();
-		ctx.WorkspaceManager.ActiveWorkspace.Returns(workspaces[activeIdx]);
+		ImmutableArray<Guid> workspaceOrder = root.WorkspaceSector.WorkspaceOrder;
+		Guid startId = workspaceOrder[startIdx];
 
-		Guid workspaceId = workspaces[startIdx].Id;
+		root.MapSector.MonitorWorkspaceMap = root.MapSector.MonitorWorkspaceMap.SetItem(
+			root.MonitorSector.ActiveMonitorHandle,
+			workspaceOrder[activeIdx]
+		);
 
 		// When we get the workspace
-		var result = ctx.Store.Pick(Pickers.PickAdjacentWorkspace(workspaceId, reverse, skipActive));
+		var result = ctx.Store.Pick(Pickers.PickAdjacentWorkspace(startId, reverse, skipActive));
 
 		// Then we get the workspace
 		Assert.True(result.IsSuccessful);
-		Assert.Same(workspaces[expected], result.Value);
+		Assert.Equal(workspaceOrder[expected], result.Value.Id);
 	}
 }

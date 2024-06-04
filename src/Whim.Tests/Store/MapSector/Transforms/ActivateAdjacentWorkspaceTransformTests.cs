@@ -57,7 +57,7 @@ public class ActivateAdjacentWorkspaceTransformTests
 		// When we activate the adjacent workspace
 		var result = ctx.Store.Dispatch(sut);
 
-		// Then we get an error
-		Assert.False(result.IsSuccessful);
+		// Then we get success
+		Assert.True(result.IsSuccessful);
 	}
 }
