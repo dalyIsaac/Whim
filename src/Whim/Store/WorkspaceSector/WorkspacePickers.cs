@@ -47,6 +47,14 @@ public static partial class Pickers
 			return Result.FromException<IWorkspace>(new WhimException($"Workspace with name {name} not found"));
 		};
 
+	/// <summary>
+	/// Base picker to get something from a workspace, provided by <paramref name="operation"/>.
+	/// </summary>
+	/// <param name="workspaceId">The id of the workspace to get something from.</param>
+	/// <param name="rootSector">The root sector.</param>
+	/// <param name="operation">The operation to determine what to get.</param>
+	/// <typeparam name="TResult">The result.</typeparam>
+	/// <returns></returns>
 	private static Result<TResult> BaseWorkspacePicker<TResult>(
 		WorkspaceId workspaceId,
 		IRootSector rootSector,
