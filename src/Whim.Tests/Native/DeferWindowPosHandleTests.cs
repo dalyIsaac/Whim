@@ -1,4 +1,5 @@
 using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -26,6 +27,35 @@ public class DeferWindowPosHandleTests
 		DeferWindowPosHandle sut = new(ctx, internalCtx);
 
 		// When
+		sut.Dispose();
+
+		// Then
+		internalCtx
+			.CoreNativeManager.DidNotReceive()
+			.SetWindowPos(
+				Arg.Any<HWND>(),
+				Arg.Any<HWND>(),
+				Arg.Any<int>(),
+				Arg.Any<int>(),
+				Arg.Any<int>(),
+				Arg.Any<int>(),
+				Arg.Any<SET_WINDOW_POS_FLAGS>()
+			);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void NoWindowOffset(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
+	{
+		// Givenn GetWindowOffset returns null
+		ctx.NativeManager.GetWindowOffset(Arg.Any<HWND>()).ReturnsNull();
+
+		DeferWindowPosHandle sut = new(ctx, internalCtx);
+		HWND hwnd = (HWND)123;
+
+		AddMonitorsToManager(ctx, root, CreateMonitor((HMONITOR)1));
+
+		// When
+		sut.DeferWindowPos(Create(hwnd));
 		sut.Dispose();
 
 		// Then
