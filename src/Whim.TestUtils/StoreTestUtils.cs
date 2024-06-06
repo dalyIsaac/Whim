@@ -36,6 +36,7 @@ internal static class StoreTestUtils
 		monitor.WorkingArea.Y.Returns(0);
 		monitor.WorkingArea.Width.Returns(1920);
 		monitor.WorkingArea.Height.Returns(1080);
+		monitor.ScaleFactor.Returns(100);
 		return monitor;
 	}
 
@@ -62,6 +63,15 @@ internal static class StoreTestUtils
 			rootSector.WorkspaceSector.Workspaces = rootSector.WorkspaceSector.Workspaces.Add(w.Id, w);
 			rootSector.WorkspaceSector.WorkspaceOrder = rootSector.WorkspaceSector.WorkspaceOrder.Add(w.Id);
 		}
+	}
+
+	public static void AddMonitorsToManager(IContext ctx, MutableRootSector rootSector, params IMonitor[] newMonitors)
+	{
+		List<IMonitor> monitors = ctx.MonitorManager.ToList();
+		monitors.AddRange(newMonitors);
+
+		ctx.MonitorManager.GetEnumerator().Returns(_ => monitors.GetEnumerator());
+		rootSector.MonitorSector.Monitors = newMonitors.ToImmutableArray();
 	}
 
 	public static void AddWindowToSector(MutableRootSector rootSector, IWindow window)

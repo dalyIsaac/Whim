@@ -21,6 +21,7 @@ public class StoreCustomization : ICustomization
 		// This is to ensure that the first Dispatch runs in a Task.
 		// All further calls will run in the same thread.
 		internalCtx.CoreNativeManager.IsStaThread().Returns(_ => true, _ => false);
+		DeferWindowPosHandle.ParallelOptions = new() { MaxDegreeOfParallelism = 1 };
 
 		NativeManagerUtils.SetupTryEnqueue(ctx);
 	}
