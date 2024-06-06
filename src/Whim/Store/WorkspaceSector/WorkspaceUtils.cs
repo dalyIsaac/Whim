@@ -8,6 +8,13 @@ internal static class WorkspaceUtils
 	public static WorkspaceId OrActiveWorkspace(this WorkspaceId WorkspaceId, IContext ctx) =>
 		WorkspaceId == default ? ctx.WorkspaceManager.ActiveWorkspace.Id : WorkspaceId;
 
+	/// <summary>
+	/// Set the active layout engine in the workspace.
+	/// This also sets the <see cref="Workspace.ActiveLayoutEngineIndex"/>.
+	/// </summary>
+	/// <param name="sector"></param>
+	/// <param name="workspace"></param>
+	/// <param name="layoutEngineIdx"></param>
 	public static Workspace SetActiveLayoutEngine(WorkspaceSector sector, Workspace workspace, int layoutEngineIdx)
 	{
 		int previousLayoutEngineIdx = workspace.ActiveLayoutEngineIndex;
