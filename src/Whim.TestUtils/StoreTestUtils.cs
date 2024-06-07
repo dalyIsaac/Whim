@@ -12,12 +12,21 @@ internal static class StoreTestUtils
 {
 	private static int _workspaceCounter = 1;
 
-	public static Workspace CreateWorkspace(IContext ctx)
+	public static Workspace CreateWorkspace(IContext ctx, Guid? providedId = null)
 	{
-		byte[] bytes = new byte[16];
-		BitConverter.GetBytes(_workspaceCounter).CopyTo(bytes, 0);
-		Guid workspaceId = new(bytes);
-		_workspaceCounter++;
+		Guid workspaceId;
+
+		if (providedId is null)
+		{
+			byte[] bytes = new byte[16];
+			BitConverter.GetBytes(_workspaceCounter).CopyTo(bytes, 0);
+			workspaceId = new(bytes);
+			_workspaceCounter++;
+		}
+		else
+		{
+			workspaceId = providedId.Value;
+		}
 
 		ILayoutEngine engine = Substitute.For<ITestLayoutEngine>();
 

@@ -77,13 +77,3 @@ public record RemoveWorkspaceByNameTransform(string Name) : BaseRemoveWorkspaceT
 	/// <inheritdoc />
 	public override bool ShouldRemove(Workspace workspace) => workspace.Name == Name;
 }
-
-/// <summary>
-/// Removes the provided <paramref name="Workspace"/>.
-/// </summary>
-/// <param name="Workspace"></param>
-public record RemoveWorkspaceTransform(Workspace Workspace) : BaseRemoveWorkspaceTransform()
-{
-	/// <inheritdoc />
-	public override bool ShouldRemove(Workspace workspace) => workspace == Workspace;
-}
