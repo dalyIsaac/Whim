@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using DotNext;
 
@@ -44,26 +45,27 @@ public record AddWorkspaceTransform(
 		}
 
 		// Create the layout engines.
-		ILayoutEngine[] layoutEngines = new ILayoutEngine[engineCreators.Length];
+		ImmutableList<ILayoutEngine>.Builder layoutEnginesBuilder = ImmutableList.CreateBuilder<ILayoutEngine>();
 		for (int i = 0; i < engineCreators.Length; i++)
 		{
-			layoutEngines[i] = engineCreators[i](new LayoutEngineIdentity());
-		}
+			ILayoutEngine currentEngine = engineCreators[i](new LayoutEngineIdentity());
 
-		// Set up the proxies.
-		for (int engineIdx = 0; engineIdx < engineCreators.Length; engineIdx++)
-		{
-			ILayoutEngine currentEngine = layoutEngines[engineIdx];
+			// Set up the proxies.
 			foreach (ProxyLayoutEngineCreator createProxyLayoutEngineFn in sector.ProxyLayoutEngineCreators)
 			{
 				ILayoutEngine proxy = createProxyLayoutEngineFn(currentEngine);
-				layoutEngines[engineIdx] = proxy;
 				currentEngine = proxy;
 			}
+
+			layoutEnginesBuilder.Add(currentEngine);
 		}
 
 		Workspace workspace =
-			new(ctx, WorkspaceId.NewGuid()) { Name = Name ?? $"Workspace {sector.Workspaces.Count + 1}" };
+			new(ctx, WorkspaceId.NewGuid())
+			{
+				BackingName = Name ?? $"Workspace {sector.Workspaces.Count + 1}",
+				LayoutEngines = layoutEnginesBuilder.ToImmutable()
+			};
 		sector.Workspaces = sector.Workspaces.Add(workspace.Id, workspace);
 		sector.WorkspaceOrder = sector.WorkspaceOrder.Add(workspace.Id);
 		sector.QueueEvent(new WorkspaceAddedEventArgs() { Workspace = workspace });

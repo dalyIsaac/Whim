@@ -10,7 +10,7 @@ namespace Whim;
 /// </summary>
 /// <param name="Name"></param>
 /// <param name="LayoutEngines"></param>
-internal record WorkspaceToCreate(string? Name, IEnumerable<CreateLeafLayoutEngine>? LayoutEngines);
+internal record WorkspaceToCreate(string? Name, IEnumerable<CreateLeafLayoutEngine>? CreateLeafLayoutEngines);
 
 internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorEvents, IDisposable
 {
