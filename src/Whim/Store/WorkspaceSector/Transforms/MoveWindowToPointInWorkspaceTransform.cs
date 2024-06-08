@@ -9,7 +9,7 @@ internal record MoveWindowToPointInWorkspaceTransform(WorkspaceId WorkspaceId, H
 		WorkspaceId,
 		WindowHandle,
 		DefaultToLastFocusedWindow: false,
-		IsWindowRequiredInWorkspace: true,
+		IsWindowRequiredInWorkspace: false,
 		SkipDoLayout: false
 	)
 {
