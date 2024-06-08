@@ -26,16 +26,26 @@ internal record MinimizeWindowEndTransform(WorkspaceId WorkspaceId, HWND WindowH
 		MutableRootSector rootSector,
 		Workspace workspace,
 		IWindow window
-	) =>
-		workspace with
+	)
+	{
+		ILayoutEngine layoutEngine = workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex];
+		ILayoutEngine newLayoutEngine = workspace
+			.LayoutEngines[workspace.ActiveLayoutEngineIndex]
+			.MinimizeWindowEnd(window);
+
+		if (newLayoutEngine == layoutEngine)
+		{
+			Logger.Debug("Window already in focus");
+			return workspace;
+		}
+
+		return workspace with
 		{
 			WindowPositions = workspace.WindowPositions.Add(window.Handle, new WindowPosition()),
 
 			// Restore in just the active layout engine. MinimizeWindowEnd is not called as part of
 			// Whim starting up.
-			LayoutEngines = workspace.LayoutEngines.SetItem(
-				workspace.ActiveLayoutEngineIndex,
-				workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex].MinimizeWindowEnd(window)
-			)
+			LayoutEngines = workspace.LayoutEngines.SetItem(workspace.ActiveLayoutEngineIndex, newLayoutEngine)
 		};
+	}
 }
