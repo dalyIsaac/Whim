@@ -10,7 +10,7 @@ using Windows.Win32.Graphics.Gdi;
 using Xunit;
 using static Whim.TestUtils.StoreTestUtils;
 
-namespace Whim.Tests.WorkspaceSector;
+namespace Whim.Tests;
 
 [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WorkspacePickersTests
@@ -195,8 +195,8 @@ public class WorkspacePickersTests
 		IWindow lastFocusedWindow = CreateWindow((HWND)2);
 
 		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
-		PopulateWindowWorkspaceMap(ctx, root, CreateWindow((HWND)1), workspace);
-		PopulateWindowWorkspaceMap(ctx, root, lastFocusedWindow, workspace);
+		workspace = PopulateWindowWorkspaceMap(ctx, root, CreateWindow((HWND)1), workspace);
+		workspace = PopulateWindowWorkspaceMap(ctx, root, lastFocusedWindow, workspace);
 		PopulateWindowWorkspaceMap(ctx, root, CreateWindow((HWND)3), workspace);
 
 		return lastFocusedWindow;

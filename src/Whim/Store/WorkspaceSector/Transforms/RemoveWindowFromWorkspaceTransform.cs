@@ -9,7 +9,7 @@ namespace Whim;
 /// </summary>
 /// <param name="WorkspaceId"></param>
 /// <param name="WindowHandle"></param>
-public record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, HWND WindowHandle)
+internal record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, HWND WindowHandle)
 	: BaseWorkspaceWindowTransform(WorkspaceId, WindowHandle, false)
 {
 	private protected override Result<Workspace> WindowOperation(
@@ -22,7 +22,7 @@ public record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, HWND W
 	{
 		workspace = workspace with { WindowPositions = workspace.WindowPositions.Remove(window.Handle) };
 
-		workspace = ResetLastFocusedWindow(internalCtx, workspace, window);
+		workspace = ResetLastFocusedWindow(workspace, window);
 		workspace = RemoveWindowFromLayoutEngines(workspace, window);
 		return workspace;
 	}
@@ -30,11 +30,10 @@ public record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, HWND W
 	/// <summary>
 	/// Reset the last focused window if the removed window was the last focused window.
 	/// </summary>
-	/// <param name="internalCtx"></param>
 	/// <param name="workspace"></param>
 	/// <param name="window"></param>
 	/// <returns></returns>
-	private static Workspace ResetLastFocusedWindow(IInternalContext internalCtx, Workspace workspace, IWindow window)
+	private static Workspace ResetLastFocusedWindow(Workspace workspace, IWindow window)
 	{
 		if (!window.Handle.Equals(workspace.LastFocusedWindowHandle))
 		{

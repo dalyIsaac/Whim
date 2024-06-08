@@ -87,9 +87,7 @@ public class MapPickersTests
 	{
 		// Given there is a workspace
 		HWND handle = (HWND)1;
-
-		var workspace = CreateWorkspace(ctx);
-		PopulateWindowWorkspaceMap(ctx, root, CreateWindow(handle), workspace);
+		Workspace workspace = PopulateWindowWorkspaceMap(ctx, root, CreateWindow(handle), CreateWorkspace(ctx));
 
 		// When we get the workspace
 		var result = ctx.Store.Pick(Pickers.PickWorkspaceByWindow(handle));

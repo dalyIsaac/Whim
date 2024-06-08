@@ -56,21 +56,28 @@ internal static class StoreTestUtils
 		return window;
 	}
 
+	public static void AddWorkspaceToManager(IContext ctx, MutableRootSector rootSector, Workspace workspace)
+	{
+		List<IWorkspace> workspaces = ctx.WorkspaceManager.ToList();
+		workspaces.Add(workspace);
+		ctx.WorkspaceManager.GetEnumerator().Returns(_ => workspaces.GetEnumerator());
+
+		rootSector.WorkspaceSector.Workspaces = rootSector.WorkspaceSector.Workspaces.Add(workspace.Id, workspace);
+		rootSector.WorkspaceSector.WorkspaceOrder = rootSector.WorkspaceSector.WorkspaceOrder.Add(workspace.Id);
+	}
+
 	public static void AddWorkspacesToManager(
 		IContext ctx,
 		MutableRootSector rootSector,
 		params Workspace[] newWorkspaces
 	)
 	{
-		List<IWorkspace> workspaces = ctx.WorkspaceManager.ToList();
-		workspaces.AddRange(newWorkspaces);
-
-		ctx.WorkspaceManager.GetEnumerator().Returns(_ => workspaces.GetEnumerator());
-
-		foreach (Workspace w in newWorkspaces)
+		foreach (Workspace workspace in newWorkspaces)
 		{
-			rootSector.WorkspaceSector.Workspaces = rootSector.WorkspaceSector.Workspaces.Add(w.Id, w);
-			rootSector.WorkspaceSector.WorkspaceOrder = rootSector.WorkspaceSector.WorkspaceOrder.Add(w.Id);
+			if (!rootSector.WorkspaceSector.Workspaces.ContainsKey(workspace.Id))
+			{
+				AddWorkspaceToManager(ctx, rootSector, workspace);
+			}
 		}
 	}
 
@@ -88,7 +95,7 @@ internal static class StoreTestUtils
 		rootSector.WindowSector.Windows = rootSector.WindowSector.Windows.Add(window.Handle, window);
 	}
 
-	public static void PopulateWindowWorkspaceMap(
+	public static Workspace PopulateWindowWorkspaceMap(
 		IContext ctx,
 		MutableRootSector rootSector,
 		IWindow window,
@@ -100,8 +107,15 @@ internal static class StoreTestUtils
 			workspace.Id
 		);
 		AddWindowToSector(rootSector, window);
+		AddWorkspaceToManager(ctx, rootSector, workspace);
 
-		AddWorkspacesToManager(ctx, rootSector, workspace);
+		workspace = workspace with
+		{
+			WindowPositions = workspace.WindowPositions.Add(window.Handle, new WindowPosition())
+		};
+		rootSector.WorkspaceSector.Workspaces = rootSector.WorkspaceSector.Workspaces.SetItem(workspace.Id, workspace);
+
+		return workspace;
 	}
 
 	public static void PopulateMonitorWorkspaceMap(
@@ -122,10 +136,10 @@ internal static class StoreTestUtils
 			rootSector.MonitorSector.ActiveMonitorHandle = monitor.Handle;
 		}
 
-		AddWorkspacesToManager(ctx, rootSector, workspace);
+		AddWorkspaceToManager(ctx, rootSector, workspace);
 	}
 
-	public static void PopulateThreeWayMap(
+	public static Workspace PopulateThreeWayMap(
 		IContext ctx,
 		MutableRootSector rootSector,
 		IMonitor monitor,
@@ -133,14 +147,9 @@ internal static class StoreTestUtils
 		IWindow window
 	)
 	{
-		PopulateWindowWorkspaceMap(ctx, rootSector, window, workspace);
+		workspace = PopulateWindowWorkspaceMap(ctx, rootSector, window, workspace);
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, workspace);
-		AddWorkspacesToManager(ctx, rootSector, workspace);
-	}
-
-	// TODO: Remove
-	public static void SetupMonitorAtPoint(IContext ctx, IPoint<int> point, IMonitor monitor)
-	{
-		ctx.MonitorManager.GetMonitorAtPoint(point).Returns(monitor);
+		AddWorkspaceToManager(ctx, rootSector, workspace);
+		return workspace;
 	}
 }

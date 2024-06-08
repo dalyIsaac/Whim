@@ -3,7 +3,8 @@ using DotNext;
 namespace Whim;
 
 /// <summary>
-/// Base transform for a workspace operation.
+/// Base transform for a workspace operation. The return value from the store dispatch is whether
+/// the workspace has changed.
 /// </summary>
 /// <param name="WorkspaceId"></param>
 /// <param name="SkipDoLayout"></param>
