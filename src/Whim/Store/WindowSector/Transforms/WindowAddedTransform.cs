@@ -86,10 +86,12 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 	)
 	{
 		MapSector mapSector = mutableRootSector.MapSector;
+		WorkspaceSector workspaceSector = mutableRootSector.WorkspaceSector;
+
 		IWorkspace? workspace = TryGetWorkspaceFromRouter(ctx, mutableRootSector, window);
 
 		// Check the workspace exists. If it doesn't, clear the workspace.
-		if (workspace != null && !ctx.WorkspaceManager.Contains(workspace))
+		if (workspace != null && !mutableRootSector.WorkspaceSector.Workspaces.ContainsKey(workspace.Id))
 		{
 			Logger.Error($"Workspace {workspace} was not found");
 			workspace = null;
@@ -106,16 +108,17 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 
 		if (window.IsMinimized)
 		{
-			workspace.MinimizeWindowStart(window);
+			ctx.Store.Dispatch(new MinimizeWindowStartTransform(workspace.Id, window.Handle));
 		}
 		else
 		{
-			workspace.AddWindow(window);
+			ctx.Store.Dispatch(new AddWindowToWorkspaceTransform(workspace.Id, window));
 		}
 
 		mapSector.QueueEvent(RouteEventArgs.WindowAdded(window, workspace));
 
-		workspace.DoLayout();
+		workspaceSector.WorkspacesToLayout = workspaceSector.WorkspacesToLayout.Add(workspace.Id);
+
 		window.Focus();
 	}
 
