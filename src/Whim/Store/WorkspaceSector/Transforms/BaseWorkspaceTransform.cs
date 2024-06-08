@@ -44,6 +44,7 @@ public abstract record BaseWorkspaceTransform(WorkspaceId WorkspaceId, bool Skip
 
 		if (newWorkspace == workspace)
 		{
+			Logger.Debug("Workspace did not change from operation");
 			return Result.FromValue(false);
 		}
 

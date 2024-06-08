@@ -4,10 +4,10 @@ using Windows.Win32.Foundation;
 namespace Whim;
 
 /// <summary>
-/// Called when a window is being unminimized - i.e., the window size will no longer be
+/// Called when a window is being un-minimized - i.e., the window size will no longer be
 /// <see cref="WindowSize.Minimized"/>.
 ///
-/// Will unminimize a window in the active layout engine.
+/// Will un-minimize a window in the active layout engine.
 /// </summary>
 /// <param name="WorkspaceId"></param>
 /// <param name="WindowHandle"></param>
@@ -33,19 +33,15 @@ internal record MinimizeWindowEndTransform(WorkspaceId WorkspaceId, HWND WindowH
 			.LayoutEngines[workspace.ActiveLayoutEngineIndex]
 			.MinimizeWindowEnd(window);
 
-		if (newLayoutEngine == layoutEngine)
-		{
-			Logger.Debug("Window already in focus");
-			return workspace;
-		}
+		return (newLayoutEngine == layoutEngine)
+			? workspace
+			: workspace with
+			{
+				WindowPositions = workspace.WindowPositions.Add(window.Handle, new WindowPosition()),
 
-		return workspace with
-		{
-			WindowPositions = workspace.WindowPositions.Add(window.Handle, new WindowPosition()),
-
-			// Restore in just the active layout engine. MinimizeWindowEnd is not called as part of
-			// Whim starting up.
-			LayoutEngines = workspace.LayoutEngines.SetItem(workspace.ActiveLayoutEngineIndex, newLayoutEngine)
-		};
+				// Restore in just the active layout engine. MinimizeWindowEnd is not called as part of
+				// Whim starting up.
+				LayoutEngines = workspace.LayoutEngines.SetItem(workspace.ActiveLayoutEngineIndex, newLayoutEngine)
+			};
 	}
 }

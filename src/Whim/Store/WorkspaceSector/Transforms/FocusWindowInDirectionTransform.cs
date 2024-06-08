@@ -33,15 +33,11 @@ public record FocusWindowInDirectionTransform(Guid WorkspaceId, HWND WindowHandl
 		ILayoutEngine layoutEngine = workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex];
 		ILayoutEngine newLayoutEngine = layoutEngine.FocusWindowInDirection(Direction, window);
 
-		if (newLayoutEngine == layoutEngine)
-		{
-			Logger.Debug("Window already in focus");
-			return workspace;
-		}
-
-		return workspace with
-		{
-			LayoutEngines = workspace.LayoutEngines.SetItem(workspace.ActiveLayoutEngineIndex, newLayoutEngine)
-		};
+		return newLayoutEngine == layoutEngine
+			? workspace
+			: workspace with
+			{
+				LayoutEngines = workspace.LayoutEngines.SetItem(workspace.ActiveLayoutEngineIndex, newLayoutEngine)
+			};
 	}
 }

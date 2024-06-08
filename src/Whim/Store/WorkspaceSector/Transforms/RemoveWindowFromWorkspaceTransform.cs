@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using DotNext;
 using Windows.Win32.Foundation;
 
@@ -26,7 +27,13 @@ internal record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, HWND
 		IWindow window
 	)
 	{
-		workspace = workspace with { WindowPositions = workspace.WindowPositions.Remove(window.Handle) };
+		ImmutableDictionary<HWND, WindowPosition> updatedPositions = workspace.WindowPositions.Remove(window.Handle);
+		if (updatedPositions == workspace.WindowPositions)
+		{
+			return workspace;
+		}
+
+		workspace = workspace with { WindowPositions = updatedPositions };
 
 		workspace = ResetLastFocusedWindow(workspace, window);
 		workspace = RemoveWindowFromLayoutEngines(workspace, window);
