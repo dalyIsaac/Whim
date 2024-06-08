@@ -13,7 +13,13 @@ namespace Whim;
 /// <param name="WorkspaceId"></param>
 /// <param name="WindowHandle"></param>
 internal record MinimizeWindowStartTransform(Guid WorkspaceId, HWND WindowHandle)
-	: BaseWorkspaceWindowTransform(WorkspaceId, WindowHandle, DefaultToLastFocusedWindow: false, SkipDoLayout: true)
+	: BaseWorkspaceWindowTransform(
+		WorkspaceId,
+		WindowHandle,
+		DefaultToLastFocusedWindow: false,
+		IsWindowRequiredInWorkspace: false,
+		SkipDoLayout: true
+	)
 {
 	private protected override Result<Workspace> WindowOperation(
 		IContext ctx,
@@ -27,10 +33,8 @@ internal record MinimizeWindowStartTransform(Guid WorkspaceId, HWND WindowHandle
 		// If it isn't, then we assume it was provided during startup and minimize it in all layouts.
 		if (workspace.WindowPositions.ContainsKey(window.Handle))
 		{
-			// _layoutEngines[_activeLayoutEngineIndex] = _layoutEngines[_activeLayoutEngineIndex]
-			// 	.MinimizeWindowStart(window);
 			ILayoutEngine activeLayoutEngine = workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex];
-			workspace = workspace with
+			return workspace with
 			{
 				LayoutEngines = workspace.LayoutEngines.SetItem(
 					workspace.ActiveLayoutEngineIndex,

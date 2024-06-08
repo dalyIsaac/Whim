@@ -15,6 +15,9 @@ namespace Whim;
 /// <param name="DefaultToLastFocusedWindow">
 /// If <paramref name="WindowHandle"/> is <c>null</c>, try to use the last focused window.
 /// </param>
+/// <param name="IsWindowRequiredInWorkspace">
+/// When <see langword="true"/>, the window must be in the workspace.
+/// </param>
 /// <param name="SkipDoLayout">
 /// If <c>true</c>, do not perform a workspace layout.
 /// </param>
@@ -22,7 +25,8 @@ public abstract record BaseWorkspaceWindowTransform(
 	Guid WorkspaceId,
 	HWND WindowHandle,
 	bool DefaultToLastFocusedWindow,
-	bool SkipDoLayout = false
+	bool IsWindowRequiredInWorkspace,
+	bool SkipDoLayout
 ) : BaseWorkspaceTransform(WorkspaceId, SkipDoLayout)
 {
 	private protected override Result<Workspace> WorkspaceOperation(
@@ -36,7 +40,8 @@ public abstract record BaseWorkspaceWindowTransform(
 			ctx,
 			workspace,
 			WindowHandle,
-			DefaultToLastFocusedWindow
+			DefaultToLastFocusedWindow,
+			IsWindowRequiredInWorkspace
 		);
 		if (!result.TryGet(out IWindow validWindow))
 		{

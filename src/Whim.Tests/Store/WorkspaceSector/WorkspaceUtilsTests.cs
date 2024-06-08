@@ -86,12 +86,14 @@ public class WorkspaceUtilsTests
 		HWND windowHandle = default;
 		bool defaultToLastFocusedWindow = false;
 
+		bool isWindowRequiredInWorkspace = true;
 		// When
 		Result<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(
 			ctx,
 			CreateWorkspace(ctx),
 			windowHandle,
-			defaultToLastFocusedWindow
+			defaultToLastFocusedWindow,
+			isWindowRequiredInWorkspace
 		);
 
 		// Then
@@ -105,12 +107,15 @@ public class WorkspaceUtilsTests
 		HWND windowHandle = default;
 		bool defaultToLastFocusedWindow = true;
 
+		bool isWindowRequiredInWorkspace = true;
+
 		// When there are no windows
 		Result<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(
 			ctx,
 			CreateWorkspace(ctx),
 			windowHandle,
-			defaultToLastFocusedWindow
+			defaultToLastFocusedWindow,
+			isWindowRequiredInWorkspace
 		);
 
 		// Then
@@ -118,22 +123,47 @@ public class WorkspaceUtilsTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void GetValidWorkspaceWindow_WindowNotInWorkspace(IContext ctx)
+	internal void GetValidWorkspaceWindow_WindowsRequiredInWorkspace_WindowNotInWorkspace(IContext ctx)
 	{
 		// Given the handle is not null, but the window is not in the workspace
 		HWND windowHandle = new(1);
 		Workspace workspace = CreateWorkspace(ctx);
+
+		bool isWindowRequiredInWorkspace = true;
 
 		// When the window is not in the workspace
 		Result<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(
 			ctx,
 			workspace,
 			windowHandle,
-			defaultToLastFocusedWindow: false
+			defaultToLastFocusedWindow: false,
+			isWindowRequiredInWorkspace
 		);
 
 		// Then
 		Assert.False(result.IsSuccessful);
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void GetValidWorkspaceWindow_WindowNotRequiredInWorkspace_WindowNotInWorkspace(IContext ctx)
+	{
+		// Given the handle is not null, but the window is not in the workspace
+		HWND windowHandle = new(1);
+		Workspace workspace = CreateWorkspace(ctx);
+
+		bool isWindowRequiredInWorkspace = false;
+
+		// When the window is not in the workspace
+		Result<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(
+			ctx,
+			workspace,
+			windowHandle,
+			defaultToLastFocusedWindow: false,
+			isWindowRequiredInWorkspace
+		);
+
+		// Then
+		Assert.True(result.IsSuccessful);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -147,12 +177,15 @@ public class WorkspaceUtilsTests
 			WindowPositions = ImmutableDictionary<HWND, WindowPosition>.Empty.Add(window.Handle, new())
 		};
 
+		bool isWindowRequiredInWorkspace = true;
+
 		// When the window is in the workspace
 		Result<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(
 			ctx,
 			workspace,
 			window.Handle,
-			defaultToLastFocusedWindow: false
+			defaultToLastFocusedWindow: false,
+			isWindowRequiredInWorkspace
 		);
 
 		// Then

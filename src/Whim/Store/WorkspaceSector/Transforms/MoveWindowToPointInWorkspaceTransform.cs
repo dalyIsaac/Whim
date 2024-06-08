@@ -5,7 +5,13 @@ using Windows.Win32.Foundation;
 namespace Whim;
 
 internal record MoveWindowToPointInWorkspaceTransform(WorkspaceId WorkspaceId, HWND WindowHandle, IPoint<double> Point)
-	: BaseWorkspaceWindowTransform(WorkspaceId, WindowHandle, DefaultToLastFocusedWindow: false)
+	: BaseWorkspaceWindowTransform(
+		WorkspaceId,
+		WindowHandle,
+		DefaultToLastFocusedWindow: false,
+		IsWindowRequiredInWorkspace: true,
+		SkipDoLayout: false
+	)
 {
 	private protected override Result<Workspace> WindowOperation(
 		IContext ctx,

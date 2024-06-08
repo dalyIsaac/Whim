@@ -8,7 +8,14 @@ internal record MoveWindowEdgesInDirectionWorkspaceTransform(
 	Direction Edges,
 	IPoint<double> Deltas,
 	HWND WindowHandle
-) : BaseWorkspaceWindowTransform(WorkspaceId, WindowHandle, false)
+)
+	: BaseWorkspaceWindowTransform(
+		WorkspaceId,
+		WindowHandle,
+		DefaultToLastFocusedWindow: false,
+		IsWindowRequiredInWorkspace: true,
+		SkipDoLayout: false
+	)
 {
 	private protected override Result<Workspace> WindowOperation(
 		IContext ctx,

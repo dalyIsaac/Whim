@@ -12,7 +12,13 @@ namespace Whim;
 /// <param name="WorkspaceId"></param>
 /// <param name="WindowHandle"></param>
 internal record MinimizeWindowEndTransform(WorkspaceId WorkspaceId, HWND WindowHandle)
-	: BaseWorkspaceWindowTransform(WorkspaceId, WindowHandle, DefaultToLastFocusedWindow: false, SkipDoLayout: true)
+	: BaseWorkspaceWindowTransform(
+		WorkspaceId,
+		WindowHandle,
+		DefaultToLastFocusedWindow: false,
+		IsWindowRequiredInWorkspace: true,
+		SkipDoLayout: true
+	)
 {
 	private protected override Result<Workspace> WindowOperation(
 		IContext ctx,

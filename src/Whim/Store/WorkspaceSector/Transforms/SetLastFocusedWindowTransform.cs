@@ -10,7 +10,13 @@ namespace Whim;
 /// <param name="WorkspaceId"></param>
 /// <param name="WindowHandle"></param>
 internal record SetLastFocusedWindowTransform(Guid WorkspaceId, HWND WindowHandle)
-	: BaseWorkspaceWindowTransform(WorkspaceId, WindowHandle, false)
+	: BaseWorkspaceWindowTransform(
+		WorkspaceId,
+		WindowHandle,
+		DefaultToLastFocusedWindow: false,
+		IsWindowRequiredInWorkspace: true,
+		SkipDoLayout: false
+	)
 {
 	private protected override Result<Workspace> WindowOperation(
 		IContext ctx,

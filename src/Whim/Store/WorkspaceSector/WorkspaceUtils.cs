@@ -39,13 +39,19 @@ internal static class WorkspaceUtils
 	/// <param name="ctx"></param>
 	/// <param name="workspace"></param>
 	/// <param name="windowHandle"></param>
-	/// <param name="defaultToLastFocusedWindow"></param>
+	/// <param name="defaultToLastFocusedWindow">
+	/// If <paramref name="windowHandle"/> is <c>null</c>, try to use the last focused window.
+	/// </param>
+	/// <param name="isWindowRequiredInWorkspace">
+	/// When <see langword="true"/>, the window must be in the workspace.
+	/// </param>
 	/// <returns></returns>
 	public static Result<IWindow> GetValidWorkspaceWindow(
 		IContext ctx,
 		Workspace workspace,
 		HWND windowHandle,
-		bool defaultToLastFocusedWindow
+		bool defaultToLastFocusedWindow,
+		bool isWindowRequiredInWorkspace
 	)
 	{
 		if (windowHandle.IsNull)
@@ -63,7 +69,7 @@ internal static class WorkspaceUtils
 			return Result.FromException<IWindow>(new WhimException("No windows in workspace"));
 		}
 
-		if (!workspace.WindowPositions.ContainsKey(windowHandle))
+		if (isWindowRequiredInWorkspace && !workspace.WindowPositions.ContainsKey(windowHandle))
 		{
 			return Result.FromException<IWindow>(new WhimException("Window not in workspace"));
 		}

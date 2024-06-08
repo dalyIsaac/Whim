@@ -12,7 +12,13 @@ namespace Whim;
 /// <param name="WindowHandle"></param>
 /// <param name="Direction"></param>
 public record SwapWindowInDirectionTransform(Guid WorkspaceId, HWND WindowHandle, Direction Direction)
-	: BaseWorkspaceWindowTransform(WorkspaceId, WindowHandle, true)
+	: BaseWorkspaceWindowTransform(
+		WorkspaceId,
+		WindowHandle,
+		DefaultToLastFocusedWindow: true,
+		IsWindowRequiredInWorkspace: true,
+		SkipDoLayout: false
+	)
 {
 	private protected override Result<Workspace> WindowOperation(
 		IContext ctx,
