@@ -262,4 +262,70 @@ public class WorkspacePickersTests
 		// Then we get an error
 		Assert.False(result.IsSuccessful);
 	}
+
+	private static IWindow Setup_WindowPosition(IContext ctx, MutableRootSector root, Workspace workspace)
+	{
+		IMonitor monitor = CreateMonitor((HMONITOR)1);
+		IWindow window = CreateWindow((HWND)2);
+
+		workspace = workspace with
+		{
+			WindowPositions = workspace.WindowPositions.Add(
+				window.Handle,
+				new WindowPosition(WindowSize.Minimized, new Rectangle<int>())
+			)
+		};
+
+		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
+		workspace = PopulateWindowWorkspaceMap(ctx, root, window, workspace);
+		PopulateWindowWorkspaceMap(ctx, root, CreateWindow((HWND)3), workspace);
+
+		return window;
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickWindowPosition_WorkspaceNotFound(IContext ctx, MutableRootSector root)
+	{
+		// Given the workspaces and windows exist, but the workspace to search for doesn't exist
+		Workspace workspace = CreateWorkspace(ctx);
+		IWindow window = Setup_WindowPosition(ctx, root, workspace);
+
+		Guid workspaceToSearchFor = Guid.NewGuid();
+
+		// When we get the window position
+		Result<WindowPosition> result = ctx.Store.Pick(Pickers.PickWindowPosition(workspaceToSearchFor, window.Handle));
+
+		// Then we get an error
+		Assert.False(result.IsSuccessful);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickWindowPosition_WindowNotFound(IContext ctx, MutableRootSector root)
+	{
+		// Given the workspaces and windows exist, but the window to search for doesn't exist
+		Workspace workspace = CreateWorkspace(ctx);
+		IWindow window = Setup_WindowPosition(ctx, root, workspace);
+
+		HWND hwndToSearchFor = (HWND)987;
+
+		// When we get the window position
+		Result<WindowPosition> result = ctx.Store.Pick(Pickers.PickWindowPosition(workspace.Id, hwndToSearchFor));
+
+		// Then we get an error
+		Assert.False(result.IsSuccessful);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickWindowPosition_Success(IContext ctx, MutableRootSector root)
+	{
+		// Given the workspaces and windows
+		Workspace workspace = CreateWorkspace(ctx);
+		IWindow window = Setup_WindowPosition(ctx, root, workspace);
+
+		// When we get the window position
+		Result<WindowPosition> result = ctx.Store.Pick(Pickers.PickWindowPosition(workspace.Id, window.Handle));
+
+		// Then we get the window position
+		Assert.True(result.IsSuccessful);
+	}
 }

@@ -59,10 +59,39 @@ public static partial class Pickers
 		WorkspaceId workspaceId,
 		IRootSector rootSector,
 		Func<IWorkspace, TResult> operation
-	) =>
-		rootSector.WorkspaceSector.Workspaces.TryGetValue(workspaceId, out Workspace? workspace)
-			? Result.FromValue(operation(workspace))
-			: Result.FromException<TResult>(StoreExceptions.WorkspaceNotFound(workspaceId));
+	)
+	{
+		if (!rootSector.WorkspaceSector.Workspaces.TryGetValue(workspaceId, out Workspace? workspace))
+		{
+			return Result.FromException<TResult>(StoreExceptions.WorkspaceNotFound(workspaceId));
+		}
+
+		return operation(workspace);
+	}
+
+	/// <summary>
+	/// Base picker to get something from a workspace, provided by <paramref name="operation"/>.
+	/// This operation returns a <see cref="Result{T}"/>.
+	/// </summary>
+	/// <param name="workspaceId">The id of the workspace to get something from.</param>
+	/// <param name="rootSector">The root sector.</param>
+	/// <param name="operation">
+	/// The operation to determine what to get. This operation returns a <see cref="Result{T}"/>.
+	/// </param>
+	/// <typeparam name="TResult">The result.</typeparam>
+	private static Result<TResult> BaseWorkspacePicker<TResult>(
+		WorkspaceId workspaceId,
+		IRootSector rootSector,
+		Func<IWorkspace, Result<TResult>> operation
+	)
+	{
+		if (!rootSector.WorkspaceSector.Workspaces.TryGetValue(workspaceId, out Workspace? workspace))
+		{
+			return Result.FromException<TResult>(StoreExceptions.WorkspaceNotFound(workspaceId));
+		}
+
+		return operation(workspace);
+	}
 
 	/// <summary>
 	/// Get the active workspace.
@@ -124,18 +153,38 @@ public static partial class Pickers
 	/// <param name="workspaceId">The workspace to get the last focused window for.</param>
 	public static PurePicker<Result<IWindow>> PickLastFocusedWindow(WorkspaceId workspaceId) =>
 		(IRootSector rootSector) =>
-		// This doesn't use BaseWorkspacePicker because it uses the Result from PickWindowByHandle.
-		{
-			if (!rootSector.WorkspaceSector.Workspaces.TryGetValue(workspaceId, out Workspace? workspace))
-			{
-				return Result.FromException<IWindow>(StoreExceptions.WorkspaceNotFound(workspaceId));
-			}
+			BaseWorkspacePicker(
+				workspaceId,
+				rootSector,
+				workspace =>
+				{
+					if (workspace.LastFocusedWindowHandle.IsNull)
+					{
+						return Result.FromException<IWindow>(new WhimException("No last focused window in workspace"));
+					}
 
-			if (workspace.LastFocusedWindowHandle.IsNull)
-			{
-				return Result.FromException<IWindow>(new WhimException("No last focused window in workspace"));
-			}
+					return PickWindowByHandle(workspace.LastFocusedWindowHandle)(rootSector);
+				}
+			);
 
-			return PickWindowByHandle(workspace.LastFocusedWindowHandle)(rootSector);
-		};
+	/// <summary>
+	/// Get the window position in the provided workspace.
+	/// </summary>
+	/// <param name="workspaceId">The workspace to get the window position for.</param>
+	/// <param name="windowHandle">The window handle to get the position for.</param>
+	public static PurePicker<Result<WindowPosition>> PickWindowPosition(WorkspaceId workspaceId, HWND windowHandle) =>
+		(IRootSector rootSector) =>
+			BaseWorkspacePicker(
+				workspaceId,
+				rootSector,
+				workspace =>
+				{
+					if (workspace.WindowPositions.TryGetValue(windowHandle, out WindowPosition? position))
+					{
+						return position;
+					}
+
+					return Result.FromException<WindowPosition>(new WhimException("Window not found in workspace"));
+				}
+			);
 }
