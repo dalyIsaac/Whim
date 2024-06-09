@@ -14,7 +14,7 @@ public class Store : IStore
 	private readonly ReaderWriterLockSlim _lock = new(LockRecursionPolicy.SupportsRecursion);
 
 	private bool _disposedValue;
-	
+
 	/// <inheritdoc />
 	public bool IsDisposing { get; private set; }
 
