@@ -187,11 +187,17 @@ public static class CustomAssert
 		IEnumerable<Guid>? noLayoutWorkspaceIds = null
 	)
 	{
-		HashSet<Guid> layoutWorkspaceIdsSet = new(layoutWorkspaceIds?.ToArray() ?? Array.Empty<Guid>());
-		HashSet<Guid> notLayoutWorkspaceIdsSet = new(noLayoutWorkspaceIds?.ToArray() ?? Array.Empty<Guid>());
+		Dictionary<Guid, int> workspaceStartedRemainingIds = new();
+		foreach (Guid id in layoutWorkspaceIds ?? Enumerable.Empty<Guid>())
+		{
+			workspaceStartedRemainingIds[id] = workspaceStartedRemainingIds.GetValueOrDefault(id, 0) + 1;
+		}
 
-		HashSet<Guid> workspaceStartedIds = new();
-		HashSet<Guid> workspaceCompletedIds = new();
+		Dictionary<Guid, int> workspaceCompletedRemainingIds = new();
+		foreach (Guid id in layoutWorkspaceIds ?? Enumerable.Empty<Guid>())
+		{
+			workspaceCompletedRemainingIds[id] = workspaceCompletedRemainingIds.GetValueOrDefault(id, 0) + 1;
+		}
 
 		Raises<WorkspaceLayoutCompletedEventArgs>(
 			h => rootSector.WorkspaceSector.WorkspaceLayoutCompleted += h,
@@ -202,22 +208,34 @@ public static class CustomAssert
 					h => rootSector.WorkspaceSector.WorkspaceLayoutStarted += h,
 					h => rootSector.WorkspaceSector.WorkspaceLayoutStarted -= h,
 					() => action(),
-					(sender, e) => workspaceStartedIds.Add(e.Workspace.Id)
+					(sender, e) =>
+					{
+						workspaceStartedRemainingIds[e.Workspace.Id] =
+							workspaceStartedRemainingIds.GetValueOrDefault(e.Workspace.Id, 0) - 1;
+					}
 				);
 			},
-			(sender, e) => workspaceCompletedIds.Add(e.Workspace.Id)
+			(sender, e) =>
+			{
+				workspaceCompletedRemainingIds[e.Workspace.Id] =
+					workspaceCompletedRemainingIds.GetValueOrDefault(e.Workspace.Id, 0) - 1;
+			}
 		);
 
-		if (layoutWorkspaceIdsSet.Count != 0)
+		foreach ((Guid id, int remaining) in workspaceStartedRemainingIds)
 		{
-			workspaceStartedIds.Should().Contain(layoutWorkspaceIdsSet);
-			workspaceCompletedIds.Should().Contain(layoutWorkspaceIdsSet);
+			if (remaining > 0)
+			{
+				throw new Exception($"Workspace {id} was not started {remaining} times.");
+			}
 		}
 
-		if (notLayoutWorkspaceIdsSet.Count != 0)
+		foreach ((Guid id, int remaining) in workspaceCompletedRemainingIds)
 		{
-			workspaceStartedIds.Should().NotContain(notLayoutWorkspaceIdsSet);
-			workspaceCompletedIds.Should().NotContain(notLayoutWorkspaceIdsSet);
+			if (remaining > 0)
+			{
+				throw new Exception($"Workspace {id} was not completed {remaining} times.");
+			}
 		}
 	}
 
