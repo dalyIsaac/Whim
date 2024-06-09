@@ -33,7 +33,7 @@ public record ImmutableTestLayoutEngine : ILayoutEngine
 
 	public ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point) => this;
 
-	public ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action) => this;
+	public ILayoutEngine PerformCustomAction<T>(LayoutEngineAction<T> action) => this;
 
 	public ILayoutEngine RemoveWindow(IWindow window) => this;
 

@@ -288,7 +288,7 @@ public record FocusLayoutEngine : ILayoutEngine
 	}
 
 	/// <inheritdoc/>
-	public ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action)
+	public ILayoutEngine PerformCustomAction<T>(LayoutEngineAction<T> action)
 	{
 		if (action.Name == $"{Name}.toggle_maximized")
 		{

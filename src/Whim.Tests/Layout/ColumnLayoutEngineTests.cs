@@ -966,7 +966,7 @@ public class ColumnLayoutEngineTests
 	{
 		// Given
 		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window);
-		LayoutEngineCustomAction<string> action =
+		LayoutEngineAction<string> action =
 			new()
 			{
 				Name = "Action",

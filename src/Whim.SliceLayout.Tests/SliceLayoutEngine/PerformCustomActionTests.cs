@@ -27,7 +27,7 @@ public class PerformCustomActionTests
 		IWindowState[] beforeStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
 
 		sut = sut.PerformCustomAction(
-			new LayoutEngineCustomAction<IWindow>()
+			new LayoutEngineAction<IWindow>()
 			{
 				Name = "whim.slice_layout.window.promote",
 				Window = untrackedWindow,
@@ -74,7 +74,7 @@ public class PerformCustomActionTests
 		}
 
 		sut = sut.PerformCustomAction(
-			new LayoutEngineCustomAction<IWindow>()
+			new LayoutEngineAction<IWindow>()
 			{
 				Name = "whim.slice_layout.window.promote",
 				Window = windows[focusedWindowIdx],
@@ -99,7 +99,7 @@ public class PerformCustomActionTests
 		IWindowState[] beforeStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
 
 		sut = sut.PerformCustomAction(
-			new LayoutEngineCustomAction<IWindow>()
+			new LayoutEngineAction<IWindow>()
 			{
 				Name = "whim.slice_layout.window.promote",
 				Window = window,
@@ -131,7 +131,7 @@ public class PerformCustomActionTests
 		IWindowState[] beforeStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
 
 		sut = sut.PerformCustomAction(
-			new LayoutEngineCustomAction<IWindow>()
+			new LayoutEngineAction<IWindow>()
 			{
 				Name = "whim.slice_layout.window.demote",
 				Window = untrackedWindow,
@@ -173,7 +173,7 @@ public class PerformCustomActionTests
 		}
 
 		sut = sut.PerformCustomAction(
-			new LayoutEngineCustomAction<IWindow>()
+			new LayoutEngineAction<IWindow>()
 			{
 				Name = "whim.slice_layout.window.demote",
 				Window = windows[focusedWindowIdx],
@@ -198,7 +198,7 @@ public class PerformCustomActionTests
 		IWindowState[] beforeStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
 
 		sut = sut.PerformCustomAction(
-			new LayoutEngineCustomAction<IWindow>()
+			new LayoutEngineAction<IWindow>()
 			{
 				Name = "whim.slice_layout.window.demote",
 				Window = window,
@@ -242,7 +242,7 @@ public class PerformCustomActionTests
 		}
 
 		ILayoutEngine resultSut = sut.PerformCustomAction(
-			new LayoutEngineCustomAction<IWindow>()
+			new LayoutEngineAction<IWindow>()
 			{
 				Name = promote ? plugin.PromoteFocusActionName : plugin.DemoteFocusActionName,
 				Window = windows[focusedWindowIdx],
@@ -273,7 +273,7 @@ public class PerformCustomActionTests
 		IWindowState[] beforeStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
 
 		sut = sut.PerformCustomAction(
-			new LayoutEngineCustomAction<IWindow>()
+			new LayoutEngineAction<IWindow>()
 			{
 				Name = "whim.slice_layout.window.unknown",
 				Window = windows[0],

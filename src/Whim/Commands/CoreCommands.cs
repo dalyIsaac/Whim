@@ -231,11 +231,7 @@ internal class CoreCommands : PluginCommands
 					}
 
 					workspace.PerformCustomLayoutEngineAction(
-						new LayoutEngineCustomAction()
-						{
-							Name = $"{focusLayoutEngine.Name}.toggle_maximized",
-							Window = null
-						}
+						new LayoutEngineAction() { Name = $"{focusLayoutEngine.Name}.toggle_maximized", Window = null }
 					);
 				},
 				condition: () =>

@@ -49,8 +49,7 @@ public record TestLayoutEngine : ILayoutEngine
 		throw new NotImplementedException();
 
 	/// <inheritdoc/>
-	public ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action) =>
-		throw new NotImplementedException();
+	public ILayoutEngine PerformCustomAction<T>(LayoutEngineAction<T> action) => throw new NotImplementedException();
 
 	/// <inheritdoc/>
 	public ILayoutEngine MinimizeWindowStart(IWindow window) => throw new NotImplementedException();

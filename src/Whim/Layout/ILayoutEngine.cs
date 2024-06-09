@@ -158,7 +158,7 @@ public interface ILayoutEngine
 	/// <returns>
 	/// A new layout engine if the action is handled, otherwise it returns the current layout engine.
 	/// </returns>
-	ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action);
+	ILayoutEngine PerformCustomAction<T>(LayoutEngineAction<T> action);
 
 	/// <summary>
 	/// Checks to see if this <see cref="ILayoutEngine"/> or a child layout engine is type

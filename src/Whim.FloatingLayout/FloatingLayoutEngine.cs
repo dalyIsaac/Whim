@@ -256,7 +256,7 @@ internal record FloatingLayoutEngine : BaseProxyLayoutEngine
 		UpdateInner(InnerLayoutEngine.MinimizeWindowEnd(window), window);
 
 	/// <inheritdoc />
-	public override ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action)
+	public override ILayoutEngine PerformCustomAction<T>(LayoutEngineAction<T> action)
 	{
 		if (action.Window != null && IsWindowFloating(action.Window))
 		{

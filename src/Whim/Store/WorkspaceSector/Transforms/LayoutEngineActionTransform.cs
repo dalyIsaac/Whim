@@ -17,10 +17,8 @@ namespace Whim;
 /// <param name="PayloadAction">
 /// Metadata about the action to perform, and the payload to perform it with.
 /// </param>
-public record PerformCustomLayoutEnginePayloadActionTransform<T>(
-	WorkspaceId WorkspaceId,
-	LayoutEngineCustomAction<T> PayloadAction
-) : BaseWorkspaceTransform(WorkspaceId)
+public record LayoutEngineActionWithPayloadTransform<T>(WorkspaceId WorkspaceId, LayoutEngineAction<T> PayloadAction)
+	: BaseWorkspaceTransform(WorkspaceId)
 {
 	private protected override Result<Workspace> WorkspaceOperation(
 		IContext ctx,
@@ -45,7 +43,7 @@ public record PerformCustomLayoutEnginePayloadActionTransform<T>(
 				hasChanged = true;
 			}
 
-			newLayoutEngines.Add(layoutEngine);
+			newLayoutEngines.Add(newLayoutEngine);
 		}
 
 		return hasChanged ? workspace with { LayoutEngines = newLayoutEngines.ToImmutableList() } : workspace;
@@ -63,10 +61,10 @@ public record PerformCustomLayoutEnginePayloadActionTransform<T>(
 /// <param name="Action">
 /// Metadata about the action to perform, and the payload to perform it with.
 /// </param>
-public record PerformCustomLayoutEngineActionTransform(WorkspaceId WorkspaceId, LayoutEngineCustomAction Action)
-	: PerformCustomLayoutEnginePayloadActionTransform<IWindow?>(
+public record LayoutEngineActionTransform(WorkspaceId WorkspaceId, LayoutEngineAction Action)
+	: LayoutEngineActionWithPayloadTransform<IWindow?>(
 		WorkspaceId,
-		new LayoutEngineCustomAction<IWindow?>()
+		new LayoutEngineAction<IWindow?>()
 		{
 			Name = Action.Name,
 			Payload = Action.Window,

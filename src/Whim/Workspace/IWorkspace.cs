@@ -287,7 +287,7 @@ public interface IWorkspace : IDisposable
 	/// <returns>
 	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
 	/// </returns>
-	bool PerformCustomLayoutEngineAction(LayoutEngineCustomAction action);
+	bool PerformCustomLayoutEngineAction(LayoutEngineAction action);
 
 	/// <summary>
 	/// Performs a custom action in a layout engine.
@@ -305,6 +305,6 @@ public interface IWorkspace : IDisposable
 	/// <returns>
 	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
 	/// </returns>
-	bool PerformCustomLayoutEngineAction<T>(LayoutEngineCustomAction<T> action);
+	bool PerformCustomLayoutEngineAction<T>(LayoutEngineAction<T> action);
 	#endregion
 }

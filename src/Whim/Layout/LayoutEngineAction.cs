@@ -3,7 +3,7 @@ namespace Whim;
 /// <summary>
 /// The payload for a custom action for a layout engine to perform, via <see cref="ILayoutEngine.PerformCustomAction{T}"/>.
 /// </summary>
-public record LayoutEngineCustomAction
+public record LayoutEngineAction
 {
 	/// <summary>
 	/// The name of the action. This should be unique to the layout engine type.
@@ -30,7 +30,7 @@ public record LayoutEngineCustomAction
 /// <typeparam name="T">
 /// The type of <see cref="Payload"/>.
 /// </typeparam>
-public record LayoutEngineCustomAction<T> : LayoutEngineCustomAction
+public record LayoutEngineAction<T> : LayoutEngineAction
 {
 	/// <summary>
 	/// The payload of the action, which the handler can use to perform the action.

@@ -114,7 +114,7 @@ public class SliceLayoutPluginTests
 
 		// Then nothing
 		IWorkspace activeWorkspace = ctx.WorkspaceManager.ActiveWorkspace;
-		activeWorkspace.DidNotReceive().PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
+		activeWorkspace.DidNotReceive().PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineAction>());
 		activeWorkspace.DidNotReceive().DoLayout();
 	}
 
@@ -133,7 +133,7 @@ public class SliceLayoutPluginTests
 		workspace
 			.Received(1)
 			.PerformCustomLayoutEngineAction(
-				Arg.Is<LayoutEngineCustomAction>(action =>
+				Arg.Is<LayoutEngineAction>(action =>
 					action.Name == plugin.PromoteWindowActionName && action.Window == window
 				)
 			);
@@ -168,7 +168,7 @@ public class SliceLayoutPluginTests
 
 		// Then nothing
 		IWorkspace activeWorkspace = ctx.WorkspaceManager.ActiveWorkspace;
-		activeWorkspace.DidNotReceive().PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
+		activeWorkspace.DidNotReceive().PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineAction>());
 		activeWorkspace.DidNotReceive().DoLayout();
 	}
 
@@ -187,7 +187,7 @@ public class SliceLayoutPluginTests
 		workspace
 			.Received(1)
 			.PerformCustomLayoutEngineAction(
-				Arg.Is<LayoutEngineCustomAction>(action =>
+				Arg.Is<LayoutEngineAction>(action =>
 					action.Name == plugin.DemoteWindowActionName && action.Window == window
 				)
 			);
@@ -239,7 +239,7 @@ public class SliceLayoutPluginTests
 
 		// Then nothing
 		ctx.WorkspaceManager.ActiveWorkspace.DidNotReceive()
-			.PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
+			.PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineAction>());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -257,7 +257,7 @@ public class SliceLayoutPluginTests
 		workspace
 			.Received(1)
 			.PerformCustomLayoutEngineAction(
-				Arg.Is<LayoutEngineCustomAction>(action =>
+				Arg.Is<LayoutEngineAction>(action =>
 					action.Name == plugin.PromoteFocusActionName && action.Window == window
 				)
 			);
@@ -292,7 +292,7 @@ public class SliceLayoutPluginTests
 
 		// Then nothing
 		ctx.WorkspaceManager.ActiveWorkspace.DidNotReceive()
-			.PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
+			.PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineAction>());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -310,7 +310,7 @@ public class SliceLayoutPluginTests
 		workspace
 			.Received(1)
 			.PerformCustomLayoutEngineAction(
-				Arg.Is<LayoutEngineCustomAction>(action =>
+				Arg.Is<LayoutEngineAction>(action =>
 					action.Name == plugin.DemoteFocusActionName && action.Window == window
 				)
 			);

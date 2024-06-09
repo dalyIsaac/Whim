@@ -1113,7 +1113,7 @@ public class FloatingLayoutEngineTests
 	{
 		// Given
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
-		LayoutEngineCustomAction<string> action =
+		LayoutEngineAction<string> action =
 			new()
 			{
 				Name = "Action",
@@ -1138,7 +1138,7 @@ public class FloatingLayoutEngineTests
 	{
 		// Given
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
-		LayoutEngineCustomAction<string> action =
+		LayoutEngineAction<string> action =
 			new()
 			{
 				Name = "Action",
@@ -1166,7 +1166,7 @@ public class FloatingLayoutEngineTests
 	{
 		// Given
 		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
-		LayoutEngineCustomAction<string> action =
+		LayoutEngineAction<string> action =
 			new()
 			{
 				Name = "Action",
