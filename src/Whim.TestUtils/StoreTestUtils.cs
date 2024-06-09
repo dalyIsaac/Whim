@@ -92,7 +92,7 @@ internal static class StoreTestUtils
 
 	public static void AddWindowToSector(MutableRootSector rootSector, IWindow window)
 	{
-		rootSector.WindowSector.Windows = rootSector.WindowSector.Windows.Add(window.Handle, window);
+		rootSector.WindowSector.Windows = rootSector.WindowSector.Windows.SetItem(window.Handle, window);
 	}
 
 	public static Workspace PopulateWindowWorkspaceMap(
@@ -109,10 +109,14 @@ internal static class StoreTestUtils
 		AddWindowToSector(rootSector, window);
 		AddWorkspaceToManager(ctx, rootSector, workspace);
 
-		workspace = workspace with
+		if (!workspace.WindowPositions.ContainsKey(window.Handle))
 		{
-			WindowPositions = workspace.WindowPositions.Add(window.Handle, new WindowPosition())
-		};
+			workspace = workspace with
+			{
+				WindowPositions = workspace.WindowPositions.SetItem(window.Handle, new WindowPosition())
+			};
+		}
+
 		rootSector.WorkspaceSector.Workspaces = rootSector.WorkspaceSector.Workspaces.SetItem(workspace.Id, workspace);
 
 		return workspace;
