@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using FluentAssertions;
 using NSubstitute;
 using Xunit;
 using Xunit.Sdk;
@@ -132,55 +135,6 @@ public static class CustomAssert
 		Assert.Empty(internalCtx.MouseHook.ReceivedCalls());
 	}
 
-	internal static IWorkspace DoesLayout(MutableRootSector rootSector, Action action)
-	{
-		Assert.RaisedEvent<WorkspaceLayoutCompletedEventArgs> result = Assert.Raises<WorkspaceLayoutCompletedEventArgs>(
-			h => rootSector.WorkspaceSector.WorkspaceLayoutCompleted += h,
-			h => rootSector.WorkspaceSector.WorkspaceLayoutCompleted -= h,
-			() =>
-			{
-				Assert.Raises<WorkspaceLayoutStartedEventArgs>(
-					h => rootSector.WorkspaceSector.WorkspaceLayoutStarted += h,
-					h => rootSector.WorkspaceSector.WorkspaceLayoutStarted -= h,
-					() => action()
-				);
-			}
-		);
-
-		return result.Arguments.Workspace;
-	}
-
-	// TODO
-	/// <summary>
-	/// Asserts that the <see cref="WorkspaceLayoutCompletedEventArgs"/> is raised with the expected workspace.
-	/// </summary>
-	/// <param name="rootSector">The root sector.</param>
-	/// <param name="action">The action to perform.</param>
-	/// <param name="expectedWorkspace">The expected workspace.</param>
-	// internal static void Layout(
-	// 	MutableRootSector rootSector,
-	// 	Action action,
-	// 	IEnumerable<Guid>? layoutWorkspaceIds = null,
-	// 	IEnumerable<Guid>? notLayoutWorkspaceIds = null
-	// )
-	// {
-	// 	Guid[] layoutWorkspaceIdsList = layoutWorkspaceIds?.ToArray() ?? Array.Empty<Guid>();
-	// 	Guid[] notLayoutWorkspaceIdsList = notLayoutWorkspaceIds?.ToArray() ?? Array.Empty<Guid>();
-
-	// 	List<Guid> laidoutWorkspaceIds = new();
-	// 	List<Guid> notLayoutWorkspaceIds = new();
-	// 	Assert.RaisedEvent<WorkspaceLayoutCompletedEventArgs> result = Assert.Raises<WorkspaceLayoutCompletedEventArgs>(
-	// 		h => rootSector.WorkspaceSector.WorkspaceLayoutCompleted += h,
-	// 		h => rootSector.WorkspaceSector.WorkspaceLayoutCompleted -= h,
-	// 		() =>
-	// 		{
-	// 			Assert.RaisedEvent<WorkspaceLayoutStartedEventArgs>(
-	// 				h => rootSector.WorkspaceSector.WorkspaceLayoutStarted += h,
-	// 				h => rootSector.WorkspaceSector.WorkspaceLayoutStarted -= h,
-	// 				() => action()
-	// 			);
-
-
 	/// <summary>
 	/// Asserts that an event is raised.
 	/// </summary>
@@ -219,4 +173,56 @@ public static class CustomAssert
 			throw new ShouldRaiseException(typeof(T));
 		}
 	}
+
+	/// <summary>
+	/// Asserts that the <see cref="WorkspaceLayoutCompletedEventArgs"/> is raised with the expected workspace.
+	/// </summary>
+	/// <param name="rootSector">The root sector.</param>
+	/// <param name="action">The action to perform.</param>
+	/// <param name="expectedWorkspace">The expected workspace.</param>
+	internal static void Layout(
+		MutableRootSector rootSector,
+		Action action,
+		IEnumerable<Guid>? layoutWorkspaceIds = null,
+		IEnumerable<Guid>? noLayoutWorkspaceIds = null
+	)
+	{
+		HashSet<Guid> layoutWorkspaceIdsSet = new(layoutWorkspaceIds?.ToArray() ?? Array.Empty<Guid>());
+		HashSet<Guid> notLayoutWorkspaceIdsSet = new(noLayoutWorkspaceIds?.ToArray() ?? Array.Empty<Guid>());
+
+		HashSet<Guid> workspaceStartedIds = new();
+		HashSet<Guid> workspaceCompletedIds = new();
+
+		Raises<WorkspaceLayoutCompletedEventArgs>(
+			h => rootSector.WorkspaceSector.WorkspaceLayoutCompleted += h,
+			h => rootSector.WorkspaceSector.WorkspaceLayoutCompleted -= h,
+			() =>
+			{
+				Raises<WorkspaceLayoutStartedEventArgs>(
+					h => rootSector.WorkspaceSector.WorkspaceLayoutStarted += h,
+					h => rootSector.WorkspaceSector.WorkspaceLayoutStarted -= h,
+					() => action(),
+					(sender, e) => workspaceStartedIds.Add(e.Workspace.Id)
+				);
+			},
+			(sender, e) => workspaceCompletedIds.Add(e.Workspace.Id)
+		);
+
+		if (layoutWorkspaceIdsSet.Count != 0)
+		{
+			workspaceStartedIds.Should().Contain(layoutWorkspaceIdsSet);
+			workspaceCompletedIds.Should().Contain(layoutWorkspaceIdsSet);
+		}
+
+		if (notLayoutWorkspaceIdsSet.Count != 0)
+		{
+			workspaceStartedIds.Should().NotContain(notLayoutWorkspaceIdsSet);
+			workspaceCompletedIds.Should().NotContain(notLayoutWorkspaceIdsSet);
+		}
+	}
+
+	/// <summary>
+	/// Get the stored transforms from the <see cref="StoreWrapper"/>.
+	/// </summary>
+	public static List<object> GetTransforms(this IContext ctx) => ((StoreWrapper)ctx.Store).Transforms;
 }

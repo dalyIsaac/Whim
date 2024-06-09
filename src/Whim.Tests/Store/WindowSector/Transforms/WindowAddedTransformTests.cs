@@ -42,7 +42,7 @@ public class WindowAddedTransformTests
 		CustomAssert.Raises<RouteEventArgs>(
 			h => rootSector.MapSector.WindowRouted += h,
 			h => rootSector.MapSector.WindowRouted -= h,
-			() => CustomAssert.DoesLayout(rootSector, () => result = ctx.Store.Dispatch(sut)),
+			() => CustomAssert.Layout(rootSector, () => result = ctx.Store.Dispatch(sut)),
 			(sender, args) => evs.Add(args)
 		);
 
@@ -280,7 +280,7 @@ public class WindowAddedTransformTests
 		Assert.Equal(workspace.Id, rootSector.MapSector.WindowWorkspaceMap[hwnd]);
 		Assert.Single(evs);
 
-		Assert.Contains(((StoreWrapper)ctx.Store).Transforms, t => t is MinimizeWindowStartTransform);
+		Assert.Contains(ctx.GetTransforms(), t => t is MinimizeWindowStartTransform);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -307,6 +307,6 @@ public class WindowAddedTransformTests
 		Assert.Equal(workspace.Id, rootSector.MapSector.WindowWorkspaceMap[hwnd]);
 		Assert.Single(evs);
 
-		Assert.Contains(((StoreWrapper)ctx.Store).Transforms, t => t is AddWindowToWorkspaceTransform);
+		Assert.Contains(ctx.GetTransforms(), t => t is AddWindowToWorkspaceTransform);
 	}
 }
