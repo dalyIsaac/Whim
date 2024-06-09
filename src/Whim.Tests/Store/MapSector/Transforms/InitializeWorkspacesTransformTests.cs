@@ -37,15 +37,11 @@ public class InitializeWorkspacesTransformTests
 	{
 		Result<Unit>? result = null;
 		List<WindowAddedEventArgs> evs = new();
-		Assert.Raises<WindowAddedEventArgs>(
-			h =>
-				rootSector.WindowSector.WindowAdded += (sender, args) =>
-				{
-					evs.Add(args);
-					h.Invoke(sender, args);
-				},
+		CustomAssert.Raises<WindowAddedEventArgs>(
+			h => rootSector.WindowSector.WindowAdded += h,
 			h => rootSector.WindowSector.WindowAdded -= h,
-			() => result = ctx.Store.Dispatch(sut)
+			() => result = ctx.Store.Dispatch(sut),
+			(sender, args) => evs.Add(args)
 		);
 		return (result!.Value, evs);
 	}

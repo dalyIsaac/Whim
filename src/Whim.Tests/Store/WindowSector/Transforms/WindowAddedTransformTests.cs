@@ -39,18 +39,11 @@ public class WindowAddedTransformTests
 		Result<IWindow>? result = null;
 		List<RouteEventArgs> evs = new();
 
-		Assert.Raises<RouteEventArgs>(
-			h =>
-				rootSector.MapSector.WindowRouted += (sender, args) =>
-				{
-					evs.Add(args);
-					h.Invoke(sender, args);
-				},
+		CustomAssert.Raises<RouteEventArgs>(
+			h => rootSector.MapSector.WindowRouted += h,
 			h => rootSector.MapSector.WindowRouted -= h,
-			() =>
-			{
-				CustomAssert.DoesLayout(rootSector, () => result = ctx.Store.Dispatch(sut));
-			}
+			() => CustomAssert.DoesLayout(rootSector, () => result = ctx.Store.Dispatch(sut)),
+			(sender, args) => evs.Add(args)
 		);
 
 		return (result!.Value, evs);

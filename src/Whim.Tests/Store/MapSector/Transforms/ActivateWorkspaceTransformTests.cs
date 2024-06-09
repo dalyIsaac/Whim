@@ -35,15 +35,11 @@ public class ActivateWorkspaceTransformTests
 		Result<Unit>? result = null;
 		List<MonitorWorkspaceChangedEventArgs> evs = new();
 
-		Assert.Raises<MonitorWorkspaceChangedEventArgs>(
-			h =>
-				rootSector.MapSector.MonitorWorkspaceChanged += (sender, args) =>
-				{
-					evs.Add(args);
-					h.Invoke(sender, args);
-				},
+		CustomAssert.Raises<MonitorWorkspaceChangedEventArgs>(
+			h => rootSector.MapSector.MonitorWorkspaceChanged += h,
 			h => rootSector.MapSector.MonitorWorkspaceChanged -= h,
-			() => result = ctx.Store.Dispatch(sut)
+			() => result = ctx.Store.Dispatch(sut),
+			(sender, args) => evs.Add(args)
 		);
 
 		return (result!.Value, evs);

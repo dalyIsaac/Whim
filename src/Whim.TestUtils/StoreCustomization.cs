@@ -36,6 +36,8 @@ public class StoreCustomization : ICustomization
 		fixture.Inject(store._root);
 		fixture.Inject(store._root.MutableRootSector);
 
+		store._root.MutableRootSector.MonitorSector.MonitorsChangedDelay = 0;
+
 		// First IsStaThread() returns true, then all further calls return false.
 		// This is to ensure that the first Dispatch runs in a Task.
 		// All further calls will run in the same thread.

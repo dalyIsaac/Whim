@@ -37,6 +37,8 @@
 // 		Result<Unit>? result = null;
 // 		List<MonitorWorkspaceChangedEventArgs> evs = new();
 //
+// Switch to CustomAssert.Raises
+// Assert.False(true);
 // 		Assert.Raises<MonitorWorkspaceChangedEventArgs>(
 // 			h =>
 // 				rootSector.MapSector.MonitorWorkspaceChanged += (sender, args) =>
