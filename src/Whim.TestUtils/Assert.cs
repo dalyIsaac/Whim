@@ -150,6 +150,7 @@ public static class CustomAssert
 		return result.Arguments.Workspace;
 	}
 
+	// TODO
 	/// <summary>
 	/// Asserts that the <see cref="WorkspaceLayoutCompletedEventArgs"/> is raised with the expected workspace.
 	/// </summary>

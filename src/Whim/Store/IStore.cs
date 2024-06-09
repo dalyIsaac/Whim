@@ -9,6 +9,11 @@ namespace Whim;
 /// </summary>
 public interface IStore : IDisposable
 {
+	/// <summary>
+	/// Whether the store is being disposed.
+	/// </summary>
+	bool IsDisposing { get; }
+
 	/// <inheritdoc cref="IMonitorSectorEvents"/>
 	IMonitorSectorEvents MonitorEvents { get; }
 

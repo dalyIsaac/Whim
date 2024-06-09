@@ -14,6 +14,9 @@ public class Store : IStore
 	private readonly ReaderWriterLockSlim _lock = new(LockRecursionPolicy.SupportsRecursion);
 
 	private bool _disposedValue;
+	
+	/// <inheritdoc />
+	public bool IsDisposing { get; private set; }
 
 	internal readonly RootSector _root;
 
@@ -127,6 +130,7 @@ public class Store : IStore
 	/// <inheritdoc/>
 	protected virtual void Dispose(bool disposing)
 	{
+		IsDisposing = true;
 		if (!_disposedValue)
 		{
 			if (disposing)
