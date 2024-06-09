@@ -23,14 +23,16 @@ internal record MoveWindowEdgesInDirectionWorkspaceTransform(
 		MutableRootSector rootSector,
 		Workspace workspace,
 		IWindow window
-	) =>
-		workspace with
-		{
-			LayoutEngines = workspace.LayoutEngines.SetItem(
-				workspace.ActiveLayoutEngineIndex,
-				workspace
-					.LayoutEngines[workspace.ActiveLayoutEngineIndex]
-					.MoveWindowEdgesInDirection(Edges, Deltas, window)
-			)
-		};
+	)
+	{
+		ILayoutEngine oldEngine = workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex];
+		ILayoutEngine newEngine = oldEngine.MoveWindowEdgesInDirection(Edges, Deltas, window);
+
+		return oldEngine == newEngine
+			? workspace
+			: workspace with
+			{
+				LayoutEngines = workspace.LayoutEngines.SetItem(workspace.ActiveLayoutEngineIndex, newEngine)
+			};
+	}
 }
