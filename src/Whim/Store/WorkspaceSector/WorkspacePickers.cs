@@ -74,6 +74,11 @@ public static partial class Pickers
 				rootSector.MapSector.MonitorWorkspaceMap[rootSector.MonitorSector.ActiveMonitorHandle]
 			];
 
+	internal static Workspace PickMutableActiveWorkspace(MutableRootSector rootSector) =>
+		rootSector.WorkspaceSector.Workspaces[
+			rootSector.MapSector.MonitorWorkspaceMap[rootSector.MonitorSector.ActiveMonitorHandle]
+		];
+
 	/// <summary>
 	/// Get the id of the active workspace.
 	/// </summary>

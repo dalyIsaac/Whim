@@ -116,4 +116,22 @@ public static class CustomAssert
 		Assert.Empty(internalCtx.KeybindHook.ReceivedCalls());
 		Assert.Empty(internalCtx.MouseHook.ReceivedCalls());
 	}
+
+	internal static IWorkspace DoesLayout(MutableRootSector rootSector, Action action)
+	{
+		Assert.RaisedEvent<WorkspaceLayoutCompletedEventArgs> result = Assert.Raises<WorkspaceLayoutCompletedEventArgs>(
+			h => rootSector.WorkspaceSector.WorkspaceLayoutCompleted += h,
+			h => rootSector.WorkspaceSector.WorkspaceLayoutCompleted -= h,
+			() =>
+			{
+				Assert.Raises<WorkspaceLayoutStartedEventArgs>(
+					h => rootSector.WorkspaceSector.WorkspaceLayoutStarted += h,
+					h => rootSector.WorkspaceSector.WorkspaceLayoutStarted -= h,
+					() => action()
+				);
+			}
+		);
+
+		return result.Arguments.Workspace;
+	}
 }

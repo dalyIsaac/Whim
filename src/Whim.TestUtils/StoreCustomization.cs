@@ -1,7 +1,26 @@
+using System.Collections.Generic;
 using AutoFixture;
+using DotNext;
 using NSubstitute;
 
 namespace Whim.TestUtils;
+
+internal class StoreWrapper : Store
+{
+	/// <summary>
+	/// All the transforms that have been executed.
+	/// </summary>
+	public List<object> Transforms { get; } = new();
+
+	public StoreWrapper(IContext ctx, IInternalContext internalCtx)
+		: base(ctx, internalCtx) { }
+
+	protected override Result<TResult> DispatchFn<TResult>(Transform<TResult> transform)
+	{
+		Transforms.Add(transform);
+		return base.DispatchFn(transform);
+	}
+}
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class StoreCustomization : ICustomization
@@ -11,7 +30,7 @@ public class StoreCustomization : ICustomization
 		IContext ctx = fixture.Freeze<IContext>();
 		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
 
-		Store store = new(ctx, internalCtx);
+		StoreWrapper store = new(ctx, internalCtx);
 		ctx.Store.Returns(store);
 
 		fixture.Inject(store._root);

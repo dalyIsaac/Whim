@@ -43,8 +43,13 @@ public class Store : IStore
 		_root.Initialize();
 	}
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	private Result<TResult> DispatchFn<TResult>(Transform<TResult> transform) =>
+	/// <summary>
+	/// Execute the given <paramref name="transform"/>.
+	/// </summary>
+	/// <param name="transform"></param>
+	/// <typeparam name="TResult"></typeparam>
+	/// <returns></returns>
+	protected virtual Result<TResult> DispatchFn<TResult>(Transform<TResult> transform) =>
 		transform.Execute(_ctx, _internalCtx, _root.MutableRootSector);
 
 	/// <inheritdoc />
