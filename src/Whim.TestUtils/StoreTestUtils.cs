@@ -58,12 +58,19 @@ internal static class StoreTestUtils
 
 	public static void AddWorkspaceToManager(IContext ctx, MutableRootSector rootSector, Workspace workspace)
 	{
+		WorkspaceSector workspaceSector = rootSector.WorkspaceSector;
+
+		if (workspaceSector.WorkspaceOrder.Contains(workspace.Id))
+		{
+			return;
+		}
+
 		List<IWorkspace> workspaces = ctx.WorkspaceManager.ToList();
 		workspaces.Add(workspace);
 		ctx.WorkspaceManager.GetEnumerator().Returns(_ => workspaces.GetEnumerator());
 
-		rootSector.WorkspaceSector.Workspaces = rootSector.WorkspaceSector.Workspaces.Add(workspace.Id, workspace);
-		rootSector.WorkspaceSector.WorkspaceOrder = rootSector.WorkspaceSector.WorkspaceOrder.Add(workspace.Id);
+		workspaceSector.Workspaces = workspaceSector.Workspaces.Add(workspace.Id, workspace);
+		workspaceSector.WorkspaceOrder = workspaceSector.WorkspaceOrder.Add(workspace.Id);
 	}
 
 	public static void AddWorkspacesToManager(
