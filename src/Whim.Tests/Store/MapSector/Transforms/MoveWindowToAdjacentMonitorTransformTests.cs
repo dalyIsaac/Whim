@@ -30,25 +30,25 @@ public class MoveWindowToAdjacentMonitorTransformTests
 		Assert.False(result.IsSuccessful);
 	}
 
-	// [Theory, AutoSubstituteData<StoreCustomization>]
-	// internal void Success(IContext ctx, MutableRootSector rootSector)
-	// {
-	// 	// Given there are two adjacent monitors
-	// 	IMonitor originalMonitor = CreateMonitor((HMONITOR)10);
-	// 	IMonitor newMonitor = CreateMonitor((HMONITOR)11);
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void Success(IContext ctx, MutableRootSector rootSector)
+	{
+		// Given there are two adjacent monitors
+		IMonitor originalMonitor = CreateMonitor((HMONITOR)10);
+		IMonitor newMonitor = CreateMonitor((HMONITOR)11);
 
-	// 	IWindow window = CreateWindow((HWND)10);
+		IWindow window = CreateWindow((HWND)10);
 
-	// 	PopulateThreeWayMap(ctx, rootSector, originalMonitor, CreateWorkspace(ctx), window);
-	// 	PopulateMonitorWorkspaceMap(ctx, rootSector, newMonitor, CreateWorkspace(ctx));
-	// 	rootSector.MonitorSector.ActiveMonitorHandle = originalMonitor.Handle;
+		PopulateThreeWayMap(ctx, rootSector, originalMonitor, CreateWorkspace(ctx), window);
+		PopulateMonitorWorkspaceMap(ctx, rootSector, newMonitor, CreateWorkspace(ctx));
+		rootSector.MonitorSector.ActiveMonitorHandle = originalMonitor.Handle;
 
-	// 	MoveWindowToAdjacentMonitorTransform sut = new(window.Handle);
+		MoveWindowToAdjacentMonitorTransform sut = new(window.Handle);
 
-	// 	// When we dispatch the transform
-	// 	var result = ctx.Store.Dispatch(sut);
+		// When we dispatch the transform
+		var result = ctx.Store.Dispatch(sut);
 
-	// 	// Then
-	// 	Assert.True(result.IsSuccessful);
-	// }
+		// Then
+		Assert.True(result.IsSuccessful);
+	}
 }
