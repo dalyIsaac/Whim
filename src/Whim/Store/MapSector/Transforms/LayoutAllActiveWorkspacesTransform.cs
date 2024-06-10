@@ -17,7 +17,9 @@ public record LayoutAllActiveWorkspacesTransform() : Transform
 
 		foreach (IWorkspace workspace in ctx.Store.Pick(Pickers.PickAllActiveWorkspaces()))
 		{
-			workspace.DoLayout();
+			rootSector.WorkspaceSector.WorkspacesToLayout = rootSector.WorkspaceSector.WorkspacesToLayout.Add(
+				workspace.Id
+			);
 		}
 
 		return Unit.Result;

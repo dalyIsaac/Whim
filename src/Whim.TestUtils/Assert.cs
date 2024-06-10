@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using FluentAssertions;
 using NSubstitute;
 using Xunit;
 using Xunit.Sdk;
@@ -183,59 +181,85 @@ public static class CustomAssert
 	internal static void Layout(
 		MutableRootSector rootSector,
 		Action action,
-		IEnumerable<Guid>? layoutWorkspaceIds = null,
-		IEnumerable<Guid>? noLayoutWorkspaceIds = null
+		Guid[]? layoutWorkspaceIds = null,
+		Guid[]? noLayoutWorkspaceIds = null
 	)
 	{
+		// Populate the dictionaries with the remaining workspace ids for each event.
 		Dictionary<Guid, int> workspaceStartedRemainingIds = new();
-		foreach (Guid id in layoutWorkspaceIds ?? Enumerable.Empty<Guid>())
+		foreach (Guid id in layoutWorkspaceIds ?? Array.Empty<Guid>())
 		{
 			workspaceStartedRemainingIds[id] = workspaceStartedRemainingIds.GetValueOrDefault(id, 0) + 1;
 		}
 
 		Dictionary<Guid, int> workspaceCompletedRemainingIds = new();
-		foreach (Guid id in layoutWorkspaceIds ?? Enumerable.Empty<Guid>())
+		foreach (Guid id in layoutWorkspaceIds ?? Array.Empty<Guid>())
 		{
 			workspaceCompletedRemainingIds[id] = workspaceCompletedRemainingIds.GetValueOrDefault(id, 0) + 1;
 		}
 
-		Raises<WorkspaceLayoutCompletedEventArgs>(
-			h => rootSector.WorkspaceSector.WorkspaceLayoutCompleted += h,
-			h => rootSector.WorkspaceSector.WorkspaceLayoutCompleted -= h,
-			() =>
-			{
-				Raises<WorkspaceLayoutStartedEventArgs>(
-					h => rootSector.WorkspaceSector.WorkspaceLayoutStarted += h,
-					h => rootSector.WorkspaceSector.WorkspaceLayoutStarted -= h,
-					() => action(),
-					(sender, e) =>
-					{
-						workspaceStartedRemainingIds[e.Workspace.Id] =
-							workspaceStartedRemainingIds.GetValueOrDefault(e.Workspace.Id, 0) - 1;
-					}
-				);
-			},
-			(sender, e) =>
-			{
-				workspaceCompletedRemainingIds[e.Workspace.Id] =
-					workspaceCompletedRemainingIds.GetValueOrDefault(e.Workspace.Id, 0) - 1;
-			}
-		);
+		bool layoutStarted = false;
+		bool layoutCompleted = false;
 
-		foreach ((Guid id, int remaining) in workspaceStartedRemainingIds)
+		// Event handlers for decreasing the remaining workspace ids.
+		void WorkspaceLayoutStarted(object? sender, WorkspaceLayoutStartedEventArgs e)
 		{
-			if (remaining > 0)
+			layoutStarted = true;
+			workspaceStartedRemainingIds[e.Workspace.Id] =
+				workspaceStartedRemainingIds.GetValueOrDefault(e.Workspace.Id, 0) - 1;
+		}
+
+		void WorkspaceLayoutCompleted(object? sender, WorkspaceLayoutCompletedEventArgs e)
+		{
+			layoutCompleted = true;
+			workspaceCompletedRemainingIds[e.Workspace.Id] =
+				workspaceCompletedRemainingIds.GetValueOrDefault(e.Workspace.Id, 0) - 1;
+		}
+
+		// Perform the action.
+		rootSector.WorkspaceSector.WorkspaceLayoutStarted += WorkspaceLayoutStarted;
+		rootSector.WorkspaceSector.WorkspaceLayoutCompleted += WorkspaceLayoutCompleted;
+		try
+		{
+			action();
+		}
+		finally
+		{
+			rootSector.WorkspaceSector.WorkspaceLayoutStarted -= WorkspaceLayoutStarted;
+			rootSector.WorkspaceSector.WorkspaceLayoutCompleted -= WorkspaceLayoutCompleted;
+		}
+
+		// Assert that the remaining workspace ids are 0.
+		foreach (Guid id in layoutWorkspaceIds ?? Array.Empty<Guid>())
+		{
+			int remaining = workspaceStartedRemainingIds[id];
+			if (remaining != 0)
 			{
 				throw new Exception($"Workspace {id} was not started {remaining} times.");
 			}
 		}
 
-		foreach ((Guid id, int remaining) in workspaceCompletedRemainingIds)
+		foreach (Guid id in layoutWorkspaceIds ?? Array.Empty<Guid>())
 		{
-			if (remaining > 0)
+			int remaining = workspaceCompletedRemainingIds[id];
+			if (remaining != 0)
 			{
 				throw new Exception($"Workspace {id} was not completed {remaining} times.");
 			}
+		}
+
+		foreach (Guid id in noLayoutWorkspaceIds ?? Array.Empty<Guid>())
+		{
+			if (workspaceCompletedRemainingIds.ContainsKey(id))
+			{
+				throw new Exception($"Workspace {id} was unexpectedly laid out.");
+			}
+		}
+
+		// Handle for when neither lists were provided.
+		if (layoutWorkspaceIds == null && noLayoutWorkspaceIds == null && !layoutStarted && !layoutCompleted)
+		{
+			throw new Exception("No events were raised.");
 		}
 	}
 
@@ -243,4 +267,27 @@ public static class CustomAssert
 	/// Get the stored transforms from the <see cref="StoreWrapper"/>.
 	/// </summary>
 	public static List<object> GetTransforms(this IContext ctx) => ((StoreWrapper)ctx.Store).Transforms;
+
+	/// <summary>
+	/// Asserts that the enumerable contains the expected number of items.
+	/// </summary>
+	/// <param name="enumerable">The enumerable.</param>
+	/// <param name="predicate">The predicate.</param>
+	/// <param name="count">The expected count.</param>
+	public static void Contains<T>(this IEnumerable<T> enumerable, Func<T, bool> predicate, int count)
+	{
+		int countFound = 0;
+		foreach (T item in enumerable)
+		{
+			if (predicate(item))
+			{
+				countFound++;
+			}
+		}
+
+		if (countFound != count)
+		{
+			throw new Exception($"Expected {count} items, found {countFound}");
+		}
+	}
 }

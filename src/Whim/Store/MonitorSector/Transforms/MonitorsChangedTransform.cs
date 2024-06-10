@@ -91,6 +91,7 @@ internal record MonitorsChangedTransform : Transform
 	{
 		MapSector mapSector = rootSector.MapSector;
 		MonitorSector monitorSector = rootSector.MonitorSector;
+		WorkspaceSector workspaceSector = rootSector.WorkspaceSector;
 
 		monitorSector.MonitorsChangingTasks++;
 
@@ -116,19 +117,19 @@ internal record MonitorsChangedTransform : Transform
 		foreach (IMonitor monitor in addedMonitors)
 		{
 			// Try find a workspace which doesn't have a monitor.
-			IWorkspace? workspace = null;
-			foreach (IWorkspace w in ctx.WorkspaceManager)
+			WorkspaceId workspaceId = default;
+			foreach (WorkspaceId currId in workspaceSector.WorkspaceOrder)
 			{
-				if (!ctx.Store.Pick(Pickers.PickMonitorByWorkspace(w.Id)).IsSuccessful)
+				if (!ctx.Store.Pick(Pickers.PickMonitorByWorkspace(currId)).IsSuccessful)
 				{
-					workspace = w;
-					mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(monitor.Handle, w.Id);
+					workspaceId = currId;
+					mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(monitor.Handle, currId);
 					break;
 				}
 			}
 
 			// If there's no workspace, create one.
-			if (workspace is null)
+			if (workspaceId == default)
 			{
 				if (ctx.WorkspaceManager.Add() is IWorkspace newWorkspace)
 				{
