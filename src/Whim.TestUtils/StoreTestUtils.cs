@@ -163,4 +163,9 @@ internal static class StoreTestUtils
 		AddWorkspaceToManager(ctx, rootSector, workspace);
 		return workspace;
 	}
+
+	public static void SetupMonitorAtPoint(IContext ctx, IPoint<int> point, IMonitor monitor)
+	{
+		ctx.MonitorManager.GetMonitorAtPoint(point).Returns(monitor);
+	}
 }
