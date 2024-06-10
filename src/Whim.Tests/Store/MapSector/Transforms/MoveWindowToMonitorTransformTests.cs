@@ -89,23 +89,23 @@ public class MoveWindowToMonitorTransformTests
 		Assert.True(result.IsSuccessful);
 	}
 
-	// [Theory, AutoSubstituteData<StoreCustomization>]
-	// internal void Success(IContext ctx, MutableRootSector rootSector)
-	// {
-	// 	// Given there is a three way map
-	// 	IWindow window = CreateWindow((HWND)10);
-	// 	IMonitor originalMonitor = CreateMonitor((HMONITOR)10);
-	// 	IMonitor newMonitor = CreateMonitor((HMONITOR)11);
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void Success(IContext ctx, MutableRootSector rootSector)
+	{
+		// Given there is a three way map
+		IWindow window = CreateWindow((HWND)10);
+		IMonitor originalMonitor = CreateMonitor((HMONITOR)10);
+		IMonitor newMonitor = CreateMonitor((HMONITOR)11);
 
-	// 	PopulateThreeWayMap(ctx, rootSector, originalMonitor, CreateWorkspace(ctx), window);
-	// 	PopulateMonitorWorkspaceMap(ctx, rootSector, newMonitor, CreateWorkspace(ctx));
+		PopulateThreeWayMap(ctx, rootSector, originalMonitor, CreateWorkspace(ctx), window);
+		PopulateMonitorWorkspaceMap(ctx, rootSector, newMonitor, CreateWorkspace(ctx));
 
-	// 	MoveWindowToMonitorTransform sut = new(newMonitor.Handle, window.Handle);
+		MoveWindowToMonitorTransform sut = new(newMonitor.Handle, window.Handle);
 
-	// 	// When
-	// 	var result = ctx.Store.Dispatch(sut);
+		// When
+		var result = ctx.Store.Dispatch(sut);
 
-	// 	// Then
-	// 	Assert.True(result.IsSuccessful);
-	// }
+		// Then
+		Assert.True(result.IsSuccessful);
+	}
 }
