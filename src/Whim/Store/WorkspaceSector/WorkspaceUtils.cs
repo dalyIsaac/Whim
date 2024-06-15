@@ -18,6 +18,11 @@ internal static class WorkspaceUtils
 	public static Workspace SetActiveLayoutEngine(WorkspaceSector sector, Workspace workspace, int layoutEngineIdx)
 	{
 		int previousLayoutEngineIdx = workspace.ActiveLayoutEngineIndex;
+		if (previousLayoutEngineIdx == layoutEngineIdx)
+		{
+			return workspace;
+		}
+
 		workspace = workspace with { ActiveLayoutEngineIndex = layoutEngineIdx };
 
 		sector.QueueEvent(

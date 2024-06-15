@@ -44,7 +44,7 @@ public class WorkspaceUtilsTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void SetActiveLayoutEngine(
+	internal void SetActiveLayoutEngine_DifferentActiveLayoutEngine(
 		IContext ctx,
 		MutableRootSector root,
 		ILayoutEngine engine1,
@@ -76,6 +76,40 @@ public class WorkspaceUtilsTests
 		// Then
 		Assert.NotSame(workspace, result);
 		Assert.Equal(2, result.ActiveLayoutEngineIndex);
+		Assert.Equal(workspace.Id, result.Id);
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void SetActiveLayoutEngine_SameActiveLayoutEngine(
+		IContext ctx,
+		MutableRootSector root,
+		ILayoutEngine engine
+	)
+	{
+		// Given
+		Workspace workspace = CreateWorkspace(ctx) with
+		{
+			LayoutEngines = ImmutableList.Create(engine),
+			ActiveLayoutEngineIndex = 0
+		};
+		int newActiveLayoutEngineIndex = 0;
+
+		// When
+		Workspace result = WorkspaceUtils.SetActiveLayoutEngine(
+			root.WorkspaceSector,
+			workspace,
+			newActiveLayoutEngineIndex
+		);
+
+		CustomAssert.DoesNotRaise<ActiveLayoutEngineChangedEventArgs>(
+			h => ctx.Store.WorkspaceEvents.ActiveLayoutEngineChanged += h,
+			h => ctx.Store.WorkspaceEvents.ActiveLayoutEngineChanged -= h,
+			root.WorkspaceSector.DispatchEvents
+		);
+
+		// Then
+		Assert.Same(workspace, result);
+		Assert.Equal(0, result.ActiveLayoutEngineIndex);
 		Assert.Equal(workspace.Id, result.Id);
 	}
 
