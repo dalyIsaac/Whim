@@ -225,7 +225,7 @@ public static class CustomAssert
 			int remaining = workspaceStartedRemainingIds[id];
 			if (remaining != 0)
 			{
-				throw new Exception($"Workspace {id} was not started {remaining} times.");
+				throw new Exception($"Workspace {id}'s layout was not started {remaining} times.");
 			}
 		}
 
@@ -234,7 +234,7 @@ public static class CustomAssert
 			int remaining = workspaceCompletedRemainingIds[id];
 			if (remaining != 0)
 			{
-				throw new Exception($"Workspace {id} was not completed {remaining} times.");
+				throw new Exception($"Workspace {id}'s layout was not completed {remaining} times.");
 			}
 		}
 

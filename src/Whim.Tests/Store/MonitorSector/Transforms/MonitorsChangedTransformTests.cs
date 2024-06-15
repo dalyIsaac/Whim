@@ -68,14 +68,38 @@ public class MonitorsChangedTransformTests
 	private static void Setup_TryEnqueue(IInternalContext internalCtx) =>
 		internalCtx.CoreNativeManager.IsStaThread().Returns(_ => true, _ => false);
 
-	private static IWorkspace[] SetupWorkspaces(IContext ctx, MutableRootSector rootSector)
+	private static IWorkspace[] SetupWorkspaces_AlreadyAdded(IContext ctx, MutableRootSector rootSector)
 	{
 		Workspace workspace1 = CreateWorkspace(ctx);
 		Workspace workspace2 = CreateWorkspace(ctx);
 		Workspace workspace3 = CreateWorkspace(ctx);
 		AddWorkspacesToManager(ctx, rootSector, workspace1, workspace2, workspace3);
+		return new[] { workspace1, workspace2, workspace3 };
+	}
 
-		ctx.WorkspaceManager.Add().Returns(_ => workspace1, _ => workspace2, _ => workspace3);
+	private static IWorkspace[] SetupWorkspaces_AddWorkspaces(IContext ctx, MutableRootSector rootSector)
+	{
+		Workspace workspace1 = CreateWorkspace(ctx);
+		Workspace workspace2 = CreateWorkspace(ctx);
+		Workspace workspace3 = CreateWorkspace(ctx);
+		ctx.WorkspaceManager.Add()
+			.Returns(
+				_ =>
+				{
+					AddWorkspaceToManager(ctx, rootSector, workspace1);
+					return workspace1;
+				},
+				_ =>
+				{
+					AddWorkspaceToManager(ctx, rootSector, workspace2);
+					return workspace2;
+				},
+				_ =>
+				{
+					AddWorkspaceToManager(ctx, rootSector, workspace3);
+					return workspace3;
+				}
+			);
 
 		return new[] { workspace1, workspace2, workspace3 };
 	}
@@ -85,7 +109,7 @@ public class MonitorsChangedTransformTests
 	{
 		// Given we've populated monitors
 		Setup_TryEnqueue(internalCtx);
-		IWorkspace[] workspaces = SetupWorkspaces(ctx, rootSector);
+		IWorkspace[] workspaces = SetupWorkspaces_AlreadyAdded(ctx, rootSector);
 
 		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup });
 
@@ -135,7 +159,7 @@ public class MonitorsChangedTransformTests
 	{
 		// Given we've populated monitors
 		Setup_TryEnqueue(internalCtx);
-		IWorkspace[] workspaces = SetupWorkspaces(ctx, rootSector);
+		IWorkspace[] workspaces = SetupWorkspaces_AlreadyAdded(ctx, rootSector);
 
 		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup });
 		ctx.Store.Dispatch(new MonitorsChangedTransform());
@@ -181,7 +205,33 @@ public class MonitorsChangedTransformTests
 	internal void MonitorsAdded_Initialization(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		// Given we have no monitors
-		IWorkspace[] workspaces = SetupWorkspaces(ctx, rootSector);
+		IWorkspace[] workspaces = SetupWorkspaces_AlreadyAdded(ctx, rootSector);
+
+		// When we add monitors
+		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup });
+		var raisedEvent = DispatchTransformEvent(ctx, rootSector, new[] { workspaces[0].Id, workspaces[1].Id });
+
+		// Then the resulting event will have a monitor added, and the other monitors in the sector will be set.
+		Assert.Equal(2, raisedEvent.Arguments.AddedMonitors.Count());
+
+		Assert.Equal(LeftTopMonitorSetup.Handle, ctx.Store.Pick(Pickers.PickLastWhimActiveMonitor()).Handle);
+		Assert.Equal(LeftTopMonitorSetup.Handle, ctx.Store.Pick(Pickers.PickActiveMonitor()).Handle);
+
+		Assert.Equal(workspaces[0].Id, rootSector.MapSector.MonitorWorkspaceMap[LeftTopMonitorSetup.Handle]);
+		Assert.Equal(workspaces[1].Id, rootSector.MapSector.MonitorWorkspaceMap[RightMonitorSetup.Handle]);
+
+		Assert.DoesNotContain(ctx.GetTransforms(), t => t is DeactivateWorkspaceTransform);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MonitorsAdded_Initialization_AddWorkspaces(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector rootSector
+	)
+	{
+		// Given we have no monitors
+		IWorkspace[] workspaces = SetupWorkspaces_AddWorkspaces(ctx, rootSector);
 
 		// When we add monitors
 		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup });
@@ -204,7 +254,7 @@ public class MonitorsChangedTransformTests
 	{
 		// Given there are no changes in the monitors.
 		Setup_TryEnqueue(internalCtx);
-		IWorkspace[] workspaces = SetupWorkspaces(ctx, rootSector);
+		IWorkspace[] workspaces = SetupWorkspaces_AlreadyAdded(ctx, rootSector);
 
 		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup });
 
