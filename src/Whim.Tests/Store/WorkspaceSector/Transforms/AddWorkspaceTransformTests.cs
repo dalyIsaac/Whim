@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using DotNext;
 using NSubstitute;
 using Whim.TestUtils;
@@ -27,7 +28,7 @@ public class AddWorkspaceTransformTests
 
 		Assert.Single(root.WorkspaceSector.WorkspacesToCreate);
 		Assert.Equal(name, root.WorkspaceSector.WorkspacesToCreate[0].Name);
-		Assert.Equal(createLeafLayoutEngines, root.WorkspaceSector.WorkspacesToCreate[0].CreateLeafLayoutEngines);
+		Assert.Equal(createLeafLayoutEngines, root.WorkspaceSector.WorkspacesToCreate[0].CreateLeafLayoutEngines); //./
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -49,13 +50,17 @@ public class AddWorkspaceTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Success(IContext ctx, MutableRootSector root)
+	internal void Success(IContext ctx, MutableRootSector root, ILayoutEngine engine1, ILayoutEngine engine2)
 	{
 		// Given the workspace sector is initialized
 		root.WorkspaceSector.HasInitialized = true;
 		string name = "Test";
-		List<CreateLeafLayoutEngine> createLeafLayoutEngines =
-			new() { (id) => Substitute.For<ILayoutEngine>(), (id) => Substitute.For<ILayoutEngine>() };
+		List<CreateLeafLayoutEngine> createLeafLayoutEngines = new() { (id) => engine1, (id) => engine2 };
+
+		root.WorkspaceSector.ProxyLayoutEngineCreators = ImmutableList.Create<ProxyLayoutEngineCreator>(
+			(engine) => Substitute.For<TestProxyLayoutEngine>(engine),
+			(engine) => Substitute.For<TestProxyLayoutEngine>(engine)
+		);
 
 		AddWorkspaceTransform sut = new(name, createLeafLayoutEngines);
 
@@ -81,6 +86,13 @@ public class AddWorkspaceTransformTests
 		Assert.Same(raisedEvent.Arguments.Workspace, workspace);
 
 		Assert.Equal(2, workspace.LayoutEngines.Count);
+
+		// We actually create the proxy layout engines.
+		Assert.IsAssignableFrom<TestProxyLayoutEngine>(workspace.LayoutEngines[0]);
+		Assert.IsAssignableFrom<TestProxyLayoutEngine>(workspace.LayoutEngines[1]);
+
+		Assert.Same(engine1, ((TestProxyLayoutEngine)workspace.LayoutEngines[0]).InnerLayoutEngine);
+		Assert.Same(engine2, ((TestProxyLayoutEngine)workspace.LayoutEngines[1]).InnerLayoutEngine);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
