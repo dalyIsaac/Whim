@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using DotNext;
+using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -327,5 +328,26 @@ public class WorkspacePickersTests
 
 		// Then we get the window position
 		Assert.True(result.IsSuccessful);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickCreateLeafLayoutEngines(IContext ctx, MutableRootSector root)
+	{
+		// Given the workspaces and windows
+		Func<CreateLeafLayoutEngine[]> createLayoutEngines = () =>
+			new CreateLeafLayoutEngine[]
+			{
+				(id) => Substitute.For<ILayoutEngine>(),
+				(id) => Substitute.For<ILayoutEngine>(),
+			};
+
+		root.WorkspaceSector.CreateLayoutEngines = createLayoutEngines;
+
+		// When we get the layout engines
+		Result<Func<CreateLeafLayoutEngine[]>> result = ctx.Store.Pick(Pickers.PickCreateLeafLayoutEngines());
+
+		// Then we get the layout engines
+		Assert.True(result.IsSuccessful);
+		Assert.Same(createLayoutEngines, result.Value);
 	}
 }

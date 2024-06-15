@@ -10,7 +10,7 @@ namespace Whim;
 /// To activate a workspace, or change the mapping between workspaces and monitors, use the
 /// <see cref="IButler"/>.
 /// </summary>
-public interface IWorkspaceManager : IEnumerable<IWorkspace>
+public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 {
 	/// <summary>
 	/// The active workspace.
@@ -31,22 +31,22 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>
 	/// <summary>
 	/// Event for when a workspace is added.
 	/// </summary>
-	event EventHandler<WorkspaceEventArgs>? WorkspaceAdded;
+	event EventHandler<WorkspaceAddedEventArgs>? WorkspaceAdded;
 
 	/// <summary>
 	/// Event for when a workspace is removed.
 	/// </summary>
-	event EventHandler<WorkspaceEventArgs>? WorkspaceRemoved;
+	event EventHandler<WorkspaceRemovedEventArgs>? WorkspaceRemoved;
 
 	/// <summary>
 	/// Event for when <see cref="IWorkspace.DoLayout"/> has started.
 	/// </summary>
-	event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutStarted;
+	event EventHandler<WorkspaceLayoutStartedEventArgs>? WorkspaceLayoutStarted;
 
 	/// <summary>
 	/// Event for when <see cref="IWorkspace.DoLayout"/> has completed.
 	/// </summary>
-	event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted;
+	event EventHandler<WorkspaceLayoutCompletedEventArgs>? WorkspaceLayoutCompleted;
 
 	/// <summary>
 	/// Event for when a workspace's active layout engine has changed.

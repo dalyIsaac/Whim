@@ -1,7 +1,6 @@
 using System.Collections;
 using NSubstitute;
 using Whim.TestUtils;
-using Windows.Win32.Graphics.Gdi;
 using Xunit;
 using static Whim.TestUtils.StoreTestUtils;
 

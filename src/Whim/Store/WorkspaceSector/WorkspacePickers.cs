@@ -187,4 +187,11 @@ public static partial class Pickers
 					return Result.FromException<WindowPosition>(new WhimException("Window not found in workspace"));
 				}
 			);
+
+	/// <summary>
+	/// Picks the function used to create the default layout engines to add to a workspace.
+	/// </summary>
+	/// <returns></returns>
+	public static PurePicker<Func<CreateLeafLayoutEngine[]>> PickCreateLeafLayoutEngines() =>
+		static (IRootSector rootSector) => rootSector.WorkspaceSector.CreateLayoutEngines;
 }

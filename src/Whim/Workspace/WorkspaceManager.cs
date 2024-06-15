@@ -9,20 +9,23 @@ internal class WorkspaceManager : IWorkspaceManager
 {
 	private readonly IContext _context;
 
-	public event EventHandler<WorkspaceEventArgs>? WorkspaceAdded;
+	public event EventHandler<WorkspaceAddedEventArgs>? WorkspaceAdded;
 
-	public event EventHandler<WorkspaceEventArgs>? WorkspaceRemoved;
+	public event EventHandler<WorkspaceRemovedEventArgs>? WorkspaceRemoved;
 
 	public event EventHandler<ActiveLayoutEngineChangedEventArgs>? ActiveLayoutEngineChanged;
 
 	public event EventHandler<WorkspaceRenamedEventArgs>? WorkspaceRenamed;
 
-	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutStarted;
+	public event EventHandler<WorkspaceLayoutStartedEventArgs>? WorkspaceLayoutStarted;
 
-	public event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted;
+	public event EventHandler<WorkspaceLayoutCompletedEventArgs>? WorkspaceLayoutCompleted;
 
-	public Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; } =
-		() => new CreateLeafLayoutEngine[] { (id) => new ColumnLayoutEngine(id) };
+	public Func<CreateLeafLayoutEngine[]> CreateLayoutEngines
+	{
+		get => _context.Store.Pick(Pickers.PickCreateLeafLayoutEngines());
+		set => _context.Store.Dispatch(new SetCreateLayoutEnginesTransform(value));
+	}
 
 	public IWorkspace? this[string workspaceName] => TryGet(workspaceName);
 
@@ -32,11 +35,7 @@ internal class WorkspaceManager : IWorkspaceManager
 		{
 			IMonitor activeMonitor = _context.MonitorManager.ActiveMonitor;
 			Logger.Debug($"Getting active workspace for monitor {activeMonitor}");
-			return _context
-				.Store.Pick(Pickers.PickWorkspaceByMonitor(activeMonitor.Handle))
-				.TryGet(out IWorkspace workspace)
-				? workspace
-				: _context.Store.Pick(Pickers.PickAllWorkspaces()).First();
+			return _context.Store.Pick(Pickers.PickActiveWorkspace());
 		}
 	}
 
@@ -66,10 +65,10 @@ internal class WorkspaceManager : IWorkspaceManager
 		_context.Store.WorkspaceEvents.WorkspaceLayoutCompleted += WorkspaceSector_WorkspaceLayoutCompleted;
 	}
 
-	private void WorkspaceSector_WorkspaceAdded(object? sender, WorkspaceEventArgs args) =>
+	private void WorkspaceSector_WorkspaceAdded(object? sender, WorkspaceAddedEventArgs args) =>
 		WorkspaceAdded?.Invoke(sender, args);
 
-	private void WorkspaceSector_WorkspaceRemoved(object? sender, WorkspaceEventArgs args) =>
+	private void WorkspaceSector_WorkspaceRemoved(object? sender, WorkspaceRemovedEventArgs args) =>
 		WorkspaceRemoved?.Invoke(sender, args);
 
 	private void WorkspaceSector_ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs args) =>
@@ -78,10 +77,10 @@ internal class WorkspaceManager : IWorkspaceManager
 	private void WorkspaceSector_WorkspaceRenamed(object? sender, WorkspaceRenamedEventArgs args) =>
 		WorkspaceRenamed?.Invoke(sender, args);
 
-	private void WorkspaceSector_WorkspaceLayoutStarted(object? sender, WorkspaceEventArgs args) =>
+	private void WorkspaceSector_WorkspaceLayoutStarted(object? sender, WorkspaceLayoutStartedEventArgs args) =>
 		WorkspaceLayoutStarted?.Invoke(sender, args);
 
-	private void WorkspaceSector_WorkspaceLayoutCompleted(object? sender, WorkspaceEventArgs args) =>
+	private void WorkspaceSector_WorkspaceLayoutCompleted(object? sender, WorkspaceLayoutCompletedEventArgs args) =>
 		WorkspaceLayoutCompleted?.Invoke(sender, args);
 
 	public bool Remove(IWorkspace workspace) =>
@@ -96,4 +95,14 @@ internal class WorkspaceManager : IWorkspaceManager
 			: null;
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+	public void Dispose()
+	{
+		_context.Store.WorkspaceEvents.WorkspaceAdded -= WorkspaceSector_WorkspaceAdded;
+		_context.Store.WorkspaceEvents.WorkspaceRemoved -= WorkspaceSector_WorkspaceRemoved;
+		_context.Store.WorkspaceEvents.ActiveLayoutEngineChanged -= WorkspaceSector_ActiveLayoutEngineChanged;
+		_context.Store.WorkspaceEvents.WorkspaceRenamed -= WorkspaceSector_WorkspaceRenamed;
+		_context.Store.WorkspaceEvents.WorkspaceLayoutStarted -= WorkspaceSector_WorkspaceLayoutStarted;
+		_context.Store.WorkspaceEvents.WorkspaceLayoutCompleted -= WorkspaceSector_WorkspaceLayoutCompleted;
+	}
 }

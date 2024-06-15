@@ -55,7 +55,7 @@ public class RemoveWorkspaceTransformTests
 		Assert.False(result.IsSuccessful);
 	}
 
-	private static void Success(
+	internal static void Success(
 		BaseRemoveWorkspaceTransform sut,
 		Workspace providedWorkspace,
 		IContext ctx,
