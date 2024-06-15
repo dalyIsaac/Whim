@@ -3,7 +3,8 @@
 namespace Whim;
 
 /// <summary>
-/// Adds a proxy layout engine to the store.
+/// Adds a proxy layout engine to the list of proxy layout engine creators.
+/// This does not add the layout engine to any existing workspaces.
 /// A proxy layout engine is used by plugins to add layout functionality to
 /// all workspaces.
 /// This should be used by <see cref="IPlugin"/>s.
