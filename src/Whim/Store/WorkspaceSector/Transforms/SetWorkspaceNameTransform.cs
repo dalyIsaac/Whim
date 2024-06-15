@@ -20,7 +20,12 @@ public record SetWorkspaceNameTransform(WorkspaceId Id, string Name) : BaseWorks
 		Workspace workspace
 	)
 	{
-		Workspace newWorkspace = workspace with { Name = Name };
+		if (Name == workspace.BackingName)
+		{
+			return workspace;
+		}
+
+		Workspace newWorkspace = workspace with { BackingName = Name };
 		rootSector.WorkspaceSector.QueueEvent(
 			new WorkspaceRenamedEventArgs() { PreviousName = workspace.Name, Workspace = newWorkspace }
 		);
