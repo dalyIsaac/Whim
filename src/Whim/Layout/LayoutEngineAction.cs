@@ -17,11 +17,6 @@ public record LayoutEngineAction
 	/// This is deliberately set to required to force the specification of the triggering window, where possible.
 	/// </summary>
 	public required IWindow? Window { get; init; }
-
-	/// <summary>
-	/// Whether to defer the layout until the next <see cref="IWorkspace.DoLayout"/>. Defaults to <see langword="false"/>.
-	/// </summary>
-	public bool DeferLayout { get; init; }
 }
 
 /// <summary>

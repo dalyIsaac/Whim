@@ -123,9 +123,6 @@ public partial record Workspace : IInternalWorkspace
 	/// <inheritdoc/>
 	public IWindowState? TryGetWindowState(IWindow window)
 	{
-		// _windowStates.TryGetValue(window.Handle, out IWindowState? rect);
-		// return rect;
-
 		if (WindowPositions.TryGetValue(window.Handle, out WindowPosition? pos))
 		{
 			return new WindowState
