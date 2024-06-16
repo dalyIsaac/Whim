@@ -65,7 +65,7 @@ public class WorkspaceSectorTests
 
 		// When
 		root.WorkspaceSector.WorkspacesToLayout = root.WorkspaceSector.WorkspacesToLayout.Add(workspace.Id);
-		root.WorkspaceSector.DispatchEvents();
+		CustomAssert.Layout(root, root.WorkspaceSector.DispatchEvents, new[] { workspace.Id });
 
 		// Then
 		ctx.NativeManager.Received(2).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
