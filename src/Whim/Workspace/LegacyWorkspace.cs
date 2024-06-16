@@ -159,7 +159,7 @@ public partial record Workspace : IInternalWorkspace
 			return;
 		}
 
-		Logger.Debug($"Disposing workspace {Name}");
+		Logger.Debug($"Disposing workspace {BackingName}");
 
 		bool isWorkspaceActive = _context.Store.Pick(Pickers.PickMonitorByWorkspace(Id)).IsSuccessful;
 

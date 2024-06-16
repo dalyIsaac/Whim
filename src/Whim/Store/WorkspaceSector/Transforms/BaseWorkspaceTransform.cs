@@ -52,7 +52,7 @@ public abstract record BaseWorkspaceTransform(WorkspaceId WorkspaceId, bool Skip
 
 		if (!SkipDoLayout)
 		{
-			sector.WorkspacesToLayout.Add(workspace.Id);
+			sector.WorkspacesToLayout = sector.WorkspacesToLayout.Add(workspace.Id);
 		}
 
 		return Result.FromValue(true);
