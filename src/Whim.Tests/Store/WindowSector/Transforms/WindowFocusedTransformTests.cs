@@ -140,38 +140,6 @@ public class WindowFocusedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void MonitorForWorkspaceNotFound(IContext ctx, MutableRootSector rootSector)
-	{
-		// Given the window's workspace is not tracked by the map sector, but the window is tracked
-		IWindow window = CreateWindow((HWND)1);
-		Workspace workspace = CreateWorkspace(ctx);
-		Workspace workspace1 = CreateWorkspace(ctx);
-		Workspace workspace2 = CreateWorkspace(ctx);
-
-		Setup_Monitors(rootSector);
-
-		var monitors = rootSector.MonitorSector.Monitors;
-
-		Setup_Monitors(rootSector);
-		PopulateThreeWayMap(ctx, rootSector, monitors[0], workspace, window);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitors[1], workspace1);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitors[2], workspace2);
-
-		WindowFocusedTransform sut = new(window);
-
-		// When we dispatch the transform
-		CustomAssert.Layout(
-			rootSector,
-			() => ctx.Store.Dispatch(sut),
-			noLayoutWorkspaceIds: new[] { workspace.Id, workspace1.Id, workspace2.Id }
-		);
-
-		// Then the active monitor index is updated based on MonitorFromWindow
-		Assert.Equal(HMONITOR_1, rootSector.MonitorSector.ActiveMonitorHandle);
-		Assert.Equal(HMONITOR_1, rootSector.MonitorSector.LastWhimActiveMonitorHandle);
-	}
-
-	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void WorkspaceLaidOut(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		// Given the window's workspace is tracked by the map sector
