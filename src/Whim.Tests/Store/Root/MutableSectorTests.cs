@@ -2,11 +2,9 @@ using System;
 using NSubstitute;
 using Whim.TestUtils;
 using Xunit;
-using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class MutableRootSectorTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -16,16 +14,21 @@ public class MutableRootSectorTests
 		MutableRootSector sut = new(ctx, internalCtx);
 		var capture = CaptureWinEventProc.Create(internalCtx);
 
-		// Create a workspace for the monitor created. This will avoid a KeyNotFoundException during Dispose.
-		AddWorkspaceToManager(ctx, rootSector, CreateWorkspace(ctx));
+		ctx.Store.Dispatch(new AddWorkspaceTransform());
 
 		// When we initialize and dispose the root sector
 		sut.Initialize();
 		sut.Dispose();
 
-		// Then
+		// Then the monitor sector subscribes to the window message monitor
 		internalCtx.WindowMessageMonitor.DisplayChanged += Arg.Any<EventHandler<WindowMessageMonitorEventArgs>>();
 		internalCtx.WindowMessageMonitor.DisplayChanged -= Arg.Any<EventHandler<WindowMessageMonitorEventArgs>>();
+
+		// and the window sector subscribes to SetWinEventHook
 		Assert.Equal(6, capture.Handles.Count);
+
+		// and a workspace is created
+		Assert.Single(rootSector.WorkspaceSector.Workspaces);
+		Assert.Single(rootSector.WorkspaceSector.WorkspaceOrder);
 	}
 }

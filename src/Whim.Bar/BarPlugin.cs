@@ -64,7 +64,7 @@ public class BarPlugin : IBarPlugin
 		foreach (IMonitor monitor in e.AddedMonitors)
 		{
 			BarWindow barWindow = new(_context, _barConfig, monitor);
-			_monitorBarMap.Add(monitor, barWindow);
+			_monitorBarMap[monitor] = barWindow;
 		}
 
 		ShowAll();

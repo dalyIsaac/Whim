@@ -53,7 +53,10 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 		_ctx = ctx;
 	}
 
-	public override void Initialize() { }
+	public override void Initialize()
+	{
+		_ctx.Store.Dispatch(new InitializeWorkspacesTransform());
+	}
 
 	public override void DispatchEvents()
 	{
