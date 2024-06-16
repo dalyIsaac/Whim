@@ -41,10 +41,7 @@ internal static class StoreTestUtils
 	{
 		IMonitor monitor = Substitute.For<IMonitor>();
 		monitor.Handle.Returns(handle);
-		monitor.WorkingArea.X.Returns(0);
-		monitor.WorkingArea.Y.Returns(0);
-		monitor.WorkingArea.Width.Returns(1920);
-		monitor.WorkingArea.Height.Returns(1080);
+		monitor.WorkingArea.Returns(new Rectangle<int>(0, 0, 1920, 1080));
 		monitor.ScaleFactor.Returns(100);
 		return monitor;
 	}

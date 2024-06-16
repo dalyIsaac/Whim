@@ -53,7 +53,6 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 		_ctx = ctx;
 	}
 
-	// TODO: Add to StoreTests
 	public override void Initialize() { }
 
 	public override void DispatchEvents()
