@@ -93,6 +93,11 @@ internal record MonitorsChangedTransform : Transform
 		MonitorSector monitorSector = rootSector.MonitorSector;
 		WorkspaceSector workspaceSector = rootSector.WorkspaceSector;
 
+		if (!workspaceSector.HasInitialized)
+		{
+			return;
+		}
+
 		monitorSector.MonitorsChangingTasks++;
 
 		// Deactivate all workspaces.

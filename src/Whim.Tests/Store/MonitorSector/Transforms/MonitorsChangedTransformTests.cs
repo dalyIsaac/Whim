@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using NSubstitute;
 using Whim.TestUtils;
@@ -11,7 +10,6 @@ using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class MonitorsChangedTransformTests
 {
 	private static readonly (RECT Rect, HMONITOR Handle) RightMonitorSetup = (
@@ -74,6 +72,7 @@ public class MonitorsChangedTransformTests
 		Workspace workspace2 = CreateWorkspace(ctx);
 		Workspace workspace3 = CreateWorkspace(ctx);
 		AddWorkspacesToManager(ctx, rootSector, workspace1, workspace2, workspace3);
+		rootSector.WorkspaceSector.HasInitialized = true;
 		return new[] { workspace1, workspace2, workspace3 };
 	}
 
@@ -100,8 +99,29 @@ public class MonitorsChangedTransformTests
 					return workspace3;
 				}
 			);
-
+		rootSector.WorkspaceSector.HasInitialized = true;
 		return new[] { workspace1, workspace2, workspace3 };
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WorkspaceSectorNotInitialized(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector rootSector
+	)
+	{
+		// Given we've populated monitors
+		SetupWorkspaces_AddWorkspaces(ctx, rootSector);
+		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup });
+
+		rootSector.WorkspaceSector.HasInitialized = false;
+
+		// When something happens
+		ctx.Store.Dispatch(new MonitorsChangedTransform());
+
+		// Then no workspaces are created
+		Assert.Empty(rootSector.WorkspaceSector.WorkspaceOrder);
+		Assert.Empty(rootSector.MapSector.MonitorWorkspaceMap);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
