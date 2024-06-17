@@ -13,6 +13,26 @@ namespace Whim.Tests;
 public class RemoveWindowFromWorkspaceTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WindowNotFound(IContext ctx, MutableRootSector root, IWindow window)
+	{
+		// Given the window is not found
+		window.Handle.Returns((HWND)3);
+
+		Workspace workspace = CreateWorkspace(ctx);
+		workspace = PopulateWindowWorkspaceMap(ctx, root, CreateWindow((HWND)1), workspace);
+		workspace = PopulateWindowWorkspaceMap(ctx, root, CreateWindow((HWND)2), workspace);
+
+		RemoveWindowFromWorkspaceTransform sut = new(workspace.Id, window);
+
+		// When we execute the transform
+		Result<bool> result = ctx.Store.Dispatch(sut);
+
+		// Then we get false
+		Assert.True(result.IsSuccessful);
+		Assert.False(result.Value);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void WindowIsNotLastFocused(IContext ctx, MutableRootSector root, IWindow window)
 	{
 		// Given the window is not the last focused window
