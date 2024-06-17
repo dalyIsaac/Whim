@@ -14,13 +14,13 @@ public class WorkspaceWidgetViewModelCustomization : ICustomization
 
 		// The workspace manager should have a single workspace
 		using IWorkspace workspace = fixture.Create<IWorkspace>();
+		workspace.Id.Returns(Guid.NewGuid());
 		context.WorkspaceManager.GetEnumerator().Returns((_) => new List<IWorkspace>() { workspace }.GetEnumerator());
 
 		fixture.Inject(context);
 	}
 }
 
-// TODO: Assert workspace name
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WorkspaceWidgetViewModelTests
 {

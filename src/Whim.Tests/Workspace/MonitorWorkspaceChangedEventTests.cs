@@ -44,14 +44,12 @@ public class MonitorWorkspaceChangedEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void Equals_DifferentPreviousWorkspace(
-		IMonitor monitor,
-		IWorkspace workspace,
-		IWorkspace aWorkspace,
-		IWorkspace bWorkspace
-	)
+	public void Equals_DifferentPreviousWorkspace(IContext ctx, IMonitor monitor)
 	{
 		// Given
+		IWorkspace workspace = StoreTestUtils.CreateWorkspace(ctx);
+		IWorkspace aWorkspace = StoreTestUtils.CreateWorkspace(ctx);
+		IWorkspace bWorkspace = StoreTestUtils.CreateWorkspace(ctx);
 		MonitorWorkspaceChangedEventArgs a =
 			new()
 			{
@@ -72,14 +70,12 @@ public class MonitorWorkspaceChangedEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void Equals_DifferentCurrentWorkspace(
-		IMonitor monitor,
-		IWorkspace aCurrentWorkspace,
-		IWorkspace bCurrentWorkspace,
-		IWorkspace previousWorkspace
-	)
+	public void Equals_DifferentCurrentWorkspace(IContext ctx, IMonitor monitor)
 	{
 		// Given
+		IWorkspace aCurrentWorkspace = StoreTestUtils.CreateWorkspace(ctx);
+		IWorkspace bCurrentWorkspace = StoreTestUtils.CreateWorkspace(ctx);
+		IWorkspace previousWorkspace = StoreTestUtils.CreateWorkspace(ctx);
 		MonitorWorkspaceChangedEventArgs a =
 			new()
 			{
