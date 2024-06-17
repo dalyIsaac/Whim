@@ -163,7 +163,7 @@ public class MoveWindowToWorkspaceTransformTests
 			ctx.GetTransforms(),
 			t =>
 				(t as RemoveWindowFromWorkspaceTransform)
-				== new RemoveWindowFromWorkspaceTransform(workspace1.Id, window.Handle)
+				== new RemoveWindowFromWorkspaceTransform(workspace1.Id, window)
 		);
 		Assert.Contains(
 			ctx.GetTransforms(),
@@ -200,7 +200,7 @@ public class MoveWindowToWorkspaceTransformTests
 			ctx.GetTransforms(),
 			t =>
 				(t as RemoveWindowFromWorkspaceTransform)
-				== new RemoveWindowFromWorkspaceTransform(workspace1.Id, window.Handle)
+				== new RemoveWindowFromWorkspaceTransform(workspace1.Id, window)
 		);
 		Assert.Contains(
 			ctx.GetTransforms(),

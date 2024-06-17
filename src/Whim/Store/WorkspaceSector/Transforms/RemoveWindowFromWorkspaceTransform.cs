@@ -5,29 +5,22 @@ using Windows.Win32.Foundation;
 namespace Whim;
 
 /// <summary>
-/// Remove the window for the given <paramref name="WindowHandle"/> from the workspace with the
+/// Remove the window for the given <paramref name="Window"/> from the workspace with the
 /// given <paramref name="WorkspaceId"/>.
 /// </summary>
 /// <param name="WorkspaceId"></param>
-/// <param name="WindowHandle"></param>
-internal record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, HWND WindowHandle)
-	: BaseWorkspaceWindowTransform(
-		WorkspaceId,
-		WindowHandle,
-		DefaultToLastFocusedWindow: false,
-		IsWindowRequiredInWorkspace: true,
-		SkipDoLayout: false
-	)
+/// <param name="Window"></param>
+internal record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, IWindow Window)
+	: BaseWorkspaceTransform(WorkspaceId, SkipDoLayout: false)
 {
-	private protected override Result<Workspace> WindowOperation(
+	private protected override Result<Workspace> WorkspaceOperation(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector rootSector,
-		Workspace workspace,
-		IWindow window
+		Workspace workspace
 	)
 	{
-		ImmutableDictionary<HWND, WindowPosition> updatedPositions = workspace.WindowPositions.Remove(window.Handle);
+		ImmutableDictionary<HWND, WindowPosition> updatedPositions = workspace.WindowPositions.Remove(Window.Handle);
 		if (updatedPositions == workspace.WindowPositions)
 		{
 			return workspace;
@@ -35,8 +28,8 @@ internal record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, HWND
 
 		workspace = workspace with { WindowPositions = updatedPositions };
 
-		workspace = ResetLastFocusedWindow(workspace, window);
-		workspace = RemoveWindowFromLayoutEngines(workspace, window);
+		workspace = ResetLastFocusedWindow(workspace, Window);
+		workspace = RemoveWindowFromLayoutEngines(workspace, Window);
 		return workspace;
 	}
 

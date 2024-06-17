@@ -118,7 +118,7 @@ public class MoveWindowToPointTransformTests
 			ctx.GetTransforms(),
 			t =>
 				(t as RemoveWindowFromWorkspaceTransform)
-				== new RemoveWindowFromWorkspaceTransform(sourceWorkspace.Id, window.Handle)
+				== new RemoveWindowFromWorkspaceTransform(sourceWorkspace.Id, window)
 		);
 		Assert.Contains(
 			ctx.GetTransforms(),

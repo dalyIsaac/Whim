@@ -81,7 +81,7 @@ public partial record Workspace : IInternalWorkspace
 
 	/// <inheritdoc/>
 	public bool RemoveWindow(IWindow window) =>
-		_context.Store.Dispatch(new RemoveWindowFromWorkspaceTransform(Id, window.Handle)).IsSuccessful;
+		_context.Store.Dispatch(new RemoveWindowFromWorkspaceTransform(Id, window)).IsSuccessful;
 
 	/// <inheritdoc/>
 	public bool FocusWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false) =>

@@ -232,7 +232,7 @@ public class LegacyWorkspaceTests
 		workspace.RemoveWindow(window);
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new RemoveWindowFromWorkspaceTransform(workspace.Id, window.Handle));
+		ctx.Store.Received(1).Dispatch(new RemoveWindowFromWorkspaceTransform(workspace.Id, window));
 	}
 
 	[Theory, AutoSubstituteData]

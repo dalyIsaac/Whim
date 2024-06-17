@@ -117,7 +117,7 @@ public class MoveWindowToAdjacentWorkspaceTransformTests
 			ctx.GetTransforms(),
 			t =>
 				(t as RemoveWindowFromWorkspaceTransform)
-				== new RemoveWindowFromWorkspaceTransform(workspace1.Id, window.Handle)
+				== new RemoveWindowFromWorkspaceTransform(workspace1.Id, window)
 		);
 		Assert.Contains(
 			ctx.GetTransforms(),
