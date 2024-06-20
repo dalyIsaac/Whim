@@ -17,6 +17,7 @@ internal record AddWindowToWorkspaceTransform(WorkspaceId WorkspaceId, IWindow W
 		Workspace workspace
 	)
 	{
+		// TODO: optimize this
 		workspace = workspace with
 		{
 			// We add the window with a dummy window position. When the workspace gets laid out, then the WindowPosition

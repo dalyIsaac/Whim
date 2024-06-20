@@ -74,6 +74,7 @@ internal record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, IWin
 
 	private static Workspace RemoveWindowFromLayoutEngines(Workspace workspace, IWindow window)
 	{
+		// TODO: Optimize
 		for (int idx = 0; idx < workspace.LayoutEngines.Count; idx++)
 		{
 			workspace = workspace with

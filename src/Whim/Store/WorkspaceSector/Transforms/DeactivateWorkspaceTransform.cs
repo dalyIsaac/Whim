@@ -8,7 +8,7 @@ namespace Whim;
 /// Updates the <see cref="WindowPosition"/>s in the <see cref="Workspace"/> to be <see cref="WindowSize.Minimized"/>.
 /// </summary>
 /// <param name="WorkspaceId"></param>
-internal record DeactivateWorkspaceTransform(WorkspaceId WorkspaceId) : BaseWorkspaceTransform(WorkspaceId)
+internal record DeactivateWorkspaceTransform(WorkspaceId WorkspaceId) : BaseWorkspaceTransform(WorkspaceId, SkipDoLayout: true)
 {
 	private protected override Result<Workspace> WorkspaceOperation(
 		IContext ctx,
