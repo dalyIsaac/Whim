@@ -1,9 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using DotNext;
-using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
 using Xunit;
 using static Whim.TestUtils.StoreTestUtils;
 
@@ -62,10 +62,11 @@ public class WindowHiddenTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Success(IContext ctx, MutableRootSector rootSector, IWindow window, IMonitor monitor)
+	internal void Success(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the window is inside the window sector,
-		window.Handle.Returns((HWND)2);
+		IWindow window = CreateWindow((HWND)2);
+		IMonitor monitor = CreateMonitor((HMONITOR)3);
 
 		Workspace workspace = CreateWorkspace(ctx);
 		PopulateThreeWayMap(ctx, rootSector, monitor, workspace, window);
