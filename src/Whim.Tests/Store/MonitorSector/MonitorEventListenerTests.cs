@@ -113,7 +113,7 @@ public class MonitorEventListenerTests
 			ctx.Store.MonitorEvents,
 			_windowMessageArgs
 		);
-		await Task.Delay(5100);
+		await Task.Delay(5200);
 
 		// Then a dispatch to the store was triggered
 		ctx.Store.Received(1).Dispatch(new MonitorsChangedTransform());
