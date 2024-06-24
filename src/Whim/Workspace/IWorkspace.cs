@@ -1,8 +1,4 @@
 global using WorkspaceId = System.Guid;
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using Windows.Win32.Foundation;
 
 namespace Whim;
 

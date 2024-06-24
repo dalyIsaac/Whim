@@ -1,8 +1,5 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using DotNext;
-using Windows.Win32.Foundation;
 
 namespace Whim;
 
@@ -75,7 +72,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	{
 		Logger.Verbose($"Adding window {hwnd}");
 
-		Result<IWindow> res = _context.Store.Pick(Pickers.PickWindowByHandle(hwnd));
+		Result<IWindow> res = _context.Store.Pick(PickWindowByHandle(hwnd));
 		if (res.IsSuccessful)
 		{
 			Logger.Debug($"Window {hwnd} already exists");
@@ -91,7 +88,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 	public void OnWindowRemoved(IWindow window) => _context.Store.Dispatch(new WindowRemovedTransform(window));
 
-	public IEnumerator<IWindow> GetEnumerator() => _context.Store.Pick(Pickers.PickAllWindows()).GetEnumerator();
+	public IEnumerator<IWindow> GetEnumerator() => _context.Store.Pick(PickAllWindows()).GetEnumerator();
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

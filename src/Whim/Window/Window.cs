@@ -2,7 +2,6 @@ using System.ComponentModel;
 using System.IO;
 using DotNext;
 using Microsoft.UI.Xaml.Media.Imaging;
-using Windows.Win32.Foundation;
 
 namespace Whim;
 

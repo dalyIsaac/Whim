@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
 using Windows.UI.Composition;
 using Windows.Win32;
-using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dwm;
 
 namespace Whim;

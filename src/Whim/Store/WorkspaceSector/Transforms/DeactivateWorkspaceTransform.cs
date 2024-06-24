@@ -1,6 +1,4 @@
-﻿using System.Collections.Immutable;
-using DotNext;
-using Windows.Win32.Foundation;
+﻿using DotNext;
 
 namespace Whim;
 

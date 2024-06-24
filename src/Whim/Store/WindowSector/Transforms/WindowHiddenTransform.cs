@@ -20,7 +20,7 @@ internal record WindowHiddenTransform(IWindow Window) : WindowRemovedTransform(W
 		MutableRootSector mutableRootSector
 	)
 	{
-		if (!ctx.Store.Pick(Pickers.PickMonitorByWindow(Window.Handle)).IsSuccessful)
+		if (!ctx.Store.Pick(PickMonitorByWindow(Window.Handle)).IsSuccessful)
 		{
 			Logger.Debug($"Window {Window} is not on a monitor, ignoring event");
 			return Unit.Result;

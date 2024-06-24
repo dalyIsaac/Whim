@@ -1,7 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using Windows.Win32.Graphics.Gdi;
 
 namespace Whim;
 
@@ -14,15 +11,15 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 
 	private bool _disposedValue;
 
-	public IMonitor ActiveMonitor => _context.Store.Pick(Pickers.PickActiveMonitor());
+	public IMonitor ActiveMonitor => _context.Store.Pick(PickActiveMonitor());
 
-	public IMonitor PrimaryMonitor => _context.Store.Pick(Pickers.PickPrimaryMonitor());
+	public IMonitor PrimaryMonitor => _context.Store.Pick(PickPrimaryMonitor());
 
-	public IMonitor LastWhimActiveMonitor => _context.Store.Pick(Pickers.PickLastWhimActiveMonitor());
+	public IMonitor LastWhimActiveMonitor => _context.Store.Pick(PickLastWhimActiveMonitor());
 
-	public int Length => _context.Store.Pick(Pickers.PickAllMonitors()).Count;
+	public int Length => _context.Store.Pick(PickAllMonitors()).Count;
 
-	public IEnumerator<IMonitor> GetEnumerator() => _context.Store.Pick(Pickers.PickAllMonitors()).GetEnumerator();
+	public IEnumerator<IMonitor> GetEnumerator() => _context.Store.Pick(PickAllMonitors()).GetEnumerator();
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -52,16 +49,16 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 		_context.Store.Dispatch(new ActivateEmptyMonitorTransform(monitor.Handle));
 
 	public IMonitor GetMonitorAtPoint(IPoint<int> point) =>
-		_context.Store.Pick(Pickers.PickMonitorAtPoint(point, getFirst: true)).Value;
+		_context.Store.Pick(PickMonitorAtPoint(point, getFirst: true)).Value;
 
 	public IMonitor GetPreviousMonitor(IMonitor monitor) =>
-		_context.Store.Pick(Pickers.PickAdjacentMonitor(monitor.Handle, reverse: true, getFirst: true)).Value;
+		_context.Store.Pick(PickAdjacentMonitor(monitor.Handle, reverse: true, getFirst: true)).Value;
 
 	public IMonitor GetNextMonitor(IMonitor monitor) =>
-		_context.Store.Pick(Pickers.PickAdjacentMonitor(monitor.Handle, reverse: false, getFirst: true)).Value;
+		_context.Store.Pick(PickAdjacentMonitor(monitor.Handle, reverse: false, getFirst: true)).Value;
 
 	public IMonitor? GetMonitorByHandle(HMONITOR hmonitor) =>
-		_context.Store.Pick(Pickers.PickMonitorByHandle(hmonitor)).OrDefault();
+		_context.Store.Pick(PickMonitorByHandle(hmonitor)).OrDefault();
 
 	protected virtual void Dispose(bool disposing)
 	{

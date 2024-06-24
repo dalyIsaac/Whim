@@ -1,5 +1,4 @@
 using DotNext;
-using Windows.Win32.Foundation;
 
 namespace Whim;
 
@@ -79,6 +78,6 @@ internal static class WorkspaceUtils
 			return Result.FromException<IWindow>(new WhimException("Window not in workspace"));
 		}
 
-		return ctx.Store.Pick(Pickers.PickWindowByHandle(windowHandle));
+		return ctx.Store.Pick(PickWindowByHandle(windowHandle));
 	}
 }

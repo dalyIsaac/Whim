@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.Windows.AppNotifications;
 
 namespace Whim;

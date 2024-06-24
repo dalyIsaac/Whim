@@ -1,8 +1,5 @@
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Threading.Tasks;
 using DotNext;
-using Windows.Win32.Graphics.Gdi;
 
 namespace Whim;
 
@@ -101,7 +98,7 @@ internal record MonitorsChangedTransform : Transform
 		monitorSector.MonitorsChangingTasks++;
 
 		// Deactivate all workspaces.
-		foreach (IWorkspace visibleWorkspace in ctx.Store.Pick(Pickers.PickAllActiveWorkspaces()))
+		foreach (IWorkspace visibleWorkspace in ctx.Store.Pick(PickAllActiveWorkspaces()))
 		{
 			visibleWorkspace.Deactivate();
 		}
@@ -109,7 +106,7 @@ internal record MonitorsChangedTransform : Transform
 		// If a monitor was removed, remove the workspace from the map.
 		foreach (IMonitor monitor in removedMonitors)
 		{
-			if (!ctx.Store.Pick(Pickers.PickWorkspaceByMonitor(monitor.Handle)).TryGet(out IWorkspace workspace))
+			if (!ctx.Store.Pick(PickWorkspaceByMonitor(monitor.Handle)).TryGet(out IWorkspace workspace))
 			{
 				continue;
 			}
@@ -125,7 +122,7 @@ internal record MonitorsChangedTransform : Transform
 			WorkspaceId workspaceId = default;
 			foreach (WorkspaceId currId in workspaceSector.WorkspaceOrder)
 			{
-				if (!ctx.Store.Pick(Pickers.PickMonitorByWorkspace(currId)).IsSuccessful)
+				if (!ctx.Store.Pick(PickMonitorByWorkspace(currId)).IsSuccessful)
 				{
 					workspaceId = currId;
 					mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(monitor.Handle, currId);

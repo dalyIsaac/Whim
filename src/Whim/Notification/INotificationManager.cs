@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Windows.AppNotifications;
 
 namespace Whim;

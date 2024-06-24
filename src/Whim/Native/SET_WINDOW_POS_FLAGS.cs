@@ -1,5 +1,3 @@
-using System;
-
 namespace Windows.Win32
 {
 	namespace UI.WindowsAndMessaging

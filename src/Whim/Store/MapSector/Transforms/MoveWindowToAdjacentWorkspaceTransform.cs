@@ -1,5 +1,4 @@
 using DotNext;
-using Windows.Win32.Foundation;
 
 namespace Whim;
 
@@ -29,7 +28,7 @@ public record MoveWindowToAdjacentWorkspaceTransform(
 			return Result.FromException<Unit>(StoreExceptions.NoValidWindow());
 		}
 
-		Result<IWindow> windowResult = ctx.Store.Pick(Pickers.PickWindowByHandle(windowHandle));
+		Result<IWindow> windowResult = ctx.Store.Pick(PickWindowByHandle(windowHandle));
 		if (!windowResult.TryGet(out IWindow window))
 		{
 			return Result.FromException<Unit>(windowResult.Error!);
@@ -40,7 +39,7 @@ public record MoveWindowToAdjacentWorkspaceTransform(
 		// Find the current workspace for the window.
 		if (
 			!sector.WindowWorkspaceMap.TryGetValue(windowHandle, out WorkspaceId currentWorkspaceId)
-			|| !ctx.Store.Pick(Pickers.PickWorkspaceById(currentWorkspaceId)).TryGet(out IWorkspace currentWorkspace)
+			|| !ctx.Store.Pick(PickWorkspaceById(currentWorkspaceId)).TryGet(out IWorkspace currentWorkspace)
 		)
 		{
 			return Result.FromException<Unit>(StoreExceptions.NoWorkspaceFoundForWindow(windowHandle));
@@ -49,7 +48,7 @@ public record MoveWindowToAdjacentWorkspaceTransform(
 		// Get the adjacent workspace for the current workspace.
 		if (
 			!ctx
-				.Store.Pick(Pickers.PickAdjacentWorkspace(currentWorkspaceId, Reverse, SkipActive))
+				.Store.Pick(PickAdjacentWorkspace(currentWorkspaceId, Reverse, SkipActive))
 				.TryGet(out IWorkspace? nextWorkspace)
 		)
 		{

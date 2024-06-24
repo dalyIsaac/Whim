@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Windows.Win32;
-using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dwm;
-using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.Accessibility;
 using Windows.Win32.UI.HiDpi;
 using Windows.Win32.UI.Input.KeyboardAndMouse;

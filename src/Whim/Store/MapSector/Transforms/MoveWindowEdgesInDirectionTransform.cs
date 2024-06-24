@@ -1,5 +1,4 @@
 using DotNext;
-using Windows.Win32.Foundation;
 
 namespace Whim;
 
@@ -31,21 +30,21 @@ public record MoveWindowEdgesInDirectionTransform(
 			return Result.FromException<Unit>(StoreExceptions.NoValidWindow());
 		}
 
-		Result<IWindow> windowResult = ctx.Store.Pick(Pickers.PickWindowByHandle(windowHandle));
+		Result<IWindow> windowResult = ctx.Store.Pick(PickWindowByHandle(windowHandle));
 		if (!windowResult.TryGet(out IWindow window))
 		{
 			return Result.FromException<Unit>(windowResult.Error!);
 		}
 
 		// Get the containing workspace.
-		Result<IWorkspace> workspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceByWindow(windowHandle));
+		Result<IWorkspace> workspaceResult = ctx.Store.Pick(PickWorkspaceByWindow(windowHandle));
 		if (!workspaceResult.TryGet(out IWorkspace workspace))
 		{
 			return Result.FromException<Unit>(workspaceResult.Error!);
 		}
 
 		// Get the containing monitor.
-		Result<IMonitor> monitorResult = ctx.Store.Pick(Pickers.PickMonitorByWindow(windowHandle));
+		Result<IMonitor> monitorResult = ctx.Store.Pick(PickMonitorByWindow(windowHandle));
 		if (!monitorResult.TryGet(out IMonitor monitor))
 		{
 			return Result.FromException<Unit>(monitorResult.Error!);

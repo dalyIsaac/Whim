@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Whim;
@@ -23,7 +21,7 @@ internal class WorkspaceManager : IWorkspaceManager
 
 	public Func<CreateLeafLayoutEngine[]> CreateLayoutEngines
 	{
-		get => _context.Store.Pick(Pickers.PickCreateLeafLayoutEngines());
+		get => _context.Store.Pick(PickCreateLeafLayoutEngines());
 		set => _context.Store.Dispatch(new SetCreateLayoutEnginesTransform(value));
 	}
 
@@ -35,7 +33,7 @@ internal class WorkspaceManager : IWorkspaceManager
 		{
 			IMonitor activeMonitor = _context.MonitorManager.ActiveMonitor;
 			Logger.Debug($"Getting active workspace for monitor {activeMonitor}");
-			return _context.Store.Pick(Pickers.PickActiveWorkspace());
+			return _context.Store.Pick(PickActiveWorkspace());
 		}
 	}
 
@@ -51,9 +49,9 @@ internal class WorkspaceManager : IWorkspaceManager
 		_context.Store.Dispatch(new AddProxyLayoutEngineTransform(proxyLayoutEngineCreator));
 
 	public bool Contains(IWorkspace workspace) =>
-		_context.Store.Pick(Pickers.PickAllWorkspaces()).Any(w => w.Id == workspace.Id);
+		_context.Store.Pick(PickAllWorkspaces()).Any(w => w.Id == workspace.Id);
 
-	public IEnumerator<IWorkspace> GetEnumerator() => _context.Store.Pick(Pickers.PickAllWorkspaces()).GetEnumerator();
+	public IEnumerator<IWorkspace> GetEnumerator() => _context.Store.Pick(PickAllWorkspaces()).GetEnumerator();
 
 	public void Initialize()
 	{
@@ -90,9 +88,7 @@ internal class WorkspaceManager : IWorkspaceManager
 		_context.Store.Dispatch(new RemoveWorkspaceByNameTransform(workspaceName)).IsSuccessful;
 
 	public IWorkspace? TryGet(string workspaceName) =>
-		_context.Store.Pick(Pickers.PickWorkspaceByName(workspaceName)).TryGet(out IWorkspace workspace)
-			? workspace
-			: null;
+		_context.Store.Pick(PickWorkspaceByName(workspaceName)).TryGet(out IWorkspace workspace) ? workspace : null;
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

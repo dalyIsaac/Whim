@@ -1,5 +1,3 @@
-using System;
-
 namespace Whim;
 
 internal class MutableRootSector : SectorBase, IDisposable

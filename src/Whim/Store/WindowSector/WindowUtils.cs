@@ -1,5 +1,4 @@
 using DotNext;
-using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim;
@@ -15,16 +14,14 @@ internal static class WindowUtils
 	public static (Direction MovedEdges, IPoint<int> MovedPoint)? GetMovedEdges(IContext ctx, IWindow window)
 	{
 		Logger.Debug("Trying to move window edges in direction of mouse movement");
-		Result<IWorkspace> workspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceByWindow(window.Handle));
+		Result<IWorkspace> workspaceResult = ctx.Store.Pick(PickWorkspaceByWindow(window.Handle));
 		if (!workspaceResult.TryGet(out IWorkspace workspace))
 		{
 			Logger.Debug($"Could not find workspace for window {window}, failed to move window edges");
 			return null;
 		}
 
-		Result<WindowPosition> windowPositionResult = ctx.Store.Pick(
-			Pickers.PickWindowPosition(workspace.Id, window.Handle)
-		);
+		Result<WindowPosition> windowPositionResult = ctx.Store.Pick(PickWindowPosition(workspace.Id, window.Handle));
 		if (!windowPositionResult.TryGet(out WindowPosition windowPosition))
 		{
 			Logger.Debug($"Could not find window state for window {window}, failed to move window edges");

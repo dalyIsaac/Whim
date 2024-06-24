@@ -1,7 +1,5 @@
-using System;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
-using Windows.Win32.Foundation;
 
 namespace Whim;
 

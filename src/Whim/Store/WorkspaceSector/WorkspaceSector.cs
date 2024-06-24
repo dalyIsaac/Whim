@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using Windows.Win32.Foundation;
-
 namespace Whim;
 
 /// <summary>
@@ -75,7 +70,7 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 
 		if (WindowHandleToFocus != default)
 		{
-			if (_ctx.Store.Pick(Pickers.PickWindowByHandle(WindowHandleToFocus)).TryGet(out IWindow window))
+			if (_ctx.Store.Pick(PickWindowByHandle(WindowHandleToFocus)).TryGet(out IWindow window))
 			{
 				window.Focus();
 			}
@@ -119,7 +114,7 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 		Logger.Debug($"Layout {workspace}");
 
 		// Get the monitor for this workspace
-		if (!_ctx.Store.Pick(Pickers.PickMonitorByWorkspace(workspace.Id)).TryGet(out IMonitor monitor))
+		if (!_ctx.Store.Pick(PickMonitorByWorkspace(workspace.Id)).TryGet(out IMonitor monitor))
 		{
 			Logger.Debug($"No active monitors found for workspace {workspace}.");
 			return;

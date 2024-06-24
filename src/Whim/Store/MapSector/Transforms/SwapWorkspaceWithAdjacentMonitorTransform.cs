@@ -17,7 +17,7 @@ public record SwapWorkspaceWithAdjacentMonitorTransform(WorkspaceId WorkspaceId 
 		// Get the current monitor.
 		WorkspaceId workspaceId = WorkspaceId.OrActiveWorkspace(ctx);
 
-		Result<IMonitor> currentMonitorResult = ctx.Store.Pick(Pickers.PickMonitorByWorkspace(workspaceId));
+		Result<IMonitor> currentMonitorResult = ctx.Store.Pick(PickMonitorByWorkspace(workspaceId));
 		if (!currentMonitorResult.TryGet(out IMonitor currentMonitor))
 		{
 			return Result.FromException<Unit>(currentMonitorResult.Error!);
@@ -35,7 +35,7 @@ public record SwapWorkspaceWithAdjacentMonitorTransform(WorkspaceId WorkspaceId 
 		}
 
 		// Get workspace on next monitor.
-		Result<IWorkspace> nextWorkspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceByMonitor(nextMonitor.Handle));
+		Result<IWorkspace> nextWorkspaceResult = ctx.Store.Pick(PickWorkspaceByMonitor(nextMonitor.Handle));
 		if (!nextWorkspaceResult.TryGet(out IWorkspace nextWorkspace))
 		{
 			return Result.FromException<Unit>(nextWorkspaceResult.Error!);

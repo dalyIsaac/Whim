@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Whim;
@@ -11,7 +10,7 @@ public partial record Workspace : IInternalWorkspace
 	/// The latest instance of <see cref="IWorkspace"/> for the given <see cref="WorkspaceId"/>.
 	/// This is used for compatibility with the old <see cref="Workspace"/> implementation.
 	/// </summary>
-	private Workspace LatestWorkspace => (Workspace)_context.Store.Pick(Pickers.PickWorkspaceById(Id)).Value;
+	private Workspace LatestWorkspace => (Workspace)_context.Store.Pick(PickWorkspaceById(Id)).Value;
 
 	/// <inheritdoc/>
 	public string Name
@@ -23,13 +22,13 @@ public partial record Workspace : IInternalWorkspace
 	private bool _disposedValue;
 
 	/// <inheritdoc/>
-	public IWindow? LastFocusedWindow => _context.Store.Pick(Pickers.PickLastFocusedWindow(Id)).OrDefault();
+	public IWindow? LastFocusedWindow => _context.Store.Pick(PickLastFocusedWindow(Id)).OrDefault();
 
 	/// <inheritdoc/>
-	public ILayoutEngine ActiveLayoutEngine => _context.Store.Pick(Pickers.PickActiveLayoutEngine(Id)).Value!;
+	public ILayoutEngine ActiveLayoutEngine => _context.Store.Pick(PickActiveLayoutEngine(Id)).Value!;
 
 	/// <inheritdoc/>
-	public IEnumerable<IWindow> Windows => _context.Store.Pick(Pickers.PickAllWindowsInWorkspace(Id)).Value!;
+	public IEnumerable<IWindow> Windows => _context.Store.Pick(PickAllWindowsInWorkspace(Id)).Value!;
 
 	internal Workspace(IContext context, WorkspaceId id)
 	{
@@ -161,7 +160,7 @@ public partial record Workspace : IInternalWorkspace
 
 		Logger.Debug($"Disposing workspace {BackingName}");
 
-		bool isWorkspaceActive = _context.Store.Pick(Pickers.PickMonitorByWorkspace(Id)).IsSuccessful;
+		bool isWorkspaceActive = _context.Store.Pick(PickMonitorByWorkspace(Id)).IsSuccessful;
 
 		// If the workspace isn't active on the monitor, show all the windows in as minimized.
 		if (!isWorkspaceActive)

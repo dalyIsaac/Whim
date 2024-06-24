@@ -1,4 +1,3 @@
-using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.HiDpi;
 
 namespace Whim;
@@ -22,7 +21,7 @@ internal record Monitor : IMonitor
 		_internalContext = internalContext;
 		Handle = monitor;
 
-		IsPrimary = isPrimaryHMonitor || _internalContext.CoreNativeManager.HasMultipleMonitors() == false;
+		IsPrimary = isPrimaryHMonitor || !_internalContext.CoreNativeManager.HasMultipleMonitors();
 		if (IsPrimary)
 		{
 			Name = "DISPLAY";

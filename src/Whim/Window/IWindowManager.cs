@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using DotNext;
-using Windows.Win32.Foundation;
 
 namespace Whim;
 
