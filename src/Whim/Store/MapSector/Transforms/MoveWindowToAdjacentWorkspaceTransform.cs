@@ -65,7 +65,7 @@ public record MoveWindowToAdjacentWorkspaceTransform(
 		currentWorkspace.DoLayout();
 		nextWorkspace.DoLayout();
 
-		window.Focus();
+		rootSector.WorkspaceSector.WindowHandleToFocus = windowHandle;
 		return Unit.Result;
 	}
 }

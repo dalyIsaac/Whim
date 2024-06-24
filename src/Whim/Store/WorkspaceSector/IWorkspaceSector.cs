@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Immutable;
+using Windows.Win32.Foundation;
 
 namespace Whim;
 
@@ -17,6 +18,16 @@ public interface IWorkspaceSector
 	/// All the workspaces currently tracked by Whim.
 	/// </summary>
 	ImmutableDictionary<WorkspaceId, Workspace> Workspaces { get; }
+
+	/// <summary>
+	/// The IDs of the workspaces that should be laid out in this dispatch.
+	/// </summary>
+	ImmutableHashSet<WorkspaceId> WorkspacesToLayout { get; }
+
+	/// <summary>
+	/// The window handle to focus after all workspaces have been laid out.
+	/// </summary>
+	HWND WindowHandleToFocus { get; }
 
 	/// <summary>
 	/// Creates the default layout engines to add to a workspace.

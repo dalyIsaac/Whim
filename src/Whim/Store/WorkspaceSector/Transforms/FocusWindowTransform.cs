@@ -7,7 +7,7 @@ namespace Whim;
 /// If <paramref name="Window"/> is <c>null</c>, focus the last focused window.
 ///
 /// NOTE: This does not update the workspace's <see cref="Workspace.LastFocusedWindow"/>.
-/// Instead, it calls <see cref="IWindow.Focus"/>. If there is no last focused window, the monitor's
+/// Instead, it queues a call to <see cref="IWindow.Focus"/>. If there is no last focused window, the monitor's
 /// desktop will be focused.
 /// </summary>
 /// <param name="WorkspaceId"></param>
@@ -25,7 +25,7 @@ public record FocusWindowTransform(WorkspaceId WorkspaceId, IWindow? Window = nu
 		IWindow? lastFocusedWindow = Window ?? workspace.LastFocusedWindow;
 		if (lastFocusedWindow != null && !lastFocusedWindow.IsMinimized)
 		{
-			lastFocusedWindow.Focus();
+			rootSector.WorkspaceSector.WindowHandleToFocus = lastFocusedWindow.Handle;
 			return workspace;
 		}
 

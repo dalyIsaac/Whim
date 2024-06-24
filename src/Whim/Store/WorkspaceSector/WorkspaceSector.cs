@@ -15,15 +15,15 @@ internal record WorkspaceToCreate(string? Name, IEnumerable<CreateLeafLayoutEngi
 internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorEvents, IDisposable
 {
 	private readonly IContext _ctx;
+	private readonly IInternalContext _internalCtx;
 
 	public bool HasInitialized { get; set; }
 
 	public ImmutableList<WorkspaceToCreate> WorkspacesToCreate { get; set; } = ImmutableList<WorkspaceToCreate>.Empty;
 
-	/// <summary>
-	/// The IDs of the workspaces that should be laid out.
-	/// </summary>
 	public ImmutableHashSet<WorkspaceId> WorkspacesToLayout { get; set; } = ImmutableHashSet<WorkspaceId>.Empty;
+
+	public HWND WindowHandleToFocus { get; set; }
 
 	public ImmutableArray<WorkspaceId> WorkspaceOrder { get; set; } = ImmutableArray<WorkspaceId>.Empty;
 
@@ -48,9 +48,10 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 
 	public event EventHandler<WorkspaceLayoutCompletedEventArgs>? WorkspaceLayoutCompleted;
 
-	public WorkspaceSector(IContext ctx)
+	public WorkspaceSector(IContext ctx, IInternalContext internalCtx)
 	{
 		_ctx = ctx;
+		_internalCtx = internalCtx;
 	}
 
 	public override void Initialize()
@@ -70,6 +71,21 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 			{
 				Logger.Error($"Could not find workspace with id {id}");
 			}
+		}
+
+		if (WindowHandleToFocus != default)
+		{
+			if (_ctx.Store.Pick(Pickers.PickWindowByHandle(WindowHandleToFocus)).TryGet(out IWindow window))
+			{
+				window.Focus();
+			}
+			else
+			{
+				WindowHandleToFocus.Focus(_internalCtx);
+			}
+
+			_internalCtx.WindowManager.OnWindowFocused(window);
+			WindowHandleToFocus = default;
 		}
 
 		WorkspacesToLayout = WorkspacesToLayout.Clear();

@@ -3,7 +3,6 @@ using System.IO;
 using DotNext;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Win32.Foundation;
-using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim;
 
@@ -62,15 +61,7 @@ internal class Window : IWindow
 	public void Focus()
 	{
 		Logger.Debug(ToString());
-		// Use SendInput hack to allow Activate to work - required to resolve focus issue https://github.com/microsoft/PowerToys/issues/4270
-		unsafe
-		{
-			INPUT input = new() { type = INPUT_TYPE.INPUT_MOUSE };
-			// Send empty mouse event. This makes this thread the last to send input, and hence allows it to pass foreground permission checks
-			_ = _internalContext.CoreNativeManager.SendInput(new[] { input }, sizeof(INPUT));
-		}
-
-		_internalContext.CoreNativeManager.SetForegroundWindow(Handle);
+		Handle.Focus(_internalContext);
 
 		// We manually call OnWindowFocused as an already focused window may have switched to a
 		// different workspace.

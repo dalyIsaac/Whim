@@ -118,8 +118,7 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 		mapSector.QueueEvent(RouteEventArgs.WindowAdded(window, workspace));
 
 		workspaceSector.WorkspacesToLayout = workspaceSector.WorkspacesToLayout.Add(workspace.Id);
-
-		window.Focus();
+		rootSector.WorkspaceSector.WindowHandleToFocus = window.Handle;
 	}
 
 	/// <summary>

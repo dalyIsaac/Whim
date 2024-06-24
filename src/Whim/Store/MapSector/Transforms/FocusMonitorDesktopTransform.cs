@@ -1,5 +1,4 @@
 using DotNext;
-using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 
 namespace Whim;
@@ -18,10 +17,7 @@ public record FocusMonitorDesktopTransform(HMONITOR MonitorHandle) : Transform
 			return Result.FromException<Unit>(monitorResult.Error!);
 		}
 
-		HWND desktop = internalCtx.CoreNativeManager.GetDesktopWindow();
-		internalCtx.CoreNativeManager.SetForegroundWindow(desktop);
-		ctx.Store.Dispatch(new WindowFocusedTransform(null));
-
+		rootSector.WorkspaceSector.WindowHandleToFocus = internalCtx.CoreNativeManager.GetDesktopWindow();
 		internalCtx.MonitorManager.ActivateEmptyMonitor(monitor);
 
 		return Unit.Result;
