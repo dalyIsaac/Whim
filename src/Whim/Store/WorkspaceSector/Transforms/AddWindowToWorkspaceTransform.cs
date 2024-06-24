@@ -1,4 +1,6 @@
+using System.Collections.Immutable;
 using DotNext;
+using Windows.Win32.Foundation;
 
 namespace Whim;
 
@@ -17,22 +19,21 @@ internal record AddWindowToWorkspaceTransform(WorkspaceId WorkspaceId, IWindow W
 		Workspace workspace
 	)
 	{
-		// TODO: optimize this
-		workspace = workspace with
-		{
-			// We add the window with a dummy window position. When the workspace gets laid out, then the WindowPosition
-			// will become populated correctly.
-			WindowPositions = workspace.WindowPositions.SetItem(Window.Handle, new WindowPosition())
-		};
+		ImmutableDictionary<HWND, WindowPosition> updatedPositions = workspace.WindowPositions.SetItem(
+			Window.Handle,
+			new WindowPosition()
+		);
 
-		for (int idx = 0; idx < workspace.LayoutEngines.Count; idx++)
+		ImmutableList<ILayoutEngine>.Builder newLayoutEngines = ImmutableList.CreateBuilder<ILayoutEngine>();
+		foreach (ILayoutEngine layoutEngine in workspace.LayoutEngines)
 		{
-			workspace = workspace with
-			{
-				LayoutEngines = workspace.LayoutEngines.SetItem(idx, workspace.LayoutEngines[idx].AddWindow(Window))
-			};
+			newLayoutEngines.Add(layoutEngine.AddWindow(Window));
 		}
 
-		return workspace;
+		return workspace with
+		{
+			WindowPositions = updatedPositions,
+			LayoutEngines = newLayoutEngines.ToImmutableList()
+		};
 	}
 }

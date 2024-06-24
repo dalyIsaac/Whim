@@ -46,6 +46,8 @@ internal record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, IWin
 			return workspace;
 		}
 
+		HWND newLastFocusedWindowHandle = workspace.LastFocusedWindowHandle;
+
 		// Find the next window to focus.
 		foreach ((HWND handle, WindowPosition pos) in workspace.WindowPositions)
 		{
@@ -59,30 +61,29 @@ internal record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, IWin
 				continue;
 			}
 
-			workspace = workspace with { LastFocusedWindowHandle = handle };
+			newLastFocusedWindowHandle = handle;
 			break;
 		}
 
 		// If there are no other windows, set the last focused window to null.
-		if (workspace.LastFocusedWindowHandle.Equals(window.Handle))
+		if (newLastFocusedWindowHandle.Equals(window.Handle))
 		{
-			workspace = workspace with { LastFocusedWindowHandle = default };
+			newLastFocusedWindowHandle = default;
 		}
 
-		return workspace;
+		return workspace with
+		{
+			LastFocusedWindowHandle = newLastFocusedWindowHandle
+		};
 	}
 
 	private static Workspace RemoveWindowFromLayoutEngines(Workspace workspace, IWindow window)
 	{
-		// TODO: Optimize
-		for (int idx = 0; idx < workspace.LayoutEngines.Count; idx++)
+		ImmutableList<ILayoutEngine>.Builder newLayoutEngines = ImmutableList.CreateBuilder<ILayoutEngine>();
+		foreach (ILayoutEngine layoutEngine in workspace.LayoutEngines)
 		{
-			workspace = workspace with
-			{
-				LayoutEngines = workspace.LayoutEngines.SetItem(idx, workspace.LayoutEngines[idx].RemoveWindow(window))
-			};
+			newLayoutEngines.Add(layoutEngine.RemoveWindow(window));
 		}
-
-		return workspace;
+		return workspace with { LayoutEngines = newLayoutEngines.ToImmutableList() };
 	}
 }
