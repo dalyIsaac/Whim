@@ -19,7 +19,9 @@ public record MoveWindowToAdjacentMonitorTransform(HWND WindowHandle = default, 
 	{
 		HMONITOR activeMonitorHandle = rootSector.MonitorSector.ActiveMonitorHandle;
 
-		Result<IMonitor> targetMonitorResult = ctx.Store.Pick(Pickers.PickAdjacentMonitor(activeMonitorHandle));
+		Result<IMonitor> targetMonitorResult = ctx.Store.Pick(
+			Pickers.PickAdjacentMonitor(activeMonitorHandle, Reverse)
+		);
 		if (!targetMonitorResult.TryGet(out IMonitor? targetMonitor))
 		{
 			return Result.FromException<Unit>(targetMonitorResult.Error!);
