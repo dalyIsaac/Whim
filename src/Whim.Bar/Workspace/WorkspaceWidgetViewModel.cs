@@ -46,7 +46,7 @@ internal class WorkspaceWidgetViewModel : IDisposable
 
 	private void WorkspaceManager_WorkspaceAdded(object? sender, WorkspaceEventArgs args)
 	{
-		if (Workspaces.Any(model => model.Workspace.Equals(args.Workspace)))
+		if (Workspaces.Any(model => model.Workspace.Id == args.Workspace.Id))
 		{
 			return;
 		}
@@ -59,7 +59,7 @@ internal class WorkspaceWidgetViewModel : IDisposable
 
 	private void WorkspaceManager_WorkspaceRemoved(object? sender, WorkspaceEventArgs args)
 	{
-		WorkspaceModel? workspaceModel = Workspaces.FirstOrDefault(model => model.Workspace.Equals(args.Workspace));
+		WorkspaceModel? workspaceModel = Workspaces.FirstOrDefault(model => model.Workspace.Id == args.Workspace.Id);
 		if (workspaceModel == null)
 		{
 			return;
@@ -77,13 +77,13 @@ internal class WorkspaceWidgetViewModel : IDisposable
 
 		foreach (WorkspaceModel workspaceModel in Workspaces)
 		{
-			workspaceModel.ActiveOnMonitor = workspaceModel.Workspace.Equals(args.CurrentWorkspace);
+			workspaceModel.ActiveOnMonitor = workspaceModel.Workspace.Id == args.CurrentWorkspace.Id;
 		}
 	}
 
 	private void WorkspaceManager_WorkspaceRenamed(object? sender, WorkspaceRenamedEventArgs e)
 	{
-		WorkspaceModel? workspace = Workspaces.FirstOrDefault(m => m.Workspace.Equals(e.Workspace));
+		WorkspaceModel? workspace = Workspaces.FirstOrDefault(m => m.Workspace.Id == e.Workspace.Id);
 		if (workspace == null)
 		{
 			return;

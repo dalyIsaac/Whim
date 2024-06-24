@@ -198,7 +198,7 @@ internal partial class NativeManager : INativeManager
 	public DeferWindowPosHandle DeferWindowPos() => new(_context, _internalContext);
 
 	/// <inheritdoc />
-	public DeferWindowPosHandle DeferWindowPos(IEnumerable<WindowPosState> windowStates) =>
+	public DeferWindowPosHandle DeferWindowPos(IEnumerable<DeferWindowPosState> windowStates) =>
 		new(_context, _internalContext, windowStates);
 
 	/// <inheritdoc />

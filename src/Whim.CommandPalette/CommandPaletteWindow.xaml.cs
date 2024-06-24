@@ -143,13 +143,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window, I
 
 		using DeferWindowPosHandle handle = _context.NativeManager.DeferWindowPos();
 		handle.DeferWindowPos(
-			new WindowState()
-			{
-				Window = _window,
-				Rectangle = windowRect,
-				WindowSize = WindowSize.Normal
-			},
-			_window.Handle
+			new DeferWindowPosState(_window.Handle, WindowSize.Normal, windowRect, hwndInsertAfter: _window.Handle)
 		);
 	}
 

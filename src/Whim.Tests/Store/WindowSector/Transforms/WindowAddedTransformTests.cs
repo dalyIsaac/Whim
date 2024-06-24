@@ -39,15 +39,11 @@ public class WindowAddedTransformTests
 		Result<IWindow>? result = null;
 		List<RouteEventArgs> evs = new();
 
-		Assert.Raises<RouteEventArgs>(
-			h =>
-				rootSector.MapSector.WindowRouted += (sender, args) =>
-				{
-					evs.Add(args);
-					h.Invoke(sender, args);
-				},
+		CustomAssert.Raises<RouteEventArgs>(
+			h => rootSector.MapSector.WindowRouted += h,
 			h => rootSector.MapSector.WindowRouted -= h,
-			() => result = ctx.Store.Dispatch(sut)
+			() => CustomAssert.Layout(rootSector, () => result = ctx.Store.Dispatch(sut)),
+			(sender, args) => evs.Add(args)
 		);
 
 		return (result!.Value, evs);
@@ -131,10 +127,11 @@ public class WindowAddedTransformTests
 	{
 		// Given the window is routed to a workspace
 		HWND hwnd = (HWND)1;
-		IWorkspace workspace = CreateWorkspace();
+		HMONITOR monitorHandle = (HMONITOR)1;
+		Workspace workspace = CreateWorkspace(ctx);
 
 		Setup(ctx, internalCtx, hwnd);
-		ctx.WorkspaceManager.Contains(workspace).Returns(true);
+		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor(monitorHandle), workspace);
 		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		WindowAddedTransform sut = new(hwnd);
@@ -147,7 +144,6 @@ public class WindowAddedTransformTests
 
 		Assert.Equal(workspace.Id, rootSector.MapSector.WindowWorkspaceMap[hwnd]);
 		Assert.Single(evs);
-		workspace.Received(1).DoLayout();
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -159,11 +155,11 @@ public class WindowAddedTransformTests
 	{
 		// Given the window is routed to an active workspace
 		HWND hwnd = (HWND)1;
-		IWorkspace workspace = CreateWorkspace();
+		HMONITOR monitorHandle = (HMONITOR)1;
+		Workspace workspace = CreateWorkspace(ctx);
 
 		Setup(ctx, internalCtx, hwnd);
-		ctx.WorkspaceManager.Contains(workspace).Returns(true);
-		ctx.WorkspaceManager.ActiveWorkspace.Returns(workspace);
+		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor(monitorHandle), workspace);
 		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).ReturnsNull();
 
 		WindowAddedTransform sut = new(hwnd, RouterOptions.RouteToActiveWorkspace);
@@ -176,7 +172,6 @@ public class WindowAddedTransformTests
 
 		Assert.Equal(workspace.Id, rootSector.MapSector.WindowWorkspaceMap[hwnd]);
 		Assert.Single(evs);
-		workspace.Received(1).DoLayout();
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -189,10 +184,9 @@ public class WindowAddedTransformTests
 		// Given the window is routed to last tracked active workspace
 		HWND hwnd = (HWND)1;
 		HMONITOR monitorHandle = (HMONITOR)1;
-		IWorkspace workspace = CreateWorkspace();
+		Workspace workspace = CreateWorkspace(ctx);
 
 		Setup(ctx, internalCtx, hwnd);
-		ctx.WorkspaceManager.Contains(workspace).Returns(true);
 		ctx.RouterManager.RouterOptions.Returns(RouterOptions.RouteToLastTrackedActiveWorkspace);
 		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).ReturnsNull();
 
@@ -209,7 +203,6 @@ public class WindowAddedTransformTests
 
 		Assert.Equal(workspace.Id, rootSector.MapSector.WindowWorkspaceMap[hwnd]);
 		Assert.Single(evs);
-		workspace.Received(1).DoLayout();
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -218,10 +211,9 @@ public class WindowAddedTransformTests
 		// Given the window has a workspace
 		HWND hwnd = (HWND)1;
 		HMONITOR monitorHandle = (HMONITOR)1;
-		IWorkspace workspace = CreateWorkspace();
+		Workspace workspace = CreateWorkspace(ctx);
 
 		Setup(ctx, internalCtx, hwnd);
-		ctx.WorkspaceManager.Contains(workspace).Returns(true);
 		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).ReturnsNull();
 
 		internalCtx
@@ -239,7 +231,6 @@ public class WindowAddedTransformTests
 
 		Assert.Equal(workspace.Id, rootSector.MapSector.WindowWorkspaceMap[hwnd]);
 		Assert.Single(evs);
-		workspace.Received(1).DoLayout();
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -247,11 +238,10 @@ public class WindowAddedTransformTests
 	{
 		// Given the window is not routed, so we use the active workspace
 		HWND hwnd = (HWND)1;
-		IWorkspace workspace = CreateWorkspace();
+		Workspace workspace = CreateWorkspace(ctx);
 
 		Setup(ctx, internalCtx, hwnd);
-		ctx.WorkspaceManager.Contains(workspace).Returns(true);
-		ctx.WorkspaceManager.ActiveWorkspace.Returns(workspace);
+		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor((HMONITOR)1), workspace);
 		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).ReturnsNull();
 
 		WindowAddedTransform sut = new(hwnd, RouterOptions.RouteToLaunchedWorkspace);
@@ -264,7 +254,6 @@ public class WindowAddedTransformTests
 
 		Assert.Equal(workspace.Id, rootSector.MapSector.WindowWorkspaceMap[hwnd]);
 		Assert.Single(evs);
-		workspace.Received(1).DoLayout();
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -272,12 +261,12 @@ public class WindowAddedTransformTests
 	{
 		// Given the window is minimized
 		HWND hwnd = (HWND)1;
-		IWorkspace workspace = CreateWorkspace();
+		Workspace workspace = CreateWorkspace(ctx);
 
 		internalCtx.CoreNativeManager.IsWindowMinimized(hwnd).Returns((BOOL)true);
 
 		Setup(ctx, internalCtx, hwnd);
-		ctx.WorkspaceManager.Contains(workspace).Returns(true);
+		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor((HMONITOR)1), workspace);
 		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		WindowAddedTransform sut = new(hwnd);
@@ -290,8 +279,8 @@ public class WindowAddedTransformTests
 
 		Assert.Equal(workspace.Id, rootSector.MapSector.WindowWorkspaceMap[hwnd]);
 		Assert.Single(evs);
-		workspace.Received(1).DoLayout();
-		workspace.Received(1).MinimizeWindowStart(Arg.Any<IWindow>());
+
+		Assert.Contains(ctx.GetTransforms(), t => t is MinimizeWindowStartTransform);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -299,12 +288,12 @@ public class WindowAddedTransformTests
 	{
 		// Given the window is not minimized
 		HWND hwnd = (HWND)1;
-		IWorkspace workspace = CreateWorkspace();
+		Workspace workspace = CreateWorkspace(ctx);
 
 		internalCtx.CoreNativeManager.IsWindowMinimized(hwnd).Returns((BOOL)false);
 
 		Setup(ctx, internalCtx, hwnd);
-		ctx.WorkspaceManager.Contains(workspace).Returns(true);
+		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor((HMONITOR)1), workspace);
 		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		WindowAddedTransform sut = new(hwnd);
@@ -317,7 +306,7 @@ public class WindowAddedTransformTests
 
 		Assert.Equal(workspace.Id, rootSector.MapSector.WindowWorkspaceMap[hwnd]);
 		Assert.Single(evs);
-		workspace.Received(1).DoLayout();
-		workspace.Received(1).AddWindow(Arg.Any<IWindow>());
+
+		Assert.Contains(ctx.GetTransforms(), t => t is AddWindowToWorkspaceTransform);
 	}
 }

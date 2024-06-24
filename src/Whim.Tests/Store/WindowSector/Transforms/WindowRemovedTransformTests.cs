@@ -1,13 +1,14 @@
-using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using DotNext;
 using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Xunit;
+using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.Tests;
 
+[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WindowRemovedTransformTests
 {
 	private static (Result<Unit>, Assert.RaisedEvent<WindowRemovedEventArgs>) AssertRaises(
@@ -83,20 +84,16 @@ public class WindowRemovedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Success(IContext ctx, MutableRootSector mutableRootSector, IWindow window, IWorkspace workspace)
+	internal void Success(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
-		// Given the window is inside the WindowSector
+		// Given the window is tracked
 		window.Handle.Returns((HWND)2);
-		mutableRootSector.WindowSector.Windows = mutableRootSector.WindowSector.Windows.Add(window.Handle, window);
-
-		// ...and inside the MapSector
-		Guid workspaceId = Guid.NewGuid();
-		workspace.Id.Returns(workspaceId);
-		ctx.WorkspaceManager.GetEnumerator().Returns(_ => new List<IWorkspace>() { workspace }.GetEnumerator());
+		Workspace workspace = CreateWorkspace(ctx);
+		PopulateWindowWorkspaceMap(ctx, mutableRootSector, window, workspace);
 
 		mutableRootSector.MapSector.WindowWorkspaceMap = mutableRootSector.MapSector.WindowWorkspaceMap.Add(
 			window.Handle,
-			workspaceId
+			workspace.Id
 		);
 
 		WindowRemovedTransform sut = new(window);

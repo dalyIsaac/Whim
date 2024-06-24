@@ -5,6 +5,12 @@
 
 using System.Diagnostics.CodeAnalysis;
 
+[assembly: SuppressMessage(
+	"Design",
+	"CA1002:Do not expose generic lists",
+	Justification = "They are used by subclasses",
+	Scope = "module"
+)]
 [assembly: SuppressMessage("Naming", "CA1707:Identifiers should not contain underscores")]
 [assembly: SuppressMessage(
 	"Performance",

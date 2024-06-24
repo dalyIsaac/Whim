@@ -8,7 +8,7 @@ namespace Whim;
 /// <see cref="Execute"/> will specify how to update the store.
 /// </summary>
 /// <typeparam name="TResult"></typeparam>
-public abstract record Transform<TResult>()
+public abstract record Transform<TResult>
 {
 	/// <summary>
 	/// How to update the store.
@@ -20,4 +20,4 @@ public abstract record Transform<TResult>()
 }
 
 /// <inheritdoc/>
-public abstract record Transform() : Transform<Unit> { }
+public abstract record Transform : Transform<Unit> { }

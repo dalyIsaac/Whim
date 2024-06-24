@@ -63,7 +63,7 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 
 	private void WorkspaceManager_ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs e)
 	{
-		if (e.Workspace == _context.Butler.Pantry.GetWorkspaceForMonitor(_monitor))
+		if (e.Workspace.Id == _context.Butler.Pantry.GetWorkspaceForMonitor(_monitor)?.Id)
 		{
 			OnPropertyChanged(string.Empty);
 		}

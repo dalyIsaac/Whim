@@ -56,8 +56,7 @@ public record MoveWindowToPointTransform(HWND WindowHandle, IPoint<int> Point) :
 
 		targetWorkspace.MoveWindowToPoint(window, normalized, deferLayout: false);
 
-		// Trigger layouts.
-		window.Focus();
+		rootSector.WorkspaceSector.WindowHandleToFocus = window.Handle;
 
 		return Unit.Result;
 	}

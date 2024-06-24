@@ -132,14 +132,13 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 	{
 		using DeferWindowPosHandle handle = context.NativeManager.DeferWindowPos();
 		handle.DeferWindowPos(
-			new WindowState()
-			{
-				Window = layoutWindow,
-				Rectangle = monitor.WorkingArea,
-				WindowSize = WindowSize.Normal
-			},
-			movingWindow.Handle,
-			SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE | SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW
+			new DeferWindowPosState(
+				layoutWindow.Handle,
+				WindowSize.Normal,
+				monitor.WorkingArea,
+				hwndInsertAfter: movingWindow.Handle,
+				flags: SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE | SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW
+			)
 		);
 	}
 

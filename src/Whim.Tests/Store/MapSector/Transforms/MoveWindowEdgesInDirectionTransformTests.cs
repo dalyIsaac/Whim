@@ -1,4 +1,3 @@
-using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -58,7 +57,7 @@ public class MoveWindowEdgesInDirectionTransformTests
 		// Given there is no monitor for the window
 		IWindow window = CreateWindow((HWND)10);
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
-		IWorkspace workspace = CreateWorkspace();
+		Workspace workspace = CreateWorkspace(ctx);
 
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, workspace);
 
@@ -77,7 +76,7 @@ public class MoveWindowEdgesInDirectionTransformTests
 		// Given there is a workspace for the window
 		IWindow window = CreateWindow((HWND)10);
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
-		IWorkspace workspace = CreateWorkspace();
+		Workspace workspace = CreateWorkspace(ctx);
 		Point<int> pixelDeltas = new(10, 10);
 
 		PopulateThreeWayMap(ctx, rootSector, monitor, workspace, window);
@@ -89,13 +88,17 @@ public class MoveWindowEdgesInDirectionTransformTests
 
 		// Then
 		Assert.True(result.IsSuccessful);
-		workspace
-			.Received(1)
-			.MoveWindowEdgesInDirection(
-				Direction.Down,
-				new Point<double>(10d / 1920, 10d / 1080),
-				window,
-				deferLayout: false
-			);
+
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t =>
+				(t as MoveWindowEdgesInDirectionWorkspaceTransform)
+				== new MoveWindowEdgesInDirectionWorkspaceTransform(
+					workspace.Id,
+					Direction.Down,
+					new Point<double>(10d / 1920, 10d / 1080),
+					window.Handle
+				)
+		);
 	}
 }

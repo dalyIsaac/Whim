@@ -37,7 +37,6 @@ public class WorkspaceModelTests
 	{
 		// Given
 		WorkspaceModel model = CreateSut(context, viewModel, workspace, true);
-		string newName = "new name";
 
 		// When
 		// Then
@@ -48,12 +47,7 @@ public class WorkspaceModelTests
 			() =>
 				model.Workspace_Renamed(
 					workspace,
-					new WorkspaceRenamedEventArgs()
-					{
-						PreviousName = workspace.Name,
-						CurrentName = newName,
-						Workspace = workspace
-					}
+					new WorkspaceRenamedEventArgs() { PreviousName = workspace.Name, Workspace = workspace }
 				)
 		);
 	}

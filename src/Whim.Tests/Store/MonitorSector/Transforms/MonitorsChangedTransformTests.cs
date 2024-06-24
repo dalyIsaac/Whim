@@ -1,4 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
+using System;
 using System.Linq;
 using NSubstitute;
 using Whim.TestUtils;
@@ -10,10 +10,9 @@ using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class MonitorsChangedTransformTests
 {
-	private static readonly (RECT, HMONITOR) RightMonitorSetup = (
+	private static readonly (RECT Rect, HMONITOR Handle) RightMonitorSetup = (
 		new RECT()
 		{
 			left = 1920,
@@ -21,10 +20,10 @@ public class MonitorsChangedTransformTests
 			right = 3840,
 			bottom = 1080
 		},
-		(HMONITOR)1
+		(HMONITOR)3
 	);
 
-	private static readonly (RECT, HMONITOR) LeftTopMonitorSetup = (
+	private static readonly (RECT Rect, HMONITOR Handle) LeftTopMonitorSetup = (
 		new RECT()
 		{
 			left = 0,
@@ -32,10 +31,10 @@ public class MonitorsChangedTransformTests
 			right = 1920,
 			bottom = 1080
 		},
-		(HMONITOR)2
+		(HMONITOR)1
 	);
 
-	private static readonly (RECT, HMONITOR) LeftBottomMonitorSetup = (
+	private static readonly (RECT Rect, HMONITOR Handle) LeftBottomMonitorSetup = (
 		new RECT()
 		{
 			left = 0,
@@ -43,31 +42,86 @@ public class MonitorsChangedTransformTests
 			right = 1920,
 			bottom = 2160
 		},
-		(HMONITOR)3
+		(HMONITOR)2
 	);
 
-	private static Assert.RaisedEvent<MonitorsChangedEventArgs> DispatchTransformEvent(IContext ctx) =>
+	private static Assert.RaisedEvent<MonitorsChangedEventArgs> DispatchTransformEvent(
+		IContext ctx,
+		MutableRootSector rootSector,
+		Guid[]? layoutWorkspaceIds = null,
+		Guid[]? notLayoutWorkspaceIds = null
+	) =>
 		Assert.Raises<MonitorsChangedEventArgs>(
 			h => ctx.Store.MonitorEvents.MonitorsChanged += h,
 			h => ctx.Store.MonitorEvents.MonitorsChanged -= h,
-			() => ctx.Store.Dispatch(new MonitorsChangedTransform())
+			() =>
+				CustomAssert.Layout(
+					rootSector,
+					() => ctx.Store.Dispatch(new MonitorsChangedTransform()),
+					layoutWorkspaceIds,
+					notLayoutWorkspaceIds
+				)
 		);
 
 	private static void Setup_TryEnqueue(IInternalContext internalCtx) =>
 		internalCtx.CoreNativeManager.IsStaThread().Returns(_ => true, _ => false);
 
-	private static IWorkspace[] SetupWorkspaces(IContext ctx, MutableRootSector rootSector)
+	private static IWorkspace[] SetupWorkspaces_AlreadyAdded(IContext ctx, MutableRootSector rootSector)
 	{
-		IWorkspace workspace1 = CreateWorkspace();
-		IWorkspace workspace2 = CreateWorkspace();
-		IWorkspace workspace3 = CreateWorkspace();
-		AddWorkspacesToManager(ctx, workspace1, workspace2, workspace3);
-
-		ctx.WorkspaceManager.Add().Returns(_ => workspace1, _ => workspace2, _ => workspace3);
-
-		rootSector.MonitorSector.MonitorsChangedDelay = 0;
-
+		Workspace workspace1 = CreateWorkspace(ctx);
+		Workspace workspace2 = CreateWorkspace(ctx);
+		Workspace workspace3 = CreateWorkspace(ctx);
+		AddWorkspacesToManager(ctx, rootSector, workspace1, workspace2, workspace3);
+		rootSector.WorkspaceSector.HasInitialized = true;
 		return new[] { workspace1, workspace2, workspace3 };
+	}
+
+	private static IWorkspace[] SetupWorkspaces_AddWorkspaces(IContext ctx, MutableRootSector rootSector)
+	{
+		Workspace workspace1 = CreateWorkspace(ctx);
+		Workspace workspace2 = CreateWorkspace(ctx);
+		Workspace workspace3 = CreateWorkspace(ctx);
+		ctx.WorkspaceManager.Add()
+			.Returns(
+				_ =>
+				{
+					AddWorkspaceToManager(ctx, rootSector, workspace1);
+					return workspace1;
+				},
+				_ =>
+				{
+					AddWorkspaceToManager(ctx, rootSector, workspace2);
+					return workspace2;
+				},
+				_ =>
+				{
+					AddWorkspaceToManager(ctx, rootSector, workspace3);
+					return workspace3;
+				}
+			);
+		rootSector.WorkspaceSector.HasInitialized = true;
+		return new[] { workspace1, workspace2, workspace3 };
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WorkspaceSectorNotInitialized(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector rootSector
+	)
+	{
+		// Given we've populated monitors
+		SetupWorkspaces_AddWorkspaces(ctx, rootSector);
+		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup });
+
+		rootSector.WorkspaceSector.HasInitialized = false;
+
+		// When something happens
+		ctx.Store.Dispatch(new MonitorsChangedTransform());
+
+		// Then no workspaces are created
+		Assert.Empty(rootSector.WorkspaceSector.WorkspaceOrder);
+		Assert.Empty(rootSector.MapSector.MonitorWorkspaceMap);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -75,7 +129,7 @@ public class MonitorsChangedTransformTests
 	{
 		// Given we've populated monitors
 		Setup_TryEnqueue(internalCtx);
-		IWorkspace[] workspaces = SetupWorkspaces(ctx, rootSector);
+		IWorkspace[] workspaces = SetupWorkspaces_AlreadyAdded(ctx, rootSector);
 
 		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup });
 
@@ -86,7 +140,12 @@ public class MonitorsChangedTransformTests
 		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup });
 
 		// Then the resulting event will have a monitor removed
-		var raisedEvent = DispatchTransformEvent(ctx);
+		var raisedEvent = DispatchTransformEvent(
+			ctx,
+			rootSector,
+			new[] { workspaces[0].Id, workspaces[2].Id },
+			new[] { workspaces[1].Id }
+		);
 
 		Assert.Empty(raisedEvent.Arguments.AddedMonitors);
 		Assert.Single(raisedEvent.Arguments.RemovedMonitors);
@@ -94,18 +153,25 @@ public class MonitorsChangedTransformTests
 
 		Assert.Equal(2, rootSector.MapSector.MonitorWorkspaceMap.Count);
 
-		Assert.Equal(workspaces[0].Id, rootSector.MapSector.MonitorWorkspaceMap[(HMONITOR)2]);
-		Assert.Equal(workspaces[2].Id, rootSector.MapSector.MonitorWorkspaceMap[(HMONITOR)1]);
-		Assert.DoesNotContain((HMONITOR)3, rootSector.MapSector.MonitorWorkspaceMap.Keys);
+		Assert.Equal(workspaces[0].Id, rootSector.MapSector.MonitorWorkspaceMap[LeftTopMonitorSetup.Handle]);
+		Assert.Equal(workspaces[2].Id, rootSector.MapSector.MonitorWorkspaceMap[RightMonitorSetup.Handle]);
+		Assert.DoesNotContain(LeftBottomMonitorSetup.Handle, rootSector.MapSector.MonitorWorkspaceMap.Keys);
 
-		workspaces[0].Received(1).Deactivate();
-		workspaces[0].Received(2).DoLayout();
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t => (t as DeactivateWorkspaceTransform) == new DeactivateWorkspaceTransform(workspaces[0].Id)
+		);
 
-		workspaces[1].Received(2).Deactivate();
-		workspaces[1].Received(1).DoLayout();
+		CustomAssert.Contains(
+			ctx.GetTransforms(),
+			t => (t as DeactivateWorkspaceTransform) == new DeactivateWorkspaceTransform(workspaces[1].Id),
+			2
+		);
 
-		workspaces[2].Received(1).Deactivate();
-		workspaces[2].Received(2).DoLayout();
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t => (t as DeactivateWorkspaceTransform) == new DeactivateWorkspaceTransform(workspaces[2].Id)
+		);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -113,7 +179,7 @@ public class MonitorsChangedTransformTests
 	{
 		// Given we've populated monitors
 		Setup_TryEnqueue(internalCtx);
-		IWorkspace[] workspaces = SetupWorkspaces(ctx, rootSector);
+		IWorkspace[] workspaces = SetupWorkspaces_AlreadyAdded(ctx, rootSector);
 
 		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup });
 		ctx.Store.Dispatch(new MonitorsChangedTransform());
@@ -123,7 +189,11 @@ public class MonitorsChangedTransformTests
 		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup });
 
 		// Then the resulting event will have a monitor added
-		var raisedEvent = DispatchTransformEvent(ctx);
+		var raisedEvent = DispatchTransformEvent(
+			ctx,
+			rootSector,
+			new[] { workspaces[0].Id, workspaces[1].Id, workspaces[2].Id }
+		);
 
 		Assert.Single(raisedEvent.Arguments.AddedMonitors);
 		Assert.Empty(raisedEvent.Arguments.RemovedMonitors);
@@ -131,44 +201,72 @@ public class MonitorsChangedTransformTests
 
 		Assert.Equal(3, rootSector.MapSector.MonitorWorkspaceMap.Count);
 
-		Assert.Equal(workspaces[0].Id, rootSector.MapSector.MonitorWorkspaceMap[(HMONITOR)2]);
-		Assert.Equal(workspaces[1].Id, rootSector.MapSector.MonitorWorkspaceMap[(HMONITOR)1]);
-		Assert.Equal(workspaces[2].Id, rootSector.MapSector.MonitorWorkspaceMap[(HMONITOR)3]);
+		Assert.Equal(workspaces[0].Id, rootSector.MapSector.MonitorWorkspaceMap[LeftTopMonitorSetup.Handle]);
+		Assert.Equal(workspaces[1].Id, rootSector.MapSector.MonitorWorkspaceMap[RightMonitorSetup.Handle]);
+		Assert.Equal(workspaces[2].Id, rootSector.MapSector.MonitorWorkspaceMap[LeftBottomMonitorSetup.Handle]);
 
-		workspaces[0].Received(1).Deactivate();
-		workspaces[0].Received(2).DoLayout();
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t => (t as DeactivateWorkspaceTransform) == new DeactivateWorkspaceTransform(workspaces[0].Id)
+		);
 
-		workspaces[1].Received(1).Deactivate();
-		workspaces[1].Received(2).DoLayout();
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t => (t as DeactivateWorkspaceTransform) == new DeactivateWorkspaceTransform(workspaces[1].Id)
+		);
 
-		workspaces[2].DidNotReceive().Deactivate();
-		workspaces[2].Received(1).DoLayout();
+		Assert.DoesNotContain(
+			ctx.GetTransforms(),
+			t => (t as DeactivateWorkspaceTransform) == new DeactivateWorkspaceTransform(workspaces[2].Id)
+		);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void MonitorsAdded_Initialization(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		// Given we have no monitors
-		IWorkspace[] workspaces = SetupWorkspaces(ctx, rootSector);
+		IWorkspace[] workspaces = SetupWorkspaces_AlreadyAdded(ctx, rootSector);
 
 		// When we add monitors
 		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup });
-		var raisedEvent = DispatchTransformEvent(ctx);
+		var raisedEvent = DispatchTransformEvent(ctx, rootSector, new[] { workspaces[0].Id, workspaces[1].Id });
 
 		// Then the resulting event will have a monitor added, and the other monitors in the sector will be set.
 		Assert.Equal(2, raisedEvent.Arguments.AddedMonitors.Count());
 
-		Assert.Equal((HMONITOR)2, ctx.Store.Pick(Pickers.PickLastWhimActiveMonitor()).Handle);
-		Assert.Equal((HMONITOR)2, ctx.Store.Pick(Pickers.PickActiveMonitor()).Handle);
+		Assert.Equal(LeftTopMonitorSetup.Handle, ctx.Store.Pick(Pickers.PickLastWhimActiveMonitor()).Handle);
+		Assert.Equal(LeftTopMonitorSetup.Handle, ctx.Store.Pick(Pickers.PickActiveMonitor()).Handle);
 
-		Assert.Equal(workspaces[0].Id, rootSector.MapSector.MonitorWorkspaceMap[(HMONITOR)2]);
-		Assert.Equal(workspaces[1].Id, rootSector.MapSector.MonitorWorkspaceMap[(HMONITOR)1]);
+		Assert.Equal(workspaces[0].Id, rootSector.MapSector.MonitorWorkspaceMap[LeftTopMonitorSetup.Handle]);
+		Assert.Equal(workspaces[1].Id, rootSector.MapSector.MonitorWorkspaceMap[RightMonitorSetup.Handle]);
 
-		workspaces[0].DidNotReceive().Deactivate();
-		workspaces[0].Received(1).DoLayout();
+		Assert.DoesNotContain(ctx.GetTransforms(), t => t is DeactivateWorkspaceTransform);
+	}
 
-		workspaces[1].DidNotReceive().Deactivate();
-		workspaces[1].Received(1).DoLayout();
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MonitorsAdded_Initialization_AddWorkspaces(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector rootSector
+	)
+	{
+		// Given we have no monitors
+		IWorkspace[] workspaces = SetupWorkspaces_AddWorkspaces(ctx, rootSector);
+
+		// When we add monitors
+		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup });
+		var raisedEvent = DispatchTransformEvent(ctx, rootSector, new[] { workspaces[0].Id, workspaces[1].Id });
+
+		// Then the resulting event will have a monitor added, and the other monitors in the sector will be set.
+		Assert.Equal(2, raisedEvent.Arguments.AddedMonitors.Count());
+
+		Assert.Equal(LeftTopMonitorSetup.Handle, ctx.Store.Pick(Pickers.PickLastWhimActiveMonitor()).Handle);
+		Assert.Equal(LeftTopMonitorSetup.Handle, ctx.Store.Pick(Pickers.PickActiveMonitor()).Handle);
+
+		Assert.Equal(workspaces[0].Id, rootSector.MapSector.MonitorWorkspaceMap[LeftTopMonitorSetup.Handle]);
+		Assert.Equal(workspaces[1].Id, rootSector.MapSector.MonitorWorkspaceMap[RightMonitorSetup.Handle]);
+
+		Assert.DoesNotContain(ctx.GetTransforms(), t => t is DeactivateWorkspaceTransform);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -176,7 +274,7 @@ public class MonitorsChangedTransformTests
 	{
 		// Given there are no changes in the monitors.
 		Setup_TryEnqueue(internalCtx);
-		IWorkspace[] workspaces = SetupWorkspaces(ctx, rootSector);
+		IWorkspace[] workspaces = SetupWorkspaces_AlreadyAdded(ctx, rootSector);
 
 		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup });
 
@@ -185,7 +283,11 @@ public class MonitorsChangedTransformTests
 
 		// Then the second dispatch should receive all monitors as unchanged.
 		Setup_TryEnqueue(internalCtx);
-		var raisedEvent = DispatchTransformEvent(ctx);
+		var raisedEvent = DispatchTransformEvent(
+			ctx,
+			rootSector,
+			notLayoutWorkspaceIds: new[] { workspaces[0].Id, workspaces[1].Id, workspaces[2].Id }
+		);
 
 		Assert.Empty(raisedEvent.Arguments.AddedMonitors);
 		Assert.Empty(raisedEvent.Arguments.RemovedMonitors);
@@ -193,17 +295,23 @@ public class MonitorsChangedTransformTests
 
 		Assert.Equal(3, rootSector.MapSector.MonitorWorkspaceMap.Count);
 
-		Assert.Equal(workspaces[0].Id, rootSector.MapSector.MonitorWorkspaceMap[(HMONITOR)2]);
-		Assert.Equal(workspaces[2].Id, rootSector.MapSector.MonitorWorkspaceMap[(HMONITOR)1]);
-		Assert.Equal(workspaces[1].Id, rootSector.MapSector.MonitorWorkspaceMap[(HMONITOR)3]);
+		Assert.Equal(workspaces[0].Id, rootSector.MapSector.MonitorWorkspaceMap[LeftTopMonitorSetup.Handle]);
+		Assert.Equal(workspaces[2].Id, rootSector.MapSector.MonitorWorkspaceMap[RightMonitorSetup.Handle]);
+		Assert.Equal(workspaces[1].Id, rootSector.MapSector.MonitorWorkspaceMap[LeftBottomMonitorSetup.Handle]);
 
-		workspaces[0].DidNotReceive().Deactivate();
-		workspaces[0].Received(1).DoLayout();
+		Assert.DoesNotContain(
+			ctx.GetTransforms(),
+			t => (t as DeactivateWorkspaceTransform) == new DeactivateWorkspaceTransform(workspaces[0].Id)
+		);
 
-		workspaces[1].DidNotReceive().Deactivate();
-		workspaces[1].Received(1).DoLayout();
+		Assert.DoesNotContain(
+			ctx.GetTransforms(),
+			t => (t as DeactivateWorkspaceTransform) == new DeactivateWorkspaceTransform(workspaces[1].Id)
+		);
 
-		workspaces[2].DidNotReceive().Deactivate();
-		workspaces[2].Received(1).DoLayout();
+		Assert.DoesNotContain(
+			ctx.GetTransforms(),
+			t => (t as DeactivateWorkspaceTransform) == new DeactivateWorkspaceTransform(workspaces[2].Id)
+		);
 	}
 }

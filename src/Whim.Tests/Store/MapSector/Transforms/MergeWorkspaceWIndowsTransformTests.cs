@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -11,7 +9,7 @@ using static Whim.TestUtils.StoreTestUtils;
 namespace Whim.Tests;
 
 [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
-public class MergeWorkspaceWIndowsTransformTests
+public class MergeWorkspaceWindowsTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void SourceWorkspaceNotFound(IContext ctx)
@@ -30,13 +28,13 @@ public class MergeWorkspaceWIndowsTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void TargetWorkspaceNotFound(IContext ctx)
+	internal void TargetWorkspaceNotFound(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given
-		IWorkspace workspace = CreateWorkspace();
+		Workspace workspace = CreateWorkspace(ctx);
 		Guid targetWorkspaceId = Guid.NewGuid();
 
-		AddWorkspacesToManager(ctx, workspace);
+		AddWorkspacesToManager(ctx, rootSector, workspace);
 
 		MergeWorkspaceWindowsTransform sut = new(workspace.Id, targetWorkspaceId);
 
@@ -51,8 +49,8 @@ public class MergeWorkspaceWIndowsTransformTests
 	internal void Success(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the source and target workspaces
-		IWorkspace sourceWorkspace = CreateWorkspace();
-		IWorkspace targetWorkspace = CreateWorkspace();
+		Workspace sourceWorkspace = CreateWorkspace(ctx);
+		Workspace targetWorkspace = CreateWorkspace(ctx);
 
 		HMONITOR monitorHandle = (HMONITOR)1;
 		IMonitor monitor = CreateMonitor(monitorHandle);
@@ -61,9 +59,11 @@ public class MergeWorkspaceWIndowsTransformTests
 		IWindow window2 = CreateWindow((HWND)2);
 		IWindow window3 = CreateWindow((HWND)3);
 
-		sourceWorkspace.Windows.Returns(new List<IWindow>() { window1, window2, window3 });
+		sourceWorkspace = PopulateWindowWorkspaceMap(ctx, rootSector, window1, sourceWorkspace);
+		sourceWorkspace = PopulateWindowWorkspaceMap(ctx, rootSector, window2, sourceWorkspace);
+		sourceWorkspace = PopulateWindowWorkspaceMap(ctx, rootSector, window3, sourceWorkspace);
 
-		AddWorkspacesToManager(ctx, sourceWorkspace, targetWorkspace);
+		AddWorkspaceToManager(ctx, rootSector, targetWorkspace);
 
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, sourceWorkspace);
 
@@ -81,8 +81,10 @@ public class MergeWorkspaceWIndowsTransformTests
 
 		Assert.Equal(targetWorkspace.Id, rootSector.MapSector.MonitorWorkspaceMap[monitor.Handle]);
 
-		targetWorkspace.Received(1).AddWindow(window1);
-		targetWorkspace.Received(1).AddWindow(window2);
-		targetWorkspace.Received(1).AddWindow(window3);
+		Workspace resultTarget = rootSector.WorkspaceSector.Workspaces[targetWorkspace.Id];
+		Assert.Equal(3, resultTarget.WindowPositions.Count);
+		Assert.Contains(window1.Handle, resultTarget.WindowPositions.Keys);
+		Assert.Contains(window2.Handle, resultTarget.WindowPositions.Keys);
+		Assert.Contains(window3.Handle, resultTarget.WindowPositions.Keys);
 	}
 }

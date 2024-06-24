@@ -1,14 +1,15 @@
-using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using DotNext;
-using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
 using Xunit;
+using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.Tests;
 
+[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WindowHiddenTransformTests
 {
 	private static Result<Unit> AssertDoesNotRaise(
@@ -61,27 +62,14 @@ public class WindowHiddenTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Success(
-		IContext ctx,
-		MutableRootSector rootSector,
-		IWindow window,
-		IMonitor monitor,
-		IWorkspace workspace
-	)
+	internal void Success(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the window is inside the window sector,
-		window.Handle.Returns((HWND)2);
-		rootSector.WindowSector.Windows = rootSector.WindowSector.Windows.Add(window.Handle, window);
+		IWindow window = CreateWindow((HWND)2);
+		IMonitor monitor = CreateMonitor((HMONITOR)3);
 
-		// and has a monitor - window mapping
-		Guid workspaceId = Guid.NewGuid();
-		workspace.Id.Returns(workspaceId);
-
-		MapSector mapSector = rootSector.MapSector;
-		mapSector.WindowWorkspaceMap = mapSector.WindowWorkspaceMap.SetItem(window.Handle, workspaceId);
-		mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(monitor.Handle, workspaceId);
-
-		ctx.WorkspaceManager.GetEnumerator().Returns(_ => new List<IWorkspace>() { workspace }.GetEnumerator());
+		Workspace workspace = CreateWorkspace(ctx);
+		PopulateThreeWayMap(ctx, rootSector, monitor, workspace, window);
 
 		WindowHiddenTransform sut = new(window);
 

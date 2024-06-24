@@ -1,3 +1,4 @@
+using DotNext;
 using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
@@ -33,7 +34,7 @@ public class MoveWindowToPointTransformTests
 		// Given there is no workspace for the window
 		IWindow window = CreateWindow((HWND)10);
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
-		IWorkspace workspace = CreateWorkspace();
+		Workspace workspace = CreateWorkspace(ctx);
 		Point<int> point = new(10, 10);
 
 		AddWindowToSector(rootSector, window);
@@ -55,7 +56,7 @@ public class MoveWindowToPointTransformTests
 		// Given there is a workspace for the window
 		IWindow window = CreateWindow((HWND)10);
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
-		IWorkspace workspace = CreateWorkspace();
+		Workspace workspace = CreateWorkspace(ctx);
 		Point<int> point = new(10, 10);
 
 		AddWindowToSector(rootSector, window);
@@ -70,7 +71,16 @@ public class MoveWindowToPointTransformTests
 		// Then we succeed
 		Assert.True(result.IsSuccessful);
 
-		workspace.Received(1).MoveWindowToPoint(window, new Point<double>(10d / 1920, 10d / 1080), deferLayout: false);
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t =>
+				(t as MoveWindowToPointInWorkspaceTransform)
+				== new MoveWindowToPointInWorkspaceTransform(
+					workspace.Id,
+					window.Handle,
+					new Point<double>(10d / 1920, 10d / 1080)
+				)
+		);
 		window.Received(1).Focus();
 	}
 
@@ -80,10 +90,10 @@ public class MoveWindowToPointTransformTests
 		// Given there is a workspace for the window
 		IWindow window = CreateWindow((HWND)10);
 		IMonitor sourceMonitor = CreateMonitor((HMONITOR)10);
-		IWorkspace sourceWorkspace = CreateWorkspace();
+		Workspace sourceWorkspace = CreateWorkspace(ctx);
 
 		IMonitor targetMonitor = CreateMonitor((HMONITOR)11);
-		IWorkspace targetWorkspace = CreateWorkspace();
+		Workspace targetWorkspace = CreateWorkspace(ctx);
 
 		Point<int> point = new(10, 10);
 
@@ -95,18 +105,31 @@ public class MoveWindowToPointTransformTests
 		MoveWindowToPointTransform sut = new(window.Handle, point);
 
 		// When we execute the transform
-		var result = ctx.Store.Dispatch(sut);
+		Result<Unit>? result = null;
+		// var result = ctx.Store.Dispatch(sut);
+		CustomAssert.Layout(rootSector, () => result = ctx.Store.Dispatch(sut), new[] { sourceWorkspace.Id });
 
 		// Then we succeed
-		Assert.True(result.IsSuccessful);
+		Assert.True(result!.Value.IsSuccessful);
 
 		Assert.Equal(targetWorkspace.Id, rootSector.MapSector.WindowWorkspaceMap[window.Handle]);
 
-		sourceWorkspace.Received(1).RemoveWindow(window);
-		sourceWorkspace.Received(1).DoLayout();
-		targetWorkspace
-			.Received(1)
-			.MoveWindowToPoint(window, new Point<double>(10d / 1920, 10d / 1080), deferLayout: false);
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t =>
+				(t as RemoveWindowFromWorkspaceTransform)
+				== new RemoveWindowFromWorkspaceTransform(sourceWorkspace.Id, window)
+		);
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t =>
+				(t as MoveWindowToPointInWorkspaceTransform)
+				== new MoveWindowToPointInWorkspaceTransform(
+					targetWorkspace.Id,
+					window.Handle,
+					new Point<double>(10d / 1920, 10d / 1080)
+				)
+		);
 
 		window.Received(1).Focus();
 	}

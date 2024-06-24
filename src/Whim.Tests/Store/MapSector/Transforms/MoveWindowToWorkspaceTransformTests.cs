@@ -37,15 +37,11 @@ public class MoveWindowToWorkspaceTransformTests
 		Result<Unit>? result = null;
 		List<MonitorWorkspaceChangedEventArgs> evs = new();
 
-		Assert.Raises<MonitorWorkspaceChangedEventArgs>(
-			h =>
-				rootSector.MapSector.MonitorWorkspaceChanged += (sender, args) =>
-				{
-					evs.Add(args);
-					h.Invoke(sender, args);
-				},
+		CustomAssert.Raises<MonitorWorkspaceChangedEventArgs>(
+			h => rootSector.MapSector.MonitorWorkspaceChanged += h,
 			h => rootSector.MapSector.MonitorWorkspaceChanged -= h,
-			() => result = ctx.Store.Dispatch(sut)
+			() => result = ctx.Store.Dispatch(sut),
+			(sender, args) => evs.Add(args)
 		);
 
 		return (result!.Value, evs);
@@ -70,10 +66,10 @@ public class MoveWindowToWorkspaceTransformTests
 	internal void WindowNotFound_SpecifiedHandle(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given a random window id
-		IWorkspace workspace = CreateWorkspace();
+		Workspace workspace = CreateWorkspace(ctx);
 		IWindow window = CreateWindow((HWND)10);
 
-		AddWorkspacesToManager(ctx, workspace);
+		AddWorkspacesToManager(ctx, rootSector, workspace);
 
 		MoveWindowToWorkspaceTransform sut = new(workspace.Id, window.Handle);
 
@@ -88,9 +84,9 @@ public class MoveWindowToWorkspaceTransformTests
 	internal void WindowNotFound_Default(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given a random window id
-		IWorkspace workspace = CreateWorkspace();
+		Workspace workspace = CreateWorkspace(ctx);
 
-		AddWorkspacesToManager(ctx, workspace);
+		AddWorkspacesToManager(ctx, rootSector, workspace);
 
 		MoveWindowToWorkspaceTransform sut = new(workspace.Id);
 
@@ -105,10 +101,10 @@ public class MoveWindowToWorkspaceTransformTests
 	internal void WorkspaceForWindowNotFound(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given a window which isn't in a workspace
-		IWorkspace workspace = CreateWorkspace();
+		Workspace workspace = CreateWorkspace(ctx);
 		IWindow window = CreateWindow((HWND)10);
 
-		AddWorkspacesToManager(ctx, workspace);
+		AddWorkspacesToManager(ctx, rootSector, workspace);
 		rootSector.WindowSector.Windows = rootSector.WindowSector.Windows.Add(window.Handle, window);
 
 		MoveWindowToWorkspaceTransform sut = new(workspace.Id, window.Handle);
@@ -124,7 +120,7 @@ public class MoveWindowToWorkspaceTransformTests
 	internal void WindowAlreadyOnWorkspace(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the window is already on the workspace
-		IWorkspace workspace = CreateWorkspace();
+		Workspace workspace = CreateWorkspace(ctx);
 		IWindow window = CreateWindow((HWND)10);
 
 		PopulateThreeWayMap(ctx, rootSector, CreateMonitor((HMONITOR)1), workspace, window);
@@ -142,8 +138,8 @@ public class MoveWindowToWorkspaceTransformTests
 	internal void Success_BothWorkspacesLayout(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the window switches workspaces, and both workspaces are visible
-		IWorkspace workspace1 = CreateWorkspace();
-		IWorkspace workspace2 = CreateWorkspace();
+		Workspace workspace1 = CreateWorkspace(ctx);
+		Workspace workspace2 = CreateWorkspace(ctx);
 
 		IWindow window = CreateWindow((HWND)10);
 
@@ -153,15 +149,26 @@ public class MoveWindowToWorkspaceTransformTests
 		MoveWindowToWorkspaceTransform sut = new(workspace2.Id, window.Handle);
 
 		// When we move the window to the workspace
-		var result = AssertDoesNotRaise(ctx, rootSector, sut);
+		// var result = AssertDoesNotRaise(ctx, rootSector, sut);
+		Result<Unit>? result = null;
+		CustomAssert.Layout(
+			rootSector,
+			() => result = AssertDoesNotRaise(ctx, rootSector, sut),
+			new[] { workspace1.Id, workspace2.Id }
+		);
 
 		// Then we succeed
-		Assert.True(result.IsSuccessful);
-		workspace1.Received().RemoveWindow(window);
-		workspace2.Received().AddWindow(window);
-
-		workspace1.Received().DoLayout();
-		workspace2.Received().DoLayout();
+		Assert.True(result!.Value.IsSuccessful);
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t =>
+				(t as RemoveWindowFromWorkspaceTransform)
+				== new RemoveWindowFromWorkspaceTransform(workspace1.Id, window)
+		);
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t => (t as AddWindowToWorkspaceTransform) == new AddWindowToWorkspaceTransform(workspace2.Id, window)
+		);
 
 		window.Received().Focus();
 	}
@@ -170,15 +177,15 @@ public class MoveWindowToWorkspaceTransformTests
 	internal void Success_SingleWorkspaceLayout(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the window gets activated on a hidden workspace
-		IWorkspace workspace1 = CreateWorkspace();
-		IWorkspace workspace2 = CreateWorkspace();
+		Workspace workspace1 = CreateWorkspace(ctx);
+		Workspace workspace2 = CreateWorkspace(ctx);
 
 		IWindow window = CreateWindow((HWND)10);
 
 		IMonitor monitor = CreateMonitor((HMONITOR)1);
 
 		PopulateThreeWayMap(ctx, rootSector, monitor, workspace1, window);
-		AddWorkspacesToManager(ctx, workspace2);
+		AddWorkspacesToManager(ctx, rootSector, workspace2);
 		rootSector.MonitorSector.ActiveMonitorHandle = monitor.Handle;
 
 		MoveWindowToWorkspaceTransform sut = new(workspace2.Id, window.Handle);
@@ -189,8 +196,16 @@ public class MoveWindowToWorkspaceTransformTests
 		// Then we succeed
 		Assert.True(result.IsSuccessful);
 
-		workspace1.Received().RemoveWindow(window);
-		workspace2.Received().AddWindow(window);
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t =>
+				(t as RemoveWindowFromWorkspaceTransform)
+				== new RemoveWindowFromWorkspaceTransform(workspace1.Id, window)
+		);
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t => (t as AddWindowToWorkspaceTransform) == new AddWindowToWorkspaceTransform(workspace2.Id, window)
+		);
 
 		Assert.Single(evs);
 

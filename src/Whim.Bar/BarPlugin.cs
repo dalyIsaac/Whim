@@ -64,7 +64,7 @@ public class BarPlugin : IBarPlugin
 		foreach (IMonitor monitor in e.AddedMonitors)
 		{
 			BarWindow barWindow = new(_context, _barConfig, monitor);
-			_monitorBarMap.Add(monitor, barWindow);
+			_monitorBarMap[monitor] = barWindow;
 		}
 
 		ShowAll();
@@ -79,9 +79,14 @@ public class BarPlugin : IBarPlugin
 		foreach (BarWindow barWindow in _monitorBarMap.Values)
 		{
 			barWindow.UpdateRect();
-			deferPosHandle.DeferWindowPos(barWindow.WindowState, forceTwoPasses: true);
+			IWindowState state = barWindow.WindowState;
+
+			deferPosHandle.DeferWindowPos(
+				new DeferWindowPosState(state.Window.Handle, state.WindowSize, state.Rectangle),
+				forceTwoPasses: true
+			);
 			_context.NativeManager.SetWindowCorners(
-				barWindow.WindowState.Window.Handle,
+				state.Window.Handle,
 				DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_DONOTROUND
 			);
 		}

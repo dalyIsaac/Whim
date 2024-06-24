@@ -1,8 +1,8 @@
 using System.Collections;
 using NSubstitute;
 using Whim.TestUtils;
-using Windows.Win32.Graphics.Gdi;
 using Xunit;
+using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.Tests;
 
@@ -76,10 +76,11 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void MonitorsChanged(IContext ctx)
+	internal void MonitorsChanged(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given
 		MonitorManager sut = new(ctx);
+		AddWorkspaceToManager(ctx, rootSector, CreateWorkspace(ctx));
 
 		// When the monitor sector triggers a MonitorsChanged event
 		// Then an MonitorsChanged event from the MonitorManager was triggered
@@ -118,10 +119,11 @@ public class MonitorManagerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Dispose(IContext ctx)
+	internal void Dispose(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given
 		MonitorManager sut = new(ctx);
+		AddWorkspaceToManager(ctx, rootSector, CreateWorkspace(ctx));
 
 		// When
 		sut.Initialize();

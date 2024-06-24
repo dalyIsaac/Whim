@@ -47,8 +47,8 @@ public class RouteEventArgs : EventArgs
 		}
 
 		return other.Window.Equals(Window)
-			&& other.PreviousWorkspace == PreviousWorkspace
-			&& other.CurrentWorkspace == CurrentWorkspace;
+			&& other.PreviousWorkspace?.Id == PreviousWorkspace?.Id
+			&& other.CurrentWorkspace?.Id == CurrentWorkspace?.Id;
 	}
 
 	/// <inheritdoc/>

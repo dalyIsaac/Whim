@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Immutable;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
@@ -30,25 +31,41 @@ public class MoveWindowToAdjacentMonitorTransformTests
 		Assert.False(result.IsSuccessful);
 	}
 
-	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Success(IContext ctx, MutableRootSector rootSector)
+	[Theory]
+	[InlineAutoSubstituteData<StoreCustomization>(false, 0, 1)]
+	[InlineAutoSubstituteData<StoreCustomization>(false, 1, 2)]
+	[InlineAutoSubstituteData<StoreCustomization>(false, 2, 0)]
+	[InlineAutoSubstituteData<StoreCustomization>(true, 0, 2)]
+	[InlineAutoSubstituteData<StoreCustomization>(true, 2, 1)]
+	[InlineAutoSubstituteData<StoreCustomization>(true, 1, 0)]
+	internal void Success(bool reverse, int startIdx, int endIdx, IContext ctx, MutableRootSector rootSector)
 	{
-		// Given there are two adjacent monitors
-		IMonitor originalMonitor = CreateMonitor((HMONITOR)10);
-		IMonitor newMonitor = CreateMonitor((HMONITOR)11);
-
+		// Given the window is on the starting monitor
 		IWindow window = CreateWindow((HWND)10);
+		AddWindowToSector(rootSector, window);
 
-		PopulateThreeWayMap(ctx, rootSector, originalMonitor, CreateWorkspace(), window);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, newMonitor, CreateWorkspace());
-		rootSector.MonitorSector.ActiveMonitorHandle = originalMonitor.Handle;
+		// and there are three adjacent monitors
+		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor((HMONITOR)10), CreateWorkspace(ctx));
+		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor((HMONITOR)11), CreateWorkspace(ctx));
+		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor((HMONITOR)12), CreateWorkspace(ctx));
 
-		MoveWindowToAdjacentMonitorTransform sut = new(window.Handle);
+		rootSector.MonitorSector.ActiveMonitorHandle = rootSector.MonitorSector.Monitors[startIdx].Handle;
+
+		Guid startWorkspaceId = rootSector.WorkspaceSector.WorkspaceOrder[startIdx];
+		rootSector.MapSector.WindowWorkspaceMap = rootSector.MapSector.WindowWorkspaceMap.SetItem(
+			window.Handle,
+			startWorkspaceId
+		);
+
+		MoveWindowToAdjacentMonitorTransform sut = new(window.Handle, reverse);
 
 		// When we dispatch the transform
 		var result = ctx.Store.Dispatch(sut);
 
 		// Then
 		Assert.True(result.IsSuccessful);
+
+		Guid endWorkspaceId = rootSector.WorkspaceSector.WorkspaceOrder[endIdx];
+		Assert.Equal(endWorkspaceId, rootSector.MapSector.WindowWorkspaceMap[window.Handle]);
 	}
 }

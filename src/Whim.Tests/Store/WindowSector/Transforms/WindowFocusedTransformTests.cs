@@ -41,7 +41,7 @@ public class WindowFocusedTransformTests
 		ImmutableArray<IMonitor> monitors = Setup_Monitors(rootSector);
 
 		window.Handle.Returns((HWND)2);
-		IWorkspace workspace = CreateWorkspace();
+		Workspace workspace = CreateWorkspace(ctx);
 
 		PopulateThreeWayMap(ctx, rootSector, monitors[1], workspace, window);
 
@@ -140,46 +140,14 @@ public class WindowFocusedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void MonitorForWorkspaceNotFound(IContext ctx, MutableRootSector rootSector)
-	{
-		// Given the window's workspace is not tracked by the map sector, but the window is tracked
-		IWindow window = CreateWindow((HWND)1);
-		IWorkspace workspace = CreateWorkspace();
-		IWorkspace workspace1 = CreateWorkspace();
-		IWorkspace workspace2 = CreateWorkspace();
-
-		Setup_Monitors(rootSector);
-
-		var monitors = rootSector.MonitorSector.Monitors;
-
-		Setup_Monitors(rootSector);
-		PopulateThreeWayMap(ctx, rootSector, monitors[0], workspace, window);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitors[1], workspace1);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitors[2], workspace2);
-
-		WindowFocusedTransform sut = new(window);
-
-		// When we dispatch the transform
-		ctx.Store.Dispatch(sut);
-
-		// Then the active monitor index is updated based on MonitorFromWindow
-		Assert.Equal(HMONITOR_1, rootSector.MonitorSector.ActiveMonitorHandle);
-		Assert.Equal(HMONITOR_1, rootSector.MonitorSector.LastWhimActiveMonitorHandle);
-
-		workspace.DidNotReceive().DoLayout();
-		workspace1.DidNotReceive().DoLayout();
-		workspace2.DidNotReceive().DoLayout();
-	}
-
-	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void WorkspaceLaidOut(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		// Given the window's workspace is tracked by the map sector
 		IWindow window = CreateWindow((HWND)1);
-		IWorkspace workspace1 = CreateWorkspace();
-		IWorkspace workspace2 = CreateWorkspace();
-		IWorkspace workspace3 = CreateWorkspace();
-		IWorkspace workspace4 = CreateWorkspace();
+		Workspace workspace1 = CreateWorkspace(ctx);
+		Workspace workspace2 = CreateWorkspace(ctx);
+		Workspace workspace3 = CreateWorkspace(ctx);
+		Workspace workspace4 = CreateWorkspace(ctx);
 
 		Setup_Monitors(rootSector);
 
@@ -195,14 +163,14 @@ public class WindowFocusedTransformTests
 		WindowFocusedTransform sut = new(window);
 
 		// When we dispatch the transform
-		ctx.Store.Dispatch(sut);
+		CustomAssert.Layout(
+			rootSector,
+			() => ctx.Store.Dispatch(sut),
+			layoutWorkspaceIds: new[] { workspace4.Id },
+			noLayoutWorkspaceIds: new[] { workspace1.Id, workspace2.Id, workspace3.Id }
+		);
 
 		// Then the active monitor index is updated based on MonitorFromWindow		Assert.Equal(HMONITOR_1, rootSector.MonitorSector.ActiveMonitorHandle);
 		Assert.Equal(HMONITOR_3, rootSector.MonitorSector.LastWhimActiveMonitorHandle);
-
-		workspace1.DidNotReceive().DoLayout();
-		workspace2.DidNotReceive().DoLayout();
-		workspace3.DidNotReceive().DoLayout();
-		workspace4.Received().DoLayout();
 	}
 }

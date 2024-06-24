@@ -7,7 +7,7 @@ namespace Whim;
 /// Container responsible for the creation and removal of <see cref="IWorkspace"/>s. Events for
 /// workspaces are exposed here.
 ///
-/// To activate a workspace, or changee the mapping between workspaces and monitors, use the
+/// To activate a workspace, or change the mapping between workspaces and monitors, use the
 /// <see cref="IButler"/>.
 /// </summary>
 public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
@@ -31,22 +31,22 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// <summary>
 	/// Event for when a workspace is added.
 	/// </summary>
-	event EventHandler<WorkspaceEventArgs>? WorkspaceAdded;
+	event EventHandler<WorkspaceAddedEventArgs>? WorkspaceAdded;
 
 	/// <summary>
 	/// Event for when a workspace is removed.
 	/// </summary>
-	event EventHandler<WorkspaceEventArgs>? WorkspaceRemoved;
+	event EventHandler<WorkspaceRemovedEventArgs>? WorkspaceRemoved;
 
 	/// <summary>
 	/// Event for when <see cref="IWorkspace.DoLayout"/> has started.
 	/// </summary>
-	event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutStarted;
+	event EventHandler<WorkspaceLayoutStartedEventArgs>? WorkspaceLayoutStarted;
 
 	/// <summary>
 	/// Event for when <see cref="IWorkspace.DoLayout"/> has completed.
 	/// </summary>
-	event EventHandler<WorkspaceEventArgs>? WorkspaceLayoutCompleted;
+	event EventHandler<WorkspaceLayoutCompletedEventArgs>? WorkspaceLayoutCompleted;
 
 	/// <summary>
 	/// Event for when a workspace's active layout engine has changed.
@@ -129,6 +129,6 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// all workspaces.
 	/// This should be used by <see cref="IPlugin"/>s.
 	/// </summary>
-	/// <param name="proxyLayoutEngine">The proxy layout engine to add.</param>
-	void AddProxyLayoutEngine(CreateProxyLayoutEngine proxyLayoutEngine);
+	/// <param name="proxyLayoutEngineCreator">The proxy layout engine to add.</param>
+	void AddProxyLayoutEngine(ProxyLayoutEngineCreator proxyLayoutEngineCreator);
 }

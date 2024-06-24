@@ -9,6 +9,11 @@ namespace Whim;
 /// </summary>
 public interface IStore : IDisposable
 {
+	/// <summary>
+	/// Whether the store is being disposed.
+	/// </summary>
+	bool IsDisposing { get; }
+
 	/// <inheritdoc cref="IMonitorSectorEvents"/>
 	IMonitorSectorEvents MonitorEvents { get; }
 
@@ -17,6 +22,9 @@ public interface IStore : IDisposable
 
 	/// <inheritdoc cref="IMapSectorEvents"/>
 	IMapSectorEvents MapEvents { get; }
+
+	/// <inheritdoc cref="IWorkspaceSectorEvents"/>
+	IWorkspaceSectorEvents WorkspaceEvents { get; }
 
 	/// <summary>
 	/// Initialize the event listeners.

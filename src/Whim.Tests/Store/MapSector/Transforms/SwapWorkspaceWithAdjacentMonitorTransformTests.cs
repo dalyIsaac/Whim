@@ -31,7 +31,7 @@ public class SwapWorkspaceWithAdjacentMonitorTransformTests
 	{
 		// Given there is a single monitor
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
-		IWorkspace workspace = CreateWorkspace();
+		Workspace workspace = CreateWorkspace(ctx);
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, workspace);
 
 		ctx.MonitorManager.GetPreviousMonitor(monitor).Returns(monitor);
@@ -52,7 +52,7 @@ public class SwapWorkspaceWithAdjacentMonitorTransformTests
 		// Given there are multiple monitors
 		IMonitor monitor1 = CreateMonitor((HMONITOR)1);
 		IMonitor monitor2 = CreateMonitor((HMONITOR)2);
-		IWorkspace workspace1 = CreateWorkspace();
+		Workspace workspace1 = CreateWorkspace(ctx);
 
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor1, workspace1);
 		ctx.MonitorManager.GetNextMonitor(monitor1).Returns(monitor2);
@@ -78,10 +78,10 @@ public class SwapWorkspaceWithAdjacentMonitorTransformTests
 	)
 	{
 		// Given the target monitor has an old workspace, and the new workspace wasn't previously activated
-		IWorkspace workspace1 = CreateWorkspace();
-		IWorkspace workspace2 = CreateWorkspace();
-		IWorkspace workspace3 = CreateWorkspace();
-		IWorkspace[] workspaces = { workspace1, workspace2, workspace3 };
+		Workspace workspace1 = CreateWorkspace(ctx);
+		Workspace workspace2 = CreateWorkspace(ctx);
+		Workspace workspace3 = CreateWorkspace(ctx);
+		Workspace[] workspaces = { workspace1, workspace2, workspace3 };
 
 		IMonitor monitor1 = CreateMonitor((HMONITOR)1);
 		IMonitor monitor2 = CreateMonitor((HMONITOR)2);

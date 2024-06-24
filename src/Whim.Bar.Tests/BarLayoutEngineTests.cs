@@ -344,7 +344,7 @@ public class BarLayoutEngineTests
 	{
 		// Given
 		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
-		LayoutEngineCustomAction<string> action =
+		LayoutEngineAction<string> action =
 			new()
 			{
 				Name = "Action",
@@ -366,7 +366,7 @@ public class BarLayoutEngineTests
 	{
 		// Given
 		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
-		LayoutEngineCustomAction<string> action =
+		LayoutEngineAction<string> action =
 			new()
 			{
 				Name = "Action",

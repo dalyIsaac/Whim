@@ -1,225 +1,35 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using AutoFixture;
 using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Xunit;
+using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.Tests;
 
-public class DeferWindowPosHandleCustomization : ICustomization
-{
-	private int _windowCount;
-
-	private int GetNextHwnd()
-	{
-		_windowCount++;
-		return _windowCount;
-	}
-
-	public void Customize(IFixture fixture)
-	{
-		fixture.Register(() =>
-		{
-			IWindow window = Substitute.For<IWindow>();
-			window.Handle.Returns(new HWND(GetNextHwnd()));
-
-			return new WindowPosState(
-				new WindowState()
-				{
-					Rectangle = new Rectangle<int>(),
-					Window = window,
-					WindowSize = WindowSize.Normal
-				}
-			);
-		});
-
-		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
-		internalCtx.DeferWindowPosManager.ParallelOptions.Returns(new ParallelOptions { MaxDegreeOfParallelism = 1 });
-	}
-}
-
 public class DeferWindowPosHandleTests
 {
-	private const SET_WINDOW_POS_FLAGS COMMON_FLAGS =
-		SET_WINDOW_POS_FLAGS.SWP_FRAMECHANGED
+	private const SET_WINDOW_POS_FLAGS DEFAULT_FLAGS =
+		SET_WINDOW_POS_FLAGS.SWP_NOZORDER
 		| SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
+		| SET_WINDOW_POS_FLAGS.SWP_FRAMECHANGED
 		| SET_WINDOW_POS_FLAGS.SWP_NOCOPYBITS
-		| SET_WINDOW_POS_FLAGS.SWP_NOZORDER
-		| SET_WINDOW_POS_FLAGS.SWP_NOOWNERZORDER;
+		| SET_WINDOW_POS_FLAGS.SWP_NOREPOSITION;
 
-	private static void AssertSetWindowPos(
-		IInternalContext internalCtx,
-		WindowPosState windowPosState,
-		SET_WINDOW_POS_FLAGS expectedFlags = COMMON_FLAGS,
-		int expectedCallCount = 1
-	)
+	private static DeferWindowPosState Create(HWND hwnd) => new(hwnd, WindowSize.Normal, Rectangle.UnitSquare<int>());
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void NoWindows(IContext ctx, IInternalContext internalCtx)
 	{
-		internalCtx
-			.CoreNativeManager.Received(expectedCallCount)
-			.SetWindowPos(
-				windowPosState.WindowState.Window.Handle,
-				windowPosState.HwndInsertAfter,
-				windowPosState.WindowState.Rectangle.X,
-				windowPosState.WindowState.Rectangle.Y,
-				windowPosState.WindowState.Rectangle.Width,
-				windowPosState.WindowState.Rectangle.Height,
-				expectedFlags
-			);
-	}
+		// Given
+		DeferWindowPosHandle sut = new(ctx, internalCtx);
 
-	[Theory, AutoSubstituteData]
-	internal void Dispose_NoWindows(IContext ctx, IInternalContext internalCtx)
-	{
-		// Given no windows
-		using DeferWindowPosHandle handle = new(ctx, internalCtx);
+		// When
+		sut.Dispose();
 
-		// When disposing
-		handle.Dispose();
-
-		// Then nothing happens
-		CustomAssert.NoContextCalls(ctx);
-		CustomAssert.NoInternalContextCalls(internalCtx);
-	}
-
-	[Theory, AutoSubstituteData<DeferWindowPosHandleCustomization>]
-	internal void Dispose_CannotDoLayout(
-		IContext ctx,
-		IInternalContext internalCtx,
-		WindowPosState windowPosState,
-		WindowPosState windowPosState2
-	)
-	{
-		// Given DeferWindowPosManager.CanDoLayout() returns false
-		windowPosState2.WindowState.WindowSize = WindowSize.Minimized;
-		using DeferWindowPosHandle handle =
-			new(ctx, internalCtx, new WindowPosState[] { windowPosState, windowPosState2 });
-		internalCtx.DeferWindowPosManager.CanDoLayout().Returns(false);
-
-		// When disposing
-		handle.Dispose();
-
-		// Then the layout is deferred
-		internalCtx.DeferWindowPosManager.DeferLayout(
-			Arg.Is<List<WindowPosState>>(x => x.Count == 1 && x[0] == windowPosState),
-			Arg.Is<List<WindowPosState>>(x => x.Count == 1 && x[0] == windowPosState2)
-		);
-	}
-
-	[Theory]
-	[InlineAutoSubstituteData<DeferWindowPosHandleCustomization>(100, 1)]
-	[InlineAutoSubstituteData<DeferWindowPosHandleCustomization>(200, 2)]
-	internal void Dispose_SingleWindow(
-		int monitorScaleFactor,
-		int numPasses,
-		IContext ctx,
-		IInternalContext internalCtx,
-		WindowPosState windowPosState
-	)
-	{
-		// Given a single window, and a monitor which has a scale factor != 100
-		using DeferWindowPosHandle handle = new(ctx, internalCtx);
-		internalCtx.DeferWindowPosManager.CanDoLayout().Returns(true);
-
-		IMonitor monitor1 = Substitute.For<IMonitor>();
-		monitor1.ScaleFactor.Returns(100);
-		IMonitor monitor2 = Substitute.For<IMonitor>();
-		monitor2.ScaleFactor.Returns(monitorScaleFactor);
-
-		ctx.MonitorManager.GetEnumerator().Returns((_) => new List<IMonitor>() { monitor1, monitor2 }.GetEnumerator());
-
-		// When disposing
-		handle.DeferWindowPos(windowPosState.WindowState, windowPosState.HwndInsertAfter, windowPosState.Flags);
-		handle.Dispose();
-
-		// Then the window is laid out twice
-		AssertSetWindowPos(internalCtx, windowPosState, expectedCallCount: numPasses);
-	}
-
-	[Theory]
-	[InlineAutoSubstituteData<DeferWindowPosHandleCustomization>(100, 1)]
-	[InlineAutoSubstituteData<DeferWindowPosHandleCustomization>(200, 2)]
-	internal void Dispose_MultipleWindows(
-		int monitorScaleFactor,
-		int numPasses,
-		IContext ctx,
-		IInternalContext internalCtx,
-		WindowPosState windowPosState1,
-		WindowPosState windowPosState2
-	)
-	{
-		// Given multiple windows, and a monitor which has a scale factor != 100
-		using DeferWindowPosHandle handle =
-			new(ctx, internalCtx, new WindowPosState[] { windowPosState1, windowPosState2 });
-		internalCtx.DeferWindowPosManager.CanDoLayout().Returns(true);
-
-		IMonitor monitor1 = Substitute.For<IMonitor>();
-		monitor1.ScaleFactor.Returns(100);
-		IMonitor monitor2 = Substitute.For<IMonitor>();
-		monitor2.ScaleFactor.Returns(monitorScaleFactor);
-
-		ctx.MonitorManager.GetEnumerator().Returns((_) => new List<IMonitor>() { monitor1, monitor2 }.GetEnumerator());
-
-		// When disposing
-		handle.Dispose();
-
-		// Then the windows are laid out twice
-		AssertSetWindowPos(internalCtx, windowPosState1, expectedCallCount: numPasses);
-		AssertSetWindowPos(internalCtx, windowPosState2, expectedCallCount: numPasses);
-	}
-
-	[Theory, AutoSubstituteData<DeferWindowPosHandleCustomization>]
-	internal void Dispose_ForceTwoPasses(
-		IContext ctx,
-		IInternalContext internalCtx,
-		WindowPosState windowPosState1,
-		WindowPosState windowPosState2
-	)
-	{
-		// Given multiple windows, and a monitor which has a scale factor == 100
-		int monitorScaleFactor = 100;
-		int numPasses = 2;
-
-		using DeferWindowPosHandle handle = new(ctx, internalCtx);
-		internalCtx.DeferWindowPosManager.CanDoLayout().Returns(true);
-
-		IMonitor monitor1 = Substitute.For<IMonitor>();
-		monitor1.ScaleFactor.Returns(100);
-		IMonitor monitor2 = Substitute.For<IMonitor>();
-		monitor2.ScaleFactor.Returns(monitorScaleFactor);
-
-		ctx.MonitorManager.GetEnumerator().Returns((_) => new List<IMonitor>() { monitor1, monitor2 }.GetEnumerator());
-
-		// When disposing
-		handle.DeferWindowPos(windowPosState1.WindowState, windowPosState1.HwndInsertAfter, windowPosState1.Flags);
-		handle.DeferWindowPos(
-			windowPosState2.WindowState,
-			windowPosState2.HwndInsertAfter,
-			windowPosState2.Flags,
-			forceTwoPasses: true
-		);
-		handle.Dispose();
-
-		// Then the windows are laid out twice
-		AssertSetWindowPos(internalCtx, windowPosState1, expectedCallCount: numPasses);
-		AssertSetWindowPos(internalCtx, windowPosState2, expectedCallCount: numPasses);
-	}
-
-	[Theory, AutoSubstituteData<DeferWindowPosHandleCustomization>]
-	internal void Dispose_NoWindowOffset(IContext ctx, IInternalContext internalCtx, WindowPosState windowPosState)
-	{
-		// Given a window with no offset
-		ctx.NativeManager.GetWindowOffset(windowPosState.WindowState.Window.Handle).Returns((Rectangle<int>?)null);
-
-		using DeferWindowPosHandle handle = new(ctx, internalCtx, new WindowPosState[] { windowPosState });
-		internalCtx.DeferWindowPosManager.CanDoLayout().Returns(true);
-
-		// When disposing
-		handle.Dispose();
-
-		// Then the window is not laid out
+		// Then
 		internalCtx
 			.CoreNativeManager.DidNotReceive()
 			.SetWindowPos(
@@ -233,60 +43,149 @@ public class DeferWindowPosHandleTests
 			);
 	}
 
-	[Theory]
-	[InlineAutoSubstituteData<DeferWindowPosHandleCustomization>(WindowSize.Maximized, 1, 0, 0)]
-	[InlineAutoSubstituteData<DeferWindowPosHandleCustomization>(WindowSize.Minimized, 0, 1, 0)]
-	[InlineAutoSubstituteData<DeferWindowPosHandleCustomization>(WindowSize.Normal, 0, 0, 1)]
-	internal void Dispose_WindowSize(
-		WindowSize windowSize,
-		int expectedMaximized,
-		int expectedMinimized,
-		int expectedNormal,
-		IContext ctx,
-		IInternalContext internalCtx,
-		WindowPosState windowPosState
-	)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void NoWindowOffset(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
 	{
-		// Given a window with a specific size
-		windowPosState.WindowState.WindowSize = windowSize;
+		// Givenn GetWindowOffset returns null
+		ctx.NativeManager.GetWindowOffset(Arg.Any<HWND>()).ReturnsNull();
 
-		using DeferWindowPosHandle handle = new(ctx, internalCtx, new WindowPosState[] { windowPosState });
-		internalCtx.DeferWindowPosManager.CanDoLayout().Returns(true);
+		DeferWindowPosHandle sut = new(ctx, internalCtx);
+		HWND hwnd = (HWND)123;
 
-		// When disposing
-		handle.Dispose();
+		AddMonitorsToManager(ctx, root, CreateMonitor((HMONITOR)1));
 
-		// Then the window is laid out with the correct flags
-		ctx.NativeManager.Received(expectedMaximized).ShowWindowMaximized(windowPosState.WindowState.Window.Handle);
-		ctx.NativeManager.Received(expectedMinimized).MinimizeWindow(windowPosState.WindowState.Window.Handle);
-		ctx.NativeManager.Received(expectedNormal).ShowWindowNoActivate(windowPosState.WindowState.Window.Handle);
+		// When
+		sut.DeferWindowPos(Create(hwnd));
+		sut.Dispose();
 
-		SET_WINDOW_POS_FLAGS expectedFlags = COMMON_FLAGS;
-		if (windowSize == WindowSize.Maximized || windowSize == WindowSize.Minimized)
-		{
-			expectedFlags |= SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
-		}
-
-		AssertSetWindowPos(internalCtx, windowPosState, expectedFlags: expectedFlags);
+		// Then
+		internalCtx
+			.CoreNativeManager.DidNotReceive()
+			.SetWindowPos(
+				Arg.Any<HWND>(),
+				Arg.Any<HWND>(),
+				Arg.Any<int>(),
+				Arg.Any<int>(),
+				Arg.Any<int>(),
+				Arg.Any<int>(),
+				Arg.Any<SET_WINDOW_POS_FLAGS>()
+			);
 	}
 
-	[Theory, AutoSubstituteData<DeferWindowPosHandleCustomization>]
-	internal void DeferWindowPos_DefaultToHwnd1(
-		IContext ctx,
-		IInternalContext internalCtx,
-		WindowPosState windowPosState
-	)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void ForceTwoPasses_Argument(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
 	{
-		// Given no HWND is provided
-		using DeferWindowPosHandle handle = new(ctx, internalCtx);
-		internalCtx.DeferWindowPosManager.CanDoLayout().Returns(true);
+		// Given
+		DeferWindowPosHandle sut = new(ctx, internalCtx);
+		HWND hwnd = (HWND)123;
 
-		handle.DeferWindowPos(windowPosState.WindowState, null, null);
+		AddMonitorsToManager(ctx, root, CreateMonitor((HMONITOR)1));
 
-		// When disposing
-		handle.Dispose();
+		// When
+		sut.DeferWindowPos(Create(hwnd), forceTwoPasses: true);
+		sut.Dispose();
 
-		// Then the window is laid out with HWND 1
-		AssertSetWindowPos(internalCtx, windowPosState, expectedFlags: COMMON_FLAGS);
+		// Then
+		internalCtx.CoreNativeManager.Received(2).SetWindowPos(hwnd, (HWND)1, 0, 0, 1, 1, DEFAULT_FLAGS);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void ForceTwoPasses_Monitor(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
+	{
+		// Given
+		DeferWindowPosHandle sut = new(ctx, internalCtx);
+		HWND hwnd = (HWND)123;
+
+		IMonitor monitor = CreateMonitor((HMONITOR)1);
+		monitor.ScaleFactor.Returns(150);
+
+		AddMonitorsToManager(ctx, root, monitor);
+
+		// When
+		sut.DeferWindowPos(Create(hwnd), forceTwoPasses: false);
+		sut.Dispose();
+
+		// Then
+		internalCtx.CoreNativeManager.Received(2).SetWindowPos(hwnd, (HWND)1, 0, 0, 1, 1, DEFAULT_FLAGS);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void NoForceTwoPasses(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
+	{
+		// Given
+		DeferWindowPosHandle sut = new(ctx, internalCtx);
+		HWND hwnd = (HWND)123;
+
+		AddMonitorsToManager(ctx, root, CreateMonitor((HMONITOR)1));
+
+		// When
+		sut.DeferWindowPos(Create(hwnd), forceTwoPasses: false);
+		sut.Dispose();
+
+		// Then
+		internalCtx.CoreNativeManager.Received(1).SetWindowPos(hwnd, (HWND)1, 0, 0, 1, 1, DEFAULT_FLAGS);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void SetMultipleWindows(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
+	{
+		// Given
+		DeferWindowPosState state1 =
+			new(
+				(HWND)1,
+				WindowSize.Normal,
+				Rectangle.UnitSquare<int>(),
+				(HWND)123,
+				SET_WINDOW_POS_FLAGS.SWP_NOSENDCHANGING
+			);
+		DeferWindowPosState state2 = new((HWND)2, WindowSize.Minimized, new Rectangle<int>(1, 2, 3, 4), (HWND)234);
+		DeferWindowPosState state3 = new((HWND)3, WindowSize.Maximized, new Rectangle<int>(5, 6, 7, 8));
+		DeferWindowPosState state4 = new((HWND)4, WindowSize.Normal, new Rectangle<int>(9, 10, 11, 12));
+
+		DeferWindowPosHandle sut = new(ctx, internalCtx, new[] { state1, state2, state3, state4 });
+
+		AddMonitorsToManager(ctx, root, CreateMonitor((HMONITOR)1));
+
+		// When
+		sut.Dispose();
+
+		// Then
+		internalCtx
+			.CoreNativeManager.Received(1)
+			.SetWindowPos((HWND)1, (HWND)123, 0, 0, 1, 1, SET_WINDOW_POS_FLAGS.SWP_NOSENDCHANGING);
+		ctx.NativeManager.Received(1).GetWindowOffset(state1.Handle);
+		ctx.NativeManager.Received(1).ShowWindowNoActivate(state1.Handle);
+
+		internalCtx
+			.CoreNativeManager.Received(1)
+			.SetWindowPos(
+				(HWND)2,
+				(HWND)234,
+				1,
+				2,
+				3,
+				4,
+				DEFAULT_FLAGS | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE
+			);
+		ctx.NativeManager.Received(1).GetWindowOffset(state2.Handle);
+		ctx.NativeManager.Received(1).MinimizeWindow(state2.Handle);
+
+		internalCtx
+			.CoreNativeManager.Received(1)
+			.SetWindowPos(
+				(HWND)3,
+				(HWND)1,
+				5,
+				6,
+				7,
+				8,
+				DEFAULT_FLAGS | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE
+			);
+		ctx.NativeManager.Received(1).GetWindowOffset(state3.Handle);
+		ctx.NativeManager.Received(1).ShowWindowMaximized(state3.Handle);
+
+		internalCtx.CoreNativeManager.Received(1).SetWindowPos((HWND)4, (HWND)1, 9, 10, 11, 12, DEFAULT_FLAGS);
+		ctx.NativeManager.Received(1).GetWindowOffset(state4.Handle);
+		ctx.NativeManager.Received(1).ShowWindowNoActivate(state4.Handle);
 	}
 }

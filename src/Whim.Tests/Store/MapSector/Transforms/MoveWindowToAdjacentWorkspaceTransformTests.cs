@@ -1,4 +1,5 @@
 using System;
+using DotNext;
 using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
@@ -79,7 +80,7 @@ public class MoveWindowToAdjacentWorkspaceTransformTests
 	{
 		// Given there are no adjacent workspaces
 		IWindow window = CreateWindow((HWND)10);
-		PopulateWindowWorkspaceMap(ctx, rootSector, window, CreateWorkspace());
+		PopulateThreeWayMap(ctx, rootSector, CreateMonitor((HMONITOR)10), CreateWorkspace(ctx), window);
 
 		MoveWindowToAdjacentWorkspaceTransform sut = new(window.Handle);
 
@@ -96,8 +97,8 @@ public class MoveWindowToAdjacentWorkspaceTransformTests
 		// Given
 		IWindow window = CreateWindow((HWND)10);
 
-		IWorkspace workspace1 = CreateWorkspace();
-		IWorkspace workspace2 = CreateWorkspace();
+		Workspace workspace1 = CreateWorkspace(ctx);
+		Workspace workspace2 = CreateWorkspace(ctx);
 
 		PopulateThreeWayMap(ctx, rootSector, CreateMonitor((HMONITOR)10), workspace1, window);
 		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor((HMONITOR)11), workspace2);
@@ -105,17 +106,23 @@ public class MoveWindowToAdjacentWorkspaceTransformTests
 		MoveWindowToAdjacentWorkspaceTransform sut = new(window.Handle);
 
 		// When
-		var result = ctx.Store.Dispatch(sut);
+		Result<Unit>? result = null;
+		CustomAssert.Layout(rootSector, () => result = ctx.Store.Dispatch(sut), new[] { workspace1.Id, workspace2.Id });
 
 		// Then
-		Assert.True(result.IsSuccessful);
+		Assert.True(result!.Value.IsSuccessful);
 		Assert.Equal(workspace2.Id, rootSector.MapSector.WindowWorkspaceMap[window.Handle]);
 
-		workspace1.Received(1).RemoveWindow(window);
-		workspace2.Received(1).AddWindow(window);
-
-		workspace1.Received(1).DoLayout();
-		workspace2.Received(1).DoLayout();
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t =>
+				(t as RemoveWindowFromWorkspaceTransform)
+				== new RemoveWindowFromWorkspaceTransform(workspace1.Id, window)
+		);
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t => (t as AddWindowToWorkspaceTransform) == new AddWindowToWorkspaceTransform(workspace2.Id, window)
+		);
 
 		window.Received(1).Focus();
 	}

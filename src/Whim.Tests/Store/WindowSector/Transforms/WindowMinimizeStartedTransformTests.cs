@@ -1,30 +1,13 @@
 using DotNext;
-using NSubstitute;
 using Whim.TestUtils;
+using Windows.Win32.Graphics.Gdi;
 using Xunit;
+using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.Tests;
 
 public class WindowMinimizeStartedTransformTests
 {
-	private static (Result<Unit>, Assert.RaisedEvent<WindowMinimizeStartedEventArgs>) AssertRaises(
-		IContext ctx,
-		MutableRootSector mutableRootSector,
-		WindowMinimizeStartedTransform sut
-	)
-	{
-		Result<Unit>? result = null;
-		Assert.RaisedEvent<WindowMinimizeStartedEventArgs> ev;
-
-		ev = Assert.Raises<WindowMinimizeStartedEventArgs>(
-			h => mutableRootSector.WindowSector.WindowMinimizeStarted += h,
-			h => mutableRootSector.WindowSector.WindowMinimizeStarted -= h,
-			() => result = ctx.Store.Dispatch(sut)
-		);
-
-		return (result!.Value, ev);
-	}
-
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void NoWorkspaceForWindow(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
@@ -44,10 +27,11 @@ public class WindowMinimizeStartedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Success(IContext ctx, MutableRootSector rootSector, IWindow window, IWorkspace workspace)
+	internal void Success(IContext ctx, MutableRootSector rootSector, IWindow window)
 	{
 		// Given the window is in a workspace
-		StoreTestUtils.SetupWindowWorkspaceMapping(ctx, rootSector, window, workspace);
+		Workspace workspace = CreateWorkspace(ctx);
+		PopulateThreeWayMap(ctx, rootSector, CreateMonitor((HMONITOR)1), workspace, window);
 		rootSector.MapSector.WindowWorkspaceMap = rootSector.MapSector.WindowWorkspaceMap.Add(
 			window.Handle,
 			workspace.Id
@@ -56,12 +40,24 @@ public class WindowMinimizeStartedTransformTests
 		WindowMinimizeStartedTransform sut = new(window);
 
 		// When
-		(var result, var ev) = AssertRaises(ctx, rootSector, sut);
+		Result<Unit>? result = null;
+		Assert.RaisedEvent<WindowMinimizeStartedEventArgs> ev;
+
+		ev = Assert.Raises<WindowMinimizeStartedEventArgs>(
+			h => rootSector.WindowSector.WindowMinimizeStarted += h,
+			h => rootSector.WindowSector.WindowMinimizeStarted -= h,
+			() =>
+			{
+				CustomAssert.Layout(rootSector, () => result = ctx.Store.Dispatch(sut), new[] { workspace.Id });
+			}
+		);
 
 		// Then
-		Assert.True(result.IsSuccessful);
+		Assert.True(result!.Value.IsSuccessful);
 		Assert.Equal(window, ev.Arguments.Window);
-		workspace.Received(1).MinimizeWindowStart(window);
-		workspace.Received(1).DoLayout();
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t => (t as MinimizeWindowStartTransform) == new MinimizeWindowStartTransform(workspace.Id, window.Handle)
+		);
 	}
 }

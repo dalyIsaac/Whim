@@ -36,8 +36,8 @@ public class MonitorWorkspaceChangedEventArgs : EventArgs
 		}
 
 		return other.Monitor.Handle == Monitor.Handle
-			&& other.PreviousWorkspace == PreviousWorkspace
-			&& other.CurrentWorkspace == CurrentWorkspace;
+			&& other.PreviousWorkspace?.Id == PreviousWorkspace?.Id
+			&& other.CurrentWorkspace.Id == CurrentWorkspace.Id;
 	}
 
 	/// <inheritdoc/>

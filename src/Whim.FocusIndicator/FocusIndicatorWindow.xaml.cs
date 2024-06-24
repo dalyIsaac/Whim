@@ -27,11 +27,11 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window, S
 	/// <summary>
 	/// Activates the window behind the given window.
 	/// </summary>
-	/// <param name="windowState">The window to show the indicator for.</param>
-	public void Activate(IWindowState windowState)
+	/// <param name="targetWindowState">The window to show the indicator for.</param>
+	public void Activate(IWindowState targetWindowState)
 	{
 		Logger.Debug("Activating focus indicator window");
-		IRectangle<int> focusedWindowRect = windowState.Rectangle;
+		IRectangle<int> focusedWindowRect = targetWindowState.Rectangle;
 		int borderSize = FocusIndicatorConfig.BorderSize;
 
 		IRectangle<int> borderRect = new Rectangle<int>()
@@ -49,14 +49,13 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window, S
 
 		// Layout the focus indicator window.
 		windowDeferPos.DeferWindowPos(
-			new WindowState()
-			{
-				Window = _window,
-				Rectangle = borderRect,
-				WindowSize = WindowSize.Normal
-			},
-			windowState.Window.Handle,
-			SET_WINDOW_POS_FLAGS.SWP_NOREDRAW | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
+			new DeferWindowPosState(
+				_window.Handle,
+				WindowSize.Normal,
+				borderRect,
+				targetWindowState.Window.Handle,
+				SET_WINDOW_POS_FLAGS.SWP_NOREDRAW | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
+			)
 		);
 	}
 

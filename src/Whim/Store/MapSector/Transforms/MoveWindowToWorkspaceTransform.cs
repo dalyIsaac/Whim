@@ -74,7 +74,7 @@ public record MoveWindowToWorkspaceTransform(WorkspaceId TargetWorkspaceId, HWND
 			ctx.Store.Dispatch(new ActivateWorkspaceTransform(TargetWorkspaceId));
 		}
 
-		window.Focus();
+		rootSector.WorkspaceSector.WindowHandleToFocus = window.Handle;
 
 		return Unit.Result;
 	}

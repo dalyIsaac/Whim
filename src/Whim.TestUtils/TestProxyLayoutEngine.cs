@@ -11,4 +11,9 @@ public abstract record TestProxyLayoutEngine : BaseProxyLayoutEngine
 	/// <param name="innerLayoutEngine"></param>
 	protected TestProxyLayoutEngine(ILayoutEngine innerLayoutEngine)
 		: base(innerLayoutEngine) { }
+
+	/// <summary>
+	/// The proxied layout engine.
+	/// </summary>
+	public ILayoutEngine InnerLayoutEngine => base.InnerLayoutEngine;
 }

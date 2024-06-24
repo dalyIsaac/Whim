@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using DotNext;
@@ -10,9 +12,18 @@ public class Store : IStore
 {
 	private readonly IContext _ctx;
 	private readonly IInternalContext _internalCtx;
+
+	[SuppressMessage(
+		"Usage",
+		"CA2213:Disposable fields should be disposed",
+		Justification = "Disposing the lock is tricky with the lack of a Application_Exit event"
+	)]
 	private readonly ReaderWriterLockSlim _lock = new(LockRecursionPolicy.SupportsRecursion);
 
 	private bool _disposedValue;
+
+	/// <inheritdoc />
+	public bool IsDisposing { get; private set; }
 
 	internal readonly RootSector _root;
 
@@ -24,6 +35,9 @@ public class Store : IStore
 
 	/// <inheritdoc />
 	public IMapSectorEvents MapEvents => _root.MutableRootSector.MapSector;
+
+	/// <inheritdoc />
+	public IWorkspaceSectorEvents WorkspaceEvents => _root.MutableRootSector.WorkspaceSector;
 
 	internal Store(IContext ctx, IInternalContext internalCtx)
 	{
@@ -39,7 +53,13 @@ public class Store : IStore
 		_root.Initialize();
 	}
 
-	private Result<TResult> DispatchFn<TResult>(Transform<TResult> transform) =>
+	/// <summary>
+	/// Execute the given <paramref name="transform"/>.
+	/// </summary>
+	/// <param name="transform"></param>
+	/// <typeparam name="TResult"></typeparam>
+	/// <returns></returns>
+	protected virtual Result<TResult> DispatchFn<TResult>(Transform<TResult> transform) =>
 		transform.Execute(_ctx, _internalCtx, _root.MutableRootSector);
 
 	/// <inheritdoc />
@@ -65,6 +85,7 @@ public class Store : IStore
 		return DispatchFn(transform);
 	}
 
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private TResult PickFn<TResult>(Picker<TResult> picker) => picker.Execute(_ctx, _internalCtx, _root);
 
 	/// <inheritdoc />
@@ -116,13 +137,13 @@ public class Store : IStore
 	/// <inheritdoc/>
 	protected virtual void Dispose(bool disposing)
 	{
+		IsDisposing = true;
 		if (!_disposedValue)
 		{
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
 				_root.Dispose();
-				_lock.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

@@ -4,6 +4,7 @@ using NSubstitute;
 using NSubstitute.ReceivedExtensions;
 using Whim.TestUtils;
 using Xunit;
+using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.Tests;
 
@@ -12,9 +13,10 @@ namespace Whim.Tests;
 public class ButlerTests
 {
 	[Theory, AutoSubstituteData]
-	internal void TriggerWindowRouted(IContext ctx, IWindow window, IWorkspace workspace)
+	internal void TriggerWindowRouted(IContext ctx, IWindow window)
 	{
 		// Given
+		Workspace workspace = CreateWorkspace(ctx);
 		Butler sut = new(ctx);
 
 		// When the event is triggered, then an event is raised
@@ -35,9 +37,10 @@ public class ButlerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void TriggerMonitorWorkspaceChanged(IContext ctx, IWorkspace workspace, IMonitor monitor)
+	internal void TriggerMonitorWorkspaceChanged(IContext ctx, IMonitor monitor)
 	{
 		// Given
+		Workspace workspace = CreateWorkspace(ctx);
 		Butler sut = new(ctx);
 
 		// When the event is triggered, then an event is raised
@@ -62,9 +65,10 @@ public class ButlerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void Activate(IContext ctx, IWorkspace workspace)
+	internal void Activate(IContext ctx)
 	{
 		// Given
+		Workspace workspace = CreateWorkspace(ctx);
 		Butler sut = new(ctx);
 
 		// When
@@ -193,9 +197,10 @@ public class ButlerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void MoveWindowToWorkspace(IContext ctx, IWorkspace workspace, IWindow window)
+	internal void MoveWindowToWorkspace(IContext ctx, IWindow window)
 	{
 		// Given
+		Workspace workspace = CreateWorkspace(ctx);
 		Butler sut = new(ctx);
 
 		// When
@@ -206,9 +211,12 @@ public class ButlerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void MergeWorkspaceWindows(IContext ctx, IWorkspace source, IWorkspace target)
+	internal void MergeWorkspaceWindows(IContext ctx)
 	{
 		// Given
+		Workspace source = CreateWorkspace(ctx);
+		Workspace target = CreateWorkspace(ctx);
+
 		Butler sut = new(ctx);
 
 		// When
@@ -219,9 +227,10 @@ public class ButlerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void SwapWorkspaceWithAdjacentMonitor(IContext ctx, IWorkspace workspace)
+	internal void SwapWorkspaceWithAdjacentMonitor(IContext ctx)
 	{
 		// Given
+		Workspace workspace = CreateWorkspace(ctx);
 		Butler sut = new(ctx);
 
 		// When

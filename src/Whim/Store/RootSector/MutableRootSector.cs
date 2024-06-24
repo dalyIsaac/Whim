@@ -8,19 +8,22 @@ internal class MutableRootSector : SectorBase, IDisposable
 
 	public MonitorSector MonitorSector { get; }
 	public WindowSector WindowSector { get; }
+	public WorkspaceSector WorkspaceSector { get; }
 	public MapSector MapSector { get; }
 
 	public MutableRootSector(IContext ctx, IInternalContext internalCtx)
 	{
 		MonitorSector = new MonitorSector(ctx, internalCtx);
 		WindowSector = new WindowSector(ctx, internalCtx);
-		MapSector = new MapSector(ctx);
+		WorkspaceSector = new WorkspaceSector(ctx, internalCtx);
+		MapSector = new MapSector();
 	}
 
 	public override void Initialize()
 	{
 		MonitorSector.Initialize();
 		WindowSector.Initialize();
+		WorkspaceSector.Initialize();
 		MapSector.Initialize();
 	}
 
@@ -29,6 +32,7 @@ internal class MutableRootSector : SectorBase, IDisposable
 		Logger.Debug("Dispatching events");
 		MonitorSector.DispatchEvents();
 		WindowSector.DispatchEvents();
+		WorkspaceSector.DispatchEvents();
 		MapSector.DispatchEvents();
 	}
 
@@ -41,6 +45,7 @@ internal class MutableRootSector : SectorBase, IDisposable
 				// dispose managed state (managed objects)
 				MonitorSector.Dispose();
 				WindowSector.Dispose();
+				WorkspaceSector.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

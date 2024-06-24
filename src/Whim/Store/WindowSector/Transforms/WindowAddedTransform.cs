@@ -76,21 +76,22 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 	/// </summary>
 	/// <param name="ctx"></param>
 	/// <param name="internalCtx"></param>
-	/// <param name="mutableRootSector"></param>
+	/// <param name="rootSector"></param>
 	/// <param name="window"></param>
 	private void UpdateMapSector(
 		IContext ctx,
 		IInternalContext internalCtx,
-		MutableRootSector mutableRootSector,
+		MutableRootSector rootSector,
 		IWindow window
 	)
 	{
-		MapSector mapSector = mutableRootSector.MapSector;
-		IWorkspace? workspace = TryGetWorkspaceFromRouter(ctx, mutableRootSector, window);
+		MapSector mapSector = rootSector.MapSector;
+		WorkspaceSector workspaceSector = rootSector.WorkspaceSector;
 
-		// TODO: With WorkspaceSector, this can be updated.
+		IWorkspace? workspace = TryGetWorkspaceFromRouter(ctx, rootSector, window);
+
 		// Check the workspace exists. If it doesn't, clear the workspace.
-		if (workspace != null && !ctx.WorkspaceManager.Contains(workspace))
+		if (workspace != null && !rootSector.WorkspaceSector.Workspaces.ContainsKey(workspace.Id))
 		{
 			Logger.Error($"Workspace {workspace} was not found");
 			workspace = null;
@@ -100,28 +101,28 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 		workspace ??= TryGetWorkspaceFromWindow(ctx, internalCtx, window);
 
 		// If that fails too, route the window to the active workspace.
-		workspace ??= ctx.WorkspaceManager.ActiveWorkspace;
+		workspace ??= Pickers.PickMutableActiveWorkspace(rootSector);
 
 		// Update the window workspace mapping.
 		mapSector.WindowWorkspaceMap = mapSector.WindowWorkspaceMap.SetItem(window.Handle, workspace.Id);
 
 		if (window.IsMinimized)
 		{
-			workspace.MinimizeWindowStart(window);
+			ctx.Store.Dispatch(new MinimizeWindowStartTransform(workspace.Id, window.Handle));
 		}
 		else
 		{
-			workspace.AddWindow(window);
+			ctx.Store.Dispatch(new AddWindowToWorkspaceTransform(workspace.Id, window));
 		}
 
 		mapSector.QueueEvent(RouteEventArgs.WindowAdded(window, workspace));
 
-		workspace.DoLayout();
-		window.Focus();
+		workspaceSector.WorkspacesToLayout = workspaceSector.WorkspacesToLayout.Add(workspace.Id);
+		rootSector.WorkspaceSector.WindowHandleToFocus = window.Handle;
 	}
 
 	/// <summary>
-	/// Try get the workspace based on routing preferences.
+	/// Try to get the workspace based on routing preferences.
 	/// </summary>
 	/// <param name="ctx"></param>
 	/// <param name="rootSector"></param>
@@ -140,7 +141,7 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 		}
 		else if (routerOptions == RouterOptions.RouteToActiveWorkspace)
 		{
-			workspace = ctx.WorkspaceManager.ActiveWorkspace;
+			workspace = Pickers.PickMutableActiveWorkspace(rootSector);
 		}
 		else if (routerOptions == RouterOptions.RouteToLastTrackedActiveWorkspace)
 		{

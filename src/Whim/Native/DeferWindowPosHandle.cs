@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
@@ -20,10 +19,10 @@ public sealed class DeferWindowPosHandle : IDisposable
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
 
-	private readonly List<WindowPosState> _windowStates = new();
-	private readonly List<WindowPosState> _minimizedWindowStates = new();
+	private readonly List<DeferWindowPosState> _windowStates = new();
+	private readonly List<DeferWindowPosState> _minimizedWindowStates = new();
 
-	private bool forceTwoPasses;
+	private bool _forceTwoPasses;
 
 	/// <summary>
 	/// The default flags to use when setting the window position.
@@ -34,6 +33,8 @@ public sealed class DeferWindowPosHandle : IDisposable
 		| SET_WINDOW_POS_FLAGS.SWP_NOCOPYBITS
 		| SET_WINDOW_POS_FLAGS.SWP_NOZORDER
 		| SET_WINDOW_POS_FLAGS.SWP_NOOWNERZORDER;
+
+	internal static ParallelOptions ParallelOptions { get; set; } = new();
 
 	/// <summary>
 	/// Create a new <see cref="DeferWindowPosHandle"/> to set the position of multiple windows at once.
@@ -62,69 +63,48 @@ public sealed class DeferWindowPosHandle : IDisposable
 	internal DeferWindowPosHandle(
 		IContext context,
 		IInternalContext internalContext,
-		IEnumerable<WindowPosState> windowStates
+		IEnumerable<DeferWindowPosState> windowStates
 	)
 		: this(context, internalContext)
 	{
 		// Add each window state to the appropriate list.
-		foreach (WindowPosState windowState in windowStates)
+		foreach (DeferWindowPosState windowState in windowStates)
 		{
-			AddToCorrectList(windowState);
+			DeferWindowPos(windowState);
 		}
 	}
 
 	/// <summary>
-	/// Using the given <paramref name="windowState"/>, sets the window's position.
+	/// Adds a window to set the position of when this <see cref="DeferWindowPosHandle"/> disposes.
 	/// </summary>
-	/// <param name="windowState"></param>
-	/// <param name="hwndInsertAfter">The window handle to insert show the given window behind.</param>
-	/// <param name="flags">
-	/// The flags to use when setting the window position. This overrides the default flags Whim sets,
-	/// except when the window is maximized or minimized.
+	/// <param name="posState">
+	/// The state of the window to set.
 	/// </param>
 	/// <param name="forceTwoPasses">
 	/// Window scaling can be finicky. Whim will set a window's position twice for windows in monitors
 	/// with non-100% scaling. Regardless of this, some windows need this even for windows with
 	/// 100% scaling.
 	/// </param>
-	public void DeferWindowPos(
-		IWindowState windowState,
-		HWND? hwndInsertAfter = null,
-		SET_WINDOW_POS_FLAGS? flags = null,
-		bool forceTwoPasses = false
-	)
+	public void DeferWindowPos(DeferWindowPosState posState, bool forceTwoPasses = false)
 	{
-		Logger.Debug($"Adding window {windowState.Window} after {hwndInsertAfter} with flags {flags}");
+		Logger.Debug($"Adding window {posState.Handle} after {posState.HandleInsertAfter} with flags {posState.Flags}");
 
 		if (forceTwoPasses)
 		{
-			this.forceTwoPasses = true;
+			_forceTwoPasses = true;
 		}
 
 		// We use HWND_BOTTOM, as modifying the Z-order of a window
 		// may cause EVENT_SYSTEM_FOREGROUND to be set, which in turn
 		// causes the relevant window to be focused, when the user hasn't
 		// actually changed the focus.
-		HWND targetHwndInsertAfter = hwndInsertAfter ?? (HWND)1; // HWND_BOTTOM
-		AddToCorrectList(new(windowState, targetHwndInsertAfter, flags));
-	}
-
-	/// <summary>
-	/// Adds the given <paramref name="windowPosState"/> to the appropriate list.
-	/// </summary>
-	/// <param name="windowPosState">
-	/// Minimized windows are added to <see cref="_minimizedWindowStates"/>, otherwise they are added to
-	/// <see cref="_windowStates"/>.
-	/// </param>
-	private void AddToCorrectList(WindowPosState windowPosState)
-	{
-		if (windowPosState.WindowState.WindowSize == WindowSize.Minimized)
+		if (posState.WindowSize == WindowSize.Minimized)
 		{
-			_minimizedWindowStates.Add(windowPosState);
+			_minimizedWindowStates.Add(posState);
 		}
 		else
 		{
-			_windowStates.Add(windowPosState);
+			_windowStates.Add(posState);
 		}
 	}
 
@@ -139,18 +119,12 @@ public sealed class DeferWindowPosHandle : IDisposable
 			return;
 		}
 
-		if (!_internalContext.DeferWindowPosManager.CanDoLayout())
-		{
-			_internalContext.DeferWindowPosManager.DeferLayout(_windowStates, _minimizedWindowStates);
-			return;
-		}
-
 		// Check to see if any monitors have non-100% scaling.
 		// If so, we need to set the window position twice.
 		int numPasses = 1;
 		foreach (IMonitor monitor in _context.MonitorManager)
 		{
-			if (monitor.ScaleFactor != 100 || forceTwoPasses)
+			if (monitor.ScaleFactor != 100 || _forceTwoPasses)
 			{
 				numPasses = 2;
 				break;
@@ -174,7 +148,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 		// which has no guarantees.
 		// However, calling `Parallel.ForEach` separately for minimized windows didn't result in the desired focus
 		// behaviour.
-		WindowPosState[] allStates = new WindowPosState[_windowStates.Count + _minimizedWindowStates.Count];
+		DeferWindowPosState[] allStates = new DeferWindowPosState[_windowStates.Count + _minimizedWindowStates.Count];
 		_windowStates.CopyTo(allStates);
 		_minimizedWindowStates.CopyTo(allStates, _windowStates.Count);
 
@@ -189,47 +163,44 @@ public sealed class DeferWindowPosHandle : IDisposable
 		{
 			for (int i = 0; i < numPasses; i++)
 			{
-				Parallel.ForEach(allStates, _internalContext.DeferWindowPosManager.ParallelOptions, SetWindowPos);
+				Parallel.ForEach(allStates, ParallelOptions, SetWindowPos);
 			}
 		}
 
 		Logger.Debug("Finished setting window position");
 	}
 
-	private void SetWindowPos(WindowPosState source)
+	private void SetWindowPos(DeferWindowPosState source)
 	{
-		IWindow window = source.WindowState.Window;
-
-		IRectangle<int>? offset = _context.NativeManager.GetWindowOffset(window.Handle);
+		IRectangle<int>? offset = _context.NativeManager.GetWindowOffset(source.Handle);
 		if (offset is null)
 		{
 			return;
 		}
 
-		IRectangle<int> rect = source.WindowState.Rectangle.Add(offset);
-		WindowSize windowSize = source.WindowState.WindowSize;
+		IRectangle<int> rect = source.LastWindowRectangle.Add(offset);
 		SET_WINDOW_POS_FLAGS uFlags = source.Flags ?? DefaultFlags;
 
-		if (windowSize == WindowSize.Maximized)
+		switch (source.WindowSize)
 		{
-			uFlags = uFlags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
-			_context.NativeManager.ShowWindowMaximized(window.Handle);
-		}
-		else if (windowSize == WindowSize.Minimized)
-		{
-			uFlags = uFlags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
-			_context.NativeManager.MinimizeWindow(window.Handle);
-		}
-		else
-		{
-			_context.NativeManager.ShowWindowNoActivate(window.Handle);
+			case WindowSize.Maximized:
+				uFlags = uFlags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
+				_context.NativeManager.ShowWindowMaximized(source.Handle);
+				break;
+			case WindowSize.Minimized:
+				uFlags = uFlags | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE;
+				_context.NativeManager.MinimizeWindow(source.Handle);
+				break;
+			default:
+				_context.NativeManager.ShowWindowNoActivate(source.Handle);
+				break;
 		}
 
-		Logger.Verbose($"Setting window position for {window} to {rect} with flags {uFlags}");
+		Logger.Verbose($"Setting window position for {source.Handle} to {rect} with flags {uFlags}");
 
 		_internalContext.CoreNativeManager.SetWindowPos(
-			window.Handle,
-			source.HwndInsertAfter,
+			source.Handle,
+			source.HandleInsertAfter,
 			rect.X,
 			rect.Y,
 			rect.Width,

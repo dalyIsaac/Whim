@@ -65,7 +65,7 @@ public class SliceLayoutPlugin : ISliceLayoutPlugin
 		}
 
 		workspace.PerformCustomLayoutEngineAction(
-			new LayoutEngineCustomAction()
+			new LayoutEngineAction()
 			{
 				Name = promote ? PromoteWindowActionName : DemoteWindowActionName,
 				Window = definedWindow
@@ -107,7 +107,7 @@ public class SliceLayoutPlugin : ISliceLayoutPlugin
 		}
 
 		workspace.PerformCustomLayoutEngineAction(
-			new LayoutEngineCustomAction()
+			new LayoutEngineAction()
 			{
 				Name = promote ? PromoteFocusActionName : DemoteFocusActionName,
 				Window = definedWindow

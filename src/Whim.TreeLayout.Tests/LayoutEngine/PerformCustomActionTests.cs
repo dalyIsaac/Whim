@@ -10,7 +10,7 @@ public class PerformCustomActionTests
 	{
 		// Given
 		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(null);
-		LayoutEngineCustomAction<string> action =
+		LayoutEngineAction<string> action =
 			new()
 			{
 				Name = "Action",

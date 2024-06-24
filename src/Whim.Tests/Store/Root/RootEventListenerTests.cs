@@ -39,22 +39,22 @@ public class RootEventListenerTests
 		ctx.Store.Received(1).Dispatch(new MouseLeftButtonUpTransform(new Point<int>(1, 2)));
 	}
 
-	// [Theory, AutoSubstituteData]
-	// internal void MouseLeftButtonDown(IContext ctx, IInternalContext internalCtx)
-	// {
-	// 	// Given
-	// 	RootEventListener sut = new(ctx, internalCtx);
+	[Theory, AutoSubstituteData]
+	internal void MouseLeftButtonDown(IContext ctx, IInternalContext internalCtx)
+	{
+		// Given
+		RootEventListener sut = new(ctx, internalCtx);
 
-	// 	// When
-	// 	sut.Initialize();
-	// 	internalCtx.MouseHook.MouseLeftButtonDown += Raise.Event<EventHandler<MouseEventArgs>>(
-	// 		ctx.Store.MonitorEvents,
-	// 		new MouseEventArgs(new Point<int>(1, 2))
-	// 	);
+		// When
+		sut.Initialize();
+		internalCtx.MouseHook.MouseLeftButtonDown += Raise.Event<EventHandler<MouseEventArgs>>(
+			ctx.Store.MonitorEvents,
+			new MouseEventArgs(new Point<int>(1, 2))
+		);
 
-	// 	// Then
-	// 	ctx.Store.Received(1).Dispatch(new MouseLeftButtonDownTransform());
-	// }
+		// Then
+		ctx.Store.Received(1).Dispatch(new MouseLeftButtonDownTransform());
+	}
 
 	[Theory, AutoSubstituteData]
 	internal void Dispose(IContext ctx, IInternalContext internalCtx)

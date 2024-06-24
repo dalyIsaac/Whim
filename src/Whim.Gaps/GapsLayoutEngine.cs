@@ -126,6 +126,6 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 		UpdateInner(InnerLayoutEngine.MinimizeWindowEnd(window));
 
 	/// <inheritdoc />
-	public override ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action) =>
+	public override ILayoutEngine PerformCustomAction<T>(LayoutEngineAction<T> action) =>
 		UpdateInner(InnerLayoutEngine.PerformCustomAction(action));
 }

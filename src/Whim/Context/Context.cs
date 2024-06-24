@@ -57,7 +57,7 @@ internal class Context : IContext
 		FilterManager = new FilterManager();
 		WindowManager = new WindowManager(this, _internalContext);
 		MonitorManager = new MonitorManager(this);
-		WorkspaceManager = new WorkspaceManager(this, _internalContext);
+		WorkspaceManager = new WorkspaceManager(this);
 		_commandManager = new CommandManager();
 		PluginManager = new PluginManager(this, _commandManager);
 		KeybindManager = new KeybindManager(this);
@@ -130,12 +130,11 @@ internal class Context : IContext
 	public void Exit(ExitEventArgs? args = null)
 	{
 		Logger.Debug("Exiting context...");
-		args ??= new ExitEventArgs() { Reason = ExitReason.User };
+		args ??= new ExitEventArgs { Reason = ExitReason.User };
 
 		Exiting?.Invoke(this, args);
 
 		PluginManager.Dispose();
-		WorkspaceManager.Dispose();
 		WindowManager.Dispose();
 		MonitorManager.Dispose();
 		NotificationManager.Dispose();

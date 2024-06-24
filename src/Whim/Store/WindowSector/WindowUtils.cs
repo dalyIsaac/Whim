@@ -1,5 +1,6 @@
 using DotNext;
 using Windows.Win32.Foundation;
+using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim;
 
@@ -21,12 +22,16 @@ internal static class WindowUtils
 			return null;
 		}
 
-		IWindowState? windowState = workspace.TryGetWindowState(window);
-		if (windowState is null)
+		Result<WindowPosition> windowPositionResult = ctx.Store.Pick(
+			Pickers.PickWindowPosition(workspace.Id, window.Handle)
+		);
+		if (!windowPositionResult.TryGet(out WindowPosition windowPosition))
 		{
 			Logger.Debug($"Could not find window state for window {window}, failed to move window edges");
 			return null;
 		}
+
+		IRectangle<int> currRect = windowPosition.LastWindowRectangle;
 
 		// Get the new window position.
 		IRectangle<int>? newRect = ctx.NativeManager.DwmGetWindowRectangle(window.Handle);
@@ -37,10 +42,10 @@ internal static class WindowUtils
 		}
 
 		// Find the one or two edges to move.
-		int leftEdgeDelta = windowState.Rectangle.X - newRect.X;
-		int topEdgeDelta = windowState.Rectangle.Y - newRect.Y;
-		int rightEdgeDelta = newRect.X + newRect.Width - (windowState.Rectangle.X + windowState.Rectangle.Width);
-		int bottomEdgeDelta = newRect.Y + newRect.Height - (windowState.Rectangle.Y + windowState.Rectangle.Height);
+		int leftEdgeDelta = currRect.X - newRect.X;
+		int topEdgeDelta = currRect.Y - newRect.Y;
+		int rightEdgeDelta = newRect.X + newRect.Width - (currRect.X + currRect.Width);
+		int bottomEdgeDelta = newRect.Y + newRect.Height - (currRect.Y + currRect.Height);
 
 		int movedEdgeCountX = 0;
 		int movedEdgeCountY = 0;
@@ -89,5 +94,18 @@ internal static class WindowUtils
 		}
 
 		return handle;
+	}
+
+	public static void Focus(this HWND handle, IInternalContext internalCtx)
+	{
+		// Use SendInput hack to allow Activate to work - required to resolve focus issue https://github.com/microsoft/PowerToys/issues/4270
+		unsafe
+		{
+			INPUT input = new() { type = INPUT_TYPE.INPUT_MOUSE };
+			// Send empty mouse event. This makes this thread the last to send input, and hence allows it to pass foreground permission checks
+			_ = internalCtx.CoreNativeManager.SendInput(new[] { input }, sizeof(INPUT));
+		}
+
+		internalCtx.CoreNativeManager.SetForegroundWindow(handle);
 	}
 }
