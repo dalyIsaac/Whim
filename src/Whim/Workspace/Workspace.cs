@@ -11,6 +11,8 @@ internal class Workspace : IWorkspace, IInternalWorkspace
 	private readonly IInternalContext _internalContext;
 	private readonly WorkspaceManagerTriggers _triggers;
 
+	public WorkspaceId Id { get; } = Guid.NewGuid();
+
 	private string _name;
 	public string Name
 	{

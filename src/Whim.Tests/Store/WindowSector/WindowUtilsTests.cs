@@ -1,21 +1,11 @@
 using System.Collections.Generic;
-using AutoFixture;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Xunit;
 
-namespace Whim;
-
-internal class WindowUtilCustomization : ICustomization
-{
-	public void Customize(IFixture fixture)
-	{
-		IWindow window = fixture.Freeze<IWindow>();
-		window.Handle.Returns((HWND)1);
-	}
-}
+namespace Whim.Tests;
 
 public class WindowUtilsTests
 {
@@ -33,11 +23,10 @@ public class WindowUtilsTests
 			);
 	}
 
-	[Theory, AutoSubstituteData]
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	public void Butler_DoesNotContainWorkspaceForWindow(IContext ctx, IWindow window)
 	{
-		// Given the butler doesn't contain the window
-		ctx.Butler.Pantry.GetWorkspaceForWindow(window).ReturnsNull();
+		// Given the map sector doesn't contain the window
 
 		// When we get the moved edges
 		var result = WindowUtils.GetMovedEdges(ctx, window);
@@ -46,12 +35,10 @@ public class WindowUtilsTests
 		Assert.Null(result);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void Workspace_DoesNotContainWindow(IContext ctx, IWindow window, IWorkspace workspace)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void Workspace_DoesNotContainWindow(IContext ctx, IWindow window)
 	{
 		// Given the workspace doesn't contain the window
-		ctx.Butler.Pantry.GetWorkspaceForWindow(window).Returns(workspace);
-		workspace.TryGetWindowState(window).ReturnsNull();
 
 		// When we get the moved edges
 		var result = WindowUtils.GetMovedEdges(ctx, window);
@@ -60,13 +47,18 @@ public class WindowUtilsTests
 		Assert.Null(result);
 	}
 
-	[Theory, AutoSubstituteData<WindowUtilCustomization>]
-	public void NativeManager_DoesNotHaveWindowRectangle(IContext ctx, IWindow window, IWorkspace workspace)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void NativeManager_DoesNotHaveWindowRectangle(
+		IContext ctx,
+		MutableRootSector rootSector,
+		IWindow window,
+		IWorkspace workspace
+	)
 	{
 		// Given we can't get the window position from the native manager
-		ctx.Butler.Pantry.GetWorkspaceForWindow(window).Returns(workspace);
+		StoreTestUtils.SetupWindowWorkspaceMapping(ctx, rootSector, window, workspace);
 		Setup_TryGetWindowState(window, workspace);
-		ctx.NativeManager.DwmGetWindowRectangle((HWND)1).ReturnsNull();
+		ctx.NativeManager.DwmGetWindowRectangle(window.Handle).ReturnsNull();
 
 		// When we get the moved edges
 		var result = WindowUtils.GetMovedEdges(ctx, window);
@@ -76,22 +68,26 @@ public class WindowUtilsTests
 	}
 
 	[Theory]
-	[InlineAutoSubstituteData<WindowUtilCustomization>(1, 0, 1, 0)]
-	[InlineAutoSubstituteData<WindowUtilCustomization>(0, 1, 1, 0)]
-	[InlineAutoSubstituteData<WindowUtilCustomization>(1, 1, 1, 1)]
-	public void MoveTooManyEdges(
+	[InlineAutoSubstituteData<StoreCustomization>(1, 0, 1, 0)]
+	[InlineAutoSubstituteData<StoreCustomization>(0, 1, 1, 0)]
+	[InlineAutoSubstituteData<StoreCustomization>(1, 1, 1, 1)]
+	internal void MoveTooManyEdges(
 		int newX,
 		int newY,
 		int newWidth,
 		int newHeight,
 		IContext ctx,
+		MutableRootSector rootSector,
 		IWindow window,
 		IWorkspace workspace
 	)
 	{
 		// Given the new window position
+		window.Handle.Returns((HWND)1);
+		StoreTestUtils.SetupWindowWorkspaceMapping(ctx, rootSector, window, workspace);
 		Setup_TryGetWindowState(window, workspace);
-		ctx.NativeManager.DwmGetWindowRectangle((HWND)1).Returns(new Rectangle<int>(newX, newY, newWidth, newHeight));
+		ctx.NativeManager.DwmGetWindowRectangle(window.Handle)
+			.Returns(new Rectangle<int>(newX, newY, newWidth, newHeight));
 
 		// When we get the moved edges
 		var result = WindowUtils.GetMovedEdges(ctx, window);
@@ -176,21 +172,22 @@ public class WindowUtilsTests
 	}
 
 	[Theory]
-	[MemberAutoSubstituteData<WindowUtilCustomization>(nameof(MoveEdgesSuccessData))]
-	public void Move(
+	[MemberAutoSubstituteData<StoreCustomization>(nameof(MoveEdgesSuccessData))]
+	internal void Move(
 		IRectangle<int> originalRect,
 		IRectangle<int> newRect,
 		Direction expectedDirection,
 		IPoint<int> expectedMovedPoint,
 		IContext ctx,
+		MutableRootSector rootSector,
 		IWindow window,
 		IWorkspace workspace
 	)
 	{
 		// Given the new window position
-		ctx.Butler.Pantry.GetWorkspaceForWindow(window).Returns(workspace);
+		StoreTestUtils.SetupWindowWorkspaceMapping(ctx, rootSector, window, workspace);
 		Setup_TryGetWindowState(window, workspace, originalRect);
-		ctx.NativeManager.DwmGetWindowRectangle((HWND)1).Returns(newRect);
+		ctx.NativeManager.DwmGetWindowRectangle(window.Handle).Returns(newRect);
 
 		// When we get the moved edges
 		var result = WindowUtils.GetMovedEdges(ctx, window);

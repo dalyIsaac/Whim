@@ -1,77 +1,233 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
+using NSubstitute;
+using NSubstitute.ReceivedExtensions;
 using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.Tests;
 
+[SuppressMessage("Usage", "NS5000:Received check.")]
+[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class ButlerTests
 {
 	[Theory, AutoSubstituteData]
-	[SuppressMessage("Style", "IDE0017:Simplify object initialization", Justification = "Testing the setter")]
-	internal void SetPantry_BeforeInitialize(IContext ctx, IInternalContext internalContext, IButlerPantry pantry)
-	{
-		// Given the pantry is not set
-		Butler sut = new(ctx, internalContext);
-
-		// When we attempt to set the pantry
-		sut.Pantry = pantry;
-
-		// Then the pantry is set
-		Assert.Equal(pantry, sut.Pantry);
-	}
-
-	[Theory, AutoSubstituteData]
-	internal void SetPantry_AfterInitialize(IContext ctx, IInternalContext internalContext, IButlerPantry pantry)
-	{
-		// Given the pantry is not set
-		Butler sut = new(ctx, internalContext);
-		sut.Initialize();
-
-		// When we attempt to set the pantry
-		sut.Pantry = pantry;
-
-		// Then the pantry is not set
-		Assert.NotEqual(pantry, sut.Pantry);
-	}
-
-	[Theory, AutoSubstituteData]
-	internal void TriggerWindowRouted(
-		IContext ctx,
-		IInternalContext internalContext,
-		IWindow window,
-		IWorkspace workspace
-	)
+	internal void TriggerWindowRouted(IContext ctx, IWindow window, IWorkspace workspace)
 	{
 		// Given
-		Butler sut = new(ctx, internalContext);
+		Butler sut = new(ctx);
 
-		// When we call TriggerWindowRouted, then the event is triggered
+		// When the event is triggered, then an event is raised
+		sut.Initialize();
 		Assert.Raises<RouteEventArgs>(
 			h => sut.WindowRouted += h,
 			h => sut.WindowRouted -= h,
-			() => sut.TriggerWindowRouted(RouteEventArgs.WindowAdded(window, workspace))
+			() =>
+				ctx.Store.MapEvents.WindowRouted += Raise.Event<EventHandler<RouteEventArgs>>(
+					ctx.Store.MapEvents,
+					RouteEventArgs.WindowAdded(window, workspace)
+				)
 		);
+
+		// Then when the disposable is disposed, then the event is unsubscribed
+		sut.Dispose();
+		ctx.Store.MapEvents.Received(1).WindowRouted -= Arg.Any<EventHandler<RouteEventArgs>>();
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void TriggerMonitorWorkspaceChanged(
-		IContext ctx,
-		IInternalContext internalContext,
-		IMonitor monitor,
-		IWorkspace workspace
-	)
+	internal void TriggerMonitorWorkspaceChanged(IContext ctx, IWorkspace workspace, IMonitor monitor)
 	{
 		// Given
-		Butler sut = new(ctx, internalContext);
+		Butler sut = new(ctx);
 
-		// When we call TriggerMonitorWorkspaceChanged, then the event is triggered
+		// When the event is triggered, then an event is raised
+		sut.Initialize();
 		Assert.Raises<MonitorWorkspaceChangedEventArgs>(
 			h => sut.MonitorWorkspaceChanged += h,
 			h => sut.MonitorWorkspaceChanged -= h,
 			() =>
-				sut.TriggerMonitorWorkspaceChanged(
+				ctx.Store.MapEvents.MonitorWorkspaceChanged += Raise.Event<
+					EventHandler<MonitorWorkspaceChangedEventArgs>
+				>(
+					ctx.Store.MapEvents,
 					new MonitorWorkspaceChangedEventArgs() { CurrentWorkspace = workspace, Monitor = monitor }
 				)
 		);
+
+		// Then when the disposable is disposed, then the event is unsubscribed
+		sut.Dispose();
+		ctx.Store.MapEvents.Received(1).MonitorWorkspaceChanged -= Arg.Any<
+			EventHandler<MonitorWorkspaceChangedEventArgs>
+		>();
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void Activate(IContext ctx, IWorkspace workspace)
+	{
+		// Given
+		Butler sut = new(ctx);
+
+		// When
+		sut.Activate(workspace);
+
+		// Then
+		ctx.Store.Received(1).Dispatch(new ActivateWorkspaceTransform(workspace.Id, default));
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void ActivateAdjacent(IContext ctx, IMonitor monitor)
+	{
+		// Given
+		Butler sut = new(ctx);
+
+		// When
+		sut.ActivateAdjacent(monitor);
+
+		// Then
+		ctx.Store.Received(1).Dispatch(new ActivateAdjacentWorkspaceTransform(monitor.Handle, false, false));
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void LayoutAllActiveWorkspaces(IContext ctx)
+	{
+		// Given
+		Butler sut = new(ctx);
+
+		// When
+		sut.LayoutAllActiveWorkspaces();
+
+		// Then
+		ctx.Store.Received(1).Dispatch(new LayoutAllActiveWorkspacesTransform());
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void FocusMonitorDesktop(IContext ctx, IMonitor monitor)
+	{
+		// Given
+		Butler sut = new(ctx);
+
+		// When
+		sut.FocusMonitorDesktop(monitor);
+
+		// Then
+		ctx.Store.Received(1).Dispatch(new FocusMonitorDesktopTransform(monitor.Handle));
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void MoveWindowEdgesInDirection(IContext ctx, IWindow window)
+	{
+		// Given
+		Butler sut = new(ctx);
+
+		// When
+		sut.MoveWindowEdgesInDirection(Direction.Down, new Point<int>(10, 10), window);
+
+		// Then
+		ctx.Store.Received(1)
+			.Dispatch(new MoveWindowEdgesInDirectionTransform(Direction.Down, new Point<int>(10, 10), window.Handle));
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void MoveWindowToAdjacentWorkspace(IContext ctx, IWindow window)
+	{
+		// Given
+		Butler sut = new(ctx);
+
+		// When
+		sut.MoveWindowToAdjacentWorkspace(window);
+
+		// Then
+		ctx.Store.Received(1).Dispatch(new MoveWindowToAdjacentWorkspaceTransform(window.Handle, false, false));
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void MoveWindowToPoint(IContext ctx, IWindow window)
+	{
+		// Given
+		Butler sut = new(ctx);
+
+		// When
+		sut.MoveWindowToPoint(window, new Point<int>(10, 10));
+
+		// Then
+		ctx.Store.Received(1).Dispatch(new MoveWindowToPointTransform(window.Handle, new Point<int>(10, 10)));
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void MoveWindowToMonitor(IContext ctx, IMonitor monitor, IWindow window)
+	{
+		// Given
+		Butler sut = new(ctx);
+
+		// When
+		sut.MoveWindowToMonitor(monitor, window);
+
+		// Then
+		ctx.Store.Received(1).Dispatch(new MoveWindowToMonitorTransform(monitor.Handle, window.Handle));
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void MoveWindowToPreviousMonitor(IContext ctx, IWindow window)
+	{
+		// Given
+		Butler sut = new(ctx);
+
+		// When
+		sut.MoveWindowToPreviousMonitor(window);
+
+		// Then
+		ctx.Store.Received(1).Dispatch(new MoveWindowToAdjacentMonitorTransform(window.Handle, Reverse: true));
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void MoveWindowToNextMonitor(IContext ctx, IWindow window)
+	{
+		// Given
+		Butler sut = new(ctx);
+
+		// When
+		sut.MoveWindowToNextMonitor(window);
+
+		// Then
+		ctx.Store.Received(1).Dispatch(new MoveWindowToAdjacentMonitorTransform(window.Handle, Reverse: false));
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void MoveWindowToWorkspace(IContext ctx, IWorkspace workspace, IWindow window)
+	{
+		// Given
+		Butler sut = new(ctx);
+
+		// When
+		sut.MoveWindowToWorkspace(workspace, window);
+
+		// Then
+		ctx.Store.Received(1).Dispatch(new MoveWindowToWorkspaceTransform(workspace.Id, window.Handle));
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void MergeWorkspaceWindows(IContext ctx, IWorkspace source, IWorkspace target)
+	{
+		// Given
+		Butler sut = new(ctx);
+
+		// When
+		sut.MergeWorkspaceWindows(source, target);
+
+		// Then
+		ctx.Store.Received(1).Dispatch(new MergeWorkspaceWindowsTransform(source.Id, target.Id));
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void SwapWorkspaceWithAdjacentMonitor(IContext ctx, IWorkspace workspace)
+	{
+		// Given
+		Butler sut = new(ctx);
+
+		// When
+		sut.SwapWorkspaceWithAdjacentMonitor(workspace);
+
+		// Then
+		ctx.Store.Received(1).Dispatch(new SwapWorkspaceWithAdjacentMonitorTransform(workspace.Id, false));
 	}
 }

@@ -22,6 +22,9 @@ public class Store : IStore
 	/// <inheritdoc />
 	public IWindowSectorEvents WindowEvents => _root.MutableRootSector.WindowSector;
 
+	/// <inheritdoc />
+	public IMapSectorEvents MapEvents => _root.MutableRootSector.MapSector;
+
 	internal Store(IContext ctx, IInternalContext internalCtx)
 	{
 		_ctx = ctx;
@@ -79,7 +82,6 @@ public class Store : IStore
 				finally
 				{
 					_lock.ExitReadLock();
-					_ctx.NativeManager.TryEnqueue(_root.DispatchEvents);
 				}
 			}).Result;
 		}
@@ -104,7 +106,6 @@ public class Store : IStore
 				finally
 				{
 					_lock.ExitReadLock();
-					_ctx.NativeManager.TryEnqueue(_root.DispatchEvents);
 				}
 			}).Result;
 		}

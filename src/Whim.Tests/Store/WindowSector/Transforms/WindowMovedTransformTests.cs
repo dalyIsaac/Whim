@@ -140,7 +140,6 @@ public class WindowMovedTransformTests
 		Assert.True(result!.Value.IsSuccessful);
 		Assert.Equal(new Point<int>(1, 2), ev.Arguments.CursorDraggedPoint);
 		Assert.Equal(window, ev.Arguments.Window);
-		ctx.Butler.Pantry.Received(2).GetWorkspaceForWindow(window);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]

@@ -10,9 +10,17 @@ internal record WindowMinimizeEndedTransform(IWindow Window) : Transform
 		MutableRootSector mutableRootSector
 	)
 	{
-		WindowMinimizeEndedEventArgs args = new() { Window = Window };
-		internalCtx.ButlerEventHandlers.OnWindowMinimizeEnd(args);
-		mutableRootSector.WindowSector.QueueEvent(args);
+		Result<IWorkspace> workspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceByWindow(Window.Handle));
+		if (!workspaceResult.TryGet(out IWorkspace workspace))
+		{
+			return Result.FromException<Unit>(workspaceResult.Error!);
+		}
+
+		workspace.MinimizeWindowEnd(Window);
+		workspace.DoLayout();
+
+		mutableRootSector.WindowSector.QueueEvent(new WindowMinimizeEndedEventArgs() { Window = Window });
+
 		return Unit.Result;
 	}
 }

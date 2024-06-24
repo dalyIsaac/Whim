@@ -7,17 +7,20 @@ namespace Whim;
 /// to handle events from the <see cref="IWindowManager"/> to update the assignment of <see cref="IWindow"/>s
 /// to <see cref="IWorkspace"/>s, and <see cref="IWorkspace"/>s to <see cref="IMonitor"/>s.
 /// </summary>
-public interface IButler : IButlerChores
+public interface IButler : IButlerChores, IDisposable
 {
 	/// <summary>
 	/// The pantry is responsible for mapping <see cref="IWindow"/>s to <see cref="IWorkspace"/>s
 	/// to <see cref="IMonitor"/>s.
 	///
-	/// The pantry can only be set prior to <see cref="Initialize"/>.
-	///
 	/// Defaults to <see cref="ButlerPantry"/>.
 	/// </summary>
-	IButlerPantry Pantry { get; set; }
+	IButlerPantry Pantry { get; }
+
+	/// <summary>
+	/// Initializes the butler with the store.
+	/// </summary>
+	void Initialize();
 
 	/// <summary>
 	/// Description of how an <see cref="IWindow"/> has been routed between workspaces.
@@ -28,9 +31,4 @@ public interface IButler : IButlerChores
 	/// Event for when a monitor's workspace has changed.
 	/// </summary>
 	event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
-
-	/// <summary>
-	/// Initialize the windows and workspaces.
-	/// </summary>
-	void Initialize();
 }

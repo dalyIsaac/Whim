@@ -13,10 +13,9 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 	)
 	{
 		SetActiveMonitor(ctx, internalCtx, mutableRootSector);
+		UpdateMapSector(ctx, Window);
 
-		WindowFocusedEventArgs args = new() { Window = Window };
-		internalCtx.ButlerEventHandlers.OnWindowFocused(args);
-		mutableRootSector.WindowSector.QueueEvent(args);
+		mutableRootSector.WindowSector.QueueEvent(new WindowFocusedEventArgs() { Window = Window });
 
 		return Unit.Result;
 	}
@@ -31,17 +30,16 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 	{
 		MonitorSector monitorSector = root.MonitorSector;
 
-		// If we know the window, use what the Butler knows instead of Windows.
-		if (Window is not null)
+		// If we know the window, use what the map sector knows instead of Windows.
+		if (
+			Window is not null
+			&& ctx.Store.Pick(Pickers.PickMonitorByWindow(Window.Handle)).TryGet(out IMonitor monitor)
+		)
 		{
-			Logger.Debug($"Focusing window {Window}");
-			if (ctx.Butler.Pantry.GetMonitorForWindow(Window) is IMonitor monitor)
-			{
-				Logger.Debug($"Setting active monitor to {monitor}");
-				monitorSector.ActiveMonitorHandle = monitor.Handle;
-				monitorSector.LastWhimActiveMonitorHandle = monitor.Handle;
-				return;
-			}
+			Logger.Debug($"Setting active monitor to {monitor}");
+			monitorSector.ActiveMonitorHandle = monitor.Handle;
+			monitorSector.LastWhimActiveMonitorHandle = monitor.Handle;
+			return;
 		}
 
 		// We don't know the window, so get the foreground window.
@@ -51,29 +49,58 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 		if (hwnd.IsNull)
 		{
 			Logger.Debug($"Hwnd is desktop window, ignoring");
-			return;
 		}
 
-		HMONITOR hMONITOR = internalCtx.CoreNativeManager.MonitorFromWindow(
+		HMONITOR monitorHandle = internalCtx.CoreNativeManager.MonitorFromWindow(
 			hwnd,
 			MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
 		);
 
-		foreach (IMonitor monitor in monitorSector.Monitors)
+		foreach (IMonitor currentMonitor in monitorSector.Monitors)
 		{
-			if (!monitor.Handle.Equals(hMONITOR))
+			if (!currentMonitor.Handle.Equals(monitorHandle))
 			{
 				continue;
 			}
 
-			Logger.Debug($"Setting active monitor to {monitor}");
-			monitorSector.ActiveMonitorHandle = monitor.Handle;
+			Logger.Debug($"Setting active monitor to {currentMonitor}");
+			monitorSector.ActiveMonitorHandle = currentMonitor.Handle;
 
+			// The window isn't tracked by Whim, so don't update LastWhimActiveMonitorHandle.
 			if (Window is not null)
 			{
-				monitorSector.LastWhimActiveMonitorHandle = monitor.Handle;
+				monitorSector.LastWhimActiveMonitorHandle = currentMonitor.Handle;
 			}
 			break;
 		}
+	}
+
+	///
+	private static void UpdateMapSector(IContext ctx, IWindow? window)
+	{
+		foreach (IWorkspace workspace in ctx.WorkspaceManager)
+		{
+			((IInternalWorkspace)workspace).WindowFocused(window);
+		}
+
+		// Only activate the workspace if the window is in a workspace, and the workspace isn't currently
+		// active.
+		if (window is null)
+		{
+			return;
+		}
+
+		Result<IWorkspace> workspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceByWindow(window.Handle));
+		if (!workspaceResult.TryGet(out IWorkspace workspaceForWindow))
+		{
+			return;
+		}
+
+		if (ctx.Store.Pick(Pickers.PickMonitorByWorkspace(workspaceForWindow.Id)).IsSuccessful)
+		{
+			return;
+		}
+
+		ctx.Store.Dispatch(new ActivateWorkspaceTransform(workspaceForWindow.Id));
 	}
 }

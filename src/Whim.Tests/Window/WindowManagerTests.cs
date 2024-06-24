@@ -270,25 +270,6 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void OnWindowAdded(IContext ctx, IInternalContext internalCtx, IWindow window)
-	{
-		// Given
-		WindowManager sut = new(ctx, internalCtx);
-
-		// When
-		Assert.Raises<WindowAddedEventArgs>(
-			h => sut.WindowAdded += h,
-			h => sut.WindowAdded -= h,
-			() => sut.OnWindowAdded(window)
-		);
-
-		// Then
-		internalCtx
-			.ButlerEventHandlers.Received(1)
-			.OnWindowAdded(Arg.Is<WindowAddedEventArgs>(e => e.Window == window));
-	}
-
-	[Theory, AutoSubstituteData]
 	internal void AddWindow(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given

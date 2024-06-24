@@ -87,14 +87,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 
 	public IWindow? AddWindow(HWND hwnd) => _context.Store.Dispatch(new WindowAddedTransform(hwnd)).OrDefault();
 
-	// TODO: Remove with the butler
-	public void OnWindowAdded(IWindow window)
-	{
-		WindowAddedEventArgs args = new() { Window = window };
-		_internalContext.ButlerEventHandlers.OnWindowAdded(args);
-		WindowAdded?.Invoke(this, args);
-	}
-
 	public void OnWindowFocused(IWindow? window) => _context.Store.Dispatch(new WindowFocusedTransform(window));
 
 	public void OnWindowRemoved(IWindow window) => _context.Store.Dispatch(new WindowRemovedTransform(window));

@@ -1,6 +1,9 @@
+using DotNext;
+using Windows.Win32.Foundation;
+
 namespace Whim;
 
-internal class WindowUtils
+internal static class WindowUtils
 {
 	/// <summary>
 	/// Tries to move the given window's edges in the direction of the mouse movement.
@@ -11,8 +14,8 @@ internal class WindowUtils
 	public static (Direction MovedEdges, IPoint<int> MovedPoint)? GetMovedEdges(IContext ctx, IWindow window)
 	{
 		Logger.Debug("Trying to move window edges in direction of mouse movement");
-		IWorkspace? workspace = ctx.Butler.Pantry.GetWorkspaceForWindow(window);
-		if (workspace is null)
+		Result<IWorkspace> workspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceByWindow(window.Handle));
+		if (!workspaceResult.TryGet(out IWorkspace workspace))
 		{
 			Logger.Debug($"Could not find workspace for window {window}, failed to move window edges");
 			return null;
@@ -76,5 +79,15 @@ internal class WindowUtils
 		}
 
 		return (movedEdges, new Point<int>() { X = movedEdgeDeltaX, Y = movedEdgeDeltaY, });
+	}
+
+	public static HWND OrLastFocusedWindow(this HWND handle, IContext ctx)
+	{
+		if (handle == default)
+		{
+			return ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow?.Handle ?? default;
+		}
+
+		return handle;
 	}
 }

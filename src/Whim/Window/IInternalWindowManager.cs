@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Windows.Win32.Foundation;
 
 namespace Whim;
@@ -14,12 +13,6 @@ internal interface IInternalWindowManager
 	IWindow? AddWindow(HWND hwnd);
 
 	/// <summary>
-	/// Fire the <see cref="IWindowManager.WindowAdded"/> event.
-	/// </summary>
-	/// <param name="window"></param>
-	void OnWindowAdded(IWindow window);
-
-	/// <summary>
 	/// Handles when the given window is focused.
 	/// This can be called by <see cref="Workspace.AddWindow"/>, as an already focused window may
 	/// have switched to a different workspace.
@@ -29,7 +22,7 @@ internal interface IInternalWindowManager
 
 	/// <summary>
 	/// Removes the given window from the <see cref="IWindowManager"/>, and fires
-	/// <see cref="ButlerEventHandlers.OnWindowRemoved(WindowEventArgs)" />.
+	/// <see cref="WindowRemovedTransform" />.
 	/// </summary>
 	/// <param name="window"></param>
 	void OnWindowRemoved(IWindow window);

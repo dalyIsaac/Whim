@@ -26,24 +26,42 @@ public class WindowMinimizeStartedTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Success(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector mutableRootSector,
-		IWindow window
-	)
+	internal void NoWorkspaceForWindow(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given
 		WindowMinimizeStartedTransform sut = new(window);
 
 		// When
-		(var result, var ev) = AssertRaises(ctx, mutableRootSector, sut);
+		Result<Unit>? result = null;
+		CustomAssert.DoesNotRaise<WindowMinimizeStartedEventArgs>(
+			h => mutableRootSector.WindowSector.WindowMinimizeStarted += h,
+			h => mutableRootSector.WindowSector.WindowMinimizeStarted -= h,
+			() => result = ctx.Store.Dispatch(sut)
+		);
+
+		// Then
+		Assert.False(result!.Value.IsSuccessful);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void Success(IContext ctx, MutableRootSector rootSector, IWindow window, IWorkspace workspace)
+	{
+		// Given the window is in a workspace
+		StoreTestUtils.SetupWindowWorkspaceMapping(ctx, rootSector, window, workspace);
+		rootSector.MapSector.WindowWorkspaceMap = rootSector.MapSector.WindowWorkspaceMap.Add(
+			window.Handle,
+			workspace.Id
+		);
+
+		WindowMinimizeStartedTransform sut = new(window);
+
+		// When
+		(var result, var ev) = AssertRaises(ctx, rootSector, sut);
 
 		// Then
 		Assert.True(result.IsSuccessful);
 		Assert.Equal(window, ev.Arguments.Window);
-		internalCtx
-			.ButlerEventHandlers.Received(1)
-			.OnWindowMinimizeStart(Arg.Is<WindowMinimizeStartedEventArgs>(a => a.Window == window));
+		workspace.Received(1).MinimizeWindowStart(window);
+		workspace.Received(1).DoLayout();
 	}
 }

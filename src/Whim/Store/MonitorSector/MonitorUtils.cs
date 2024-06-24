@@ -52,4 +52,7 @@ internal static class MonitorUtils
 
 	public static HMONITOR OrActiveMonitor(this HMONITOR handle, IRootSector rootSector) =>
 		handle == default ? rootSector.MonitorSector.ActiveMonitorHandle : handle;
+
+	public static HMONITOR OrActiveMonitor(this HMONITOR handle, MutableRootSector rootSector) =>
+		handle == default ? rootSector.MonitorSector.ActiveMonitorHandle : handle;
 }

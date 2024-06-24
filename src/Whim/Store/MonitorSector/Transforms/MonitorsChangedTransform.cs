@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Threading.Tasks;
 using DotNext;
 using Windows.Win32.Graphics.Gdi;
 
@@ -66,7 +67,7 @@ internal record MonitorsChangedTransform : Transform
 
 		if (addedMonitors.Count != 0 || removedMonitors.Count != 0)
 		{
-			internalCtx.ButlerEventHandlers.OnMonitorsChanged(args);
+			UpdateMapSector(ctx, mutableRootSector, addedMonitors, removedMonitors);
 		}
 
 		// Make sure the other monitor handles are set if they're unset.
@@ -79,5 +80,88 @@ internal record MonitorsChangedTransform : Transform
 		sector.QueueEvent(args);
 
 		return Unit.Result;
+	}
+
+	private static void UpdateMapSector(
+		IContext ctx,
+		MutableRootSector rootSector,
+		List<IMonitor> addedMonitors,
+		List<IMonitor> removedMonitors
+	)
+	{
+		MapSector mapSector = rootSector.MapSector;
+		MonitorSector monitorSector = rootSector.MonitorSector;
+
+		monitorSector.MonitorsChangingTasks++;
+
+		// Deactivate all workspaces.
+		foreach (IWorkspace visibleWorkspace in ctx.Store.Pick(Pickers.PickAllActiveWorkspaces()))
+		{
+			visibleWorkspace.Deactivate();
+		}
+
+		// If a monitor was removed, remove the workspace from the map.
+		foreach (IMonitor monitor in removedMonitors)
+		{
+			if (!ctx.Store.Pick(Pickers.PickWorkspaceByMonitor(monitor.Handle)).TryGet(out IWorkspace workspace))
+			{
+				continue;
+			}
+
+			workspace.Deactivate();
+			mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.Remove(monitor.Handle);
+		}
+
+		// If a monitor was added, set it to an inactive workspace.
+		foreach (IMonitor monitor in addedMonitors)
+		{
+			// Try find a workspace which doesn't have a monitor.
+			IWorkspace? workspace = null;
+			foreach (IWorkspace w in ctx.WorkspaceManager)
+			{
+				if (!ctx.Store.Pick(Pickers.PickMonitorByWorkspace(w.Id)).IsSuccessful)
+				{
+					workspace = w;
+					mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(monitor.Handle, w.Id);
+					break;
+				}
+			}
+
+			// If there's no workspace, create one.
+			if (workspace is null)
+			{
+				if (ctx.WorkspaceManager.Add() is IWorkspace newWorkspace)
+				{
+					mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(
+						monitor.Handle,
+						newWorkspace.Id
+					);
+				}
+				else
+				{
+					continue;
+				}
+			}
+		}
+
+		// Hack to only accept window events after Windows has been given a chance to stop moving
+		// windows around after a monitor change.
+		ctx.NativeManager.TryEnqueue(async () =>
+		{
+			await Task.Delay(monitorSector.MonitorsChangedDelay).ConfigureAwait(true);
+
+			monitorSector.MonitorsChangingTasks--;
+			if (monitorSector.MonitorsChangingTasks > 0)
+			{
+				Logger.Debug("Monitors changed: More tasks are pending");
+				return;
+			}
+
+			Logger.Debug("Cleared AreMonitorsChanging");
+
+			// For each workspace which is active in a monitor, do a layout.
+			// This will handle cases when the monitor's properties have changed.
+			ctx.Store.Dispatch(new LayoutAllActiveWorkspacesTransform());
+		});
 	}
 }

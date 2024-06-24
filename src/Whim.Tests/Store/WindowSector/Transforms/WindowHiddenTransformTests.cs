@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using DotNext;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
@@ -45,12 +47,7 @@ public class WindowHiddenTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Failed(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector mutableRootSector,
-		IWindow window
-	)
+	internal void Failed(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given
 		ctx.Butler.Pantry.GetMonitorForWindow(window).ReturnsNull();
@@ -61,23 +58,30 @@ public class WindowHiddenTransformTests
 
 		// Then
 		Assert.True(result.IsSuccessful);
-		internalCtx.ButlerEventHandlers.DidNotReceive().OnWindowRemoved(Arg.Any<WindowRemovedEventArgs>());
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void Success(
 		IContext ctx,
-		IInternalContext internalCtx,
 		MutableRootSector rootSector,
 		IWindow window,
-		IMonitor monitor
+		IMonitor monitor,
+		IWorkspace workspace
 	)
 	{
-		// Given the window is inside the sector
+		// Given the window is inside the window sector,
 		window.Handle.Returns((HWND)2);
-
-		ctx.Butler.Pantry.GetMonitorForWindow(window).Returns(monitor);
 		rootSector.WindowSector.Windows = rootSector.WindowSector.Windows.Add(window.Handle, window);
+
+		// and has a monitor - window mapping
+		Guid workspaceId = Guid.NewGuid();
+		workspace.Id.Returns(workspaceId);
+
+		MapSector mapSector = rootSector.MapSector;
+		mapSector.WindowWorkspaceMap = mapSector.WindowWorkspaceMap.SetItem(window.Handle, workspaceId);
+		mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(monitor.Handle, workspaceId);
+
+		ctx.WorkspaceManager.GetEnumerator().Returns(_ => new List<IWorkspace>() { workspace }.GetEnumerator());
 
 		WindowHiddenTransform sut = new(window);
 
@@ -87,8 +91,5 @@ public class WindowHiddenTransformTests
 		// Then
 		Assert.True(result.IsSuccessful);
 		Assert.Equal(window, ev.Arguments.Window);
-		internalCtx
-			.ButlerEventHandlers.Received(1)
-			.OnWindowRemoved(Arg.Is<WindowRemovedEventArgs>(a => a.Window == window));
 	}
 }
