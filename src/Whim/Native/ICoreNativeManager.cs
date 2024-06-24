@@ -493,4 +493,10 @@ internal interface ICoreNativeManager
 
 	/// <inheritdoc cref="PInvoke.SetWindowPos(HWND, HWND, int, int, int, int, SET_WINDOW_POS_FLAGS)"/>
 	bool SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int x, int y, int cx, int cy, SET_WINDOW_POS_FLAGS uFlags);
+
+	/// <summary>
+	/// Returns <see langword="true"/> when the thread is STA.
+	/// </summary>
+	/// <returns></returns>
+	bool IsStaThread();
 }

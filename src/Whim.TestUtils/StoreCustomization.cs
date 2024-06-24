@@ -16,5 +16,8 @@ public class StoreCustomization : ICustomization
 
 		fixture.Inject(store._root);
 		fixture.Inject(store._root.MutableRootSector);
+
+		internalCtx.CoreNativeManager.IsStaThread().Returns(true);
+		NativeManagerUtils.SetupTryEnqueue(ctx);
 	}
 }

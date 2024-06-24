@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutoFixture;
+using DotNext;
 using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
@@ -183,10 +184,10 @@ public class WorkspaceManagerTests
 		window3.Handle.Returns((HWND)3);
 		window4.Handle.Returns((HWND)4);
 
-		ctx.WindowManager.CreateWindow((HWND)1).Returns(window1);
-		ctx.WindowManager.CreateWindow((HWND)2).Returns((IWindow?)null);
-		ctx.WindowManager.CreateWindow((HWND)3).Returns(window3);
-		ctx.WindowManager.CreateWindow((HWND)4).Returns(window4);
+		ctx.WindowManager.CreateWindow((HWND)1).Returns(Result.FromValue(window1));
+		ctx.WindowManager.CreateWindow((HWND)2).Returns(Result.FromException<IWindow>(new WhimException("welp")));
+		ctx.WindowManager.CreateWindow((HWND)3).Returns(Result.FromValue(window3));
+		ctx.WindowManager.CreateWindow((HWND)4).Returns(Result.FromValue(window4));
 
 		WorkspaceManagerTestWrapper workspaceManager = CreateSut(ctx, internalCtx);
 		MonitorManagerUtils.SetupMonitors(ctx, new[] { Substitute.For<IMonitor>(), ctx.MonitorManager.ActiveMonitor });

@@ -33,9 +33,4 @@ internal interface IInternalWindowManager
 	/// </summary>
 	/// <param name="window"></param>
 	void OnWindowRemoved(IWindow window);
-
-	/// <summary>
-	/// Map of <see cref="HWND"/> to <see cref="IWindow"/> for easy <see cref="IWindow"/> lookup.
-	/// </summary>
-	IReadOnlyDictionary<HWND, IWindow> HandleWindowMap { get; }
 }

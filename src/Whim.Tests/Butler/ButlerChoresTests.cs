@@ -61,7 +61,7 @@ public class ButlerChoresTests
 	private static void WindowAdded(IInternalContext internalCtx, IWindow window)
 	{
 		// Raise the WindowAdded event.
-		internalCtx.ButlerEventHandlers.OnWindowAdded(new WindowEventArgs() { Window = window });
+		internalCtx.ButlerEventHandlers.OnWindowAdded(new WindowAddedEventArgs() { Window = window });
 	}
 
 	private static void ActivateWorkspacesOnMonitors(

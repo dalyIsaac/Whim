@@ -79,7 +79,7 @@ internal class DeferWorkspacePosManager : IDeferWorkspacePosManager
 				Logger.Debug($"Window {window.Handle} is no longer a window.");
 				removeWindow = true;
 			}
-			else if (!_internalContext.WindowManager.HandleWindowMap.ContainsKey(window.Handle))
+			else if (!_context.Store.Pick(Pickers.PickWindowByHandle(window.Handle)).IsSuccessful)
 			{
 				Logger.Debug($"Window {window.Handle} is somehow no longer managed.");
 				removeWindow = true;
