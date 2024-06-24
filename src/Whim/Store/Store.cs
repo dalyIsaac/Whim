@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +12,12 @@ public class Store : IStore
 {
 	private readonly IContext _ctx;
 	private readonly IInternalContext _internalCtx;
+
+	[SuppressMessage(
+		"Usage",
+		"CA2213:Disposable fields should be disposed",
+		Justification = "Disposing the lock is tricky with the lack of a Application_Exit event"
+	)]
 	private readonly ReaderWriterLockSlim _lock = new(LockRecursionPolicy.SupportsRecursion);
 
 	private bool _disposedValue;
@@ -137,7 +144,6 @@ public class Store : IStore
 			{
 				// dispose managed state (managed objects)
 				_root.Dispose();
-				_lock.Dispose();
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
