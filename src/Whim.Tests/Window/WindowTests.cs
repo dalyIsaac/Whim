@@ -1,10 +1,6 @@
 using System.ComponentModel;
 using AutoFixture;
-using NSubstitute;
-using Whim.TestUtils;
-using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
-using Xunit;
 
 namespace Whim.Tests;
 

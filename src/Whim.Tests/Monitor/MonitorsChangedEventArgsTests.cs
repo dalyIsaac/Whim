@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using Whim.TestUtils;
-using Xunit;
-
 namespace Whim.Tests;
 
 public class MonitorsChangedEventArgsTests

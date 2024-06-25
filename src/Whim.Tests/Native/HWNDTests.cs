@@ -1,7 +1,3 @@
-using System;
-using Windows.Win32.Foundation;
-using Xunit;
-
 namespace Whim.Tests;
 
 public class HWNDTests

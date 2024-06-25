@@ -1,11 +1,4 @@
-using System.Collections.Immutable;
-using DotNext;
 using Microsoft.UI.Dispatching;
-using NSubstitute;
-using NSubstitute.ReturnsExtensions;
-using Whim.TestUtils;
-using Windows.Win32.Foundation;
-using Xunit;
 
 namespace Whim.Tests;
 

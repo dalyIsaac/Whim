@@ -1,9 +1,3 @@
-using System;
-using NSubstitute;
-using Whim.TestUtils;
-using Windows.Win32.Graphics.Gdi;
-using Xunit;
-
 namespace Whim.Tests;
 
 public class MonitorWorkspaceChangedEventTests

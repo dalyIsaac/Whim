@@ -1,14 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
-using NSubstitute;
-using Whim.TestUtils;
 using Windows.Win32;
-using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.Win32.UI.WindowsAndMessaging;
-using Xunit;
 
 namespace Whim.Tests;
 

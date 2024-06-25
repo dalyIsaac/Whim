@@ -1,7 +1,4 @@
 using FluentAssertions;
-using NSubstitute;
-using Whim.TestUtils;
-using Xunit;
 
 namespace Whim.Tests;
 

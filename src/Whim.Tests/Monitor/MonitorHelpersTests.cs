@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using NSubstitute.Core;
 using Windows.Web.Syndication;
-using Xunit;
 
 namespace Whim.Tests;
 

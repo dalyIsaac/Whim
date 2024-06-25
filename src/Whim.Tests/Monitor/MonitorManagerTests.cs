@@ -1,8 +1,4 @@
 using System.Collections;
-using NSubstitute;
-using Whim.TestUtils;
-using Xunit;
-using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.Tests;
 
