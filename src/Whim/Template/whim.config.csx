@@ -12,8 +12,8 @@
 #r "WHIM_PATH\plugins\Whim.TreeLayout.CommandPalette\Whim.TreeLayout.CommandPalette.dll"
 #r "WHIM_PATH\plugins\Whim.Updater\Whim.Updater.dll"
 
-
-
+using System;
+using System.Collections.Generic;
 using Microsoft.UI;
 using Microsoft.UI.Xaml.Media;
 using Whim;
