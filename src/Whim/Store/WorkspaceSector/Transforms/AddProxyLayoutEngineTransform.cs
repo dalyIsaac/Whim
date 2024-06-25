@@ -1,6 +1,4 @@
-﻿using DotNext;
-
-namespace Whim;
+﻿namespace Whim;
 
 /// <summary>
 /// Adds a proxy layout engine to the list of proxy layout engine creators.

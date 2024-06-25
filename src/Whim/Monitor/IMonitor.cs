@@ -1,6 +1,4 @@
-using System;
 using System.Diagnostics;
-using Windows.Win32.Graphics.Gdi;
 
 namespace Whim;
 

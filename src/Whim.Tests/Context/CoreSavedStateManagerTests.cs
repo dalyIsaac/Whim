@@ -1,9 +1,5 @@
 using System.Collections.Generic;
 using System.Text.Json;
-using NSubstitute;
-using Whim.TestUtils;
-using Windows.Win32.Foundation;
-using Xunit;
 
 namespace Whim.Tests;
 

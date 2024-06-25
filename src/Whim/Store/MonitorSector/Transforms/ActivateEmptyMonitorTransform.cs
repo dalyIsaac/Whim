@@ -1,6 +1,3 @@
-using DotNext;
-using Windows.Win32.Graphics.Gdi;
-
 namespace Whim;
 
 /// <summary>
@@ -13,7 +10,7 @@ internal record ActivateEmptyMonitorTransform(HMONITOR Handle) : Transform
 {
 	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
 	{
-		Result<IMonitor> result = ctx.Store.Pick(Pickers.PickMonitorByHandle(Handle));
+		Result<IMonitor> result = ctx.Store.Pick(PickMonitorByHandle(Handle));
 		if (result.Error is not null)
 		{
 			return Result.FromException<Unit>(result.Error);

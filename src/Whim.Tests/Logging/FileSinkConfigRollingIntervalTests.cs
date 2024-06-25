@@ -1,5 +1,4 @@
 using Serilog;
-using Xunit;
 
 namespace Whim.Tests;
 

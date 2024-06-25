@@ -1,6 +1,3 @@
-using DotNext;
-using Windows.Win32.Graphics.Gdi;
-
 namespace Whim;
 
 /// <summary>
@@ -15,13 +12,13 @@ public record MergeWorkspaceWindowsTransform(WorkspaceId SourceWorkspaceId, Work
 		MapSector sector = rootSector.MapSector;
 
 		// Get the workspaces.
-		Result<IWorkspace> sourceWorkspace = ctx.Store.Pick(Pickers.PickWorkspaceById(SourceWorkspaceId));
+		Result<IWorkspace> sourceWorkspace = ctx.Store.Pick(PickWorkspaceById(SourceWorkspaceId));
 		if (!sourceWorkspace.TryGet(out IWorkspace Source))
 		{
 			return Result.FromException<Unit>(sourceWorkspace.Error!);
 		}
 
-		Result<IWorkspace> targetWorkspace = ctx.Store.Pick(Pickers.PickWorkspaceById(TargetWorkspaceId));
+		Result<IWorkspace> targetWorkspace = ctx.Store.Pick(PickWorkspaceById(TargetWorkspaceId));
 		if (!targetWorkspace.TryGet(out IWorkspace Target))
 		{
 			return Result.FromException<Unit>(targetWorkspace.Error!);

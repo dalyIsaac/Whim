@@ -1,5 +1,3 @@
-using DotNext;
-
 namespace Whim;
 
 internal record WindowMinimizeStartedTransform(IWindow Window) : Transform
@@ -10,7 +8,7 @@ internal record WindowMinimizeStartedTransform(IWindow Window) : Transform
 		MutableRootSector mutableRootSector
 	)
 	{
-		Result<IWorkspace> workspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceByWindow(Window.Handle));
+		Result<IWorkspace> workspaceResult = ctx.Store.Pick(PickWorkspaceByWindow(Window.Handle));
 		if (!workspaceResult.TryGet(out IWorkspace workspace))
 		{
 			return Result.FromException<Unit>(workspaceResult.Error!);

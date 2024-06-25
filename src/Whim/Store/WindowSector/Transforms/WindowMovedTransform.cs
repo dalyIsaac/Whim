@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using DotNext;
 
 namespace Whim;
 
@@ -30,7 +29,7 @@ internal record WindowMovedTransform(IWindow Window) : Transform
 			ctx.NativeManager.TryEnqueue(async () =>
 			{
 				await Task.Delay(windowSector.WindowMovedDelay).ConfigureAwait(true);
-				if (ctx.Store.Pick(Pickers.PickWorkspaceByWindow(Window.Handle)).TryGet(out IWorkspace workspace))
+				if (ctx.Store.Pick(PickWorkspaceByWindow(Window.Handle)).TryGet(out IWorkspace workspace))
 				{
 					windowSector.HandledLocationRestoringWindows.Add(Window.Handle);
 					workspace.DoLayout();

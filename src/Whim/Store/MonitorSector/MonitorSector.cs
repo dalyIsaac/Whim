@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Immutable;
-using Windows.Win32.Graphics.Gdi;
-
 namespace Whim;
 
 internal class MonitorSector : SectorBase, IDisposable, IMonitorSector, IMonitorSectorEvents

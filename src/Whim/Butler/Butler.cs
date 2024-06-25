@@ -1,5 +1,3 @@
-using System;
-
 namespace Whim;
 
 internal partial class Butler : IButler

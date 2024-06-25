@@ -1,4 +1,3 @@
-using System;
 using Microsoft.UI;
 using Windows.UI;
 

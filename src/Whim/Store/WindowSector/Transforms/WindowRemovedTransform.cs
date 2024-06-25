@@ -1,5 +1,3 @@
-using DotNext;
-
 namespace Whim;
 
 internal record WindowRemovedTransform(IWindow Window) : Transform
@@ -19,7 +17,7 @@ internal record WindowRemovedTransform(IWindow Window) : Transform
 			return Unit.Result;
 		}
 
-		Result<IWorkspace> workspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceByWindow(Window.Handle));
+		Result<IWorkspace> workspaceResult = ctx.Store.Pick(PickWorkspaceByWindow(Window.Handle));
 		if (!workspaceResult.TryGet(out IWorkspace workspace))
 		{
 			return Unit.Result;

@@ -1,10 +1,3 @@
-using System;
-using NSubstitute;
-using Whim.TestUtils;
-using Windows.Win32.Graphics.Gdi;
-using Xunit;
-using static Whim.TestUtils.StoreTestUtils;
-
 namespace Whim.Tests;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]

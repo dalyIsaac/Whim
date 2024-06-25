@@ -1,14 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
-using DotNext;
-using NSubstitute;
-using Whim.TestUtils;
-using Windows.Win32.Foundation;
-using Windows.Win32.Graphics.Gdi;
-using Xunit;
-using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.Tests;
 

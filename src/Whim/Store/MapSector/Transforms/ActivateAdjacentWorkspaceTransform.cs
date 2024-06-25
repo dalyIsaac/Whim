@@ -1,6 +1,3 @@
-using DotNext;
-using Windows.Win32.Graphics.Gdi;
-
 namespace Whim;
 
 /// <summary>
@@ -32,7 +29,7 @@ public record ActivateAdjacentWorkspaceTransform(
 		}
 
 		Result<IWorkspace> nextWorkspaceResult = ctx.Store.Pick(
-			Pickers.PickAdjacentWorkspace(currentWorkspaceId, Reverse, SkipActive)
+			PickAdjacentWorkspace(currentWorkspaceId, Reverse, SkipActive)
 		);
 		if (!nextWorkspaceResult.TryGet(out IWorkspace? nextWorkspace))
 		{

@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Whim;
@@ -21,7 +19,7 @@ internal class KeybindManager : IKeybindManager
 		get => _uniqueKeyModifiers;
 		set
 		{
-			if (value && _uniqueKeyModifiers == false)
+			if (value && !_uniqueKeyModifiers)
 			{
 				_uniqueKeyModifiers = true;
 				UnifyKeybinds();

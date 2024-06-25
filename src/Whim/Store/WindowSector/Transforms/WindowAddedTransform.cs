@@ -1,7 +1,3 @@
-using DotNext;
-using Windows.Win32.Foundation;
-using Windows.Win32.Graphics.Gdi;
-
 namespace Whim;
 
 internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOptions = null) : Transform<IWindow>()
@@ -101,7 +97,7 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 		workspace ??= TryGetWorkspaceFromWindow(ctx, internalCtx, window);
 
 		// If that fails too, route the window to the active workspace.
-		workspace ??= Pickers.PickMutableActiveWorkspace(rootSector);
+		workspace ??= PickMutableActiveWorkspace(rootSector);
 
 		// Update the window workspace mapping.
 		mapSector.WindowWorkspaceMap = mapSector.WindowWorkspaceMap.SetItem(window.Handle, workspace.Id);
@@ -141,12 +137,12 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 		}
 		else if (routerOptions == RouterOptions.RouteToActiveWorkspace)
 		{
-			workspace = Pickers.PickMutableActiveWorkspace(rootSector);
+			workspace = PickMutableActiveWorkspace(rootSector);
 		}
 		else if (routerOptions == RouterOptions.RouteToLastTrackedActiveWorkspace)
 		{
 			workspace = ctx
-				.Store.Pick(Pickers.PickWorkspaceByMonitor(rootSector.MonitorSector.LastWhimActiveMonitorHandle))
+				.Store.Pick(PickWorkspaceByMonitor(rootSector.MonitorSector.LastWhimActiveMonitorHandle))
 				.Value!;
 		}
 
@@ -167,6 +163,6 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 			MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
 		);
 
-		return ctx.Store.Pick(Pickers.PickWorkspaceByMonitor(hmonitor)).OrDefault();
+		return ctx.Store.Pick(PickWorkspaceByMonitor(hmonitor)).OrDefault();
 	}
 }

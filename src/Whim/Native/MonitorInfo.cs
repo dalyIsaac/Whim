@@ -1,5 +1,3 @@
-using Windows.Win32.Graphics.Gdi;
-
 namespace Whim;
 
 internal static class MonitorInfo

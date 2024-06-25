@@ -1,6 +1,4 @@
-﻿using DotNext;
-
-namespace Whim;
+﻿namespace Whim;
 
 /// <summary>
 /// Triggers a layout (sets all the window positions) for the workspace specified by <see cref="WorkspaceId"/>.

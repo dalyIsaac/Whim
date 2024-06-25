@@ -4,7 +4,6 @@ using System.IO;
 using System.Xml.Linq;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Win32;
-using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;

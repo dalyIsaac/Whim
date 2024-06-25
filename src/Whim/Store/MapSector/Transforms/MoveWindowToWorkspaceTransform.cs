@@ -1,6 +1,3 @@
-using DotNext;
-using Windows.Win32.Foundation;
-
 namespace Whim;
 
 /// <summary>
@@ -17,7 +14,7 @@ public record MoveWindowToWorkspaceTransform(WorkspaceId TargetWorkspaceId, HWND
 {
 	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
-		Result<IWorkspace> targetWorkspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceById(TargetWorkspaceId));
+		Result<IWorkspace> targetWorkspaceResult = ctx.Store.Pick(PickWorkspaceById(TargetWorkspaceId));
 		if (!targetWorkspaceResult.TryGet(out IWorkspace targetWorkspace))
 		{
 			return Result.FromException<Unit>(targetWorkspaceResult.Error!);
@@ -30,7 +27,7 @@ public record MoveWindowToWorkspaceTransform(WorkspaceId TargetWorkspaceId, HWND
 			return Result.FromException<Unit>(StoreExceptions.NoValidWindow());
 		}
 
-		Result<IWindow> windowResult = ctx.Store.Pick(Pickers.PickWindowByHandle(windowHandle));
+		Result<IWindow> windowResult = ctx.Store.Pick(PickWindowByHandle(windowHandle));
 		if (!windowResult.TryGet(out IWindow window))
 		{
 			return Result.FromException<Unit>(windowResult.Error!);
@@ -39,7 +36,7 @@ public record MoveWindowToWorkspaceTransform(WorkspaceId TargetWorkspaceId, HWND
 		Logger.Debug($"Moving window {windowHandle} to workspace {TargetWorkspaceId}");
 
 		// Find the current workspace for the window.
-		Result<IWorkspace> oldWorkspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceByWindow(windowHandle));
+		Result<IWorkspace> oldWorkspaceResult = ctx.Store.Pick(PickWorkspaceByWindow(windowHandle));
 		if (!oldWorkspaceResult.TryGet(out IWorkspace oldWorkspace))
 		{
 			return Result.FromException<Unit>(oldWorkspaceResult.Error!);
@@ -62,8 +59,8 @@ public record MoveWindowToWorkspaceTransform(WorkspaceId TargetWorkspaceId, HWND
 		// If both workspaces are visible, activate both
 		// Otherwise, only layout the new workspace.
 		if (
-			ctx.Store.Pick(Pickers.PickMonitorByWorkspace(oldWorkspace.Id)).IsSuccessful
-			&& ctx.Store.Pick(Pickers.PickMonitorByWorkspace(targetWorkspace.Id)).IsSuccessful
+			ctx.Store.Pick(PickMonitorByWorkspace(oldWorkspace.Id)).IsSuccessful
+			&& ctx.Store.Pick(PickMonitorByWorkspace(targetWorkspace.Id)).IsSuccessful
 		)
 		{
 			targetWorkspace.DoLayout();

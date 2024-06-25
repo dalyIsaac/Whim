@@ -1,7 +1,3 @@
-using DotNext;
-using Windows.Win32.Foundation;
-using Windows.Win32.Graphics.Gdi;
-
 namespace Whim;
 
 internal record WindowFocusedTransform(IWindow? Window) : Transform()
@@ -31,10 +27,7 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 		MonitorSector monitorSector = root.MonitorSector;
 
 		// If we know the window, use what the map sector knows instead of Windows.
-		if (
-			Window is not null
-			&& ctx.Store.Pick(Pickers.PickMonitorByWindow(Window.Handle)).TryGet(out IMonitor monitor)
-		)
+		if (Window is not null && ctx.Store.Pick(PickMonitorByWindow(Window.Handle)).TryGet(out IMonitor monitor))
 		{
 			Logger.Debug($"Setting active monitor to {monitor}");
 			monitorSector.ActiveMonitorHandle = monitor.Handle;
@@ -90,13 +83,13 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 			return;
 		}
 
-		Result<IWorkspace> workspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceByWindow(window.Handle));
+		Result<IWorkspace> workspaceResult = ctx.Store.Pick(PickWorkspaceByWindow(window.Handle));
 		if (!workspaceResult.TryGet(out IWorkspace workspaceForWindow))
 		{
 			return;
 		}
 
-		if (ctx.Store.Pick(Pickers.PickMonitorByWorkspace(workspaceForWindow.Id)).IsSuccessful)
+		if (ctx.Store.Pick(PickMonitorByWorkspace(workspaceForWindow.Id)).IsSuccessful)
 		{
 			return;
 		}

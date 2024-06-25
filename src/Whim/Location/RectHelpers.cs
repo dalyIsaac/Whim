@@ -1,6 +1,4 @@
-﻿using Windows.Win32.Foundation;
-
-namespace Whim;
+﻿namespace Whim;
 
 /// <summary>
 /// Extension methods for <see cref="RECT"/>.

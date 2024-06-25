@@ -1,6 +1,3 @@
-using DotNext;
-using Windows.Win32.Graphics.Gdi;
-
 namespace Whim;
 
 /// <summary>
@@ -19,7 +16,7 @@ public record ActivateWorkspaceTransform(WorkspaceId WorkspaceId, HMONITOR Monit
 	{
 		MapSector mapSector = rootSector.MapSector;
 
-		Result<IWorkspace> workspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceById(WorkspaceId));
+		Result<IWorkspace> workspaceResult = ctx.Store.Pick(PickWorkspaceById(WorkspaceId));
 		if (!workspaceResult.TryGet(out IWorkspace workspace))
 		{
 			return Result.FromException<Unit>(workspaceResult.Error!);
@@ -31,17 +28,17 @@ public record ActivateWorkspaceTransform(WorkspaceId WorkspaceId, HMONITOR Monit
 			targetMonitorHandle = rootSector.MonitorSector.ActiveMonitorHandle;
 		}
 
-		Result<IMonitor> targetMonitorResult = ctx.Store.Pick(Pickers.PickMonitorByHandle(targetMonitorHandle));
+		Result<IMonitor> targetMonitorResult = ctx.Store.Pick(PickMonitorByHandle(targetMonitorHandle));
 		if (!targetMonitorResult.TryGet(out IMonitor targetMonitor))
 		{
 			return Result.FromException<Unit>(targetMonitorResult.Error!);
 		}
 
 		// Get the old workspace for the event.
-		IWorkspace? oldWorkspace = ctx.Store.Pick(Pickers.PickWorkspaceByMonitor(targetMonitorHandle)).OrDefault();
+		IWorkspace? oldWorkspace = ctx.Store.Pick(PickWorkspaceByMonitor(targetMonitorHandle)).OrDefault();
 
 		// Find the monitor which just lost `workspace`.
-		IMonitor? loserMonitor = ctx.Store.Pick(Pickers.PickMonitorByWorkspace(WorkspaceId)).OrDefault();
+		IMonitor? loserMonitor = ctx.Store.Pick(PickMonitorByWorkspace(WorkspaceId)).OrDefault();
 
 		if (targetMonitorHandle == loserMonitor?.Handle)
 		{

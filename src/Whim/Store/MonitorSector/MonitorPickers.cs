@@ -1,8 +1,3 @@
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using DotNext;
-using Windows.Win32.Graphics.Gdi;
-
 namespace Whim;
 
 public static partial class Pickers

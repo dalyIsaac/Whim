@@ -1,14 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using FluentAssertions;
-using NSubstitute;
-using Whim.TestUtils;
-using Windows.Win32.Foundation;
-using Windows.Win32.Graphics.Gdi;
-using Xunit;
-using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.Tests;
 

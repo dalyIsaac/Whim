@@ -1,10 +1,5 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
-using NSubstitute;
 using NSubstitute.ReceivedExtensions;
-using Whim.TestUtils;
-using Xunit;
-using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.Tests;
 

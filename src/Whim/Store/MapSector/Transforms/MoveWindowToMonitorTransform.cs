@@ -1,7 +1,3 @@
-using DotNext;
-using Windows.Win32.Foundation;
-using Windows.Win32.Graphics.Gdi;
-
 namespace Whim;
 
 /// <summary>
@@ -27,13 +23,13 @@ public record MoveWindowToMonitorTransform(HMONITOR MonitorHandle, HWND WindowHa
 
 		Logger.Debug($"Moving window {windowHandle} to monitor {MonitorHandle}");
 
-		Result<IWorkspace> workspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceByMonitor(MonitorHandle));
+		Result<IWorkspace> workspaceResult = ctx.Store.Pick(PickWorkspaceByMonitor(MonitorHandle));
 		if (!workspaceResult.TryGet(out IWorkspace workspace))
 		{
 			return Result.FromException<Unit>(workspaceResult.Error!);
 		}
 
-		Result<IMonitor> oldMonitorResult = ctx.Store.Pick(Pickers.PickMonitorByWindow(windowHandle));
+		Result<IMonitor> oldMonitorResult = ctx.Store.Pick(PickMonitorByWindow(windowHandle));
 		if (!oldMonitorResult.TryGet(out IMonitor oldMonitor))
 		{
 			return Result.FromException<Unit>(oldMonitorResult.Error!);

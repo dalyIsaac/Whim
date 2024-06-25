@@ -1,5 +1,3 @@
-using DotNext;
-
 namespace Whim;
 
 /// <summary>
@@ -15,7 +13,7 @@ public record LayoutAllActiveWorkspacesTransform() : Transform
 			return Result.FromException<Unit>(new WhimException("Whim is shutting down"));
 		}
 
-		foreach (IWorkspace workspace in ctx.Store.Pick(Pickers.PickAllActiveWorkspaces()))
+		foreach (IWorkspace workspace in ctx.Store.Pick(PickAllActiveWorkspaces()))
 		{
 			rootSector.WorkspaceSector.WorkspacesToLayout = rootSector.WorkspaceSector.WorkspacesToLayout.Add(
 				workspace.Id

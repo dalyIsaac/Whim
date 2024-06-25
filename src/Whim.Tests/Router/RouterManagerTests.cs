@@ -1,7 +1,4 @@
 using AutoFixture;
-using NSubstitute;
-using Whim.TestUtils;
-using Xunit;
 
 namespace Whim.Tests;
 

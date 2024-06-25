@@ -1,4 +1,3 @@
-using System;
 using Windows.Win32.UI.Shell;
 
 namespace Whim;

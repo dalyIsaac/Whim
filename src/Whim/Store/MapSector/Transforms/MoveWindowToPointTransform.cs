@@ -1,6 +1,3 @@
-using DotNext;
-using Windows.Win32.Foundation;
-
 namespace Whim;
 
 /// <summary>
@@ -21,14 +18,14 @@ public record MoveWindowToPointTransform(HWND WindowHandle, IPoint<int> Point) :
 		IMonitor targetMonitor = ctx.MonitorManager.GetMonitorAtPoint(Point);
 
 		// Get the target workspace.
-		Result<IWorkspace> targetWorkspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceByMonitor(targetMonitor.Handle));
+		Result<IWorkspace> targetWorkspaceResult = ctx.Store.Pick(PickWorkspaceByMonitor(targetMonitor.Handle));
 		if (!targetWorkspaceResult.TryGet(out IWorkspace targetWorkspace))
 		{
 			return Result.FromException<Unit>(targetWorkspaceResult.Error!);
 		}
 
 		// Get the old workspace.
-		Result<IWorkspace> oldWorkspaceResult = ctx.Store.Pick(Pickers.PickWorkspaceByWindow(WindowHandle));
+		Result<IWorkspace> oldWorkspaceResult = ctx.Store.Pick(PickWorkspaceByWindow(WindowHandle));
 		if (!oldWorkspaceResult.TryGet(out IWorkspace oldWorkspace))
 		{
 			return Result.FromException<Unit>(oldWorkspaceResult.Error!);

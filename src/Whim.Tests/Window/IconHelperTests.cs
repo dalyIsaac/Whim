@@ -2,10 +2,6 @@ using System.IO;
 using System.Text;
 using AutoFixture;
 using Microsoft.UI.Xaml.Media.Imaging;
-using NSubstitute;
-using Whim.TestUtils;
-using Windows.Win32.Foundation;
-using Xunit;
 
 namespace Whim.Tests;
 

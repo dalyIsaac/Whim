@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using Windows.Win32.Foundation;
-using Windows.Win32.Graphics.Gdi;
-
 namespace Whim;
 
 internal class MonitorEnumCallback

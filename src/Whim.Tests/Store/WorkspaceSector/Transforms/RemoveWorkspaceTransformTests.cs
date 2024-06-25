@@ -1,10 +1,4 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
-using DotNext;
-using Whim.TestUtils;
-using Windows.Win32.Graphics.Gdi;
-using Xunit;
-using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.Tests;
 

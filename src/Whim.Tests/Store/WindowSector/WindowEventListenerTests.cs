@@ -1,13 +1,5 @@
-using System;
-using System.Collections.Generic;
-using DotNext;
-using NSubstitute;
-using NSubstitute.ExceptionExtensions;
-using Whim.TestUtils;
 using Windows.Win32;
-using Windows.Win32.Foundation;
 using Windows.Win32.UI.Accessibility;
-using Xunit;
 
 namespace Whim.Tests;
 

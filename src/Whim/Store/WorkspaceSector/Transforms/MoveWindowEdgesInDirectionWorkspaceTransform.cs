@@ -1,6 +1,3 @@
-using DotNext;
-using Windows.Win32.Foundation;
-
 namespace Whim;
 
 internal record MoveWindowEdgesInDirectionWorkspaceTransform(

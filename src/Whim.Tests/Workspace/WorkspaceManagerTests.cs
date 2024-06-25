@@ -1,10 +1,5 @@
-using System;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
-using DotNext;
-using NSubstitute;
-using Whim.TestUtils;
-using Xunit;
 
 namespace Whim.Tests;
 

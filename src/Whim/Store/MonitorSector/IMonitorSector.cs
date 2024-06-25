@@ -1,6 +1,3 @@
-using System.Collections.Immutable;
-using Windows.Win32.Graphics.Gdi;
-
 namespace Whim;
 
 /// <summary>

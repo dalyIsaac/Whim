@@ -1,6 +1,3 @@
-using Windows.Win32.Graphics.Gdi;
-using Xunit;
-
 namespace Whim.Tests;
 
 public class MonitorInfoTests

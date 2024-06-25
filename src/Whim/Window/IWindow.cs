@@ -1,5 +1,4 @@
 using Microsoft.UI.Xaml.Media.Imaging;
-using Windows.Win32.Foundation;
 
 namespace Whim;
 

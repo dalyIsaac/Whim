@@ -1,7 +1,3 @@
-using DotNext;
-using Windows.Win32.Foundation;
-using Windows.Win32.Graphics.Gdi;
-
 namespace Whim;
 
 /// <summary>
@@ -19,9 +15,7 @@ public record MoveWindowToAdjacentMonitorTransform(HWND WindowHandle = default, 
 	{
 		HMONITOR activeMonitorHandle = rootSector.MonitorSector.ActiveMonitorHandle;
 
-		Result<IMonitor> targetMonitorResult = ctx.Store.Pick(
-			Pickers.PickAdjacentMonitor(activeMonitorHandle, Reverse)
-		);
+		Result<IMonitor> targetMonitorResult = ctx.Store.Pick(PickAdjacentMonitor(activeMonitorHandle, Reverse));
 		if (!targetMonitorResult.TryGet(out IMonitor? targetMonitor))
 		{
 			return Result.FromException<Unit>(targetMonitorResult.Error!);

@@ -1,8 +1,4 @@
-﻿using System.Collections.Immutable;
-using DotNext;
-using Windows.Win32.Foundation;
-
-namespace Whim;
+﻿namespace Whim;
 
 /// <summary>
 /// Updates the <see cref="WindowPosition"/>s in the <see cref="Workspace"/> to be <see cref="WindowSize.Minimized"/>.

@@ -1,7 +1,4 @@
-using System;
-using DotNext;
 using Windows.Win32;
-using Windows.Win32.Foundation;
 using Windows.Win32.UI.Accessibility;
 using Windows.Win32.UI.WindowsAndMessaging;
 
@@ -124,7 +121,7 @@ internal class WindowEventListener : IDisposable
 			return;
 		}
 
-		if (!_ctx.Store.Pick(Pickers.PickWindowByHandle(hwnd)).TryGet(out IWindow window))
+		if (!_ctx.Store.Pick(PickWindowByHandle(hwnd)).TryGet(out IWindow window))
 		{
 			Logger.Verbose($"Window {hwnd} is not added, event type 0x{eventType:X4}");
 
