@@ -1,4 +1,3 @@
-using DotNext;
 using Windows.Win32;
 using Windows.Win32.UI.Accessibility;
 using Windows.Win32.UI.WindowsAndMessaging;

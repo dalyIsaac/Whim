@@ -1,5 +1,3 @@
-using DotNext;
-
 namespace Whim;
 
 internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOptions = null) : Transform<IWindow>()

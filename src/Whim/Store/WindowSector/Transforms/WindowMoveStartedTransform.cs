@@ -1,5 +1,3 @@
-using DotNext;
-
 namespace Whim;
 
 internal record WindowMoveStartedTransform(IWindow Window) : Transform

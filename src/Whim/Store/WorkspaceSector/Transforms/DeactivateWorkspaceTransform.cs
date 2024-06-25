@@ -1,6 +1,4 @@
-﻿using DotNext;
-
-namespace Whim;
+﻿namespace Whim;
 
 /// <summary>
 /// Updates the <see cref="WindowPosition"/>s in the <see cref="Workspace"/> to be <see cref="WindowSize.Minimized"/>.

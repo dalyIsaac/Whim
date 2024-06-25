@@ -1,5 +1,3 @@
-using DotNext;
-
 namespace Whim;
 
 internal record MoveWindowToPointInWorkspaceTransform(WorkspaceId WorkspaceId, HWND WindowHandle, IPoint<double> Point)

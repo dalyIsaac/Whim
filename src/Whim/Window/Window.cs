@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.IO;
-using DotNext;
 using Microsoft.UI.Xaml.Media.Imaging;
 
 namespace Whim;
