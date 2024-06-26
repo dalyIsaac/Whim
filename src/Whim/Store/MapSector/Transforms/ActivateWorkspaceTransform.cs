@@ -14,19 +14,15 @@ public record ActivateWorkspaceTransform(WorkspaceId WorkspaceId, HMONITOR Monit
 {
 	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
-		MapSector mapSector = rootSector.MapSector;
-
-		Result<IWorkspace> workspaceResult = ctx.Store.Pick(PickWorkspaceById(WorkspaceId));
-		if (!workspaceResult.TryGet(out IWorkspace workspace))
+		// Get the workspace.
+		if (!rootSector.WorkspaceSector.Workspaces.TryGetValue(WorkspaceId, out Workspace? workspace))
 		{
-			return Result.FromException<Unit>(workspaceResult.Error!);
+			return Result.FromException<Unit>(StoreExceptions.WorkspaceNotFound(WorkspaceId));
 		}
 
-		HMONITOR targetMonitorHandle = MonitorHandle;
-		if (targetMonitorHandle == default)
-		{
-			targetMonitorHandle = rootSector.MonitorSector.ActiveMonitorHandle;
-		}
+		// Get the monitor.
+		HMONITOR targetMonitorHandle =
+			MonitorHandle == default ? rootSector.MonitorSector.ActiveMonitorHandle : MonitorHandle;
 
 		Result<IMonitor> targetMonitorResult = ctx.Store.Pick(PickMonitorByHandle(targetMonitorHandle));
 		if (!targetMonitorResult.TryGet(out IMonitor targetMonitor))
@@ -38,46 +34,55 @@ public record ActivateWorkspaceTransform(WorkspaceId WorkspaceId, HMONITOR Monit
 		IWorkspace? oldWorkspace = ctx.Store.Pick(PickWorkspaceByMonitor(targetMonitorHandle)).OrDefault();
 
 		// Find the monitor which just lost `workspace`.
-		IMonitor? loserMonitor = ctx.Store.Pick(PickMonitorByWorkspace(WorkspaceId)).OrDefault();
+		IMonitor? sourceMonitor = ctx.Store.Pick(PickMonitorByWorkspace(WorkspaceId)).OrDefault();
 
-		if (targetMonitorHandle == loserMonitor?.Handle)
+		return ActivateWorkspace(ctx, rootSector, workspace, oldWorkspace, targetMonitor, sourceMonitor);
+	}
+
+	private Result<Unit> ActivateWorkspace(
+		IContext ctx,
+		MutableRootSector root,
+		Workspace workspace,
+		IWorkspace? oldWorkspace,
+		IMonitor targetMonitor,
+		IMonitor? sourceMonitor
+	)
+	{
+		if (targetMonitor.Handle == sourceMonitor?.Handle)
 		{
 			Logger.Debug("Workspace is already activated");
 			return Unit.Result;
 		}
 
-		// Update the active monitor. Having this line before the old workspace is deactivated
-		// is important, as WindowManager.OnWindowHidden() checks to see if a window is in a
-		// visible workspace when it receives the EVENT_OBJECT_HIDE event.
-		mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(targetMonitorHandle, WorkspaceId);
+		MapSector mapSector = root.MapSector;
 
-		if (loserMonitor != null && oldWorkspace != null && loserMonitor.Handle != targetMonitorHandle)
+		mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(targetMonitor.Handle, WorkspaceId);
+
+		if (sourceMonitor != null && oldWorkspace != null)
 		{
-			Logger.Debug($"Layouting workspace {oldWorkspace} in loser monitor {loserMonitor}");
-			mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(loserMonitor.Handle, oldWorkspace.Id);
+			Logger.Debug($"Layout workspace {oldWorkspace} was previously in monitor {sourceMonitor}");
 
-			oldWorkspace!.DoLayout();
+			mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(
+				sourceMonitor.Handle,
+				oldWorkspace.Id
+			);
+			ctx.Store.Dispatch(new DoWorkspaceLayoutTransform(oldWorkspace.Id, FocusWindow: false));
+
 			mapSector.QueueEvent(
 				new MonitorWorkspaceChangedEventArgs()
 				{
-					Monitor = loserMonitor,
+					Monitor = sourceMonitor,
 					PreviousWorkspace = workspace,
 					CurrentWorkspace = oldWorkspace
 				}
 			);
 		}
-		else
+		else if (oldWorkspace != null)
 		{
-			oldWorkspace?.Deactivate();
-
-			// Temporarily focus the monitor's desktop HWND, to prevent another window from being focused.
-			ctx.Store.Dispatch(new FocusMonitorDesktopTransform(targetMonitorHandle));
+			ctx.Store.Dispatch(new DeactivateWorkspaceTransform(oldWorkspace.Id));
 		}
 
-		// Layout the new workspace.
-		workspace.DoLayout();
-		workspace.FocusLastFocusedWindow();
-
+		ctx.Store.Dispatch(new DoWorkspaceLayoutTransform(workspace.Id));
 		mapSector.QueueEvent(
 			new MonitorWorkspaceChangedEventArgs()
 			{
