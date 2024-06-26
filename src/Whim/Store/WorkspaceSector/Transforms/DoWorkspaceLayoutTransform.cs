@@ -36,14 +36,13 @@ internal record DoWorkspaceLayoutTransform(WorkspaceId WorkspaceId, bool FocusWi
 		// If there aren't any windows, focus the monitor.
 		if (workspace.WindowPositions.Count == 0)
 		{
-			// return ctx.Store.Dispatch(new FocusMonitorDesktopTransform())
 			Result<IMonitor> monitorResult = ctx.Store.Pick(PickMonitorByWorkspace(WorkspaceId));
 			if (!monitorResult.TryGet(out IMonitor monitor))
 			{
 				return Result.FromException<Unit>(monitorResult.Error!);
 			}
 
-			return ctx.Store.Dispatch(new FocusMonitorDesktopTransform(monitor.Handle));
+			return ctx.Store.Dispatch(new ActivateEmptyMonitorTransform(monitor.Handle));
 		}
 
 		return Unit.Result;

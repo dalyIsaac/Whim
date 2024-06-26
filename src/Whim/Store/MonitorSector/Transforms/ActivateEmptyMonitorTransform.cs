@@ -17,6 +17,10 @@ internal record ActivateEmptyMonitorTransform(HMONITOR Handle) : Transform
 		}
 
 		root.MonitorSector.ActiveMonitorHandle = Handle;
+
+		// TODO: Test this
+		root.WorkspaceSector.WindowHandleToFocus = internalCtx.CoreNativeManager.GetDesktopWindow();
+
 		return Unit.Result;
 	}
 }
