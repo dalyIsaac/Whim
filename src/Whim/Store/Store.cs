@@ -67,6 +67,8 @@ public class Store : IStore
 		{
 			return Task.Run(() =>
 			{
+				Logger.Debug($"Entering task, executing transform {transform}");
+
 				try
 				{
 					_lock.EnterWriteLock();
@@ -80,6 +82,7 @@ public class Store : IStore
 			}).Result;
 		}
 
+		Logger.Debug($"Executing transform {transform}");
 		return DispatchFn(transform);
 	}
 
@@ -93,6 +96,8 @@ public class Store : IStore
 		{
 			return Task.Run(() =>
 			{
+				Logger.Debug($"Entering task, executing picker {picker}");
+
 				try
 				{
 					_lock.EnterReadLock();
@@ -105,6 +110,7 @@ public class Store : IStore
 			}).Result;
 		}
 
+		Logger.Debug($"Executing picker {picker}");
 		return PickFn(picker);
 	}
 
@@ -117,6 +123,7 @@ public class Store : IStore
 		{
 			return Task.Run(() =>
 			{
+				Logger.Debug($"Entering task, executing picker {picker}");
 				try
 				{
 					_lock.EnterReadLock();
@@ -129,6 +136,7 @@ public class Store : IStore
 			}).Result;
 		}
 
+		Logger.Debug($"Executing picker {picker}");
 		return PurePickFn(picker);
 	}
 
