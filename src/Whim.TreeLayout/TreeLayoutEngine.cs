@@ -774,5 +774,5 @@ public record TreeLayoutEngine : ILayoutEngine
 	}
 
 	/// <inheritdoc />
-	public ILayoutEngine PerformCustomAction<T>(LayoutEngineAction<T> action) => this;
+	public ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action) => this;
 }

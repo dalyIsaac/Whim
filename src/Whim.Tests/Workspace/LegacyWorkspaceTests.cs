@@ -390,9 +390,9 @@ public class LegacyWorkspaceTests
 	{
 		// Given
 		Workspace workspace = CreateWorkspace(ctx);
-		LayoutEngineAction action = new() { Name = "Test", Window = window };
+		LayoutEngineCustomAction action = new() { Name = "Test", Window = window };
 
-		ctx.Store.Dispatch(new LayoutEngineActionTransform(workspace.Id, action)).Returns(isChanged);
+		ctx.Store.Dispatch(new LayoutEngineCustomActionTransform(workspace.Id, action)).Returns(isChanged);
 
 		// When
 		bool result = workspace.PerformCustomLayoutEngineAction(action);
@@ -408,7 +408,7 @@ public class LegacyWorkspaceTests
 	{
 		// Given
 		Workspace workspace = CreateWorkspace(ctx);
-		LayoutEngineAction<IWindow> action =
+		LayoutEngineCustomAction<IWindow> action =
 			new()
 			{
 				Name = "Test",
@@ -416,7 +416,7 @@ public class LegacyWorkspaceTests
 				Payload = window
 			};
 
-		ctx.Store.Dispatch(new LayoutEngineActionWithPayloadTransform<IWindow>(workspace.Id, action))
+		ctx.Store.Dispatch(new LayoutEngineCustomActionWithPayloadTransform<IWindow>(workspace.Id, action))
 			.Returns(isChanged);
 
 		// When

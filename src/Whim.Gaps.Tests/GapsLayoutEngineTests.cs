@@ -720,7 +720,7 @@ public class GapsLayoutEngineTests
 		// Given
 		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
 
-		LayoutEngineAction<string> action =
+		LayoutEngineCustomAction<string> action =
 			new()
 			{
 				Name = "Action",
@@ -746,7 +746,7 @@ public class GapsLayoutEngineTests
 		// Given
 		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
 
-		LayoutEngineAction<string> action =
+		LayoutEngineCustomAction<string> action =
 			new()
 			{
 				Name = "Action",

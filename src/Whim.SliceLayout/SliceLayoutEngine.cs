@@ -299,17 +299,18 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	}
 
 	/// <inheritdoc />
-	public ILayoutEngine PerformCustomAction<T>(LayoutEngineAction<T> action) =>
+	public ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action) =>
 		action switch
 		{
-			LayoutEngineAction<IWindow> promoteAction when promoteAction.Name == _plugin.PromoteWindowActionName
+			LayoutEngineCustomAction<IWindow> promoteAction when promoteAction.Name == _plugin.PromoteWindowActionName
 				=> PromoteWindowInStack(promoteAction.Payload, promote: true),
-			LayoutEngineAction<IWindow> demoteAction when demoteAction.Name == _plugin.DemoteWindowActionName
+			LayoutEngineCustomAction<IWindow> demoteAction when demoteAction.Name == _plugin.DemoteWindowActionName
 				=> PromoteWindowInStack(demoteAction.Payload, promote: false),
-			LayoutEngineAction<IWindow> promoteFocusAction
+			LayoutEngineCustomAction<IWindow> promoteFocusAction
 				when promoteFocusAction.Name == _plugin.PromoteFocusActionName
 				=> PromoteFocusInStack(promoteFocusAction.Payload, promote: true),
-			LayoutEngineAction<IWindow> demoteFocusAction when demoteFocusAction.Name == _plugin.DemoteFocusActionName
+			LayoutEngineCustomAction<IWindow> demoteFocusAction
+				when demoteFocusAction.Name == _plugin.DemoteFocusActionName
 				=> PromoteFocusInStack(demoteFocusAction.Payload, promote: false),
 			_ => this
 		};
