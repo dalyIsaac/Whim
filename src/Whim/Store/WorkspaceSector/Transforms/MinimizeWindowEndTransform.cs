@@ -34,7 +34,7 @@ internal record MinimizeWindowEndTransform(WorkspaceId WorkspaceId, HWND WindowH
 			? workspace
 			: workspace with
 			{
-				WindowPositions = workspace.WindowPositions.Add(window.Handle, new WindowPosition()),
+				WindowPositions = workspace.WindowPositions.SetItem(window.Handle, new WindowPosition()),
 
 				// Restore in just the active layout engine. MinimizeWindowEnd is not called as part of
 				// Whim starting up.

@@ -261,7 +261,7 @@ public class WorkspacePickersTests
 
 		workspace = workspace with
 		{
-			WindowPositions = workspace.WindowPositions.Add(
+			WindowPositions = workspace.WindowPositions.SetItem(
 				window.Handle,
 				new WindowPosition(WindowSize.Minimized, new Rectangle<int>())
 			)

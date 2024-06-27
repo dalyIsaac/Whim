@@ -41,7 +41,7 @@ internal record MinimizeWindowStartTransform(Guid WorkspaceId, HWND WindowHandle
 
 		workspace = workspace with
 		{
-			WindowPositions = workspace.WindowPositions.Add(window.Handle, new WindowPosition())
+			WindowPositions = workspace.WindowPositions.SetItem(window.Handle, new WindowPosition())
 		};
 
 		for (int idx = 0; idx < workspace.LayoutEngines.Count; idx++)
