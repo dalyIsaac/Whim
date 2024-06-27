@@ -14,8 +14,10 @@ namespace Whim;
 /// <param name="PayloadAction">
 /// Metadata about the action to perform, and the payload to perform it with.
 /// </param>
-public record LayoutEngineActionWithPayloadTransform<T>(WorkspaceId WorkspaceId, LayoutEngineAction<T> PayloadAction)
-	: BaseWorkspaceTransform(WorkspaceId)
+public record LayoutEngineCustomActionWithPayloadTransform<T>(
+	WorkspaceId WorkspaceId,
+	LayoutEngineCustomAction<T> PayloadAction
+) : BaseWorkspaceTransform(WorkspaceId)
 {
 	private protected override Result<Workspace> WorkspaceOperation(
 		IContext ctx,
@@ -58,10 +60,10 @@ public record LayoutEngineActionWithPayloadTransform<T>(WorkspaceId WorkspaceId,
 /// <param name="Action">
 /// Metadata about the action to perform, and the payload to perform it with.
 /// </param>
-public record LayoutEngineActionTransform(WorkspaceId WorkspaceId, LayoutEngineAction Action)
-	: LayoutEngineActionWithPayloadTransform<IWindow?>(
+public record LayoutEngineCustomActionTransform(WorkspaceId WorkspaceId, LayoutEngineCustomAction Action)
+	: LayoutEngineCustomActionWithPayloadTransform<IWindow?>(
 		WorkspaceId,
-		new LayoutEngineAction<IWindow?>()
+		new LayoutEngineCustomAction<IWindow?>()
 		{
 			Name = Action.Name,
 			Payload = Action.Window,

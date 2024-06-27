@@ -297,7 +297,7 @@ public class FocusLayoutEngineTests
 
 		// When
 		ILayoutEngine result = sut.PerformCustomAction(
-			new LayoutEngineAction<IWindow?>()
+			new LayoutEngineCustomAction<IWindow?>()
 			{
 				Name = actionName,
 				Window = null,
@@ -339,7 +339,7 @@ public class FocusLayoutEngineTests
 
 		// When
 		ILayoutEngine result = sut.PerformCustomAction(
-			new LayoutEngineAction<IWindow?>()
+			new LayoutEngineCustomAction<IWindow?>()
 			{
 				Name = "Focus.unknown",
 				Window = null,

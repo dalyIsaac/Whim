@@ -480,7 +480,7 @@ public class CoreCommandsTests
 
 		// Then
 		IWorkspace workspace = ctx.WorkspaceManager.ActiveWorkspace;
-		workspace.DidNotReceive().PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineAction>());
+		workspace.DidNotReceive().PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
 		workspace.DidNotReceive().DoLayout();
 	}
 
@@ -501,6 +501,6 @@ public class CoreCommandsTests
 
 		// Then
 		IWorkspace workspace = ctx.WorkspaceManager.ActiveWorkspace;
-		workspace.Received(1).PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineAction>());
+		workspace.Received(1).PerformCustomLayoutEngineAction(Arg.Any<LayoutEngineCustomAction>());
 	}
 }

@@ -142,13 +142,15 @@ public partial record Workspace : IInternalWorkspace
 	public bool ContainsWindow(IWindow window) => LatestWorkspace.WindowPositions.ContainsKey(window.Handle);
 
 	/// <inheritdoc/>
-	public bool PerformCustomLayoutEngineAction(LayoutEngineAction action) =>
-		_context.Store.Dispatch(new LayoutEngineActionTransform(Id, action)).TryGet(out bool isChanged) && isChanged;
+	public bool PerformCustomLayoutEngineAction(LayoutEngineCustomAction action) =>
+		_context.Store.Dispatch(new LayoutEngineCustomActionTransform(Id, action)).TryGet(out bool isChanged)
+		&& isChanged;
 
 	/// <inheritdoc/>
-	public bool PerformCustomLayoutEngineAction<T>(LayoutEngineAction<T> action) =>
-		_context.Store.Dispatch(new LayoutEngineActionWithPayloadTransform<T>(Id, action)).TryGet(out bool isChanged)
-		&& isChanged;
+	public bool PerformCustomLayoutEngineAction<T>(LayoutEngineCustomAction<T> action) =>
+		_context
+			.Store.Dispatch(new LayoutEngineCustomActionWithPayloadTransform<T>(Id, action))
+			.TryGet(out bool isChanged) && isChanged;
 
 	/// <inheritdoc/>
 	public void Dispose()

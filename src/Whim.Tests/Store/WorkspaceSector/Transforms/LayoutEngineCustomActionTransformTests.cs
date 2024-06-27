@@ -3,26 +3,26 @@ using System.Diagnostics.CodeAnalysis;
 namespace Whim.TestUtils;
 
 [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
-public class LayoutEngineActionTransformTests
+public class LayoutEngineCustomActionTransformTests
 {
 	private static readonly Guid WorkspaceId = Guid.NewGuid();
 
 	private static ILayoutEngine CreateLayoutEngineNotSupportingAction<T>()
 	{
 		ILayoutEngine engine = Substitute.For<ILayoutEngine>();
-		engine.PerformCustomAction(Arg.Any<LayoutEngineAction<T>>()).Returns(engine);
+		engine.PerformCustomAction(Arg.Any<LayoutEngineCustomAction<T>>()).Returns(engine);
 		return engine;
 	}
 
 	private static ILayoutEngine CreateLayoutEngineSupportingAction<T>()
 	{
 		ILayoutEngine engine = Substitute.For<ILayoutEngine>();
-		engine.PerformCustomAction(Arg.Any<LayoutEngineAction<T>>()).Returns(Substitute.For<ILayoutEngine>());
+		engine.PerformCustomAction(Arg.Any<LayoutEngineCustomAction<T>>()).Returns(Substitute.For<ILayoutEngine>());
 		return engine;
 	}
 
 	private static void NoChanges(
-		LayoutEngineActionWithPayloadTransform<IWindow?> sut,
+		LayoutEngineCustomActionWithPayloadTransform<IWindow?> sut,
 		IContext ctx,
 		MutableRootSector rootSector,
 		IWindow window
@@ -47,7 +47,7 @@ public class LayoutEngineActionTransformTests
 	}
 
 	private static void Changes(
-		LayoutEngineActionWithPayloadTransform<IWindow?> sut,
+		LayoutEngineCustomActionWithPayloadTransform<IWindow?> sut,
 		IContext ctx,
 		MutableRootSector root,
 		IWindow window
@@ -81,10 +81,10 @@ public class LayoutEngineActionTransformTests
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void PayloadAction_NoChanges(IContext ctx, MutableRootSector root, IWindow window)
 	{
-		LayoutEngineActionWithPayloadTransform<IWindow?> sut =
+		LayoutEngineCustomActionWithPayloadTransform<IWindow?> sut =
 			new(
 				WorkspaceId,
-				new LayoutEngineAction<IWindow?>
+				new LayoutEngineCustomAction<IWindow?>
 				{
 					Name = "Action",
 					Payload = window,
@@ -98,7 +98,8 @@ public class LayoutEngineActionTransformTests
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void NoPayload_NoChanges(IContext ctx, MutableRootSector root, IWindow window)
 	{
-		LayoutEngineActionTransform sut = new(WorkspaceId, new LayoutEngineAction { Name = "Action", Window = window });
+		LayoutEngineCustomActionTransform sut =
+			new(WorkspaceId, new LayoutEngineCustomAction { Name = "Action", Window = window });
 
 		NoChanges(sut, ctx, root, window);
 	}
@@ -106,10 +107,10 @@ public class LayoutEngineActionTransformTests
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void PayloadAction_Changes(IContext ctx, MutableRootSector root, IWindow window)
 	{
-		LayoutEngineActionWithPayloadTransform<IWindow?> sut =
+		LayoutEngineCustomActionWithPayloadTransform<IWindow?> sut =
 			new(
 				WorkspaceId,
-				new LayoutEngineAction<IWindow?>
+				new LayoutEngineCustomAction<IWindow?>
 				{
 					Name = "Action",
 					Payload = window,
@@ -123,7 +124,8 @@ public class LayoutEngineActionTransformTests
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void NoPayload_Changes(IContext ctx, MutableRootSector root, IWindow window)
 	{
-		LayoutEngineActionTransform sut = new(WorkspaceId, new LayoutEngineAction { Name = "Action", Window = window });
+		LayoutEngineCustomActionTransform sut =
+			new(WorkspaceId, new LayoutEngineCustomAction { Name = "Action", Window = window });
 
 		Changes(sut, ctx, root, window);
 	}
