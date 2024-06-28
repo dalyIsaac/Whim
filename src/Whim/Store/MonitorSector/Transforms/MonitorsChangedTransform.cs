@@ -18,7 +18,6 @@ internal record MonitorsChangedTransform : Transform
 
 		// Get the new monitors.
 		ImmutableArray<IMonitor> previousMonitors = sector.Monitors;
-
 		UpdateMonitorSector(ctx, internalCtx, mutableRootSector);
 
 		List<IMonitor> unchangedMonitors = new();
