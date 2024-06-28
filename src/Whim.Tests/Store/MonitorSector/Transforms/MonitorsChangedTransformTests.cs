@@ -96,6 +96,23 @@ public class MonitorsChangedTransformTests
 		return new[] { workspace1, workspace2, workspace3 };
 	}
 
+	private static void AssertContainsTransform(IContext ctx, Guid workspaceId, int times = 1)
+	{
+		CustomAssert.Contains(
+			ctx.GetTransforms(),
+			t => (t as DeactivateWorkspaceTransform) == new DeactivateWorkspaceTransform(workspaceId),
+			times
+		);
+	}
+
+	private static void AssertDoesNotContainTransform(IContext ctx, Guid workspaceId)
+	{
+		Assert.DoesNotContain(
+			ctx.GetTransforms(),
+			t => (t as DeactivateWorkspaceTransform) == new DeactivateWorkspaceTransform(workspaceId)
+		);
+	}
+
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void WorkspaceSectorNotInitialized(
 		IContext ctx,
@@ -150,21 +167,9 @@ public class MonitorsChangedTransformTests
 		Assert.Equal(workspaces[2].Id, rootSector.MapSector.MonitorWorkspaceMap[RightMonitorSetup.Handle]);
 		Assert.DoesNotContain(LeftBottomMonitorSetup.Handle, rootSector.MapSector.MonitorWorkspaceMap.Keys);
 
-		Assert.Contains(
-			ctx.GetTransforms(),
-			t => (t as DeactivateWorkspaceTransform) == new DeactivateWorkspaceTransform(workspaces[0].Id)
-		);
-
-		CustomAssert.Contains(
-			ctx.GetTransforms(),
-			t => (t as DeactivateWorkspaceTransform) == new DeactivateWorkspaceTransform(workspaces[1].Id),
-			2
-		);
-
-		Assert.Contains(
-			ctx.GetTransforms(),
-			t => (t as DeactivateWorkspaceTransform) == new DeactivateWorkspaceTransform(workspaces[2].Id)
-		);
+		AssertContainsTransform(ctx, workspaces[0].Id);
+		AssertContainsTransform(ctx, workspaces[1].Id, 2);
+		AssertContainsTransform(ctx, workspaces[2].Id);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -198,20 +203,9 @@ public class MonitorsChangedTransformTests
 		Assert.Equal(workspaces[1].Id, rootSector.MapSector.MonitorWorkspaceMap[RightMonitorSetup.Handle]);
 		Assert.Equal(workspaces[2].Id, rootSector.MapSector.MonitorWorkspaceMap[LeftBottomMonitorSetup.Handle]);
 
-		Assert.Contains(
-			ctx.GetTransforms(),
-			t => (t as DeactivateWorkspaceTransform) == new DeactivateWorkspaceTransform(workspaces[0].Id)
-		);
-
-		Assert.Contains(
-			ctx.GetTransforms(),
-			t => (t as DeactivateWorkspaceTransform) == new DeactivateWorkspaceTransform(workspaces[1].Id)
-		);
-
-		Assert.DoesNotContain(
-			ctx.GetTransforms(),
-			t => (t as DeactivateWorkspaceTransform) == new DeactivateWorkspaceTransform(workspaces[2].Id)
-		);
+		AssertContainsTransform(ctx, workspaces[0].Id);
+		AssertContainsTransform(ctx, workspaces[1].Id);
+		AssertDoesNotContainTransform(ctx, workspaces[2].Id);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -292,19 +286,8 @@ public class MonitorsChangedTransformTests
 		Assert.Equal(workspaces[2].Id, rootSector.MapSector.MonitorWorkspaceMap[RightMonitorSetup.Handle]);
 		Assert.Equal(workspaces[1].Id, rootSector.MapSector.MonitorWorkspaceMap[LeftBottomMonitorSetup.Handle]);
 
-		Assert.DoesNotContain(
-			ctx.GetTransforms(),
-			t => (t as DeactivateWorkspaceTransform) == new DeactivateWorkspaceTransform(workspaces[0].Id)
-		);
-
-		Assert.DoesNotContain(
-			ctx.GetTransforms(),
-			t => (t as DeactivateWorkspaceTransform) == new DeactivateWorkspaceTransform(workspaces[1].Id)
-		);
-
-		Assert.DoesNotContain(
-			ctx.GetTransforms(),
-			t => (t as DeactivateWorkspaceTransform) == new DeactivateWorkspaceTransform(workspaces[2].Id)
-		);
+		AssertDoesNotContainTransform(ctx, workspaces[0].Id);
+		AssertDoesNotContainTransform(ctx, workspaces[1].Id);
+		AssertDoesNotContainTransform(ctx, workspaces[2].Id);
 	}
 }
