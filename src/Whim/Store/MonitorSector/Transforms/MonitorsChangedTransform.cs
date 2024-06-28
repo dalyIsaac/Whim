@@ -18,8 +18,7 @@ internal record MonitorsChangedTransform : Transform
 
 		// Get the new monitors.
 		ImmutableArray<IMonitor> previousMonitors = sector.Monitors;
-
-		sector.Monitors = MonitorUtils.GetCurrentMonitors(internalCtx);
+		UpdateMonitorSector(ctx, internalCtx, mutableRootSector);
 
 		List<IMonitor> unchangedMonitors = new();
 		List<IMonitor> removedMonitors = new();
@@ -76,6 +75,24 @@ internal record MonitorsChangedTransform : Transform
 		sector.QueueEvent(args);
 
 		return Unit.Result;
+	}
+
+	private static void UpdateMonitorSector(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	{
+		MonitorSector sector = rootSector.MonitorSector;
+
+		sector.Monitors = MonitorUtils.GetCurrentMonitors(internalCtx);
+
+		foreach (IMonitor m in sector.Monitors)
+		{
+			if (m.IsPrimary)
+			{
+				sector.PrimaryMonitorHandle = m.Handle;
+				sector.ActiveMonitorHandle = m.Handle;
+				sector.LastWhimActiveMonitorHandle = m.Handle;
+				break;
+			}
+		}
 	}
 
 	private static void UpdateMapSector(
