@@ -6,3 +6,15 @@ updates:
     rebase-strategy: auto
     schedule:
       interval: daily
+  - directory: /
+    open-pull-requests-limit: 5
+    package-ecosystem: github-actions
+    rebase-strategy: auto
+    schedule:
+      interval: daily
+  - directory: /
+    open-pull-requests-limit: 5
+    package-ecosystem: pip
+    rebase-strategy: auto
+    schedule:
+      interval: daily
