@@ -130,8 +130,8 @@ public static class MonitorHelpers
 	{
 		return new Rectangle<int>()
 		{
-			X = Math.Abs(Convert.ToInt32(monitor.X + (rectangle.X * monitor.Width))),
-			Y = Math.Abs(Convert.ToInt32(monitor.Y + (rectangle.Y * monitor.Height))),
+			X = Convert.ToInt32(monitor.X + (rectangle.X * monitor.Width)),
+			Y = Convert.ToInt32(monitor.Y + (rectangle.Y * monitor.Height)),
 			Width = Math.Abs(Convert.ToInt32(rectangle.Width * monitor.Width)),
 			Height = Math.Abs(Convert.ToInt32(rectangle.Height * monitor.Height))
 		};
