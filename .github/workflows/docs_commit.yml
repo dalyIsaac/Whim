@@ -3,6 +3,7 @@ name: docs-commit
 on:
   pull_request:
     paths:
+      - .github/workflows/docs_commit.yml
       - docs/**
       - toc.yml
 
