@@ -342,6 +342,29 @@ public class MonitorHelpersTests
 					Height = 108
 				}
 			},
+			{
+				new Rectangle<int>()
+				{
+					X = -1920,
+					Y = -1080,
+					Width = 1920,
+					Height = 1080
+				},
+				new Rectangle<double>()
+				{
+					X = 0.1,
+					Y = 0.1,
+					Width = 0.1,
+					Height = 0.1
+				},
+				new Rectangle<int>()
+				{
+					X = -1920 + 192,
+					Y = -1080 + 108,
+					Width = 192,
+					Height = 108
+				}
+			}
 		};
 
 	[Theory]
