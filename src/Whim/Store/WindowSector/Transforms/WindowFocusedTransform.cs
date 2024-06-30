@@ -42,6 +42,7 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 		if (hwnd.IsNull)
 		{
 			Logger.Debug($"Hwnd is desktop window, ignoring");
+			return;
 		}
 
 		HMONITOR monitorHandle = internalCtx.CoreNativeManager.MonitorFromWindow(
@@ -68,7 +69,6 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 		}
 	}
 
-	///
 	private static void UpdateMapSector(IContext ctx, IWindow? window)
 	{
 		foreach (IWorkspace workspace in ctx.WorkspaceManager)

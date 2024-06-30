@@ -79,6 +79,11 @@ public class WindowFocusedTransformTests
 
 		internalCtx.CoreNativeManager.GetForegroundWindow().Returns((HWND)0);
 
+		// Mock out the next call to make sure it doesn't matter
+		internalCtx
+			.CoreNativeManager.MonitorFromWindow(Arg.Any<HWND>(), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST)
+			.Returns(HMONITOR_1);
+
 		WindowFocusedTransform sut = new(null);
 
 		// When we dispatch the transform
