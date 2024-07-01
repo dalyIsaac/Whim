@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cache NuGet packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.NUGET_PACKAGES }}
           key: ${{ env.PLATFORM }}-nuget-${{ hashFiles('Directory.Packages.props') }}
