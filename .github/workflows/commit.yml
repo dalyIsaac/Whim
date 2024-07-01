@@ -5,6 +5,7 @@ on:
   push:
     branches: [main]
     paths:
+      - ".github/workflows/commit.yml"
       - "src/**"
       - "scripts/**"
       - "whim-installer.iss"
@@ -15,6 +16,7 @@ on:
       - ".config/dotnet-tools.json"
   pull_request:
     paths:
+      - ".github/workflows/commit.yml"
       - "src/**"
       - "scripts/**"
       - "whim-installer.iss"
