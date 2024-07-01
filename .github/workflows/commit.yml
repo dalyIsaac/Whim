@@ -76,7 +76,7 @@ jobs:
       #       dotnet format analyzers Whim.sln --verify-no-changes --no-restore
 
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.3.1
+        uses: microsoft/setup-msbuild@v2.0.0
 
       - name: Build
         run: |
