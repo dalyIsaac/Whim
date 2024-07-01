@@ -1,6 +1,5 @@
 ﻿using System.Linq;
-using DotNext.Collections.Generic;
-
+	
 namespace Whim;
 
 /// <summary>
@@ -17,6 +16,7 @@ public class FreeLayoutEngine : ILayoutEngine
 	/// <inheritdoc/>
 	public int Count => _dict.Count;
 
+	/// <inheritdoc/>
 	public LayoutEngineIdentity Identity { get; }
 
 	/// <summary>
