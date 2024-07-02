@@ -30,6 +30,8 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 	private GapsLayoutEngine UpdateInner(ILayoutEngine newInnerLayoutEngine) =>
 		InnerLayoutEngine == newInnerLayoutEngine ? this : new GapsLayoutEngine(this, newInnerLayoutEngine);
 
+	private bool isFreeLayoutEngine() => InnerLayoutEngine.GetLayoutEngine<FreeLayoutEngine>() is not null;
+
 	/// <inheritdoc />
 	public override int Count => InnerLayoutEngine.Count;
 
@@ -42,6 +44,16 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 	/// <inheritdoc />
 	public override IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor)
 	{
+		if (isFreeLayoutEngine())
+		{
+			foreach (IWindowState windowState in InnerLayoutEngine.DoLayout(rectangle, monitor))
+			{
+				yield return windowState;
+			}
+
+			yield break;
+		}
+
 		double scaleFactor = monitor.ScaleFactor;
 		double scale = scaleFactor / 100.0;
 
