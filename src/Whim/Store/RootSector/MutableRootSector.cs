@@ -34,6 +34,8 @@ internal class MutableRootSector : SectorBase, IDisposable
 		MapSector.DispatchEvents();
 	}
 
+	public void DoLayout() => WorkspaceSector.DoLayout();
+
 	protected virtual void Dispose(bool disposing)
 	{
 		if (!_disposedValue)

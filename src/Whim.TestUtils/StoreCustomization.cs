@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using AutoFixture;
 using DotNext;
 using NSubstitute;
+using Windows.Win32.Foundation;
 
 namespace Whim.TestUtils;
 
@@ -43,6 +44,9 @@ public class StoreCustomization : ICustomization
 		// All further calls will run in the same thread.
 		internalCtx.CoreNativeManager.IsStaThread().Returns(_ => true, _ => false);
 		DeferWindowPosHandle.ParallelOptions = new() { MaxDegreeOfParallelism = 1 };
+
+		// Assume that all windows are windows.
+		internalCtx.CoreNativeManager.IsWindow(Arg.Any<HWND>()).Returns(true);
 
 		NativeManagerUtils.SetupTryEnqueue(ctx);
 	}

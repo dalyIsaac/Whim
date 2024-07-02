@@ -6,6 +6,9 @@ namespace Whim.Tests;
 [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WorkspaceSectorTests
 {
+	// TODO: DispatchEvents
+	// TODO: GarbageCollect
+
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void DoLayout_NoMonitorFoundForWorkspace(IContext ctx, MutableRootSector root)
 	{
@@ -14,7 +17,7 @@ public class WorkspaceSectorTests
 
 		// When
 		root.WorkspaceSector.WorkspacesToLayout = root.WorkspaceSector.WorkspacesToLayout.Add(workspace.Id);
-		root.WorkspaceSector.DispatchEvents();
+		root.WorkspaceSector.DoLayout();
 
 		// Then
 		ctx.NativeManager.DidNotReceive().TryEnqueue(Arg.Any<DispatcherQueueHandler>());
@@ -57,7 +60,7 @@ public class WorkspaceSectorTests
 
 		// When
 		root.WorkspaceSector.WorkspacesToLayout = root.WorkspaceSector.WorkspacesToLayout.Add(workspace.Id);
-		CustomAssert.Layout(root, root.WorkspaceSector.DispatchEvents, new[] { workspace.Id });
+		CustomAssert.Layout(root, root.WorkspaceSector.DoLayout, new[] { workspace.Id });
 
 		// Then
 		ctx.NativeManager.Received(2).TryEnqueue(Arg.Any<DispatcherQueueHandler>());

@@ -77,6 +77,7 @@ public class Store : IStore
 				finally
 				{
 					_lock.ExitWriteLock();
+					_root.DoLayout();
 					_ctx.NativeManager.TryEnqueue(_root.DispatchEvents);
 				}
 			}).Result;

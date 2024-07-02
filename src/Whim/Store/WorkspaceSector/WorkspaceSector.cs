@@ -56,35 +56,6 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 
 	public override void DispatchEvents()
 	{
-		foreach (WorkspaceId id in WorkspacesToLayout)
-		{
-			if (Workspaces.TryGetValue(id, out Workspace? workspace))
-			{
-				DoLayout(workspace);
-			}
-			else
-			{
-				Logger.Error($"Could not find workspace with id {id}");
-			}
-		}
-
-		if (WindowHandleToFocus != default)
-		{
-			if (_ctx.Store.Pick(PickWindowByHandle(WindowHandleToFocus)).TryGet(out IWindow window))
-			{
-				window.Focus();
-			}
-			else
-			{
-				WindowHandleToFocus.Focus(_internalCtx);
-			}
-
-			_internalCtx.WindowManager.OnWindowFocused(window);
-			WindowHandleToFocus = default;
-		}
-
-		WorkspacesToLayout = WorkspacesToLayout.Clear();
-
 		foreach (EventArgs eventArgs in _events)
 		{
 			switch (eventArgs)
@@ -107,6 +78,66 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 		}
 
 		_events.Clear();
+	}
+
+	public void DoLayout()
+	{
+		Logger.Debug("Doing layout");
+
+		GarbageCollect();
+		LayoutAllWorkspaces();
+		FocusHandle();
+	}
+
+	private void GarbageCollect()
+	{
+		foreach (IWindow window in _ctx.Store.Pick(PickAllWindows()))
+		{
+			if (_internalCtx.CoreNativeManager.IsWindow(window.Handle))
+			{
+				continue;
+			}
+
+			Logger.Debug($"Window {window.Handle} is no longer a window.");
+			_ctx.Store.Dispatch(new WindowRemovedTransform(window));
+		}
+	}
+
+	private void LayoutAllWorkspaces()
+	{
+		foreach (WorkspaceId id in WorkspacesToLayout)
+		{
+			if (Workspaces.TryGetValue(id, out Workspace? workspace))
+			{
+				DoLayout(workspace);
+			}
+			else
+			{
+				Logger.Error($"Could not find workspace with id {id}");
+			}
+		}
+
+		WorkspacesToLayout = WorkspacesToLayout.Clear();
+	}
+
+	private void FocusHandle()
+	{
+		if (WindowHandleToFocus == default)
+		{
+			return;
+		}
+
+		if (_ctx.Store.Pick(PickWindowByHandle(WindowHandleToFocus)).TryGet(out IWindow window))
+		{
+			window.Focus();
+		}
+		else
+		{
+			WindowHandleToFocus.Focus(_internalCtx);
+		}
+
+		_internalCtx.WindowManager.OnWindowFocused(window);
+		WindowHandleToFocus = default;
 	}
 
 	private void DoLayout(Workspace workspace)
