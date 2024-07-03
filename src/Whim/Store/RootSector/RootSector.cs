@@ -34,6 +34,8 @@ public class RootSector : IRootSector, IDisposable
 
 	internal void DispatchEvents() => MutableRootSector.DispatchEvents();
 
+	internal void DoLayout() => MutableRootSector.DoLayout();
+
 	/// <inheritdoc/>
 	protected virtual void Dispose(bool disposing)
 	{
