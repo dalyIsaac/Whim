@@ -6,9 +6,6 @@ namespace Whim.Tests;
 [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WorkspaceSectorTests
 {
-	// TODO: DispatchEvents
-	// TODO: GarbageCollect
-
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void DoLayout_NoMonitorFoundForWorkspace(IContext ctx, MutableRootSector root)
 	{
@@ -76,5 +73,72 @@ public class WorkspaceSectorTests
 		WindowPosition position2 = resultWorkspace.WindowPositions[window2.Handle];
 		Assert.Equal(new Rectangle<int>(100, 100, 100, 100), position2.LastWindowRectangle);
 		Assert.Equal(WindowSize.Minimized, position2.WindowSize);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void DoLayout_GarbageCollect(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
+	{
+		// Given one of the windows is not a valid window.
+		IWindow validWindow = CreateWindow((HWND)1);
+		IWindow invalidWindow = CreateWindow((HWND)2);
+
+		internalCtx.CoreNativeManager.IsWindow(invalidWindow.Handle).Returns(false);
+
+		Workspace workspace = CreateWorkspace(ctx);
+		workspace = PopulateWindowWorkspaceMap(ctx, root, validWindow, workspace);
+		workspace = PopulateWindowWorkspaceMap(ctx, root, invalidWindow, workspace);
+		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), workspace);
+
+		WorkspaceSector sut = root.WorkspaceSector;
+		sut.WorkspacesToLayout = sut.WorkspacesToLayout.Add(workspace.Id);
+
+		// When we do the layout
+		CustomAssert.Layout(root, root.WorkspaceSector.DoLayout, new[] { workspace.Id });
+
+		// Then the invalid window should be removed from the workspace.
+		Assert.DoesNotContain(invalidWindow.Handle, sut.Workspaces[workspace.Id].WindowPositions.Keys);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void DoLayout_FocusWindow(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
+	{
+		// Given
+		IWindow window = CreateWindow((HWND)1);
+
+		Workspace workspace = CreateWorkspace(ctx);
+		workspace = PopulateWindowWorkspaceMap(ctx, root, window, workspace);
+
+		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), workspace);
+
+		WorkspaceSector sut = root.WorkspaceSector;
+		sut.WorkspacesToLayout = sut.WorkspacesToLayout.Add(workspace.Id);
+		sut.WindowHandleToFocus = window.Handle;
+
+		// When we do the layout
+		CustomAssert.Layout(root, root.WorkspaceSector.DoLayout, new[] { workspace.Id });
+
+		// Then the window should be focused
+		window.Received().Focus();
+		internalCtx.WindowManager.Received().OnWindowFocused(window);
+
+		Assert.Equal(default, sut.WindowHandleToFocus);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void DoLayout_FocusHandle(IInternalContext internalCtx, MutableRootSector root)
+	{
+		// Given
+		HWND handle = (HWND)1;
+
+		WorkspaceSector sut = root.WorkspaceSector;
+		sut.WindowHandleToFocus = handle;
+
+		// When we do the layout
+		root.WorkspaceSector.DoLayout();
+
+		// Then the window should be focused
+		internalCtx.CoreNativeManager.Received().SetForegroundWindow(handle);
+
+		Assert.Equal(default, sut.WindowHandleToFocus);
 	}
 }
