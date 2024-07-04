@@ -1,5 +1,3 @@
-using System;
-
 namespace Whim;
 
 /// <summary>
@@ -32,6 +30,27 @@ public class RouteEventArgs : EventArgs
 		PreviousWorkspace = previousWorkspace;
 		CurrentWorkspace = currentWorkspace;
 	}
+
+	/// <inheritdoc/>
+	public override bool Equals(object? obj)
+	{
+		if (obj is null)
+		{
+			return false;
+		}
+
+		if (obj is not RouteEventArgs other)
+		{
+			return false;
+		}
+
+		return other.Window.Equals(Window)
+			&& other.PreviousWorkspace?.Id == PreviousWorkspace?.Id
+			&& other.CurrentWorkspace?.Id == CurrentWorkspace?.Id;
+	}
+
+	/// <inheritdoc/>
+	public override int GetHashCode() => HashCode.Combine(Window, PreviousWorkspace, CurrentWorkspace);
 
 	/// <summary>
 	/// Helper method for creating a new <see cref="RouteEventArgs"/> for when a window is added to a workspace.

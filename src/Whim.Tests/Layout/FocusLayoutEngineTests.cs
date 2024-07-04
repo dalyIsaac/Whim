@@ -1,9 +1,6 @@
 using System.Collections;
 using System.Linq;
 using FluentAssertions;
-using NSubstitute;
-using Whim.TestUtils;
-using Xunit;
 
 namespace Whim.Tests;
 

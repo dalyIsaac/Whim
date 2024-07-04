@@ -24,7 +24,7 @@
     <RootNamespace>Whim</RootNamespace>
     <RuntimeIdentifiers>win10-x64;win10-arm64</RuntimeIdentifiers>
     <TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
-    <Version>0.5.0</Version>
+    <Version>0.6.0</Version>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
     <!-- Required for VSCode debugging -->
     <Platform>x64</Platform>
@@ -33,6 +33,7 @@
     <Page Remove="Resources\Defaults.xaml" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="DotNext" />
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" />
     <PackageReference Include="Microsoft.Win32.SystemEvents" />
     <PackageReference Include="Microsoft.Windows.CsWin32">
@@ -48,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+    <InternalsVisibleTo Include="Whim.Bar.Tests" />
     <InternalsVisibleTo Include="Whim.FloatingLayout.Tests" />
     <InternalsVisibleTo Include="Whim.Gaps.Tests" />
     <InternalsVisibleTo Include="Whim.LayoutPreview.Tests" />
@@ -55,6 +57,8 @@
     <InternalsVisibleTo Include="Whim.Tests" />
     <InternalsVisibleTo Include="Whim.TestUtils" />
     <InternalsVisibleTo Include="Whim.TreeLayout.Tests" />
+    <InternalsVisibleTo Include="Whim.TreeLayout.Bar.Tests" />
+    <InternalsVisibleTo Include="Whim.TreeLayout.CommandPalette.Tests" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Template\whim.config.csx" />

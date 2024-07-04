@@ -1,5 +1,3 @@
-using System;
-
 namespace Whim;
 
 /// <summary>
@@ -18,18 +16,6 @@ public interface IKeybindManager
 	/// All new keybinds will also be unified.
 	/// </remarks>
 	bool UnifyKeyModifiers { get; set; }
-
-	/// <summary>
-	/// Adds a keybind.
-	/// </summary>
-	/// <remarks>
-	/// Keybinds can have multiple commands bound to them.
-	/// </remarks>
-	/// <param name="commandId">The identifier of the command to bind to.</param>
-	/// <param name="keybind">The keybind to add.</param>
-	/// <exception cref="ArgumentException">Thrown if the command identifier is already bound to a keybind.</exception>
-	[Obsolete("Method is deprecated, please use SetKeybind(string, IKeybind) instead.")]
-	void Add(string commandId, IKeybind keybind);
 
 	/// <summary>
 	/// Sets a keybind.

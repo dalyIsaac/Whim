@@ -1,5 +1,6 @@
 using NSubstitute;
 using Whim.TestUtils;
+using Windows.Win32.Graphics.Gdi;
 using Xunit;
 
 namespace Whim.Bar.Tests;
@@ -18,7 +19,7 @@ public class FocusedWindowWidgetViewModelTests
 
 		window.Title.Returns("title");
 
-		context.WorkspaceManager.GetMonitorForWindow(window).Returns(monitor);
+		context.Butler.Pantry.GetMonitorForWindow(window).Returns(monitor);
 
 		// When
 		Assert.PropertyChanged(
@@ -41,12 +42,13 @@ public class FocusedWindowWidgetViewModelTests
 	public void Title_DifferentMonitor(IContext context, IMonitor monitor, IWindow window, IWindow otherWindow)
 	{
 		// Given
+		monitor.Handle.Returns((HMONITOR)100);
 		FocusedWindowWidgetViewModel viewModel = CreateSut(context, monitor);
 
 		window.Title.Returns("title");
 		otherWindow.Title.Returns("other title");
 
-		context.WorkspaceManager.GetMonitorForWindow(window).Returns(monitor);
+		context.Butler.Pantry.GetMonitorForWindow(window).Returns(monitor);
 
 		// When
 		context.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
@@ -95,7 +97,7 @@ public class FocusedWindowWidgetViewModelTests
 		FocusedWindowWidgetViewModel viewModel = CreateSut(context, monitor);
 
 		window.Title.Returns("title");
-		context.WorkspaceManager.GetMonitorForWindow(window).Returns(monitor);
+		context.Butler.Pantry.GetMonitorForWindow(window).Returns(monitor);
 
 		// When
 		Assert.PropertyChanged(
@@ -121,9 +123,10 @@ public class FocusedWindowWidgetViewModelTests
 	)
 	{
 		// Given
+		monitor.Handle.Returns((HMONITOR)100);
 		FocusedWindowWidgetViewModel viewModel = CreateSut(context, monitor);
 
-		context.WorkspaceManager.GetMonitorForWindow(window).Returns(monitor);
+		context.Butler.Pantry.GetMonitorForWindow(window).Returns(monitor);
 
 		window.Title.Returns("title");
 		otherWindow.Title.Returns("other title");
@@ -154,7 +157,7 @@ public class FocusedWindowWidgetViewModelTests
 		FocusedWindowWidgetViewModel viewModel = CreateSut(context, monitor);
 
 		window.Title.Returns("title");
-		context.WorkspaceManager.GetMonitorForWindow(window).Returns(monitor);
+		context.Butler.Pantry.GetMonitorForWindow(window).Returns(monitor);
 
 		// When
 		Assert.PropertyChanged(

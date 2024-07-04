@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
@@ -12,7 +10,6 @@ using System.Threading.Tasks;
 using Windows.System;
 using Windows.UI.Composition;
 using Windows.Win32;
-using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dwm;
 using Windows.Win32.System.WinRT;
 using Windows.Win32.UI.WindowsAndMessaging;
@@ -198,7 +195,7 @@ internal partial class NativeManager : INativeManager
 	public DeferWindowPosHandle DeferWindowPos() => new(_context, _internalContext);
 
 	/// <inheritdoc />
-	public DeferWindowPosHandle DeferWindowPos(IEnumerable<WindowPosState> windowStates) =>
+	public DeferWindowPosHandle DeferWindowPos(IEnumerable<DeferWindowPosState> windowStates) =>
 		new(_context, _internalContext, windowStates);
 
 	/// <inheritdoc />

@@ -1,8 +1,6 @@
 using System.ComponentModel;
 using System.IO;
 using Microsoft.UI.Xaml.Media.Imaging;
-using Windows.Win32.Foundation;
-using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim;
 
@@ -34,16 +32,11 @@ internal class Window : IWindow
 		}
 	}
 
-	public IPoint<int> Center =>
-		new Point<int>() { X = Rectangle.X + (Rectangle.Width / 2), Y = Rectangle.Y + (Rectangle.Height / 2) };
-
 	public required int ProcessId { get; init; }
 
 	public required string? ProcessFileName { get; init; }
 
 	public required string? ProcessFilePath { get; init; }
-
-	public required string? ProcessName { get; init; }
 
 	public bool IsFocused => _internalContext.CoreNativeManager.GetForegroundWindow() == Handle;
 
@@ -66,15 +59,7 @@ internal class Window : IWindow
 	public void Focus()
 	{
 		Logger.Debug(ToString());
-		// Use SendInput hack to allow Activate to work - required to resolve focus issue https://github.com/microsoft/PowerToys/issues/4270
-		unsafe
-		{
-			INPUT input = new() { type = INPUT_TYPE.INPUT_MOUSE };
-			// Send empty mouse event. This makes this thread the last to send input, and hence allows it to pass foreground permission checks
-			_ = _internalContext.CoreNativeManager.SendInput(new[] { input }, sizeof(INPUT));
-		}
-
-		_internalContext.CoreNativeManager.SetForegroundWindow(Handle);
+		Handle.Focus(_internalContext);
 
 		// We manually call OnWindowFocused as an already focused window may have switched to a
 		// different workspace.
@@ -131,11 +116,10 @@ internal class Window : IWindow
 	/// <param name="internalContext"></param>
 	/// <param name="hwnd">The handle of the window.</param>
 	/// <returns></returns>
-	public static IWindow? CreateWindow(IContext context, IInternalContext internalContext, HWND hwnd)
+	public static Result<IWindow> CreateWindow(IContext context, IInternalContext internalContext, HWND hwnd)
 	{
 		_ = internalContext.CoreNativeManager.GetWindowThreadProcessId(hwnd, out uint pid);
 		int processId = (int)pid;
-		string? processName;
 		string? processPath;
 		string? processFileName;
 
@@ -144,7 +128,6 @@ internal class Window : IWindow
 			(string ProcessName, string? ProcessPath)? result = internalContext.CoreNativeManager.GetProcessNameAndPath(
 				processId
 			);
-			processName = result?.ProcessName;
 			processPath = result?.ProcessPath;
 
 			processFileName = Path.GetFileName(processPath);
@@ -156,15 +139,15 @@ internal class Window : IWindow
 			// The exception will usually have a message of:
 			// "Unable to enumerate the process modules."
 			// This will be thrown by Path.GetFileName.
-			Logger.Error($"Could not create a Window instance for {hwnd.Value}, {ex.Message}");
-			return null;
+			return Result.FromException<IWindow>(
+				new WhimException($"Could not create a Window instance for {hwnd.Value}", ex)
+			);
 		}
 
 		return new Window(context, internalContext)
 		{
 			Handle = hwnd,
 			ProcessId = processId,
-			ProcessName = processName,
 			ProcessFileName = processFileName,
 			ProcessFilePath = processPath
 		};
@@ -190,7 +173,7 @@ internal class Window : IWindow
 		return Handle.GetHashCode();
 	}
 
-	public override string ToString() => $"{Title} ({ProcessName}) [{ProcessId}] <{WindowClass}> {{{Handle}}}";
+	public override string ToString() => $"{Title} ({ProcessFileName}) [{ProcessId}] <{WindowClass}> {{{Handle}}}";
 
 	public BitmapImage? GetIcon() => this.GetIcon(_context, _internalContext);
 }

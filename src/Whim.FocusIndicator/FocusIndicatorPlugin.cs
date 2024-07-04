@@ -64,7 +64,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 		Hide();
 	}
 
-	private void WindowManager_WindowMoveStart(object? sender, WindowMovedEventArgs e) => Hide();
+	private void WindowManager_WindowMoveStart(object? sender, WindowMoveStartedEventArgs e) => Hide();
 
 	private void WindowManager_WindowFocused(object? sender, WindowFocusedEventArgs e)
 	{
@@ -186,6 +186,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 				_context.WindowManager.WindowFocused -= WindowManager_WindowFocused;
 				_context.WorkspaceManager.WorkspaceLayoutStarted -= WorkspaceManager_WorkspaceLayoutStarted;
 				_context.WorkspaceManager.WorkspaceLayoutCompleted -= WorkspaceManager_WorkspaceLayoutCompleted;
+				_focusIndicatorWindow?.Dispose();
 				_focusIndicatorWindow?.Close();
 			}
 

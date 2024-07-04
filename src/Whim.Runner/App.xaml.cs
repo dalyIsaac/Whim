@@ -91,7 +91,10 @@ public partial class App : Application
 
 		if (e.Reason == ExitReason.User)
 		{
+			// For some reason, both Exit calls are required? Otherwise, the Application continues
+			// running but doesn't report why.
 			Exit();
+			Current.Exit();
 		}
 		else if (e.Reason == ExitReason.Restart || e.Reason == ExitReason.Update)
 		{

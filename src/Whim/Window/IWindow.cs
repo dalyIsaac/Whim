@@ -1,6 +1,4 @@
-using System;
 using Microsoft.UI.Xaml.Media.Imaging;
-using Windows.Win32.Foundation;
 
 namespace Whim;
 
@@ -35,12 +33,6 @@ public interface IWindow
 	IRectangle<int> Rectangle { get; }
 
 	/// <summary>
-	/// The center of the window.
-	/// </summary>
-	[Obsolete("Use Rectangle.Center instead.")]
-	IPoint<int> Center { get; }
-
-	/// <summary>
 	/// The process ID of the window.
 	/// </summary>
 	int ProcessId { get; }
@@ -55,13 +47,6 @@ public interface IWindow
 	/// The fully qualified path that defines the location of the module.
 	/// </summary>
 	string? ProcessFilePath { get; }
-
-	/// <summary>
-	/// The name that the system uses to identify the process to the user.
-	/// For example, <c>SnippingTool</c>.
-	/// </summary>
-	[Obsolete("Use ProcessFileName instead.")]
-	string? ProcessName { get; }
 
 	/// <summary>
 	/// Indicates whether the window is focused.

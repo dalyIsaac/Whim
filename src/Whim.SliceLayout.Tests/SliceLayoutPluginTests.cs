@@ -98,7 +98,7 @@ public class SliceLayoutPluginTests
 		plugin.PromoteWindowInStack();
 
 		// Then nothing
-		ctx.WorkspaceManager.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+		ctx.Butler.Pantry.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -107,7 +107,7 @@ public class SliceLayoutPluginTests
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
-		ctx.WorkspaceManager.GetWorkspaceForWindow(window).ReturnsNull();
+		ctx.Butler.Pantry.GetWorkspaceForWindow(window).ReturnsNull();
 
 		// When
 		plugin.PromoteWindowInStack(window);
@@ -124,7 +124,7 @@ public class SliceLayoutPluginTests
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
-		ctx.WorkspaceManager.GetWorkspaceForWindow(window).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(window).Returns(workspace);
 
 		// When
 		plugin.PromoteWindowInStack(window);
@@ -152,7 +152,7 @@ public class SliceLayoutPluginTests
 		plugin.DemoteWindowInStack();
 
 		// Then nothing
-		ctx.WorkspaceManager.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+		ctx.Butler.Pantry.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -161,7 +161,7 @@ public class SliceLayoutPluginTests
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
-		ctx.WorkspaceManager.GetWorkspaceForWindow(window).ReturnsNull();
+		ctx.Butler.Pantry.GetWorkspaceForWindow(window).ReturnsNull();
 
 		// When
 		plugin.DemoteWindowInStack(window);
@@ -178,7 +178,7 @@ public class SliceLayoutPluginTests
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
-		ctx.WorkspaceManager.GetWorkspaceForWindow(window).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(window).Returns(workspace);
 
 		// When
 		plugin.DemoteWindowInStack(window);
@@ -223,7 +223,7 @@ public class SliceLayoutPluginTests
 		plugin.PromoteFocusInStack();
 
 		// Then nothing
-		ctx.WorkspaceManager.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+		ctx.Butler.Pantry.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -232,7 +232,7 @@ public class SliceLayoutPluginTests
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
-		ctx.WorkspaceManager.GetWorkspaceForWindow(window).ReturnsNull();
+		ctx.Butler.Pantry.GetWorkspaceForWindow(window).ReturnsNull();
 
 		// When
 		plugin.PromoteFocusInStack(window);
@@ -248,7 +248,7 @@ public class SliceLayoutPluginTests
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
-		ctx.WorkspaceManager.GetWorkspaceForWindow(window).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(window).Returns(workspace);
 
 		// When
 		plugin.PromoteFocusInStack(window);
@@ -276,7 +276,7 @@ public class SliceLayoutPluginTests
 		plugin.DemoteFocusInStack();
 
 		// Then nothing
-		ctx.WorkspaceManager.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
+		ctx.Butler.Pantry.DidNotReceive().GetWorkspaceForWindow(Arg.Any<IWindow>());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -285,7 +285,7 @@ public class SliceLayoutPluginTests
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
-		ctx.WorkspaceManager.GetWorkspaceForWindow(window).ReturnsNull();
+		ctx.Butler.Pantry.GetWorkspaceForWindow(window).ReturnsNull();
 
 		// When
 		plugin.DemoteFocusInStack(window);
@@ -301,7 +301,7 @@ public class SliceLayoutPluginTests
 		// Given
 		SliceLayoutPlugin plugin = new(ctx);
 		ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Returns(window);
-		ctx.WorkspaceManager.GetWorkspaceForWindow(window).Returns(workspace);
+		ctx.Butler.Pantry.GetWorkspaceForWindow(window).Returns(workspace);
 
 		// When
 		plugin.DemoteFocusInStack(window);

@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Whim;
 
 /// <summary>
@@ -7,7 +5,7 @@ namespace Whim;
 /// The wrapper layout engine provides additional functionality, but still utilises the underlying
 /// layout engine.
 /// </summary>
-public delegate ILayoutEngine CreateProxyLayoutEngine(ILayoutEngine engine);
+public delegate ILayoutEngine ProxyLayoutEngineCreator(ILayoutEngine engine);
 
 /// <summary>
 /// Abstract layout engine, which proxy layout engines should inherit from.

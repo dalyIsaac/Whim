@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
 using Windows.UI.Composition;
 using Windows.Win32;
-using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dwm;
 
 namespace Whim;
@@ -119,7 +116,7 @@ public interface INativeManager
 	/// </summary>
 	/// <param name="windowStates">The initial window states to set.</param>
 	/// <returns></returns>
-	DeferWindowPosHandle DeferWindowPos(IEnumerable<WindowPosState> windowStates);
+	DeferWindowPosHandle DeferWindowPos(IEnumerable<DeferWindowPosState> windowStates);
 
 	/// <summary>
 	/// Retrieves the path to the executable file of the UWP app associated with the given <paramref name="window"/>.

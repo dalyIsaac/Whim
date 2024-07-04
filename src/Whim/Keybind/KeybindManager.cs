@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Whim;
@@ -21,7 +19,7 @@ internal class KeybindManager : IKeybindManager
 		get => _uniqueKeyModifiers;
 		set
 		{
-			if (value && _uniqueKeyModifiers == false)
+			if (value && !_uniqueKeyModifiers)
 			{
 				_uniqueKeyModifiers = true;
 				UnifyKeybinds();
@@ -41,20 +39,6 @@ internal class KeybindManager : IKeybindManager
 		{
 			SetKeybind(keybind.Key, keybind.Value);
 		}
-	}
-
-	[Obsolete("Method is deprecated, please use SetKeybind(string, IKeybind) instead.")]
-	public void Add(string commandId, IKeybind keybind)
-	{
-		Logger.Warning("Method is deprecated, please use SetKeybind(string, IKeybind) instead.");
-		Logger.Debug($"Adding keybind '{keybind}' for command '{commandId}'");
-
-		if (_commandsKeybindsMap.ContainsKey(commandId))
-		{
-			throw new ArgumentException($"Command '{commandId}' already has a keybind");
-		}
-
-		SetKeybind(commandId, keybind);
 	}
 
 	public void SetKeybind(string commandId, IKeybind keybind)

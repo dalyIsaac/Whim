@@ -1,14 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
-using NSubstitute;
-using Whim.TestUtils;
 using Windows.Win32;
-using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.Win32.UI.WindowsAndMessaging;
-using Xunit;
 
 namespace Whim.Tests;
 
@@ -194,45 +188,40 @@ public class KeybindHookTests
 		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
 	}
 
-	public static readonly IEnumerable<object[]> KeybindsToExecute = new List<object[]>()
-	{
-		new object[]
+	public static readonly TheoryData<VIRTUAL_KEY[], VIRTUAL_KEY, Keybind> KeybindsToExecute =
+		new()
 		{
-			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_LSHIFT },
-			VIRTUAL_KEY.VK_A,
-			new Keybind(KeyModifiers.LShift, VIRTUAL_KEY.VK_A)
-		},
-		new object[]
-		{
-			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_RSHIFT },
-			VIRTUAL_KEY.VK_A,
-			new Keybind(KeyModifiers.RShift, VIRTUAL_KEY.VK_A)
-		},
-		new object[]
-		{
-			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_LMENU, VIRTUAL_KEY.VK_LCONTROL },
-			VIRTUAL_KEY.VK_A,
-			new Keybind(KeyModifiers.LAlt | KeyModifiers.LControl, VIRTUAL_KEY.VK_A)
-		},
-		new object[]
-		{
-			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_RMENU, VIRTUAL_KEY.VK_RCONTROL },
-			VIRTUAL_KEY.VK_A,
-			new Keybind(KeyModifiers.RAlt | KeyModifiers.RControl, VIRTUAL_KEY.VK_A)
-		},
-		new object[]
-		{
-			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_LWIN },
-			VIRTUAL_KEY.VK_A,
-			new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_A)
-		},
-		new object[]
-		{
-			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_RWIN },
-			VIRTUAL_KEY.VK_A,
-			new Keybind(KeyModifiers.RWin, VIRTUAL_KEY.VK_A)
-		},
-	};
+			{
+				new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_LSHIFT },
+				VIRTUAL_KEY.VK_A,
+				new Keybind(KeyModifiers.LShift, VIRTUAL_KEY.VK_A)
+			},
+			{
+				new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_RSHIFT },
+				VIRTUAL_KEY.VK_A,
+				new Keybind(KeyModifiers.RShift, VIRTUAL_KEY.VK_A)
+			},
+			{
+				new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_LMENU, VIRTUAL_KEY.VK_LCONTROL },
+				VIRTUAL_KEY.VK_A,
+				new Keybind(KeyModifiers.LAlt | KeyModifiers.LControl, VIRTUAL_KEY.VK_A)
+			},
+			{
+				new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_RMENU, VIRTUAL_KEY.VK_RCONTROL },
+				VIRTUAL_KEY.VK_A,
+				new Keybind(KeyModifiers.RAlt | KeyModifiers.RControl, VIRTUAL_KEY.VK_A)
+			},
+			{
+				new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_LWIN },
+				VIRTUAL_KEY.VK_A,
+				new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_A)
+			},
+			{
+				new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_RWIN },
+				VIRTUAL_KEY.VK_A,
+				new Keybind(KeyModifiers.RWin, VIRTUAL_KEY.VK_A)
+			},
+		};
 
 	[MemberData(nameof(KeybindsToExecute))]
 	[Theory]

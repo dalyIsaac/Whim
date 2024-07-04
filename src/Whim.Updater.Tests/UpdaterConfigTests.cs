@@ -4,16 +4,15 @@ namespace Whim.Updater.Tests;
 
 public class UpdaterConfigTests
 {
-	public static IEnumerable<object[]> GetTimerData()
-	{
-		yield return new object[] { UpdateFrequency.Daily, TimeSpan.FromDays(1).TotalMilliseconds };
-		yield return new object[] { UpdateFrequency.Weekly, TimeSpan.FromDays(7).TotalMilliseconds };
-		yield return new object[] { UpdateFrequency.Monthly, TimeSpan.FromDays(30).TotalMilliseconds };
-#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-		yield return new object[] { UpdateFrequency.Never, null };
-		yield return new object[] { (UpdateFrequency)int.MaxValue, null };
-#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
-	}
+	public static TheoryData<UpdateFrequency, double?> GetTimerData =>
+		new()
+		{
+			{ UpdateFrequency.Daily, TimeSpan.FromDays(1).TotalMilliseconds },
+			{ UpdateFrequency.Weekly, TimeSpan.FromDays(7).TotalMilliseconds },
+			{ UpdateFrequency.Monthly, TimeSpan.FromDays(30).TotalMilliseconds },
+			{ UpdateFrequency.Never, null },
+			{ (UpdateFrequency)int.MaxValue, null },
+		};
 
 	[Theory]
 	[MemberData(nameof(GetTimerData))]

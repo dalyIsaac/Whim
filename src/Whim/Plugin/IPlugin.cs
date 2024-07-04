@@ -19,7 +19,7 @@ public interface IPlugin
 	/// <b>This method is to be called by the plugin manager.</b>
 	/// Initializes the plugin before the <see cref="IContext"/> has been initialized.
 	/// Put things like event listeners here or adding proxy layout engines
-	/// (see <see cref="IWorkspaceManager.AddProxyLayoutEngine(CreateProxyLayoutEngine)"/>).
+	/// (see <see cref="IWorkspaceManager.AddProxyLayoutEngine(ProxyLayoutEngineCreator)"/>).
 	/// </summary>
 	void PreInitialize();
 
@@ -34,7 +34,7 @@ public interface IPlugin
 	/// The commands and keybinds for this plugin. These are registered during <see cref="IPluginManager.PreInitialize"/>.
 	/// </summary>
 	/// <remarks>
-	/// Keybindings can be overridden by the user using <see cref="IKeybindManager.Add"/>.
+	/// Keybindings can be overridden by the user using <see cref="IKeybindManager.SetKeybind(string, IKeybind)"/>.
 	/// </remarks>
 	IPluginCommands PluginCommands { get; }
 

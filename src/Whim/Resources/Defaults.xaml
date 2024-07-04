@@ -12,7 +12,7 @@
 	<FontFamily x:Key="_font:family">Segoe UI</FontFamily>
 
 	<!--  Explicit colors, other colors are inherited from the system settings  -->
-	<Color x:Key="bar:active_workspace:background">#81a1c1</Color>
+	<Color x:Key="bar:active_workspace:background">#81a1c180</Color>
 	<Color x:Key="bar:active_workspace:foreground">#1c1c1c</Color>
 	<Color x:Key="bar:hover:background">#15777777</Color>
 	<Color x:Key="bar:hover:foreground">#da777777</Color>

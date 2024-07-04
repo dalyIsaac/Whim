@@ -4,7 +4,7 @@
 
 > All the power to the user!
 
-Whim is an hackable, pluggable and scriptable dynamic window manager for Windows 10 and 11, built using WinUI 3, .NET, and C# scripting.
+Whim is a hackable, pluggable and scriptable dynamic window manager for Windows 10 and 11, built using WinUI 3, .NET, and C# scripting.
 
 ![Whim demo](images/demo.gif)
 

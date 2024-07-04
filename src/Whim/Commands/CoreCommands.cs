@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
@@ -300,7 +299,7 @@ internal class CoreCommands : PluginCommands
 				? _context.MonitorManager.GetNextMonitor(active)
 				: _context.MonitorManager.GetPreviousMonitor(active);
 
-			IWorkspace? workspace = _context.Butler.GetWorkspaceForMonitor(monitor);
+			IWorkspace? workspace = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor);
 			if (workspace == null)
 			{
 				Logger.Error($"Could not find workspace for monitor {monitor}");

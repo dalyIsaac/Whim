@@ -20,12 +20,6 @@ internal class InternalContext : IInternalContext
 
 	public IMouseHook MouseHook { get; }
 
-	public IDeferWindowPosManager DeferWindowPosManager { get; }
-
-	public IDeferWorkspacePosManager DeferWorkspacePosManager { get; }
-
-	public IButlerEventHandlers ButlerEventHandlers => ((Butler)_context.Butler).EventHandlers;
-
 	public InternalContext(IContext context)
 	{
 		_context = context;
@@ -34,8 +28,6 @@ internal class InternalContext : IInternalContext
 		WindowMessageMonitor = new WindowMessageMonitor(context, this);
 		KeybindHook = new KeybindHook(context, this);
 		MouseHook = new MouseHook(context, this);
-		DeferWindowPosManager = new DeferWindowPosManager(context, this);
-		DeferWorkspacePosManager = new DeferWorkspacePosManager(context, this);
 	}
 
 	public void PreInitialize()

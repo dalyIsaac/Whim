@@ -1,5 +1,3 @@
-using System;
-
 namespace Whim;
 
 /// <summary>
@@ -31,6 +29,8 @@ internal class Context : IContext
 	public IKeybindManager KeybindManager { get; }
 	public INotificationManager NotificationManager { get; }
 
+	public IStore Store { get; }
+
 	public event EventHandler<ExitEventArgs>? Exiting;
 	public event EventHandler<ExitEventArgs>? Exited;
 
@@ -45,15 +45,17 @@ internal class Context : IContext
 		Logger = new Logger();
 		ResourceManager = new ResourceManager();
 		_internalContext = new InternalContext(this);
-		Butler = new Butler(this, _internalContext);
+
+		Store = new Store(this, _internalContext);
+		Butler = new Butler(this);
 
 		NativeManager = new NativeManager(this, _internalContext);
 
 		RouterManager = new RouterManager(this);
 		FilterManager = new FilterManager();
 		WindowManager = new WindowManager(this, _internalContext);
-		MonitorManager = new MonitorManager(this, _internalContext);
-		WorkspaceManager = new WorkspaceManager(this, _internalContext);
+		MonitorManager = new MonitorManager(this);
+		WorkspaceManager = new WorkspaceManager(this);
 		_commandManager = new CommandManager();
 		PluginManager = new PluginManager(this, _commandManager);
 		KeybindManager = new KeybindManager(this);
@@ -95,12 +97,12 @@ internal class Context : IContext
 
 		NotificationManager.Initialize();
 		MonitorManager.Initialize();
-		WindowManager.Initialize();
 		WorkspaceManager.Initialize();
+		WindowManager.Initialize();
 
+		Store.Initialize();
 		Butler.Initialize();
 
-		WindowManager.PostInitialize();
 		PluginManager.PostInitialize();
 		_internalContext.PostInitialize();
 
@@ -126,15 +128,16 @@ internal class Context : IContext
 	public void Exit(ExitEventArgs? args = null)
 	{
 		Logger.Debug("Exiting context...");
-		args ??= new ExitEventArgs() { Reason = ExitReason.User };
+		args ??= new ExitEventArgs { Reason = ExitReason.User };
 
 		Exiting?.Invoke(this, args);
 
 		PluginManager.Dispose();
-		WorkspaceManager.Dispose();
 		WindowManager.Dispose();
 		MonitorManager.Dispose();
 		NotificationManager.Dispose();
+		Butler.Dispose();
+		Store.Dispose();
 		_internalContext.Dispose();
 
 		Logger.Debug("Mostly exited...");

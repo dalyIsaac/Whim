@@ -1,5 +1,3 @@
-using System;
-
 namespace Whim;
 
 /// <summary>
@@ -21,4 +19,25 @@ public class MonitorWorkspaceChangedEventArgs : EventArgs
 	/// The new workspace shown on the monitor.
 	/// </summary>
 	public required IWorkspace CurrentWorkspace { get; init; }
+
+	/// <inheritdoc/>
+	public override bool Equals(object? obj)
+	{
+		if (obj is null)
+		{
+			return false;
+		}
+
+		if (obj is not MonitorWorkspaceChangedEventArgs other)
+		{
+			return false;
+		}
+
+		return other.Monitor.Handle == Monitor.Handle
+			&& other.PreviousWorkspace?.Id == PreviousWorkspace?.Id
+			&& other.CurrentWorkspace.Id == CurrentWorkspace.Id;
+	}
+
+	/// <inheritdoc/>
+	public override int GetHashCode() => HashCode.Combine(Monitor, PreviousWorkspace, CurrentWorkspace);
 }

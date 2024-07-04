@@ -4,65 +4,34 @@ namespace Whim.CommandPalette.Tests;
 
 public class CamelCaseTests
 {
-	public static IEnumerable<object[]> MatchesCamelCase_Ok_Data()
-	{
-		yield return new object[] { "", "anything", Array.Empty<FilterTextMatch>() };
-		yield return new object[] { "alpha", "alpha", new FilterTextMatch[] { new(0, 5) } };
-		yield return new object[] { "AlPhA", "alpha", new FilterTextMatch[] { new(0, 5) } };
-		yield return new object[] { "alpha", "alphasomething", new FilterTextMatch[] { new(0, 5) } };
-		yield return new object[] { "c", "CamelCaseRocks", new FilterTextMatch[] { new(0, 1) } };
-		yield return new object[] { "cc", "CamelCaseRocks", new FilterTextMatch[] { new(0, 1), new(5, 6) } };
-		yield return new object[]
+	public static TheoryData<string, string, FilterTextMatch[]?> MatchesCamelCase_Ok_Data =>
+		new()
 		{
-			"ccr",
-			"CamelCaseRocks",
-			new FilterTextMatch[] { new(0, 1), new(5, 6), new(9, 10) }
+			{ "", "anything", Array.Empty<FilterTextMatch>() },
+			{ "alpha", "alpha", new FilterTextMatch[] { new(0, 5) } },
+			{ "AlPhA", "alpha", new FilterTextMatch[] { new(0, 5) } },
+			{ "alpha", "alphasomething", new FilterTextMatch[] { new(0, 5) } },
+			{ "c", "CamelCaseRocks", new FilterTextMatch[] { new(0, 1) } },
+			{ "cc", "CamelCaseRocks", new FilterTextMatch[] { new(0, 1), new(5, 6) } },
+			{ "ccr", "CamelCaseRocks", new FilterTextMatch[] { new(0, 1), new(5, 6), new(9, 10) } },
+			{ "cacr", "CamelCaseRocks", new FilterTextMatch[] { new(0, 2), new(5, 6), new(9, 10) } },
+			{ "cacar", "CamelCaseRocks", new FilterTextMatch[] { new(0, 2), new(5, 7), new(9, 10) } },
+			{ "ccarocks", "CamelCaseRocks", new FilterTextMatch[] { new(0, 1), new(5, 7), new(9, 14) } },
+			{ "cr", "CamelCaseRocks", new FilterTextMatch[] { new(0, 1), new(9, 10) } },
+			{ "fba", "FooBarAbe", new FilterTextMatch[] { new(0, 1), new(3, 5) } },
+			{ "fbar", "FooBarAbe", new FilterTextMatch[] { new(0, 1), new(3, 6) } },
+			{ "fbara", "FooBarAbe", new FilterTextMatch[] { new(0, 1), new(3, 7) } },
+			{ "fbaa", "FooBarAbe", new FilterTextMatch[] { new(0, 1), new(3, 5), new(6, 7) } },
+			{ "fbaab", "FooBarAbe", new FilterTextMatch[] { new(0, 1), new(3, 5), new(6, 8) } },
+			{ "c2d", "canvasCreation2D", new FilterTextMatch[] { new(0, 1), new(14, 16) } },
+			{ "cce", "_canvasCreationEvent", new FilterTextMatch[] { new(1, 2), new(7, 8), new(15, 16) } },
+			{ "Debug Console", "Open: Debug Console", new FilterTextMatch[] { new(6, 19) } },
+			{ "Debug console", "Open: Debug Console", new FilterTextMatch[] { new(6, 19) } },
+			{ "debug console", "Open: Debug Console", new FilterTextMatch[] { new(6, 19) } },
+			{ "long", "Very long string which is over 60 characters long which will fail the test", null },
+			{ "a", "A B C D E F", null },
+			{ "a", "a BCDEF", null },
 		};
-		yield return new object[]
-		{
-			"cacr",
-			"CamelCaseRocks",
-			new FilterTextMatch[] { new(0, 2), new(5, 6), new(9, 10) }
-		};
-		yield return new object[]
-		{
-			"cacar",
-			"CamelCaseRocks",
-			new FilterTextMatch[] { new(0, 2), new(5, 7), new(9, 10) }
-		};
-		yield return new object[]
-		{
-			"ccarocks",
-			"CamelCaseRocks",
-			new FilterTextMatch[] { new(0, 1), new(5, 7), new(9, 14) }
-		};
-		yield return new object[] { "cr", "CamelCaseRocks", new FilterTextMatch[] { new(0, 1), new(9, 10) } };
-		yield return new object[] { "fba", "FooBarAbe", new FilterTextMatch[] { new(0, 1), new(3, 5) } };
-		yield return new object[] { "fbar", "FooBarAbe", new FilterTextMatch[] { new(0, 1), new(3, 6) } };
-		yield return new object[] { "fbara", "FooBarAbe", new FilterTextMatch[] { new(0, 1), new(3, 7) } };
-		yield return new object[] { "fbaa", "FooBarAbe", new FilterTextMatch[] { new(0, 1), new(3, 5), new(6, 7) } };
-		yield return new object[] { "fbaab", "FooBarAbe", new FilterTextMatch[] { new(0, 1), new(3, 5), new(6, 8) } };
-		yield return new object[] { "c2d", "canvasCreation2D", new FilterTextMatch[] { new(0, 1), new(14, 16) } };
-		yield return new object[]
-		{
-			"cce",
-			"_canvasCreationEvent",
-			new FilterTextMatch[] { new(1, 2), new(7, 8), new(15, 16) }
-		};
-		yield return new object[] { "Debug Console", "Open: Debug Console", new FilterTextMatch[] { new(6, 19) } };
-		yield return new object[] { "Debug console", "Open: Debug Console", new FilterTextMatch[] { new(6, 19) } };
-		yield return new object[] { "debug console", "Open: Debug Console", new FilterTextMatch[] { new(6, 19) } };
-#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-		yield return new object[]
-		{
-			"long",
-			"Very long string which is over 60 characters long which will fail the test",
-			null
-		};
-		yield return new object[] { "a", "A B C D E F", null };
-		yield return new object[] { "a", "a BCDEF", null };
-#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
-	}
 
 	[Theory]
 	[MemberData(nameof(MatchesCamelCase_Ok_Data))]

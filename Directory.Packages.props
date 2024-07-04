@@ -3,6 +3,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="DotNext" Version="4.15.2" />
     <PackageVersion Include="Markdig" Version="0.33.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Scripting" Version="4.8.0" />
     <PackageVersion Include="Microsoft.Win32.SystemEvents" Version="7.0.0" />

@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using Windows.Win32.Foundation;
-
 namespace Whim;
 
 internal interface IInternalWindowManager
@@ -14,12 +11,6 @@ internal interface IInternalWindowManager
 	IWindow? AddWindow(HWND hwnd);
 
 	/// <summary>
-	/// Fire the <see cref="IWindowManager.WindowAdded"/> event.
-	/// </summary>
-	/// <param name="window"></param>
-	void OnWindowAdded(IWindow window);
-
-	/// <summary>
 	/// Handles when the given window is focused.
 	/// This can be called by <see cref="Workspace.AddWindow"/>, as an already focused window may
 	/// have switched to a different workspace.
@@ -28,18 +19,9 @@ internal interface IInternalWindowManager
 	void OnWindowFocused(IWindow? window);
 
 	/// <summary>
-	/// Removes the given window from the <see cref="IWindowManager"/>, and fires:
-	///
-	/// <list type="bullet">
-	/// <item><description><see cref="IInternalWorkspaceManager.WindowRemoved(IWindow)" /></description></item>
-	/// <item><description><see cref="IWindowManager.WindowRemoved"/></description></item>
-	/// </list>
+	/// Removes the given window from the <see cref="IWindowManager"/>, and fires
+	/// <see cref="WindowRemovedTransform" />.
 	/// </summary>
 	/// <param name="window"></param>
 	void OnWindowRemoved(IWindow window);
-
-	/// <summary>
-	/// Map of <see cref="HWND"/> to <see cref="IWindow"/> for easy <see cref="IWindow"/> lookup.
-	/// </summary>
-	IReadOnlyDictionary<HWND, IWindow> HandleWindowMap { get; }
 }

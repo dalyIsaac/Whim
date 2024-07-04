@@ -64,6 +64,18 @@ public class BarConfig : INotifyPropertyChanged
 	}
 
 	/// <summary>
+	/// The backdrop/material to use for the bar. Changes to this property during runtime will
+	/// not be reflected in the UI - any changes must be done in the csx config <i>prior</i> to initializing Whim.
+	/// Switching between different backdrops can influence the transparency - for more see <see cref="BackdropType"/>.
+	///
+	/// Defaults to <see cref="BackdropType.Mica"/>, and to always show the backdrop.
+	/// </summary>
+	/// <remarks>
+	/// To change the opacity for the bar's background color, make sure the hex color includes the alpha values.
+	/// </remarks>
+	public WindowBackdropConfig Backdrop { get; set; } = new(BackdropType.Mica, AlwaysShowBackdrop: true);
+
+	/// <summary>
 	/// Creates a new bar configuration.
 	/// </summary>
 	/// <param name="leftComponents">The components to display on the left side of the bar.</param>

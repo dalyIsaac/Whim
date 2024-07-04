@@ -1,9 +1,11 @@
 name: commit
 
 on:
+  workflow_dispatch: # Allow running on-demand
   push:
     branches: [main]
     paths:
+      - ".github/workflows/commit.yml"
       - "src/**"
       - "scripts/**"
       - "whim-installer.iss"
@@ -14,6 +16,7 @@ on:
       - ".config/dotnet-tools.json"
   pull_request:
     paths:
+      - ".github/workflows/commit.yml"
       - "src/**"
       - "scripts/**"
       - "whim-installer.iss"
@@ -42,7 +45,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cache NuGet packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.NUGET_PACKAGES }}
           key: ${{ matrix.platform }}-nuget-${{ hashFiles('Directory.Packages.props') }}
@@ -73,7 +76,7 @@ jobs:
       #       dotnet format analyzers Whim.sln --verify-no-changes --no-restore
 
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.3.1
+        uses: microsoft/setup-msbuild@v2.0.0
 
       - name: Build
         run: |
@@ -91,6 +94,6 @@ jobs:
           dotnet test Whim.sln --collect:"XPlat Code Coverage;Format=opencover"
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.0
-        with:
-          files: src/**/TestResults/**/coverage.opencover.xml
+        uses: codecov/codecov-action@v4.5.0
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

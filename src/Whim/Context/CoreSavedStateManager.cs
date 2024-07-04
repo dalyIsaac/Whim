@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 
@@ -58,7 +56,11 @@ internal class CoreSavedStateManager : ICoreSavedStateManager
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				SaveState();
+				try
+				{
+					SaveState();
+				}
+				catch (Exception) { }
 			}
 
 			_disposedValue = true;

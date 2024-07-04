@@ -43,7 +43,8 @@ For example, the following resource file defines a custom `background` color of 
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Style x:Key="bar:root_panel" TargetType="RelativePanel">
-        <Setter Property="Background" Value="#2e3440" />
+        <!-- The color is a hex color, with the final two bytes being alpha (transparency). -->
+        <Setter Property="Background" Value="#2e344080" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="Padding" Value="2" />
     </Style>
@@ -64,7 +65,7 @@ The `bar:height` key is a special key that is used to communicate to Whim the de
 Notes:
 
 - The corresponding style must not contain any property other than `Height`.
-- This setting is overwritten if `Height` is explicitly set in <xref:Whim.Bar.BarConfig>.
+- This setting is overwritten if `Height` is explicitly set in <xref:Whim.Bar.BarConfig> - this may be required in some monitor configurations - tracked in [#887](https://github.com/dalyIsaac/Whim/issues/887)
 - The actual height of the bar may differ from the specified one due to overflowing elements.
 
 > [!NOTE]

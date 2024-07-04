@@ -22,7 +22,7 @@
     <Platforms>x64;arm64;Any CPU</Platforms>
     <RuntimeIdentifiers>win10-x64;win10-arm64</RuntimeIdentifiers>
     <TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
-    <Version>0.5.0</Version>
+    <Version>0.6.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Whim\Whim.csproj" />

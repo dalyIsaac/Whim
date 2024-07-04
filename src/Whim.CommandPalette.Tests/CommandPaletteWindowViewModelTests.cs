@@ -153,33 +153,31 @@ public class CommandPaletteWindowViewModelTests
 		Assert.Equal((int)(100 * 0.4), vm.MaxHeight);
 	}
 
-	public static IEnumerable<object[]> ActivateData()
-	{
-		yield return new object[] { new UnknownConfig(), false, "Confirm" };
-		yield return new object[]
+	public static TheoryData<BaseVariantConfig, bool, string> ActivateData =>
+		new()
 		{
-			new MenuVariantConfig() { Commands = Array.Empty<ICommand>() },
-			true,
-			"Confirm"
-		};
-		yield return new object[]
-		{
-			new FreeTextVariantConfig() { Callback = (text) => { }, Prompt = "Prompt" },
-			true,
-			"Confirm"
-		};
-		yield return new object[]
-		{
-			new SelectVariantConfig()
+			{ new UnknownConfig(), false, "Confirm" },
 			{
-				Options = Array.Empty<SelectOption>(),
-				Callback = (items) => { },
-				ConfirmButtonText = "Save"
+				new MenuVariantConfig() { Commands = Array.Empty<ICommand>() },
+				true,
+				"Confirm"
 			},
-			true,
-			"Save"
+			{
+				new FreeTextVariantConfig() { Callback = (text) => { }, Prompt = "Prompt" },
+				true,
+				"Confirm"
+			},
+			{
+				new SelectVariantConfig()
+				{
+					Options = Array.Empty<SelectOption>(),
+					Callback = (items) => { },
+					ConfirmButtonText = "Save"
+				},
+				true,
+				"Save"
+			}
 		};
-	}
 
 	[Theory]
 	[MemberAutoSubstituteData(nameof(ActivateData))]

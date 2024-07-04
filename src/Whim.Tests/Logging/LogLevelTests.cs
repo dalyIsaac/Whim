@@ -1,5 +1,4 @@
 using Serilog.Events;
-using Xunit;
 
 namespace Whim.Tests;
 

@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
-using Xunit;
 
 namespace Whim.Tests;
 

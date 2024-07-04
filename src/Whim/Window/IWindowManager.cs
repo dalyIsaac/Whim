@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using Windows.Win32.Foundation;
-
 namespace Whim;
 
 /// <summary>
@@ -21,11 +17,6 @@ public interface IWindowManager : IEnumerable<IWindow>, IDisposable
 	void Initialize();
 
 	/// <summary>
-	/// Add the top-level windows.
-	/// </summary>
-	void PostInitialize();
-
-	/// <summary>
 	/// Creates a new window. If the window cannot be created, <see langword="null"/> is returned.
 	/// This will try reuse existing <see cref="IWindow"/>s if possible.
 	/// </summary>
@@ -34,12 +25,12 @@ public interface IWindowManager : IEnumerable<IWindow>, IDisposable
 	/// </remarks>
 	/// <param name="hWnd">The window handle.</param>
 	/// <returns></returns>
-	IWindow? CreateWindow(HWND hWnd);
+	Result<IWindow> CreateWindow(HWND hWnd);
 
 	/// <summary>
 	/// Event for when a window is added by the <see cref="IWindowManager"/>.
 	/// </summary>
-	event EventHandler<WindowEventArgs>? WindowAdded;
+	event EventHandler<WindowAddedEventArgs>? WindowAdded;
 
 	/// <summary>
 	/// Event for when a window is focused.
@@ -49,12 +40,12 @@ public interface IWindowManager : IEnumerable<IWindow>, IDisposable
 	/// <summary>
 	/// Event for when a window is removed from Whim.
 	/// </summary>
-	event EventHandler<WindowEventArgs>? WindowRemoved;
+	event EventHandler<WindowRemovedEventArgs>? WindowRemoved;
 
 	/// <summary>
 	/// Event for when a window is being moved or resized.
 	/// </summary>
-	event EventHandler<WindowMovedEventArgs>? WindowMoveStart;
+	event EventHandler<WindowMoveStartedEventArgs>? WindowMoveStart;
 
 	/// <summary>
 	/// Event for when a window has changed location, shape, or size.
@@ -71,15 +62,15 @@ public interface IWindowManager : IEnumerable<IWindow>, IDisposable
 	/// <see cref="Windows.Win32.PInvoke.EVENT_SYSTEM_MOVESIZEEND"/> event.
 	/// See https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants for more information.
 	/// </summary>
-	event EventHandler<WindowMovedEventArgs>? WindowMoveEnd;
+	event EventHandler<WindowMoveEndedEventArgs>? WindowMoveEnd;
 
 	/// <summary>
 	/// Event for when a window has started being minimized.
 	/// </summary>
-	event EventHandler<WindowEventArgs>? WindowMinimizeStart;
+	event EventHandler<WindowMinimizeStartedEventArgs>? WindowMinimizeStart;
 
 	/// <summary>
 	/// Event for when a window has ended being minimized.
 	/// </summary>
-	event EventHandler<WindowEventArgs>? WindowMinimizeEnd;
+	event EventHandler<WindowMinimizeEndedEventArgs>? WindowMinimizeEnd;
 }

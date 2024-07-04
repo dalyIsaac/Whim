@@ -4,12 +4,13 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Whim.CommandPalette;
 
-internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
+internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window, IDisposable
 {
 	public static double TextEntryHeight => 32;
 
 	private readonly IContext _context;
 	private readonly IWindow _window;
+	private readonly WindowBackdropController _backdropController;
 
 	public ICommandPaletteWindowViewModel ViewModel { get; private set; }
 
@@ -24,7 +25,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 		_window = this.InitializeBorderlessWindow(_context, "Whim.CommandPalette", "CommandPaletteWindow");
 		this.SetIsShownInSwitchers(false);
-		this.SetSystemBackdrop();
+		_backdropController = new WindowBackdropController(this, plugin.Config.Backdrop);
 
 		Activated += CommandPaletteWindow_Activated;
 		Title = CommandPaletteConfig.Title;
@@ -142,13 +143,12 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window
 
 		using DeferWindowPosHandle handle = _context.NativeManager.DeferWindowPos();
 		handle.DeferWindowPos(
-			new WindowState()
-			{
-				Window = _window,
-				Rectangle = windowRect,
-				WindowSize = WindowSize.Normal
-			},
-			_window.Handle
+			new DeferWindowPosState(_window.Handle, WindowSize.Normal, windowRect, hwndInsertAfter: _window.Handle)
 		);
+	}
+
+	public void Dispose()
+	{
+		_backdropController.Dispose();
 	}
 }

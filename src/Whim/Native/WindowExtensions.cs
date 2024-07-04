@@ -1,9 +1,5 @@
-using System;
 using Microsoft.UI;
-using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
-using Microsoft.UI.Xaml.Media;
-using Windows.Win32.Foundation;
 
 namespace Whim;
 
@@ -86,27 +82,13 @@ public static class WindowExtensions
 		UIElementExtensions.InitializeComponent(uiWindow, componentNamespace, componentPath);
 
 		HWND hwnd = new(WinRT.Interop.WindowNative.GetWindowHandle(uiWindow));
-		IWindow window =
-			context.WindowManager.CreateWindow(GetHandle(uiWindow))
-			?? throw new InitializeWindowException("Window was unexpectedly null");
+		IWindow window = context
+			.WindowManager.CreateWindow(GetHandle(uiWindow))
+			.OrInvoke(() => throw new InitializeWindowException("Window was unexpectedly null"));
 
 		context.NativeManager.HideCaptionButtons(hwnd);
 		context.NativeManager.SetWindowCorners(hwnd);
 
 		return window;
-	}
-
-	/// <summary>
-	/// Sets the given <paramref name="window"/>'s <see cref="Microsoft.UI.Xaml.Window.SystemBackdrop"/>
-	/// to a <see cref="MicaBackdrop"/> if the current system supports it, otherwise a
-	/// <see cref="DesktopAcrylicBackdrop"/>.
-	/// </summary>
-	/// <param name="window"></param>
-	/// <param name="micaKind">The mica kind to use, if mica is supported</param>
-	public static void SetSystemBackdrop(this Microsoft.UI.Xaml.Window window, MicaKind micaKind = MicaKind.Base)
-	{
-		window.SystemBackdrop = MicaController.IsSupported()
-			? new MicaBackdrop() { Kind = micaKind }
-			: new DesktopAcrylicBackdrop();
 	}
 }

@@ -54,7 +54,7 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 	/// <inheritdoc />
 	public JsonElement? SaveState() => null;
 
-	private void WindowManager_WindowMoveStart(object? sender, WindowMovedEventArgs e)
+	private void WindowManager_WindowMoveStart(object? sender, WindowMoveStartedEventArgs e)
 	{
 		if (e.CursorDraggedPoint == null)
 		{
@@ -65,7 +65,7 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 		WindowMoved(this, e);
 	}
 
-	private void WindowMoved(object? sender, WindowMovedEventArgs e)
+	private void WindowMoved(object? sender, WindowMoveEventArgs e)
 	{
 		lock (_previewLock)
 		{
@@ -78,7 +78,7 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 			IMonitor monitor = _context.MonitorManager.GetMonitorAtPoint(cursorDraggedPoint);
 			IPoint<double> normalizedPoint = monitor.WorkingArea.NormalizeAbsolutePoint(cursorDraggedPoint);
 
-			IWorkspace? workspace = _context.WorkspaceManager.GetWorkspaceForMonitor(monitor);
+			IWorkspace? workspace = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor);
 			if (workspace == null)
 			{
 				return;

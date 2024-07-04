@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 
 namespace Whim;
@@ -8,6 +7,11 @@ namespace Whim;
 /// </summary>
 public interface IMonitor
 {
+	/// <summary>
+	/// The handle of the monitor.
+	/// </summary>
+	public HMONITOR Handle { get; }
+
 	/// <summary>
 	/// The name of the monitor.
 	/// </summary>
@@ -126,8 +130,8 @@ public static class MonitorHelpers
 	{
 		return new Rectangle<int>()
 		{
-			X = Math.Abs(Convert.ToInt32(monitor.X + (rectangle.X * monitor.Width))),
-			Y = Math.Abs(Convert.ToInt32(monitor.Y + (rectangle.Y * monitor.Height))),
+			X = Convert.ToInt32(monitor.X + (rectangle.X * monitor.Width)),
+			Y = Convert.ToInt32(monitor.Y + (rectangle.Y * monitor.Height)),
 			Width = Math.Abs(Convert.ToInt32(rectangle.Width * monitor.Width)),
 			Height = Math.Abs(Convert.ToInt32(rectangle.Height * monitor.Height))
 		};
