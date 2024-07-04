@@ -1,7 +1,10 @@
-﻿using System.Linq;
-using AutoFixture;
+﻿using AutoFixture;
+using NSubstitute;
+using Whim.TestUtils;
+using Windows.Win32.Foundation;
+using Xunit;
 
-namespace Whim.Tests;
+namespace Whim.FloatingLayout.Tests;
 
 public class FreeLayoutEngineCustomization : ICustomization
 {

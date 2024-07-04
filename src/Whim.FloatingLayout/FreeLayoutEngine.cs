@@ -1,9 +1,12 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 
-namespace Whim;
+namespace Whim.FloatingLayout;
 
 /// <summary>
 /// Layout engine that lays out all windows as free-floating.
+/// This layout will be soon renamed FloatingLayoutEngine.
 /// </summary>
 public class FreeLayoutEngine : ILayoutEngine
 {
