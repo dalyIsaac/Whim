@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Text.Json;
+using Whim.FloatingLayout;
 
 namespace Whim.LayoutPreview;
 
@@ -86,6 +87,12 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 
 			DraggedWindow = e.Window;
 			ILayoutEngine layoutEngine = workspace.ActiveLayoutEngine.MoveWindowToPoint(e.Window, normalizedPoint);
+			if (layoutEngine.GetLayoutEngine<FreeLayoutEngine>() is not null)
+			{
+				// To be renamed when FreeLayoutEngine will be renamed
+				Logger.Debug("Skip LayoutPreview as LeafLayoutEngine is a FreeLayoutEngine");
+				return;
+			}
 
 			Rectangle<int> rect = new() { Height = monitor.WorkingArea.Height, Width = monitor.WorkingArea.Width };
 
