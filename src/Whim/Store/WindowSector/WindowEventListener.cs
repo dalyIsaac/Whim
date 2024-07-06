@@ -29,7 +29,7 @@ internal class WindowEventListener : IDisposable
 
 	public void Initialize()
 	{
-		Logger.Debug("Initializing window manager...");
+		Logger.Information("Initializing WindowEventListener");
 
 		// Each of the following hooks add just one or two event constants from https://docs.microsoft.com/en-us/windows/win32/winauto/event-constants
 		_addedHooks[0] = _internalCtx.CoreNativeManager.SetWinEventHook(

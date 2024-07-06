@@ -34,6 +34,7 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 
 	public override void Initialize()
 	{
+		Logger.Information("Initializing WindowSector");
 		_listener.Initialize();
 	}
 

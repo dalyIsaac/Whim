@@ -51,6 +51,7 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 
 	public override void Initialize()
 	{
+		Logger.Information("Initializing WorkspaceSector");
 		_ctx.Store.Dispatch(new InitializeWorkspacesTransform());
 	}
 

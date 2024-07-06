@@ -16,6 +16,7 @@ internal class MonitorEventListener : IDisposable
 
 	public void Initialize()
 	{
+		Logger.Information("Initializing MonitorEventListener");
 		_internalCtx.WindowMessageMonitor.DisplayChanged += WindowMessageMonitor_MonitorsChanged;
 		_internalCtx.WindowMessageMonitor.WorkAreaChanged += WindowMessageMonitor_MonitorsChanged;
 		_internalCtx.WindowMessageMonitor.DpiChanged += WindowMessageMonitor_MonitorsChanged;

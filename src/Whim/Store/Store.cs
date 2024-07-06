@@ -67,7 +67,16 @@ public class Store : IStore
 		{
 			return Task.Run(() =>
 			{
-				Logger.Debug($"Entering task, executing transform {transform}");
+				// A very ugly way of minimizing the noise from getting notified of the many window added events.
+				switch (transform)
+				{
+					case WindowAddedTransform:
+						Logger.Verbose($"Entering task, executing transform {transform}");
+						break;
+					default:
+						Logger.Debug($"Entering task, executing transform {transform}");
+						break;
+				}
 
 				try
 				{
@@ -83,6 +92,7 @@ public class Store : IStore
 
 					if (hasQueuedEvents)
 					{
+						Logger.Debug("Enqueuing dispatch events");
 						_ctx.NativeManager.TryEnqueue(_root.DispatchEvents);
 					}
 				}

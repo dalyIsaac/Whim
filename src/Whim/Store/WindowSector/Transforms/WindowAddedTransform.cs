@@ -14,6 +14,7 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 			return windowResult;
 		}
 
+		Logger.Debug($"Adding window {window}");
 		UpdateWindowSector(mutableRootSector, window);
 		UpdateMapSector(ctx, internalCtx, mutableRootSector, window);
 
@@ -25,24 +26,30 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 		// Filter the handle.
 		if (internalCtx.CoreNativeManager.IsSplashScreen(Handle))
 		{
-			return Result.FromException<IWindow>(new WhimException($"Window {Handle} is a splash screen, ignoring"));
+			return Result.FromException<IWindow>(
+				new WhimException($"Window {Handle} is a splash screen, ignoring", LogLevel.Verbose)
+			);
 		}
 
 		if (internalCtx.CoreNativeManager.IsCloakedWindow(Handle))
 		{
-			return Result.FromException<IWindow>(new WhimException($"Window {Handle} is cloaked, ignoring"));
+			return Result.FromException<IWindow>(
+				new WhimException($"Window {Handle} is cloaked, ignoring", LogLevel.Verbose)
+			);
 		}
 
 		if (!internalCtx.CoreNativeManager.IsStandardWindow(Handle))
 		{
 			return Result.FromException<IWindow>(
-				new WhimException($"Window {Handle} is not a standard window, ignoring")
+				new WhimException($"Window {Handle} is not a standard window, ignoring", LogLevel.Verbose)
 			);
 		}
 
 		if (!internalCtx.CoreNativeManager.HasNoVisibleOwner(Handle))
 		{
-			return Result.FromException<IWindow>(new WhimException($"Window {Handle} has a visible owner, ignoring"));
+			return Result.FromException<IWindow>(
+				new WhimException($"Window {Handle} has a visible owner, ignoring", LogLevel.Verbose)
+			);
 		}
 
 		Result<IWindow> windowResult = Window.CreateWindow(ctx, internalCtx, Handle);
