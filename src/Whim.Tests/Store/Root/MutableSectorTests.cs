@@ -26,4 +26,68 @@ public class MutableRootSectorTests
 		Assert.Single(rootSector.WorkspaceSector.Workspaces);
 		Assert.Single(rootSector.WorkspaceSector.WorkspaceOrder);
 	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void HasQueuedEvents_False(MutableRootSector rootSector)
+	{
+		// Given no queued events
+
+		// When we check if there are queued events
+		bool result = rootSector.HasQueuedEvents;
+
+		// Then we get false
+		Assert.False(result);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void HasQueuedEvents_MonitorSector(MutableRootSector rootSector)
+	{
+		// Given queued events in the monitor sector
+		rootSector.MonitorSector.QueueEvent(new EventArgs());
+
+		// When we check if there are queued events
+		bool result = rootSector.HasQueuedEvents;
+
+		// Then we get true
+		Assert.True(result);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void HasQueuedEvents_WindowSector(MutableRootSector rootSector)
+	{
+		// Given queued events in the window sector
+		rootSector.WindowSector.QueueEvent(new EventArgs());
+
+		// When we check if there are queued events
+		bool result = rootSector.HasQueuedEvents;
+
+		// Then we get true
+		Assert.True(result);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void HasQueuedEvents_WorkspaceSector(MutableRootSector rootSector)
+	{
+		// Given queued events in the workspace sector
+		rootSector.WorkspaceSector.QueueEvent(new EventArgs());
+
+		// When we check if there are queued events
+		bool result = rootSector.HasQueuedEvents;
+
+		// Then we get true
+		Assert.True(result);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void HasQueuedEvents_MapSector(MutableRootSector rootSector)
+	{
+		// Given queued events in the map sector
+		rootSector.MapSector.QueueEvent(new EventArgs());
+
+		// When we check if there are queued events
+		bool result = rootSector.HasQueuedEvents;
+
+		// Then we get true
+		Assert.True(result);
+	}
 }
