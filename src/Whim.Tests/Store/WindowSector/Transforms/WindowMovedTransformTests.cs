@@ -65,7 +65,7 @@ public class WindowMovedTransformTests
 
 		// Then we get an empty result
 		Assert.True(result.IsSuccessful);
-		ctx.NativeManager.Received(1).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
+		ctx.NativeManager.DidNotReceive().TryEnqueue(Arg.Any<DispatcherQueueHandler>());
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -83,7 +83,7 @@ public class WindowMovedTransformTests
 
 		// Then we get an empty result
 		Assert.True(result.IsSuccessful);
-		ctx.NativeManager.Received(1).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
+		ctx.NativeManager.DidNotReceive().TryEnqueue(Arg.Any<DispatcherQueueHandler>());
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -104,7 +104,7 @@ public class WindowMovedTransformTests
 
 		// Then we get an empty result
 		Assert.True(result.IsSuccessful);
-		ctx.NativeManager.Received(1).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
+		ctx.NativeManager.DidNotReceive().TryEnqueue(Arg.Any<DispatcherQueueHandler>());
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
