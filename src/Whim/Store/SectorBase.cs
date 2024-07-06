@@ -8,7 +8,12 @@ internal abstract class SectorBase
 	/// <summary>
 	/// Queue of events to dispatch.
 	/// </summary>
-	protected readonly List<EventArgs> _events = new();
+	protected readonly List<EventArgs> _events = [];
+
+	/// <summary>
+	/// Whether there are events queued.
+	/// </summary>
+	public virtual bool HasQueuedEvents => _events.Count > 0;
 
 	/// <summary>
 	/// Initialize the event listeners.

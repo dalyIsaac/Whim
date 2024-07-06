@@ -9,6 +9,13 @@ internal class MutableRootSector : SectorBase, IDisposable
 	public WorkspaceSector WorkspaceSector { get; }
 	public MapSector MapSector { get; }
 
+	/// <inheritdoc/>
+	public override bool HasQueuedEvents =>
+		MonitorSector.HasQueuedEvents
+		|| WindowSector.HasQueuedEvents
+		|| WorkspaceSector.HasQueuedEvents
+		|| MapSector.HasQueuedEvents;
+
 	public MutableRootSector(IContext ctx, IInternalContext internalCtx)
 	{
 		MonitorSector = new MonitorSector(ctx, internalCtx);
