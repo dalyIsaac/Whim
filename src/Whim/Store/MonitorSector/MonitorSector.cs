@@ -23,6 +23,7 @@ internal class MonitorSector : SectorBase, IDisposable, IMonitorSector, IMonitor
 
 	public override void Initialize()
 	{
+		Logger.Information("Initializing MonitorSector");
 		_ctx.Store.Dispatch(new MonitorsChangedTransform());
 		_listener.Initialize();
 	}

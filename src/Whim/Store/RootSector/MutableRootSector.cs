@@ -26,6 +26,7 @@ internal class MutableRootSector : SectorBase, IDisposable
 
 	public override void Initialize()
 	{
+		Logger.Information("Initializing MutableRootSector");
 		MonitorSector.Initialize();
 		WindowSector.Initialize();
 		WorkspaceSector.Initialize();

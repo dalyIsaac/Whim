@@ -62,7 +62,7 @@ internal record InitializeWorkspacesTransform : Transform
 
 			if (workspace == null)
 			{
-				Logger.Debug($"Could not find workspace {savedWorkspace.Name}");
+				Logger.Information($"Could not find workspace {savedWorkspace.Name}");
 				continue;
 			}
 
@@ -72,7 +72,7 @@ internal record InitializeWorkspacesTransform : Transform
 				processedWindows.Add(hwnd);
 				if (!ctx.WindowManager.CreateWindow(hwnd).TryGet(out IWindow window))
 				{
-					Logger.Debug($"Could not find window with handle {savedWindow.Handle}");
+					Logger.Information($"Could not find window with handle {savedWindow.Handle}");
 					continue;
 				}
 
