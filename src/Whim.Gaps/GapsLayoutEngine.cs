@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Whim.FloatingLayout;
 
 namespace Whim.Gaps;
 
@@ -42,6 +43,16 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 	/// <inheritdoc />
 	public override IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor)
 	{
+		if (InnerLayoutEngine.GetLayoutEngine<FreeLayoutEngine>() is not null)
+		{
+			foreach (IWindowState windowState in InnerLayoutEngine.DoLayout(rectangle, monitor))
+			{
+				yield return windowState;
+			}
+
+			yield break;
+		}
+
 		double scaleFactor = monitor.ScaleFactor;
 		double scale = scaleFactor / 100.0;
 
