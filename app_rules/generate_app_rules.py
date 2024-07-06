@@ -59,7 +59,7 @@ FOOTER = """\
 """
 
 # config options
-TAB = "\t" * 2  # indention of of auto-generated rules, " " * 8 or "\t" * 2
+TAB = "\t" * 2  # indention of auto-generated rules, " " * 8 or "\t" * 2
 COMMENT = "// "  # comment string used for auto-generated content, "// " or "/// "
 
 
@@ -99,58 +99,86 @@ class Application:
 		with open(OUTFILE, "a") as o:
 			o.write("".join(["\n", TAB, COMMENT, self.app_name, "\n"]))
 		for r in self.app_rules:
-			IgnoreRule(r).add_rule()
+			CompositeRule(r).add_rule()
 
 
-class IgnoreRule:
-	_implemented = ("Equals", "StartsWith", "EndsWith", "Contains", "Legacy")
+class CompositeRule:
 	_processed = []
 
 	def __init__(self, rule):
-		self.kind = rule["kind"]
-		self.id = rule["id"]
-		self.matching_strategy = rule[_] if (_ := "matching_strategy") in rule else "Legacy"
-		self.comment = rule[_] if (_ := "comment") in rule else None
-
-		if self.kind not in ("Class", "Exe", "Title"):
-			raise RuntimeError("Undefined kind: " + self.kind)
-
-		# "Legacy" maps to "Equals" for processes
-		if self.matching_strategy == "Legacy" and self.kind == "Exe":
-			self.matching_strategy = "Equals"
-
-	def get_property_by_kind(self):
-		return {"Class": "WindowClass", "Exe": "ProcessFileName", "Title": "Title"}[self.kind]
-
-	def not_implemented(self):
-		if self.matching_strategy not in self._implemented:
-			with open(OUTFILE, "a") as o:
-				o.write(TAB + f"// undefined matching strategy: {self.matching_strategy}\n")
-			return True
+		self.rule = rule
 
 	def add_rule(self):
-		if self.not_implemented():
-			return
+		if isinstance(self.rule, list):
+			rule = " && ".join([Rule(r, composite=True).make_rule() for r in self.rule])
+		else:
+			rule = Rule(self.rule, composite=False).make_rule()
 
-		match self.matching_strategy:
-			case "Equals":
-				scheme = 'filterManager.Add{0}Filter("{2}");'
-			case "StartsWith" | "EndsWith" | "Contains":
-				scheme = 'filterManager.Add((window) => window.{}.{}("{}"));'
-			case "Legacy":
-				scheme = 'filterManager.Add((window) => window.{0}.StartsWith("{2}") || window.{0}.EndsWith("{2}"));'
+		if rule[:13] != "filterManager":
+			rule = f"filterManager.Add((window) => {rule});"
 
-		rule = scheme.format(self.get_property_by_kind(), self.matching_strategy, self.id)
 		if rule in self._processed:
 			pre = TAB + "// "
 			post = "  // duplicate rule"
 		else:
 			self._processed.append(rule)
 			pre = TAB
-			post = "  // " + self.comment if self.comment else ""
+			post = ""
 
 		with open(OUTFILE, "a") as o:
 			o.write("".join([pre, rule, post, "\n"]))
+
+
+class Rule:
+	def __init__(self, rule, composite=False):
+		self.kind = rule["kind"]
+		self.id = rule["id"]
+		self.matching_strategy = rule[_] if (_ := "matching_strategy") in rule else "Legacy"
+		self.composite = composite
+
+		if self.kind not in ("Class", "Exe", "Title"):
+			raise NotImplementedError("Unknown rule type: " + self.kind)
+
+		# Look for negated matching strategies
+		self.negated = self.is_negated()
+
+		# "Legacy" maps to "Equals" for processes
+		if self.matching_strategy == "Legacy" and self.kind == "Exe":
+			self.matching_strategy = "Equals"
+
+	def is_negated(self):
+		if self.matching_strategy[:7] != "DoesNot":
+			return False
+
+		# Convert matching strategy to un-negated, plural form
+		self.matching_strategy = self.matching_strategy[7:]
+		match self.matching_strategy:
+			case "Equal":
+				self.matching_strategy = "Equals"
+			case "Contain":
+				self.matching_strategy = "Contains"
+			case "EndWith":
+				self.matching_strategy = "EndsWith"
+			case "StartWith":
+				self.matching_strategy = "StartsWith"
+
+		return True
+
+	def get_property_by_kind(self):
+		return {"Class": "WindowClass", "Exe": "ProcessFileName", "Title": "Title"}[self.kind]
+
+	def make_rule(self):
+		if self.matching_strategy == "Equals" and not self.negated and not self.composite:
+			scheme = 'filterManager.Add{0}Filter("{2}");'
+		elif self.matching_strategy in {"Equals", "Contains", "EndsWith", "StartsWith"}:
+			scheme = 'window.{}.{}("{}")'
+		elif self.matching_strategy == "Legacy":
+			scheme = '(window.{0}.StartsWith("{2}") || window.{0}.EndsWith("{2}"))'
+		else:
+			raise NotImplementedError("Unknown matching strategy: " + self.matching_strategy)
+
+		rule = scheme.format(self.get_property_by_kind(), self.matching_strategy, self.id)
+		return f"!{rule}" if self.negated else rule
 
 
 # Add header
