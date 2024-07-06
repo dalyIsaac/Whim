@@ -11,6 +11,11 @@ internal abstract class SectorBase
 	protected readonly List<EventArgs> _events = new();
 
 	/// <summary>
+	/// Whether there are events queued.
+	/// </summary>
+	public virtual bool HasQueuedEvents => _events.Count > 0;
+
+	/// <summary>
 	/// Initialize the event listeners.
 	/// </summary>
 	public abstract void Initialize();
