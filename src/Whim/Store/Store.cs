@@ -85,16 +85,9 @@ public class Store : IStore
 				}
 				finally
 				{
-					bool hasQueuedEvents = _root.MutableRootSector.HasQueuedEvents;
-
-					_lock.ExitWriteLock();
 					_root.DoLayout();
-
-					if (hasQueuedEvents)
-					{
-						Logger.Debug("Enqueuing dispatch events");
-						_ctx.NativeManager.TryEnqueue(_root.DispatchEvents);
-					}
+					_root.DispatchEvents();
+					_lock.ExitWriteLock();
 				}
 			}).Result;
 		}
