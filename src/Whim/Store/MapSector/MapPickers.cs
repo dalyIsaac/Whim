@@ -102,8 +102,10 @@ public static partial class Pickers
 	) =>
 		rootSector =>
 		{
-			IWorkspaceSector sector = rootSector.WorkspaceSector;
-			ImmutableArray<WorkspaceId> order = sector.WorkspaceOrder;
+			IWorkspaceSector workspaceSector = rootSector.WorkspaceSector;
+			IMapSector mapSector = rootSector.MapSector;
+
+			ImmutableArray<WorkspaceId> order = workspaceSector.WorkspaceOrder;
 			int idx = order.IndexOf(workspaceId);
 
 			if (idx == -1)
@@ -119,9 +121,11 @@ public static partial class Pickers
 			{
 				WorkspaceId nextWorkspaceId = order[nextIdx];
 
-				if (!skipActive || nextWorkspaceId != activeWorkspaceId)
+				bool isActive = mapSector.MonitorWorkspaceMap.ContainsValue(nextWorkspaceId);
+
+				if (!skipActive || !isActive)
 				{
-					return sector.Workspaces[nextWorkspaceId];
+					return workspaceSector.Workspaces[nextWorkspaceId];
 				}
 
 				nextIdx = (nextIdx + delta).Mod(order.Length);

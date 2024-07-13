@@ -188,18 +188,29 @@ public class MapPickersTests
 		Assert.False(result.IsSuccessful);
 	}
 
+	public static TheoryData<int, int[], bool, bool, int> PickAdjacentWorkspaceData =>
+		new()
+		{
+			{ 0, new[] { 0 }, false, false, 1 },
+			{ 0, new[] { 0 }, true, false, 3 },
+			{ 3, new[] { 3 }, false, false, 0 },
+			{ 3, new[] { 3 }, true, false, 2 },
+			{ 0, new[] { 1 }, false, true, 2 },
+			{ 1, new[] { 0 }, true, true, 3 },
+			{ 3, new[] { 0 }, false, true, 1 },
+			{ 3, new[] { 2 }, true, true, 1 },
+			// Multiple active, skip active.
+			{ 0, new[] { 0, 1 }, false, true, 2 },
+			{ 1, new[] { 0, 1 }, true, true, 3 },
+			{ 3, new[] { 0, 2 }, false, true, 1 },
+			{ 3, new[] { 2, 3 }, true, true, 1 }
+		};
+
 	[Theory]
-	[InlineAutoSubstituteData<StoreCustomization>(0, 0, false, false, 1)]
-	[InlineAutoSubstituteData<StoreCustomization>(0, 0, true, false, 3)]
-	[InlineAutoSubstituteData<StoreCustomization>(3, 3, false, false, 0)]
-	[InlineAutoSubstituteData<StoreCustomization>(3, 3, true, false, 2)]
-	[InlineAutoSubstituteData<StoreCustomization>(0, 1, false, true, 2)]
-	[InlineAutoSubstituteData<StoreCustomization>(1, 0, true, true, 3)]
-	[InlineAutoSubstituteData<StoreCustomization>(3, 0, false, true, 1)]
-	[InlineAutoSubstituteData<StoreCustomization>(3, 2, true, true, 1)]
+	[MemberAutoSubstituteData<StoreCustomization>(nameof(PickAdjacentWorkspaceData))]
 	internal void PickAdjacentWorkspace_Success(
 		int startIdx,
-		int activeIdx,
+		int[] activeIdx,
 		bool reverse,
 		bool skipActive,
 		int expected,
@@ -219,11 +230,15 @@ public class MapPickersTests
 
 		ImmutableArray<Guid> workspaceOrder = root.WorkspaceSector.WorkspaceOrder;
 		Guid startId = workspaceOrder[startIdx];
+		Random gen = new();
 
-		root.MapSector.MonitorWorkspaceMap = root.MapSector.MonitorWorkspaceMap.SetItem(
-			root.MonitorSector.ActiveMonitorHandle,
-			workspaceOrder[activeIdx]
-		);
+		for (int idx = 0; idx < activeIdx.Length; idx++)
+		{
+			root.MapSector.MonitorWorkspaceMap = root.MapSector.MonitorWorkspaceMap.SetItem(
+				(HMONITOR)idx,
+				workspaceOrder[activeIdx[idx]]
+			);
+		}
 
 		// When we get the workspace
 		var result = ctx.Store.Pick(Pickers.PickAdjacentWorkspace(startId, reverse, skipActive));
