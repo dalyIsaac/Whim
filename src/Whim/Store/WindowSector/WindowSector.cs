@@ -10,13 +10,9 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 
 	public ImmutableDictionary<HWND, IWindow> Windows { get; internal set; } = ImmutableDictionary<HWND, IWindow>.Empty;
 
-	public ImmutableHashSet<HWND> HandledLocationRestoringWindows { get; internal set; } = ImmutableHashSet<HWND>.Empty;
-
 	public bool IsMovingWindow { get; internal set; }
 
 	public bool IsLeftMouseButtonDown { get; internal set; }
-
-	public int WindowMovedDelay { get; internal set; } = 2000;
 
 	public event EventHandler<WindowAddedEventArgs>? WindowAdded;
 	public event EventHandler<WindowFocusedEventArgs>? WindowFocused;

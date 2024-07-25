@@ -32,9 +32,6 @@ internal record WindowRemovedTransform(IWindow Window) : Transform
 	private void UpdateWindowSector(WindowSector windowSector)
 	{
 		windowSector.Windows = windowSector.Windows.Remove(Window.Handle);
-		windowSector.HandledLocationRestoringWindows = windowSector.HandledLocationRestoringWindows.Remove(
-			Window.Handle
-		);
 		windowSector.QueueEvent(new WindowRemovedEventArgs() { Window = Window });
 	}
 

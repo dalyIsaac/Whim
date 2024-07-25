@@ -11,12 +11,6 @@ public interface IWindowSector
 	ImmutableDictionary<HWND, IWindow> Windows { get; }
 
 	/// <summary>
-	/// The windows which had their first location change event handled - see <see cref="IWindowManager.LocationRestoringFilterManager"/>.
-	/// We maintain a set of the windows that have been handled so that we don't enter an infinite loop of location change events.
-	/// </summary>
-	ImmutableHashSet<HWND> HandledLocationRestoringWindows { get; }
-
-	/// <summary>
 	/// Whether a window is currently moving.
 	/// </summary>
 	bool IsMovingWindow { get; }
@@ -26,9 +20,4 @@ public interface IWindowSector
 	/// Used for window movement.
 	/// </summary>
 	bool IsLeftMouseButtonDown { get; }
-
-	/// <summary>
-	/// The delay to wait when trying to restore windows from <see cref="IWindowManager.LocationRestoringFilterManager"/>.
-	/// </summary>
-	int WindowMovedDelay { get; }
 }

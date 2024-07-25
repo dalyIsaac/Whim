@@ -13,12 +13,4 @@ public static class DefaultFilteredWindows
 	{
 		DefaultFilteredWindowsKomorebi.LoadWindowsIgnoredByKomorebi(filterManager);
 	}
-
-	/// <summary>
-	/// Load the windows which try to set their own locations when the start up.
-	/// See <see cref="IWindowManager.LocationRestoringFilterManager"/>
-	/// </summary>
-	/// <param name="filterManager"></param>
-	public static void LoadLocationRestoringWindows(IFilterManager filterManager) =>
-		filterManager.AddProcessFileNameFilter("firefox.exe").AddProcessFileNameFilter("gateway64.exe");
 }
