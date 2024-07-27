@@ -20,11 +20,14 @@ internal class WindowEventListener : IDisposable
 	/// </summary>
 	private readonly WINEVENTPROC _hookDelegate;
 
+	private readonly WindowProcessorManager _processorManager;
+
 	public WindowEventListener(IContext ctx, IInternalContext internalCtx)
 	{
 		_ctx = ctx;
 		_internalCtx = internalCtx;
 		_hookDelegate = new WINEVENTPROC(WinEventProcWrapper);
+		_processorManager = new WindowProcessorManager(ctx);
 	}
 
 	public void Initialize()
@@ -130,6 +133,21 @@ internal class WindowEventListener : IDisposable
 			{
 				return;
 			}
+		}
+
+		if (
+			_processorManager.ShouldBeIgnored(
+				window,
+				_hWinEventHook,
+				eventType,
+				idObject,
+				idChild,
+				_idEventThread,
+				_dwmsEventTime
+			)
+		)
+		{
+			return;
 		}
 
 		Logger.Debug($"Windows event 0x{eventType:X4} for {window}");
