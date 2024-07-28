@@ -147,6 +147,7 @@ internal class WindowEventListener : IDisposable
 			)
 		)
 		{
+			Logger.Debug("Ignoring event for window due to processor");
 			return;
 		}
 

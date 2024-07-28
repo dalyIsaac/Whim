@@ -7,7 +7,6 @@ namespace Whim;
 /// </summary>
 public class FirefoxWindowProcessor : IWindowProcessor
 {
-	private bool _hasSeenFirstShow;
 	private bool _hasSeenFirstCloaked;
 
 	/// <inheritdoc/>
@@ -51,7 +50,7 @@ public class FirefoxWindowProcessor : IWindowProcessor
 	/// </item>
 	/// </list>
 	///
-	/// To deal with these issues, we ignore the first <c>EVENT_OBJECT_SHOW</c> and <c>EVENT_OBJECT_CLOAKED</c> events.
+	/// To deal with these issues, we ignore all events until the first <see cref="PInvoke.EVENT_OBJECT_CLOAKED"/> event is received.
 	/// </remarks>
 	/// <param name="eventType"></param>
 	/// <param name="idObject"></param>
@@ -67,15 +66,7 @@ public class FirefoxWindowProcessor : IWindowProcessor
 		uint dwmsEventTime
 	)
 	{
-		if (eventType == PInvoke.EVENT_OBJECT_SHOW)
-		{
-			if (!_hasSeenFirstShow)
-			{
-				_hasSeenFirstShow = true;
-				return WindowProcessorResult.Ignore;
-			}
-		}
-
+		Logger.Debug($"Firefox event: 0x{eventType:X4}");
 		if (eventType == PInvoke.EVENT_OBJECT_CLOAKED)
 		{
 			if (!_hasSeenFirstCloaked)
@@ -90,6 +81,12 @@ public class FirefoxWindowProcessor : IWindowProcessor
 			return WindowProcessorResult.RemoveProcessor;
 		}
 
+		if (!_hasSeenFirstCloaked)
+		{
+			return WindowProcessorResult.Ignore;
+		}
+
 		return WindowProcessorResult.Process;
+		// return WindowProcessorResult.Process;
 	}
 }
