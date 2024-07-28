@@ -13,9 +13,9 @@ public interface IWindowProcessor
 	public IWindow Window { get; }
 
 	/// <summary>
-	/// Indicates whether the event should be ignored by Whim.
+	/// Processes the given event.
 	///
-	/// For more, see https://docs.microsoft.com/en-us/windows/win32/api/winuser/nc-winuser-wineventproc
+	/// For more about the arguments, see https://docs.microsoft.com/en-us/windows/win32/api/winuser/nc-winuser-wineventproc
 	/// </summary>
 	/// <param name="eventType"></param>
 	/// <param name="idObject"></param>
@@ -25,7 +25,7 @@ public interface IWindowProcessor
 	/// <returns>
 	/// Whether the event should be ignored by Whim.
 	/// </returns>
-	public abstract WindowProcessorResult ShouldBeIgnored(
+	public abstract WindowProcessorResult ProcessEvent(
 		uint eventType,
 		int idObject,
 		int idChild,

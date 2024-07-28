@@ -35,7 +35,7 @@ internal class WindowProcessorManager
 			}
 		}
 
-		WindowProcessorResult result = processor.ShouldBeIgnored(
+		WindowProcessorResult result = processor.ProcessEvent(
 			eventType,
 			idObject,
 			idChild,

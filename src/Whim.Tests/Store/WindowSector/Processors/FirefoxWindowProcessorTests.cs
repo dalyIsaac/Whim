@@ -49,7 +49,7 @@ public class FirefoxWindowProcessorTests
 		IWindowProcessor processor = FirefoxWindowProcessor.Create(ctx, window)!;
 
 		// When the event is passed to `ShouldBeIgnored`
-		WindowProcessorResult result = processor.ShouldBeIgnored(eventType, 0, 0, 0, 0);
+		WindowProcessorResult result = processor.ProcessEvent(eventType, 0, 0, 0, 0);
 
 		// Then the event should be ignored
 		Assert.Equal(WindowProcessorResult.Ignore, result);
@@ -64,7 +64,7 @@ public class FirefoxWindowProcessorTests
 		IWindowProcessor processor = FirefoxWindowProcessor.Create(ctx, window)!;
 
 		// When the event is passed to `ShouldBeIgnored`
-		WindowProcessorResult result = processor.ShouldBeIgnored(PInvoke.EVENT_OBJECT_CLOAKED, 0, 0, 0, 0);
+		WindowProcessorResult result = processor.ProcessEvent(PInvoke.EVENT_OBJECT_CLOAKED, 0, 0, 0, 0);
 
 		// Then the event should be ignored
 		Assert.Equal(WindowProcessorResult.Ignore, result);
@@ -77,10 +77,10 @@ public class FirefoxWindowProcessorTests
 		// Given the second `EVENT_OBJECT_CLOAKED` event
 		window.ProcessFileName.Returns("firefox.exe");
 		IWindowProcessor processor = FirefoxWindowProcessor.Create(ctx, window)!;
-		processor.ShouldBeIgnored(PInvoke.EVENT_OBJECT_CLOAKED, 0, 0, 0, 0);
+		processor.ProcessEvent(PInvoke.EVENT_OBJECT_CLOAKED, 0, 0, 0, 0);
 
 		// When the event is passed to `ShouldBeIgnored`
-		WindowProcessorResult result = processor.ShouldBeIgnored(PInvoke.EVENT_OBJECT_CLOAKED, 0, 0, 0, 0);
+		WindowProcessorResult result = processor.ProcessEvent(PInvoke.EVENT_OBJECT_CLOAKED, 0, 0, 0, 0);
 
 		// Then the event should not be ignored
 		Assert.Equal(WindowProcessorResult.Process, result);
@@ -95,7 +95,7 @@ public class FirefoxWindowProcessorTests
 		IWindowProcessor processor = FirefoxWindowProcessor.Create(ctx, window)!;
 
 		// When the event is passed to `ShouldBeIgnored`
-		WindowProcessorResult result = processor.ShouldBeIgnored(PInvoke.EVENT_OBJECT_DESTROY, 0, 0, 0, 0);
+		WindowProcessorResult result = processor.ProcessEvent(PInvoke.EVENT_OBJECT_DESTROY, 0, 0, 0, 0);
 
 		// Then the processor should be removed
 		Assert.Equal(WindowProcessorResult.RemoveProcessor, result);

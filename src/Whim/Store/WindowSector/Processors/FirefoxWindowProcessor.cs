@@ -58,7 +58,7 @@ public class FirefoxWindowProcessor : IWindowProcessor
 	/// <param name="idEventThread"></param>
 	/// <param name="dwmsEventTime"></param>
 	/// <returns></returns>
-	public WindowProcessorResult ShouldBeIgnored(
+	public WindowProcessorResult ProcessEvent(
 		uint eventType,
 		int idObject,
 		int idChild,
