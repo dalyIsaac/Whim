@@ -66,7 +66,6 @@ public class FirefoxWindowProcessor : IWindowProcessor
 		uint dwmsEventTime
 	)
 	{
-		Logger.Debug($"Firefox event: 0x{eventType:X4}");
 		if (eventType == PInvoke.EVENT_OBJECT_CLOAKED)
 		{
 			if (!_hasSeenFirstCloaked)
@@ -87,6 +86,5 @@ public class FirefoxWindowProcessor : IWindowProcessor
 		}
 
 		return WindowProcessorResult.Process;
-		// return WindowProcessorResult.Process;
 	}
 }
