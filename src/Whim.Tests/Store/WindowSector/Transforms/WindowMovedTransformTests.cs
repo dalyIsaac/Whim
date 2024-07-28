@@ -85,9 +85,8 @@ public class WindowMovedTransformTests
 		// When we dispatch the transform
 		(Result<Unit>? result, Assert.RaisedEvent<WindowMovedEventArgs> ev) = AssertRaises(ctx, mutableRootSector, sut);
 
-		// Then we get a resulting window, a NativeManager.TryEnqueue to restore a window's position, and a second TryEnqueue
-		// to dispatch the events.
-		ctx.NativeManager.Received(2).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
+		// Then we get a resulting window and a second TryEnqueue to dispatch the events.
+		ctx.NativeManager.Received(1).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
 		Assert.True(result!.Value.IsSuccessful);
 		Assert.Equal(new Point<int>(1, 2), ev.Arguments.CursorDraggedPoint);
 		Assert.Equal(window, ev.Arguments.Window);
