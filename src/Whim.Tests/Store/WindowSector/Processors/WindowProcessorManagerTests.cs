@@ -4,8 +4,7 @@ namespace Whim.Tests;
 
 public class WindowProcessorManagerTests
 {
-	[Theory]
-	[AutoSubstituteData]
+	[Theory, AutoSubstituteData]
 	public void ShouldBeIgnored_CreateProcessor_Failure(IContext ctx, IWindow window)
 	{
 		// Given a window which is not a Firefox window
@@ -19,8 +18,7 @@ public class WindowProcessorManagerTests
 		Assert.False(result);
 	}
 
-	[Theory]
-	[AutoSubstituteData]
+	[Theory, AutoSubstituteData]
 	public void ShouldBeIgnored_CreateProcessor_Success(IContext ctx, IWindow window)
 	{
 		// Given a window which is a Firefox window
@@ -34,8 +32,7 @@ public class WindowProcessorManagerTests
 		Assert.True(result);
 	}
 
-	[Theory]
-	[AutoSubstituteData]
+	[Theory, AutoSubstituteData]
 	public void ShouldBeIgnored_ProcessorExists_Process(IContext ctx, IWindow window)
 	{
 		// Given a window which is a Firefox window
@@ -50,8 +47,7 @@ public class WindowProcessorManagerTests
 		Assert.False(result);
 	}
 
-	[Theory]
-	[AutoSubstituteData]
+	[Theory, AutoSubstituteData]
 	public void ShouldBeIgnored_ProcessorExists_RemoveProcessor(IContext ctx, IWindow window)
 	{
 		// Given a window which is a Firefox window

@@ -4,8 +4,7 @@ namespace Whim.Tests;
 
 public class FirefoxWindowProcessorTests
 {
-	[Theory]
-	[AutoSubstituteData]
+	[Theory, AutoSubstituteData]
 	public void Create_Failure(IContext ctx, IWindow window)
 	{
 		// Given a window which is not a Firefox window
@@ -18,8 +17,7 @@ public class FirefoxWindowProcessorTests
 		Assert.Null(processor);
 	}
 
-	[Theory]
-	[AutoSubstituteData]
+	[Theory, AutoSubstituteData]
 	public void Create_Success(IContext ctx, IWindow window)
 	{
 		// Given a window which is a Firefox window
@@ -55,8 +53,7 @@ public class FirefoxWindowProcessorTests
 		Assert.Equal(WindowProcessorResult.Ignore, result);
 	}
 
-	[Theory]
-	[AutoSubstituteData]
+	[Theory, AutoSubstituteData]
 	public void ShouldBeIgnored_FirstCloaked(IContext ctx, IWindow window)
 	{
 		// Given the first `EVENT_OBJECT_CLOAKED` event
@@ -70,8 +67,7 @@ public class FirefoxWindowProcessorTests
 		Assert.Equal(WindowProcessorResult.Ignore, result);
 	}
 
-	[Theory]
-	[AutoSubstituteData]
+	[Theory, AutoSubstituteData]
 	public void ShouldNotBeIgnored_SecondCloaked(IContext ctx, IWindow window)
 	{
 		// Given the second `EVENT_OBJECT_CLOAKED` event
@@ -86,8 +82,7 @@ public class FirefoxWindowProcessorTests
 		Assert.Equal(WindowProcessorResult.Process, result);
 	}
 
-	[Theory]
-	[AutoSubstituteData]
+	[Theory, AutoSubstituteData]
 	public void ShouldBeRemoved(IContext ctx, IWindow window)
 	{
 		// Given an `EVENT_OBJECT_DESTROY` event
@@ -99,5 +94,19 @@ public class FirefoxWindowProcessorTests
 
 		// Then the processor should be removed
 		Assert.Equal(WindowProcessorResult.RemoveProcessor, result);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void Window(IContext ctx, IWindow window)
+	{
+		// Given a window which is a Firefox window
+		window.ProcessFileName.Returns("firefox.exe");
+		IWindowProcessor processor = FirefoxWindowProcessor.Create(ctx, window)!;
+
+		// When `Window` is called
+		IWindow result = processor.Window;
+
+		// Then the result should be the window
+		Assert.Equal(window, result);
 	}
 }
