@@ -3,7 +3,6 @@ namespace Whim;
 /// <summary>
 /// Operation describing how to update the state of the <see cref="Store"/>.
 /// The implementing record should be populated with the payload.
-/// <see cref="Execute"/> will specify how to update the store.
 /// </summary>
 /// <typeparam name="TResult"></typeparam>
 public abstract record Transform<TResult>

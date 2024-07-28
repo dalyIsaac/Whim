@@ -3,7 +3,7 @@
 The <xref:Whim.FocusIndicator.FocusIndicatorPlugin> adds a border around the current window which Whim has tracked as having focus. Various options can be configured using the <xref:Whim.FocusIndicator.FocusIndicatorConfig>.
 
 > [!WARNING]
-> The focus may remain on a window despite the focus shifting to an untracked window (e.g., the Start Menu). This depends on the config option <xref:Whim.IRouterManager.RouteToActiveWorkspace>.
+> The focus may remain on a window despite the focus shifting to an untracked window (e.g., the Start Menu). This depends on the config option <xref:Whim.IRouterManager.RouterOptions>.
 
 ![Focus indicator demo](../../images/focus-indicator-demo.gif)
 
