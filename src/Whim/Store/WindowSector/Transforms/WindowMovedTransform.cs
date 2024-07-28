@@ -12,29 +12,9 @@ internal record WindowMovedTransform(IWindow Window) : Transform
 	{
 		WindowSector windowSector = mutableRootSector.WindowSector;
 
-		if (!windowSector.IsMovingWindow)
+		if (!windowSector.IsMovingWindow && Window.ProcessFileName == null)
 		{
-			if (
-				Window.ProcessFileName == null
-				|| windowSector.HandledLocationRestoringWindows.Contains(Window.Handle)
-				|| !ctx.WindowManager.LocationRestoringFilterManager.ShouldBeIgnored(Window)
-			)
-			{
-				// Ignore the window moving event.
-				return Unit.Result;
-			}
-
-			// The window's application tried to restore its position.
-			// Wait, then restore the position.
-			ctx.NativeManager.TryEnqueue(async () =>
-			{
-				await Task.Delay(windowSector.WindowMovedDelay).ConfigureAwait(true);
-				if (ctx.Store.Pick(PickWorkspaceByWindow(Window.Handle)).TryGet(out IWorkspace workspace))
-				{
-					windowSector.HandledLocationRestoringWindows.Add(Window.Handle);
-					workspace.DoLayout();
-				}
-			});
+			return Unit.Result;
 		}
 
 		IPoint<int>? cursorPoint = null;

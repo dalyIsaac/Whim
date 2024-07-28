@@ -5,6 +5,7 @@ items:
   - href: getting-started/customize.md
   - href: getting-started/plugins.md
   - href: getting-started/inspiration.md
+  - href: getting-started/troubleshooting.md
 
   - name: Customize
   - href: customize/scripting.md

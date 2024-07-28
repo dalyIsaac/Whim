@@ -2,13 +2,9 @@
 
 ## Managing troublesome windows
 
-Some windows like to remember their size and position. This can be a problem for Whim, because it will try to manage the window's size and position, and the window will fight back.
+Some applications are difficult to manage. Whim will try to manage them as best as it can, but there are some limitations. For example, Firefox will try to remember its size and position, and will fight against Whim's attempts to manage it on first load.
 
-The <xref:Whim.IWindowManager> exposes an <xref:Whim.IFilterManager> called <xref:Whim.IWindowManager.LocationRestoringFilterManager>. `LocationRestoringFilterManager` listens to <xref:Whim.IWindowManager.WindowMoved> events for these windows and will force their parent <xref:Whim.IWorkspace> to do a layout two seconds after their first `WindowMoved` event, attempting to restore the window to its correct position.
-
-If this doesn't work, dragging a window's edge will force a layout, which should fix the window's position. This is an area which could use further improvement.
-
-Examples of troublesome windows include Firefox and JetBrains Gateway.
+To get around this, Whim has <xref:Whim.IWindowProcessor>s. These are used to tell Whim to ignore specific window messages (see [Event Constants](https://learn.microsoft.com/en-us/windows/win32/winauto/event-constants)). For example, the <xref:Whim.FirefoxWindowProcessor> ignores all events until the first [`EVENT_OBJECT_CLOAKED`](https://learn.microsoft.com/en-us/windows/win32/winauto/event-constants#:~:text=EVENT_OBJECT_CLOAKED) event is received.
 
 ## Window launch locations
 
@@ -18,7 +14,7 @@ To counteract this, the <xref:Whim.IRouterManager> has a <xref:Whim.IRouterManag
 
 ## Adding/removing monitors
 
-When adding and removing monitors, Windows will very helpfully move windows between monitors. However, this conflicts with Whim. To work around Windows' helpfulness, Whim (in the `WindowManager` and `ButlerEventHandlers` will) ignore [`WinEvents`](../architecture/events.md) for 3 seconds for tracked windows. After the 3 seconds have elapsed, Whim will layout all the active workspaces.
+When adding and removing monitors, Windows will very helpfully move windows between monitors. However, this conflicts with Whim. To work around Windows' helpfulness, Whim (in the `WindowManager` and `ButlerEventHandlers`) will ignore [`WinEvents`](../architecture/events.md) for 3 seconds for tracked windows. After the 3 seconds have elapsed, Whim will lay out all the active workspaces.
 
 ## Window overflows given area
 

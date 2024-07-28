@@ -6,11 +6,6 @@ namespace Whim;
 public interface IWindowManager : IEnumerable<IWindow>, IDisposable
 {
 	/// <summary>
-	/// Filters for windows that will try restore window locations after their windows are created.
-	/// </summary>
-	IFilterManager LocationRestoringFilterManager { get; }
-
-	/// <summary>
 	/// Initialize the windows event hooks.
 	/// </summary>
 	/// <returns></returns>

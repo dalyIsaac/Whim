@@ -21,16 +21,10 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	/// </summary>
 	private bool _disposedValue;
 
-	public IFilterManager LocationRestoringFilterManager { get; } = new FilterManager();
-
-	internal int WindowMovedDelay { get; init; } = 2000;
-
 	public WindowManager(IContext context, IInternalContext internalContext)
 	{
 		_context = context;
 		_internalContext = internalContext;
-
-		DefaultFilteredWindows.LoadLocationRestoringWindows(LocationRestoringFilterManager);
 	}
 
 	public void Initialize()

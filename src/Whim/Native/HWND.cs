@@ -16,7 +16,10 @@ namespace Windows.Win32
 
 			internal static HWND Null => default;
 
-			internal bool IsNull => Value == default;
+			/// <summary>
+			/// Whether the handle has a zero value.
+			/// </summary>
+			public bool IsNull => Value == default;
 
 			/// <inheritdoc />
 			public static implicit operator IntPtr(HWND value) => value.Value;

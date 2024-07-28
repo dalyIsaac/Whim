@@ -302,7 +302,7 @@ public class WindowEventListenerTests
 
 	[MemberAutoSubstituteData(nameof(WinEventProcCasesData))]
 	[Theory]
-	internal void WindowFocusedTransform(
+	internal void WinEventProc_Dispatch(
 		uint ev,
 		Func<IWindow, Transform> createTransform,
 		IContext ctx,
@@ -321,6 +321,26 @@ public class WindowEventListenerTests
 
 		// Then a transform was dispatched
 		ctx.Store.Received(1).Dispatch(createTransform(window));
+	}
+
+	[Theory, AutoSubstituteData]
+	internal void WinEventProc_Ignore(IContext ctx, IInternalContext internalCtx, IWindow window)
+	{
+		// Given the window is a Firefox window
+		window.Handle.Returns((HWND)1);
+		window.ProcessFileName.Returns("firefox.exe");
+		ctx.Store.Pick(Arg.Any<PurePicker<Result<IWindow>>>()).Returns(Result.FromValue(window));
+
+		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
+
+		WindowEventListener sut = new(ctx, internalCtx);
+		sut.Initialize();
+
+		// When we send through the event
+		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, window.Handle, 0, 0, 0, 0);
+
+		// Then nothing happens
+		AssertDispatches(ctx);
 	}
 
 	[Theory, AutoSubstituteData]
