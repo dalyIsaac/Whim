@@ -55,6 +55,9 @@ internal static class DefaultFilteredWindowsKomorebi
 		// Affinity Publisher 2
 		filterManager.AddProcessFileNameFilter("Publisher.exe");
 
+		// Amazon Chime
+		filterManager.Add((window) => window.Title.EndsWith("Meeting Controls"));
+
 		// AutoHotkey
 		filterManager.Add((window) => window.Title.StartsWith("Window Spy"));
 		filterManager.AddProcessFileNameFilter("AutoHotkeyUX.exe");
@@ -70,6 +73,9 @@ internal static class DefaultFilteredWindowsKomorebi
 
 		// Citrix Receiver
 		filterManager.AddProcessFileNameFilter("SelfService.exe");
+
+		// Core Temp
+		filterManager.AddProcessFileNameFilter("Core Temp.exe");
 
 		// Credential Manager UI Host
 		filterManager.AddProcessFileNameFilter("CredentialUIBroker.exe");
