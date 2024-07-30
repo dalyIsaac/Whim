@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Whim.FloatingLayout.Tests;
 
-public class FreeLayoutEngineCustomization : ICustomization
+public class FloatingLayoutEngineCustomization : ICustomization
 {
 	public void Customize(IFixture fixture)
 	{
@@ -24,7 +24,7 @@ public class FreeLayoutEngineCustomization : ICustomization
 	}
 }
 
-public class FreeLayoutEngineTests
+public class FloatingLayoutEngineTests
 {
 	private static readonly LayoutEngineIdentity identity = new();
 
@@ -32,21 +32,21 @@ public class FreeLayoutEngineTests
 	public void Name(IContext context)
 	{
 		// Given
-		ILayoutEngine engine = new FreeLayoutEngine(context, identity);
+		ILayoutEngine engine = new FloatingLayoutEngine(context, identity);
 
 		// When
 		string name = engine.Name;
 
 		// Then
-		Assert.Equal("Free", name);
+		Assert.Equal("Floating", name);
 	}
 
 	#region AddWindow
-	[Theory, AutoSubstituteData<FreeLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
 	public void AddWindow(IContext context, IWindow window)
 	{
 		// Given
-		ILayoutEngine engine = new FreeLayoutEngine(context, identity);
+		ILayoutEngine engine = new FloatingLayoutEngine(context, identity);
 
 		// When
 		ILayoutEngine newLayoutEngine = engine.AddWindow(window);
@@ -56,11 +56,11 @@ public class FreeLayoutEngineTests
 		Assert.Equal(1, newLayoutEngine.Count);
 	}
 
-	[Theory, AutoSubstituteData<FreeLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
 	public void AddWindow_WindowAlreadyPresent(IContext context, IWindow window)
 	{
 		// Given
-		ILayoutEngine engine = new FreeLayoutEngine(context, identity).AddWindow(window);
+		ILayoutEngine engine = new FloatingLayoutEngine(context, identity).AddWindow(window);
 
 		// When
 		ILayoutEngine newLayoutEngine = engine.AddWindow(window);
@@ -72,11 +72,11 @@ public class FreeLayoutEngineTests
 	#endregion
 
 	#region RemoveWindow
-	[Theory, AutoSubstituteData<FreeLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
 	public void Remove(IContext context, IWindow window)
 	{
 		// Given
-		ILayoutEngine engine = new FreeLayoutEngine(context, identity).AddWindow(window);
+		ILayoutEngine engine = new FloatingLayoutEngine(context, identity).AddWindow(window);
 
 		// When
 		ILayoutEngine newLayoutEngine = engine.RemoveWindow(window);
@@ -86,11 +86,11 @@ public class FreeLayoutEngineTests
 		Assert.Equal(0, newLayoutEngine.Count);
 	}
 
-	[Theory, AutoSubstituteData<FreeLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
 	public void Remove_NoChanges(IContext context, IWindow window)
 	{
 		// Given
-		ILayoutEngine engine = new FreeLayoutEngine(context, identity).AddWindow(window);
+		ILayoutEngine engine = new FloatingLayoutEngine(context, identity).AddWindow(window);
 
 		// When
 		ILayoutEngine newLayoutEngine = engine.RemoveWindow(Substitute.For<IWindow>());
@@ -102,11 +102,11 @@ public class FreeLayoutEngineTests
 	#endregion RemoveWindow
 
 	#region Contains
-	[Theory, AutoSubstituteData<FreeLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
 	public void Contains(IContext context, IWindow window)
 	{
 		// Given
-		ILayoutEngine engine = new FreeLayoutEngine(context, identity).AddWindow(window);
+		ILayoutEngine engine = new FloatingLayoutEngine(context, identity).AddWindow(window);
 
 		// When
 		bool contains = engine.ContainsWindow(window);
@@ -115,11 +115,11 @@ public class FreeLayoutEngineTests
 		Assert.True(contains);
 	}
 
-	[Theory, AutoSubstituteData<FreeLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
 	public void Contains_False(IContext context, IWindow window)
 	{
 		// Given
-		ILayoutEngine engine = new FreeLayoutEngine(context, identity).AddWindow(window);
+		ILayoutEngine engine = new FloatingLayoutEngine(context, identity).AddWindow(window);
 
 		// When
 		bool contains = engine.ContainsWindow(Substitute.For<IWindow>());
@@ -130,11 +130,11 @@ public class FreeLayoutEngineTests
 	#endregion
 
 	#region DoLayout
-	[Theory, AutoSubstituteData<FreeLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
 	public void DoLayout_Empty(IContext context)
 	{
 		// Given
-		ILayoutEngine engine = new FreeLayoutEngine(context, identity);
+		ILayoutEngine engine = new FloatingLayoutEngine(context, identity);
 
 		// When
 		IWindowState[] windowStates = engine
@@ -145,7 +145,7 @@ public class FreeLayoutEngineTests
 		Assert.Empty(windowStates);
 	}
 
-	[Theory, AutoSubstituteData<FreeLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
 	public void DoLayout_KeepWindowSize(
 		IContext context,
 		IWindow windowNormal,
@@ -156,7 +156,7 @@ public class FreeLayoutEngineTests
 		// Given
 		windowMinimized.IsMinimized.Returns(true);
 		windowMaximized.IsMaximized.Returns(true);
-		ILayoutEngine engine = new FreeLayoutEngine(context, identity)
+		ILayoutEngine engine = new FloatingLayoutEngine(context, identity)
 			.AddWindow(windowNormal)
 			.AddWindow(windowMinimized)
 			.AddWindow(windowMaximized);
@@ -180,7 +180,7 @@ public class FreeLayoutEngineTests
 	public void GetFirstWindow_Null(IContext context)
 	{
 		// Given
-		ILayoutEngine engine = new FreeLayoutEngine(context, identity);
+		ILayoutEngine engine = new FloatingLayoutEngine(context, identity);
 
 		// When
 		IWindow? result = engine.GetFirstWindow();
@@ -189,11 +189,11 @@ public class FreeLayoutEngineTests
 		Assert.Null(result);
 	}
 
-	[Theory, AutoSubstituteData<FreeLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
 	public void GetFirstWindow_SingleWindow(IContext context, IWindow window)
 	{
 		// Given
-		ILayoutEngine engine = new FreeLayoutEngine(context, identity).AddWindow(window);
+		ILayoutEngine engine = new FloatingLayoutEngine(context, identity).AddWindow(window);
 
 		// When
 		IWindow? result = engine.GetFirstWindow();
@@ -204,11 +204,11 @@ public class FreeLayoutEngineTests
 	#endregion
 
 	#region WindowRelated
-	[Theory, AutoSubstituteData<FreeLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
 	public void MoveWindowToPoint(IContext context, IWindow window)
 	{
 		// Given
-		ILayoutEngine engine = new FreeLayoutEngine(context, identity).AddWindow(window);
+		ILayoutEngine engine = new FloatingLayoutEngine(context, identity).AddWindow(window);
 		IRectangle<double> rect = new Rectangle<double>();
 
 		// When
@@ -218,11 +218,11 @@ public class FreeLayoutEngineTests
 		Assert.Equal(engine, newEngine);
 	}
 
-	[Theory, AutoSubstituteData<FreeLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
 	public void MoveWindowEdgesInDirection(IContext context, IWindow window)
 	{
 		// Given
-		ILayoutEngine engine = new FreeLayoutEngine(context, identity).AddWindow(window);
+		ILayoutEngine engine = new FloatingLayoutEngine(context, identity).AddWindow(window);
 		IRectangle<double> rect = new Rectangle<double>();
 
 		// When
@@ -232,11 +232,11 @@ public class FreeLayoutEngineTests
 		Assert.Equal(engine, newEngine);
 	}
 
-	[Theory, AutoSubstituteData<FreeLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
 	public void MinimizeWindowStart(IContext context, IWindow window)
 	{
 		// Given
-		ILayoutEngine engine = new FreeLayoutEngine(context, identity).AddWindow(window);
+		ILayoutEngine engine = new FloatingLayoutEngine(context, identity).AddWindow(window);
 
 		// When
 		ILayoutEngine newEngine = engine.MinimizeWindowStart(window);
@@ -245,11 +245,11 @@ public class FreeLayoutEngineTests
 		Assert.Equal(engine, newEngine);
 	}
 
-	[Theory, AutoSubstituteData<FreeLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
 	public void MinimizeWindowEnd(IContext context, IWindow window)
 	{
 		// Given
-		ILayoutEngine engine = new FreeLayoutEngine(context, identity).AddWindow(window);
+		ILayoutEngine engine = new FloatingLayoutEngine(context, identity).AddWindow(window);
 
 		// When
 		ILayoutEngine newEngine = engine.MinimizeWindowEnd(window);
@@ -258,11 +258,11 @@ public class FreeLayoutEngineTests
 		Assert.Equal(engine, newEngine);
 	}
 
-	[Theory, AutoSubstituteData<FreeLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
 	public void FocusWindowInDirection(IContext context, IWindow window)
 	{
 		// Given
-		ILayoutEngine engine = new FreeLayoutEngine(context, identity).AddWindow(window);
+		ILayoutEngine engine = new FloatingLayoutEngine(context, identity).AddWindow(window);
 
 		// When
 		ILayoutEngine newEngine = engine.FocusWindowInDirection(Direction.Up, window);
@@ -271,11 +271,11 @@ public class FreeLayoutEngineTests
 		Assert.Equal(engine, newEngine);
 	}
 
-	[Theory, AutoSubstituteData<FreeLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
 	public void SwapWindowInDirection(IContext context, IWindow window)
 	{
 		// Given
-		ILayoutEngine engine = new FreeLayoutEngine(context, identity).AddWindow(window);
+		ILayoutEngine engine = new FloatingLayoutEngine(context, identity).AddWindow(window);
 
 		// When
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Up, window);
@@ -285,11 +285,11 @@ public class FreeLayoutEngineTests
 	}
 	#endregion
 
-	[Theory, AutoSubstituteData<FreeLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
 	public void PerformCustomAction(IContext context, IWindow window)
 	{
 		// Given
-		ILayoutEngine engine = new FreeLayoutEngine(context, identity).AddWindow(window);
+		ILayoutEngine engine = new FloatingLayoutEngine(context, identity).AddWindow(window);
 		LayoutEngineCustomAction<string> action =
 			new()
 			{

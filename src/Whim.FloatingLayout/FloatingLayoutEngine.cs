@@ -6,15 +6,14 @@ namespace Whim.FloatingLayout;
 
 /// <summary>
 /// Layout engine that lays out all windows as free-floating.
-/// This layout will be soon renamed FloatingLayoutEngine.
 /// </summary>
-public class FreeLayoutEngine : ILayoutEngine
+public class FloatingLayoutEngine : ILayoutEngine
 {
 	private readonly IContext _context;
 	private readonly ImmutableDictionary<IWindow, IRectangle<double>> _dict;
 
 	/// <inheritdoc/>
-	public string Name { get; init; } = "Free";
+	public string Name { get; init; } = "Floating";
 
 	/// <inheritdoc/>
 	public int Count => _dict.Count;
@@ -23,18 +22,21 @@ public class FreeLayoutEngine : ILayoutEngine
 	public LayoutEngineIdentity Identity { get; }
 
 	/// <summary>
-	/// Creates a new instance of the <see cref="FreeLayoutEngine"/> class.
+	/// Creates a new instance of the <see cref="FloatingLayoutEngine"/> class.
 	/// </summary>
 	/// <param name="context">The identity of the layout engine.</param>
 	/// <param name="identity">The context of the layout engine.</param>
-	public FreeLayoutEngine(IContext context, LayoutEngineIdentity identity)
+	public FloatingLayoutEngine(IContext context, LayoutEngineIdentity identity)
 	{
 		Identity = identity;
 		_context = context;
 		_dict = ImmutableDictionary<IWindow, IRectangle<double>>.Empty;
 	}
 
-	private FreeLayoutEngine(FreeLayoutEngine layoutEngine, ImmutableDictionary<IWindow, IRectangle<double>> dict)
+	private FloatingLayoutEngine(
+		FloatingLayoutEngine layoutEngine,
+		ImmutableDictionary<IWindow, IRectangle<double>> dict
+	)
 	{
 		Name = layoutEngine.Name;
 		Identity = layoutEngine.Identity;
@@ -63,7 +65,7 @@ public class FreeLayoutEngine : ILayoutEngine
 
 		ImmutableDictionary<IWindow, IRectangle<double>> newDict = _dict.Remove(window);
 
-		return new FreeLayoutEngine(this, newDict);
+		return new FloatingLayoutEngine(this, newDict);
 	}
 
 	/// <inheritdoc/>
@@ -118,7 +120,7 @@ public class FreeLayoutEngine : ILayoutEngine
 	/// <inheritdoc/>
 	public ILayoutEngine SwapWindowInDirection(Direction direction, IWindow window) => this;
 
-	private FreeLayoutEngine UpdateWindowRectangle(IWindow window)
+	private FloatingLayoutEngine UpdateWindowRectangle(IWindow window)
 	{
 		// Try get the old rectangle.
 		IRectangle<double>? oldRectangle = _dict.TryGetValue(window, out IRectangle<double>? rectangle)
@@ -143,6 +145,6 @@ public class FreeLayoutEngine : ILayoutEngine
 
 		ImmutableDictionary<IWindow, IRectangle<double>> newDict = _dict.SetItem(window, newUnitSquareRectangle);
 
-		return new FreeLayoutEngine(this, newDict);
+		return new FloatingLayoutEngine(this, newDict);
 	}
 }

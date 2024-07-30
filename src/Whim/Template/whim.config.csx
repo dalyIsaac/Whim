@@ -114,7 +114,7 @@ void DoConfig(IContext context)
 			(id) => SliceLayouts.CreateSecondaryPrimaryLayout(context, sliceLayoutPlugin, id),
 			(id) => new FocusLayoutEngine(id),
 			(id) => new TreeLayoutEngine(context, treeLayoutPlugin, id),
-			(id) => new FreeLayoutEngine(context, id)
+			(id) => new FloatingLayoutEngine(context, id)
 		};
 }
 

@@ -87,10 +87,9 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 
 			DraggedWindow = e.Window;
 			ILayoutEngine layoutEngine = workspace.ActiveLayoutEngine.MoveWindowToPoint(e.Window, normalizedPoint);
-			if (layoutEngine.GetLayoutEngine<FreeLayoutEngine>() is not null)
+			if (layoutEngine.GetLayoutEngine<FloatingLayoutEngine>() is not null)
 			{
-				// To be renamed when FreeLayoutEngine will be renamed
-				Logger.Debug("Skip LayoutPreview as LeafLayoutEngine is a FreeLayoutEngine");
+				Logger.Debug("Skip LayoutPreview as LeafLayoutEngine is a FloatingLayoutEngine");
 				return;
 			}
 

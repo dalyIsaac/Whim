@@ -414,7 +414,7 @@ public class GapsLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void DoLayout_WithFreeLayoutEngine(GapsConfig gapsConfig, IWindow window)
+	public void DoLayout_WithFloatingLayoutEngine(GapsConfig gapsConfig, IWindow window)
 	{
 		// Input
 		Rectangle<int> rect = new(0, 0, -300, -300);
@@ -431,8 +431,8 @@ public class GapsLayoutEngineTests
 		// Given
 		ILayoutEngine innerLayoutEngine = Substitute.For<ILayoutEngine>();
 		innerLayoutEngine
-			.GetLayoutEngine<FreeLayoutEngine>()
-			.Returns(new FreeLayoutEngine(Substitute.For<IContext>(), _identity));
+			.GetLayoutEngine<FloatingLayoutEngine>()
+			.Returns(new FloatingLayoutEngine(Substitute.For<IContext>(), _identity));
 		innerLayoutEngine.DoLayout(rect, Arg.Any<IMonitor>()).Returns(inputWindowStates);
 
 		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
