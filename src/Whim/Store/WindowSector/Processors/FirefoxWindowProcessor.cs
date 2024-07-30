@@ -53,7 +53,7 @@ public class FirefoxWindowProcessor : IWindowProcessor
 	/// </list>
 	///
 	/// To deal with these issues, we ignore all events until the first <see cref="PInvoke.EVENT_OBJECT_CLOAKED"/> event is received.
-	/// If Firefox is already visible
+	/// If Firefox is already visible, we process all events.
 	/// </remarks>
 	/// <param name="eventType"></param>
 	/// <param name="idObject"></param>
