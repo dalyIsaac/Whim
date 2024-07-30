@@ -30,6 +30,21 @@ public class FirefoxWindowProcessorTests
 		Assert.NotNull(processor);
 	}
 
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void ProcessEvent_IsStartupWindow(IContext ctx, IWindow window, MutableRootSector rootSector)
+	{
+		// Given a Firefox window which was open when Whim started
+		window.ProcessFileName.Returns("firefox.exe");
+		rootSector.WindowSector.StartupWindows = new[] { window.Handle }.ToImmutableHashSet();
+		IWindowProcessor processor = FirefoxWindowProcessor.Create(ctx, window)!;
+
+		// When `ProcessEvent` is called
+		WindowProcessorResult result = processor.ProcessEvent(PInvoke.EVENT_OBJECT_SHOW, 0, 0, 0, 0);
+
+		// Then the window should be marked as a startup window
+		Assert.Equal(WindowProcessorResult.Process, result);
+	}
+
 	[Theory]
 	[InlineAutoSubstituteData(PInvoke.EVENT_OBJECT_SHOW)]
 	[InlineAutoSubstituteData(PInvoke.EVENT_SYSTEM_FOREGROUND)]
@@ -40,13 +55,13 @@ public class FirefoxWindowProcessorTests
 	[InlineAutoSubstituteData(PInvoke.EVENT_OBJECT_LOCATIONCHANGE)]
 	[InlineAutoSubstituteData(PInvoke.EVENT_SYSTEM_MINIMIZESTART)]
 	[InlineAutoSubstituteData(PInvoke.EVENT_SYSTEM_MINIMIZEEND)]
-	public void ShouldBeIgnored_UntilCloaked(uint eventType, IContext ctx, IWindow window)
+	public void ProcessEvent_UntilCloaked(uint eventType, IContext ctx, IWindow window)
 	{
 		// Given an event which isn't `EVENT_OBJECT_CLOAKED` or `EVENT_OBJECT_DESTROY`
 		window.ProcessFileName.Returns("firefox.exe");
 		IWindowProcessor processor = FirefoxWindowProcessor.Create(ctx, window)!;
 
-		// When the event is passed to `ShouldBeIgnored`
+		// When the event is passed to `ProcessEvent`
 		WindowProcessorResult result = processor.ProcessEvent(eventType, 0, 0, 0, 0);
 
 		// Then the event should be ignored
@@ -54,13 +69,13 @@ public class FirefoxWindowProcessorTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void ShouldBeIgnored_FirstCloaked(IContext ctx, IWindow window)
+	public void ProcessEvent_FirstCloaked(IContext ctx, IWindow window)
 	{
 		// Given the first `EVENT_OBJECT_CLOAKED` event
 		window.ProcessFileName.Returns("firefox.exe");
 		IWindowProcessor processor = FirefoxWindowProcessor.Create(ctx, window)!;
 
-		// When the event is passed to `ShouldBeIgnored`
+		// When the event is passed to `ProcessEvent`
 		WindowProcessorResult result = processor.ProcessEvent(PInvoke.EVENT_OBJECT_CLOAKED, 0, 0, 0, 0);
 
 		// Then the event should be ignored
@@ -75,7 +90,7 @@ public class FirefoxWindowProcessorTests
 		IWindowProcessor processor = FirefoxWindowProcessor.Create(ctx, window)!;
 		processor.ProcessEvent(PInvoke.EVENT_OBJECT_CLOAKED, 0, 0, 0, 0);
 
-		// When the event is passed to `ShouldBeIgnored`
+		// When the event is passed to `ProcessEvent`
 		WindowProcessorResult result = processor.ProcessEvent(PInvoke.EVENT_OBJECT_CLOAKED, 0, 0, 0, 0);
 
 		// Then the event should not be ignored
@@ -89,7 +104,7 @@ public class FirefoxWindowProcessorTests
 		window.ProcessFileName.Returns("firefox.exe");
 		IWindowProcessor processor = FirefoxWindowProcessor.Create(ctx, window)!;
 
-		// When the event is passed to `ShouldBeIgnored`
+		// When the event is passed to `ProcessEvent`
 		WindowProcessorResult result = processor.ProcessEvent(PInvoke.EVENT_OBJECT_DESTROY, 0, 0, 0, 0);
 
 		// Then the processor should be removed

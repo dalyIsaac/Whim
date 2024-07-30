@@ -11,6 +11,11 @@ public interface IWindowSector
 	ImmutableDictionary<HWND, IWindow> Windows { get; }
 
 	/// <summary>
+	/// The windows which were open when Whim started.
+	/// </summary>
+	ImmutableHashSet<HWND> StartupWindows { get; }
+
+	/// <summary>
 	/// Whether a window is currently moving.
 	/// </summary>
 	bool IsMovingWindow { get; }
