@@ -1,4 +1,5 @@
 using System.Linq;
+using FluentAssertions;
 
 namespace Whim.Tests;
 
@@ -254,5 +255,11 @@ public class InitializeWorkspacesTransformTests
 		Assert.Equal(browserWorkspace.Id, rootSector.MapSector.MonitorWorkspaceMap[BrowserMonitor]);
 		Assert.Equal(codeWorkspace.Id, rootSector.MapSector.MonitorWorkspaceMap[CodeMonitor]);
 		Assert.Equal(autoWorkspace.Id, rootSector.MapSector.MonitorWorkspaceMap[AutoMonitor]);
+
+		// - the startup windows are set
+		Assert.Equal(5, rootSector.WindowSector.StartupWindows.Count);
+		rootSector
+			.WindowSector.StartupWindows.Should()
+			.BeEquivalentTo(new[] { BrowserHandle, DiscordHandle, SpotifyHandle, BrokenHandle, VscodeHandle });
 	}
 }
