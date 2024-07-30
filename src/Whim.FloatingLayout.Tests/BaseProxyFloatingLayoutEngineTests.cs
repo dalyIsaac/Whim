@@ -4,14 +4,14 @@ using Windows.Win32.Foundation;
 
 namespace Whim.FloatingLayout.Tests;
 
-public class BaseFloatingLayoutEngineTests : ProxyLayoutEngineBaseTests
+public class BaseProxyFloatingLayoutEngineTests : ProxyLayoutEngineBaseTests
 {
 	public override Func<ILayoutEngine, BaseProxyLayoutEngine> CreateLayoutEngine =>
 		(inner) =>
 		{
 			IContext context = Substitute.For<IContext>();
 			IMonitor monitor = Substitute.For<IMonitor>();
-			IInternalFloatingLayoutPlugin plugin = Substitute.For<IInternalFloatingLayoutPlugin>();
+			IInternalProxyFloatingLayoutPlugin plugin = Substitute.For<IInternalProxyFloatingLayoutPlugin>();
 			ILayoutEngine innerLayoutEngine = Substitute.For<ILayoutEngine>();
 
 			context
@@ -21,6 +21,6 @@ public class BaseFloatingLayoutEngineTests : ProxyLayoutEngineBaseTests
 			monitor.WorkingArea.Returns(new Rectangle<int>() { Width = 1000, Height = 1000 });
 			innerLayoutEngine.Identity.Returns(new LayoutEngineIdentity());
 
-			return new FloatingLayoutEngine(context, plugin, innerLayoutEngine);
+			return new ProxyFloatingLayoutEngine(context, plugin, innerLayoutEngine);
 		};
 }

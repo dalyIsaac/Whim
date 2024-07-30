@@ -1,10 +1,10 @@
-# Floating Layout Plugin
+# Proxy Floating Layout Plugin
 
-The <xref:Whim.FloatingLayout.FloatingLayoutPlugin> adds a `FloatingLayoutEngine` proxy engine to Whim. This adds the ability for windows to float outside of any other layouts.
+The <xref:Whim.FloatingLayout.ProxyFloatingLayoutPlugin> adds a `ProxyFloatingLayoutEngine` proxy engine to Whim. This adds the ability for windows to float outside of any other layouts.
 
-The <xref:Whim.FloatingLayout.FloatingLayoutPlugin> has no configuration options.
+The <xref:Whim.FloatingLayout.ProxyFloatingLayoutPlugin> has no configuration options.
 
-![Floating layout demo](../../images/floating-layout-demo.gif)
+![Proxy Floating layout demo](../../images/proxy-floating-layout-demo.gif)
 
 ## Example Config
 
@@ -19,8 +19,8 @@ void DoConfig(IContext context)
 {
   // ...
 
-  FloatingLayoutPlugin floatingLayoutPlugin = new(context);
-  context.PluginManager.AddPlugin(floatingLayoutPlugin);
+  ProxyFloatingLayoutPlugin proxyFloatingLayoutPlugin = new(context);
+  context.PluginManager.AddPlugin(proxyFloatingLayoutPlugin);
 
   // ...
 }

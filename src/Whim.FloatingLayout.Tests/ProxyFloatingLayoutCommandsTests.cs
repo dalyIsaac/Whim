@@ -5,23 +5,23 @@ using Xunit;
 
 namespace Whim.FloatingLayout.Tests;
 
-public class FloatingLayoutCommandsCustomization : ICustomization
+public class ProxyFloatingLayoutCommandsCustomization : ICustomization
 {
 	public void Customize(IFixture fixture)
 	{
-		IFloatingLayoutPlugin plugin = fixture.Freeze<IFloatingLayoutPlugin>();
+		IProxyFloatingLayoutPlugin plugin = fixture.Freeze<IProxyFloatingLayoutPlugin>();
 		plugin.Name.Returns("whim.floating_layout");
 		fixture.Inject(plugin);
 	}
 }
 
-public class FloatingLayoutCommandsTests
+public class ProxyFloatingLayoutCommandsTests
 {
-	private static ICommand CreateSut(IFloatingLayoutPlugin plugin, string id) =>
-		new PluginCommandsTestUtils(new FloatingLayoutCommands(plugin)).GetCommand(id);
+	private static ICommand CreateSut(IProxyFloatingLayoutPlugin plugin, string id) =>
+		new PluginCommandsTestUtils(new ProxyFloatingLayoutCommands(plugin)).GetCommand(id);
 
-	[Theory, AutoSubstituteData<FloatingLayoutCommandsCustomization>]
-	public void ToggleWindowFloatingCommand(IFloatingLayoutPlugin plugin)
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutCommandsCustomization>]
+	public void ToggleWindowFloatingCommand(IProxyFloatingLayoutPlugin plugin)
 	{
 		// Given
 		ICommand command = CreateSut(plugin, "whim.floating_layout.toggle_window_floating");
@@ -33,8 +33,8 @@ public class FloatingLayoutCommandsTests
 		plugin.Received(1).ToggleWindowFloating(null);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutCommandsCustomization>]
-	public void MarkWindowAsFloatingCommand(IFloatingLayoutPlugin plugin)
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutCommandsCustomization>]
+	public void MarkWindowAsFloatingCommand(IProxyFloatingLayoutPlugin plugin)
 	{
 		// Given
 		ICommand command = CreateSut(plugin, "whim.floating_layout.mark_window_as_floating");
@@ -46,8 +46,8 @@ public class FloatingLayoutCommandsTests
 		plugin.Received(1).MarkWindowAsFloating(null);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutCommandsCustomization>]
-	public void MarkWindowAsDockedCommand(IFloatingLayoutPlugin plugin)
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutCommandsCustomization>]
+	public void MarkWindowAsDockedCommand(IProxyFloatingLayoutPlugin plugin)
 	{
 		// Given
 		ICommand command = CreateSut(plugin, "whim.floating_layout.mark_window_as_docked");

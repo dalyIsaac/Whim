@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Whim.FloatingLayout.Tests;
 
-public class FloatingLayoutEngineCustomization : ICustomization
+public class ProxyFloatingLayoutEngineCustomization : ICustomization
 {
 	public void Customize(IFixture fixture)
 	{
@@ -25,10 +25,10 @@ public class FloatingLayoutEngineCustomization : ICustomization
 	}
 }
 
-public class FloatingLayoutEngineTests
+public class ProxyFloatingLayoutEngineTests
 {
-	private FloatingLayoutEngineTests MarkWindowAsFloating(
-		IInternalFloatingLayoutPlugin plugin,
+	private ProxyFloatingLayoutEngineTests MarkWindowAsFloating(
+		IInternalProxyFloatingLayoutPlugin plugin,
 		IWindow window,
 		ILayoutEngine innerLayoutEngine
 	)
@@ -47,7 +47,7 @@ public class FloatingLayoutEngineTests
 		return this;
 	}
 
-	private FloatingLayoutEngineTests Setup_RemoveWindow(
+	private ProxyFloatingLayoutEngineTests Setup_RemoveWindow(
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -58,7 +58,7 @@ public class FloatingLayoutEngineTests
 		return this;
 	}
 
-	private FloatingLayoutEngineTests Setup_AddWindow(
+	private ProxyFloatingLayoutEngineTests Setup_AddWindow(
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -70,16 +70,16 @@ public class FloatingLayoutEngineTests
 	}
 
 	#region AddWindow
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void AddWindow_UseInner(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
 	{
 		// Given
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine = engine.AddWindow(window);
@@ -89,16 +89,16 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.Received(1).AddWindow(window);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void AddWindow_UseInner_SameInner(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
 	{
 		// Given
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		innerLayoutEngine.AddWindow(window).Returns(innerLayoutEngine);
 
@@ -110,17 +110,17 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.Received(1).AddWindow(window);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void AddWindow_FloatingInPlugin_Succeed(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
 	{
 		// Given
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine = engine.AddWindow(window);
@@ -130,17 +130,17 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.DidNotReceive().AddWindow(window);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void AddWindow_FloatingInPlugin_FailOnNoRectangle(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
 	{
 		// Given
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		context.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns((Rectangle<int>?)null);
 
@@ -152,10 +152,10 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.Received(1).AddWindow(window);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void AddWindow_FloatingInPlugin_FailOnSameRectangle(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -164,7 +164,7 @@ public class FloatingLayoutEngineTests
 		// Given
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
 			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine1 = engine.AddWindow(window);
@@ -177,10 +177,10 @@ public class FloatingLayoutEngineTests
 		newInnerLayoutEngine.DidNotReceive().AddWindow(window);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void AddWindow_FloatingInPlugin_RemoveFromInner(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -188,7 +188,7 @@ public class FloatingLayoutEngineTests
 	{
 		// Given
 		Setup_AddWindow(innerLayoutEngine, window, newInnerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine = engine.AddWindow(window);
@@ -204,16 +204,16 @@ public class FloatingLayoutEngineTests
 	#endregion
 
 	#region RemoveWindow
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void RemoveWindow_UseInner(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
 	{
 		// Given
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine = engine.RemoveWindow(window);
@@ -223,16 +223,16 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.Received(1).RemoveWindow(window);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void RemoveWindow_UseInner_SameInner(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
 	{
 		// Given
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 		innerLayoutEngine.RemoveWindow(window).Returns(innerLayoutEngine);
 
 		// When
@@ -243,10 +243,10 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.Received(1).RemoveWindow(window);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void RemoveWindow_FloatingInPlugin(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -255,7 +255,7 @@ public class FloatingLayoutEngineTests
 		// Given
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
 			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine1 = engine.AddWindow(window);
@@ -273,17 +273,17 @@ public class FloatingLayoutEngineTests
 	#endregion
 
 	#region MoveWindowToPoint
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void MoveWindowToPoint_UseInner(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
 	{
 		// Given
 		IRectangle<double> rect = new Rectangle<double>();
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, rect);
@@ -293,10 +293,10 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.Received(1).MoveWindowToPoint(window, rect);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void MoveWindowToPoint_UseInner_SameInner(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -304,7 +304,7 @@ public class FloatingLayoutEngineTests
 		// Given
 		IRectangle<double> rect = new Rectangle<double>();
 
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 		innerLayoutEngine.MoveWindowToPoint(window, rect).Returns(innerLayoutEngine);
 
 		// When
@@ -315,10 +315,10 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.Received(1).MoveWindowToPoint(window, rect);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void MoveWindowToPoint_FloatingInPlugin_WindowIsNew(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -327,7 +327,7 @@ public class FloatingLayoutEngineTests
 		IRectangle<double> rect = new Rectangle<double>();
 
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, rect);
@@ -337,10 +337,10 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.DidNotReceive().MoveWindowToPoint(window, rect);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void MoveWindowToPoint_FloatingInPlugin_WindowIsNotNew_SameRectangle(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -351,7 +351,7 @@ public class FloatingLayoutEngineTests
 
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
 			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine1 = engine.AddWindow(window);
@@ -363,10 +363,10 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.DidNotReceive().MoveWindowToPoint(window, rect);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void MoveWindowToPoint_FloatingInPlugin_WindowIsNotNew_DifferentRectangle(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -377,7 +377,7 @@ public class FloatingLayoutEngineTests
 
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
 			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine1 = engine.AddWindow(window);
@@ -389,10 +389,10 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.DidNotReceive().MoveWindowToPoint(window, rect);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void MoveWindowToPoint_FloatingInPlugin_CannotGetDwmRectangle(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -403,7 +403,7 @@ public class FloatingLayoutEngineTests
 
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
 			.Setup_AddWindow(innerLayoutEngine, window, newInnerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		context.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns((Rectangle<int>?)null);
 
@@ -420,10 +420,10 @@ public class FloatingLayoutEngineTests
 	#endregion
 
 	#region MoveWindowEdgesInDirection
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void MoveWindowEdgesInDirection_UseInner(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -432,7 +432,7 @@ public class FloatingLayoutEngineTests
 		Direction direction = Direction.Left;
 		IPoint<double> deltas = new Point<double>();
 
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowEdgesInDirection(direction, deltas, window);
@@ -442,10 +442,10 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.Received(1).MoveWindowEdgesInDirection(direction, deltas, window);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void MoveWindowEdgesInDirection_UseInner_SameInner(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -454,7 +454,7 @@ public class FloatingLayoutEngineTests
 		Direction direction = Direction.Left;
 		IPoint<double> deltas = new Point<double>();
 
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		innerLayoutEngine.MoveWindowEdgesInDirection(direction, deltas, window).Returns(innerLayoutEngine);
 
@@ -466,10 +466,10 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.Received(1).MoveWindowEdgesInDirection(direction, deltas, window);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void MoveWindowEdgesInDirection_FloatingInPlugin_WindowIsNew(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -479,7 +479,7 @@ public class FloatingLayoutEngineTests
 		IPoint<double> deltas = new Point<double>();
 
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowEdgesInDirection(direction, deltas, window);
@@ -489,10 +489,10 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.DidNotReceive().MoveWindowEdgesInDirection(direction, deltas, window);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void MoveWindowEdgesInDirection_FloatingInPlugin_WindowIsNotNew_SameRectangle(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -504,7 +504,7 @@ public class FloatingLayoutEngineTests
 
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
 			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine1 = engine.AddWindow(window);
@@ -516,10 +516,10 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.DidNotReceive().MoveWindowEdgesInDirection(direction, deltas, window);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void MoveWindowEdgesInDirection_FloatingInPlugin_WindowIsNotNew_DifferentRectangle(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -531,7 +531,7 @@ public class FloatingLayoutEngineTests
 
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
 			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine1 = engine.AddWindow(window);
@@ -543,10 +543,10 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.DidNotReceive().MoveWindowEdgesInDirection(direction, deltas, window);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void MoveWindowEdgesInDirection_FloatingInPlugin_CannotGetDwmRectangle(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -558,7 +558,7 @@ public class FloatingLayoutEngineTests
 
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
 			.Setup_AddWindow(innerLayoutEngine, window, newInnerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		context.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns((Rectangle<int>?)null);
 
@@ -575,10 +575,10 @@ public class FloatingLayoutEngineTests
 	#endregion
 
 	#region DoLayout
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void DoLayout(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		ILayoutEngine newInnerLayoutEngine,
 		IWindow window1,
@@ -591,7 +591,7 @@ public class FloatingLayoutEngineTests
 		MarkWindowAsFloating(plugin, floatingWindow, innerLayoutEngine)
 			.Setup_RemoveWindow(innerLayoutEngine, floatingWindow, newInnerLayoutEngine);
 
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		newInnerLayoutEngine
 			.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
@@ -668,15 +668,15 @@ public class FloatingLayoutEngineTests
 	#endregion
 
 	#region GetFirstWindow
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void GetFirstWindow_NoInnerFirstWindow(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine
 	)
 	{
 		// Given
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 		innerLayoutEngine.GetFirstWindow().Returns((IWindow?)null);
 
 		// When
@@ -686,16 +686,16 @@ public class FloatingLayoutEngineTests
 		Assert.Null(firstWindow);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void GetFirstWindow_InnerFirstWindow(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
 	{
 		// Given
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 		innerLayoutEngine.GetFirstWindow().Returns(window);
 
 		// When
@@ -705,17 +705,17 @@ public class FloatingLayoutEngineTests
 		Assert.Same(window, firstWindow);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void GetFirstWindow_FloatingFirstWindow(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
 	)
 	{
 		// Given
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
 			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
@@ -731,17 +731,17 @@ public class FloatingLayoutEngineTests
 	#endregion
 
 	#region FocusWindowInDirection
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void FocusWindowInDirection_UseInner(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
 	{
 		// Given
 		Direction direction = Direction.Left;
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 		innerLayoutEngine.GetFirstWindow().Returns(window);
 
 		// When
@@ -752,13 +752,13 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.DidNotReceive().GetFirstWindow();
 		window.DidNotReceive().Focus();
 		Assert.NotSame(engine, newEngine);
-		Assert.IsType<FloatingLayoutEngine>(newEngine);
+		Assert.IsType<ProxyFloatingLayoutEngine>(newEngine);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void FocusWindowInDirection_FloatingWindow_NullFirstWindow(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -769,7 +769,7 @@ public class FloatingLayoutEngineTests
 
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
 			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine = engine.AddWindow(window).FocusWindowInDirection(direction, window);
@@ -783,13 +783,13 @@ public class FloatingLayoutEngineTests
 
 		window.DidNotReceive().Focus();
 		Assert.NotSame(engine, newEngine);
-		Assert.IsType<FloatingLayoutEngine>(newEngine);
+		Assert.IsType<ProxyFloatingLayoutEngine>(newEngine);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void FocusWindowInDirection_FloatingWindow_DefinedFirstWindow(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -800,7 +800,7 @@ public class FloatingLayoutEngineTests
 
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
 			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		newInnerLayoutEngine.GetFirstWindow().Returns(window);
 
@@ -816,22 +816,22 @@ public class FloatingLayoutEngineTests
 
 		window.Received(1).Focus();
 		Assert.NotSame(engine, newEngine);
-		Assert.IsType<FloatingLayoutEngine>(newEngine);
+		Assert.IsType<ProxyFloatingLayoutEngine>(newEngine);
 	}
 	#endregion
 
 	#region SwapWindowInDirection
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void SwapWindowInDirection_UseInner(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
 	{
 		// Given
 		Direction direction = Direction.Left;
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(direction, window);
@@ -839,20 +839,20 @@ public class FloatingLayoutEngineTests
 		// Then
 		innerLayoutEngine.Received(1).SwapWindowInDirection(direction, window);
 		Assert.NotSame(engine, newEngine);
-		Assert.IsType<FloatingLayoutEngine>(newEngine);
+		Assert.IsType<ProxyFloatingLayoutEngine>(newEngine);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void SwapWindowInDirection_UseInner_SameInner(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
 	{
 		// Given
 		Direction direction = Direction.Left;
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		innerLayoutEngine.SwapWindowInDirection(direction, window).Returns(innerLayoutEngine);
 
@@ -862,13 +862,13 @@ public class FloatingLayoutEngineTests
 		// Then
 		innerLayoutEngine.Received(1).SwapWindowInDirection(direction, window);
 		Assert.Same(engine, newEngine);
-		Assert.IsType<FloatingLayoutEngine>(newEngine);
+		Assert.IsType<ProxyFloatingLayoutEngine>(newEngine);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void SwapWindowInDirection_FloatingWindow(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -879,7 +879,7 @@ public class FloatingLayoutEngineTests
 
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
 			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine = engine.AddWindow(window).SwapWindowInDirection(direction, window);
@@ -887,21 +887,21 @@ public class FloatingLayoutEngineTests
 		// Then
 		innerLayoutEngine.DidNotReceive().SwapWindowInDirection(direction, window);
 		Assert.NotSame(engine, newEngine);
-		Assert.IsType<FloatingLayoutEngine>(newEngine);
+		Assert.IsType<ProxyFloatingLayoutEngine>(newEngine);
 	}
 	#endregion
 
 	#region ContainsWindow
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void ContainsWindow_UseInner(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
 	{
 		// Given
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		bool containsWindow = engine.ContainsWindow(window);
@@ -911,16 +911,16 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.Received(1).ContainsWindow(window);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void ContainsWindow_UseInner_SameInner(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
 	{
 		// Given
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 		innerLayoutEngine.ContainsWindow(window).Returns(true);
 
 		// When
@@ -931,10 +931,10 @@ public class FloatingLayoutEngineTests
 		innerLayoutEngine.Received(1).ContainsWindow(window);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void ContainsWindow_FloatingWindow(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -943,7 +943,7 @@ public class FloatingLayoutEngineTests
 		// Given
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine)
 			.Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		bool containsWindow = engine.AddWindow(window).ContainsWindow(window);
@@ -955,10 +955,10 @@ public class FloatingLayoutEngineTests
 	#endregion
 
 	#region WindowWasFloating_ShouldBeGarbageCollectedByUpdateInner
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void WindowWasFloating_AddWindow(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -966,7 +966,7 @@ public class FloatingLayoutEngineTests
 	{
 		// Given
 		Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When the window is floating...
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
@@ -984,10 +984,10 @@ public class FloatingLayoutEngineTests
 		newInnerLayoutEngine.Received(1).AddWindow(window);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void WindowWasFloating_MoveWindowToPoint(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -995,7 +995,7 @@ public class FloatingLayoutEngineTests
 	{
 		// Given
 		Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When the window is floating...
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
@@ -1013,10 +1013,10 @@ public class FloatingLayoutEngineTests
 		newInnerLayoutEngine.Received(1).MoveWindowToPoint(window, new Rectangle<double>());
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void WindowWasFloating_RemoveWindow(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -1024,7 +1024,7 @@ public class FloatingLayoutEngineTests
 	{
 		// Given
 		Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When the window is floating...
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
@@ -1042,10 +1042,10 @@ public class FloatingLayoutEngineTests
 		newInnerLayoutEngine.Received(1).RemoveWindow(window);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void WindowWasFloating_MoveWindowEdgesInDirection(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -1055,7 +1055,7 @@ public class FloatingLayoutEngineTests
 		Point<double> deltas = new();
 
 		Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When the window is floating...
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
@@ -1073,10 +1073,10 @@ public class FloatingLayoutEngineTests
 		newInnerLayoutEngine.Received(1).MoveWindowEdgesInDirection(Direction.Left, deltas, window);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void WindowWasFloating_SwapWindowInDirection(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -1084,7 +1084,7 @@ public class FloatingLayoutEngineTests
 	{
 		// Given
 		Setup_RemoveWindow(innerLayoutEngine, window, newInnerLayoutEngine);
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When the window is floating...
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
@@ -1104,15 +1104,15 @@ public class FloatingLayoutEngineTests
 	#endregion
 
 	#region PerformCustomAction
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void PerformCustomAction_UseInner(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine
 	)
 	{
 		// Given
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 		LayoutEngineCustomAction<string> action =
 			new()
 			{
@@ -1126,18 +1126,18 @@ public class FloatingLayoutEngineTests
 
 		// Then
 		Assert.NotSame(engine, newEngine);
-		Assert.IsType<FloatingLayoutEngine>(newEngine);
+		Assert.IsType<ProxyFloatingLayoutEngine>(newEngine);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void PerformCustomAction_UseInner_WindowIsDefined(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine
 	)
 	{
 		// Given
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 		LayoutEngineCustomAction<string> action =
 			new()
 			{
@@ -1153,19 +1153,19 @@ public class FloatingLayoutEngineTests
 		// Then
 		Assert.Same(engine, newEngine);
 		innerLayoutEngine.Received(1).PerformCustomAction(action);
-		Assert.IsType<FloatingLayoutEngine>(newEngine);
+		Assert.IsType<ProxyFloatingLayoutEngine>(newEngine);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutEngineCustomization>]
 	internal void PerformCustomAction_FloatingWindow(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
 	{
 		// Given
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 		LayoutEngineCustomAction<string> action =
 			new()
 			{
@@ -1183,7 +1183,7 @@ public class FloatingLayoutEngineTests
 		Assert.NotSame(engine, newEngine);
 		Assert.Same(newEngine, newEngine2);
 		innerLayoutEngine.DidNotReceive().PerformCustomAction(action);
-		Assert.IsType<FloatingLayoutEngine>(newEngine);
+		Assert.IsType<ProxyFloatingLayoutEngine>(newEngine);
 	}
 	#endregion
 
@@ -1191,13 +1191,13 @@ public class FloatingLayoutEngineTests
 	[Theory, AutoSubstituteData]
 	internal void MinimizeWindowStart_NotSame(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
 	{
 		// Given
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine = engine.MinimizeWindowStart(window);
@@ -1209,13 +1209,13 @@ public class FloatingLayoutEngineTests
 	[Theory, AutoSubstituteData]
 	internal void MinimizeWindowStart_Same(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
 	{
 		// Given
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 		innerLayoutEngine.MinimizeWindowStart(window).Returns(innerLayoutEngine);
 
 		// When
@@ -1228,13 +1228,13 @@ public class FloatingLayoutEngineTests
 	[Theory, AutoSubstituteData]
 	internal void MinimizeWindowEnd_NotSame(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
 	{
 		// Given
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 
 		// When
 		ILayoutEngine newEngine = engine.MinimizeWindowEnd(window);
@@ -1246,13 +1246,13 @@ public class FloatingLayoutEngineTests
 	[Theory, AutoSubstituteData]
 	internal void MinimizeWindowEnd_Same(
 		IContext context,
-		IInternalFloatingLayoutPlugin plugin,
+		IInternalProxyFloatingLayoutPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
 	{
 		// Given
-		FloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine engine = new(context, plugin, innerLayoutEngine);
 		innerLayoutEngine.MinimizeWindowEnd(window).Returns(innerLayoutEngine);
 
 		// When

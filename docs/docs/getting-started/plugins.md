@@ -9,10 +9,10 @@ context.PluginManager.AddPlugin(barPlugin);
 ```
 
 | Plugin                                                                   | TL;DR                                                                                             |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+|--------------------------------------------------------------------------| ------------------------------------------------------------------------------------------------- |
 | [Bar](../plugins/bar.md)                                                 | Adds a configurable bar to the top of each screen                                                 |
 | [Command Palette](../plugins/command-palette.md)                         | Fuzzy command palette filled with [commands](../customize/commands.md)                            |
-| [Floating Layout](../plugins/floating-layout.md)                         | Lets windows float outside other layout engines                                                   |
+| [Proxy Floating Layout](../plugins/proxy-floating-layout.md)             | Lets windows float outside other layout engines                                                   |
 | [Focus](../plugins/focus-indicator.md)                                   | Adds a border around the current window                                                           |
 | [Gaps](../plugins/gaps.md)                                               | Adds gaps between windows                                                                         |
 | [Layout Preview](../plugins/layout-preview.md)                           | Shows a preview when dragging windows                                                             |

@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Whim.FloatingLayout.Tests;
 
-public class FloatingLayoutPluginCustomization : ICustomization
+public class ProxyFloatingLayoutPluginCustomization : ICustomization
 {
 	public void Customize(IFixture fixture)
 	{
@@ -40,9 +40,9 @@ public class FloatingLayoutPluginCustomization : ICustomization
 	}
 }
 
-public class FloatingLayoutPluginTests
+public class ProxyFloatingLayoutPluginTests
 {
-	private static FloatingLayoutPlugin CreateSut(IContext context) => new(context);
+	private static ProxyFloatingLayoutPlugin CreateSut(IContext context) => new(context);
 
 	private static void AssertFloatingWindowsEqual(
 		IReadOnlyDictionary<IWindow, ISet<LayoutEngineIdentity>> expected,
@@ -58,11 +58,11 @@ public class FloatingLayoutPluginTests
 		}
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutPluginCustomization>]
 	public void Name(IContext context)
 	{
 		// Given
-		FloatingLayoutPlugin plugin = CreateSut(context);
+		ProxyFloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		string name = plugin.Name;
@@ -71,11 +71,11 @@ public class FloatingLayoutPluginTests
 		Assert.Equal("whim.floating_layout", name);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutPluginCustomization>]
 	public void PluginCommands(IContext context)
 	{
 		// Given
-		FloatingLayoutPlugin plugin = CreateSut(context);
+		ProxyFloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		IPluginCommands commands = plugin.PluginCommands;
@@ -84,11 +84,11 @@ public class FloatingLayoutPluginTests
 		Assert.NotEmpty(commands.Commands);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutPluginCustomization>]
 	public void PreInitialize(IContext context)
 	{
 		// Given
-		FloatingLayoutPlugin plugin = CreateSut(context);
+		ProxyFloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		plugin.PreInitialize();
@@ -97,11 +97,11 @@ public class FloatingLayoutPluginTests
 		context.WorkspaceManager.Received(1).AddProxyLayoutEngine(Arg.Any<ProxyLayoutEngineCreator>());
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutPluginCustomization>]
 	public void PostInitialize(IContext context)
 	{
 		// Given
-		FloatingLayoutPlugin plugin = CreateSut(context);
+		ProxyFloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		plugin.PostInitialize();
@@ -110,7 +110,7 @@ public class FloatingLayoutPluginTests
 		context.WorkspaceManager.DidNotReceive().AddProxyLayoutEngine(Arg.Any<ProxyLayoutEngineCreator>());
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutPluginCustomization>]
 	public void WindowManager_WindowRemoved(
 		IContext context,
 		IWindow window,
@@ -132,7 +132,7 @@ public class FloatingLayoutPluginTests
 		activeWorkspace.TryGetWindowState(window).Returns(windowState);
 		context.MonitorManager.GetMonitorAtPoint(rect).Returns(monitor);
 
-		FloatingLayoutPlugin plugin = CreateSut(context);
+		ProxyFloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		plugin.PreInitialize();
@@ -144,11 +144,11 @@ public class FloatingLayoutPluginTests
 	}
 
 	#region MarkWindowAsFloating
-	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutPluginCustomization>]
 	public void MarkWindowAsFloating_NoWindow(IContext context)
 	{
 		// Given
-		FloatingLayoutPlugin plugin = CreateSut(context);
+		ProxyFloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		plugin.MarkWindowAsFloating(null);
@@ -157,11 +157,11 @@ public class FloatingLayoutPluginTests
 		Assert.Empty(plugin.FloatingWindows);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutPluginCustomization>]
 	public void MarkWindowAsFloating_NoWorkspaceForWindow(IContext context, IWindow window)
 	{
 		// Given
-		FloatingLayoutPlugin plugin = CreateSut(context);
+		ProxyFloatingLayoutPlugin plugin = CreateSut(context);
 		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns((IWorkspace?)null);
 
 		// When
@@ -171,7 +171,7 @@ public class FloatingLayoutPluginTests
 		Assert.Empty(plugin.FloatingWindows);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutPluginCustomization>]
 	public void MarkWindowAsFloating_NoWorkspaceForWindow_LastFocusedWindow(
 		IContext context,
 		IWindow window,
@@ -179,7 +179,7 @@ public class FloatingLayoutPluginTests
 	)
 	{
 		// Given
-		FloatingLayoutPlugin plugin = CreateSut(context);
+		ProxyFloatingLayoutPlugin plugin = CreateSut(context);
 
 		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns((IWorkspace?)null);
 		activeWorkspace.LastFocusedWindow.Returns(window);
@@ -191,14 +191,14 @@ public class FloatingLayoutPluginTests
 		Assert.Empty(plugin.FloatingWindows);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutPluginCustomization>]
 	public void MarkWindowAsFloating_NoWindowState(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
 		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(activeWorkspace);
 		activeWorkspace.TryGetWindowState(window).Returns((IWindowState?)null);
 
-		FloatingLayoutPlugin plugin = CreateSut(context);
+		ProxyFloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		plugin.MarkWindowAsFloating(window);
@@ -207,7 +207,7 @@ public class FloatingLayoutPluginTests
 		Assert.Empty(plugin.FloatingWindows);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutPluginCustomization>]
 	public void MarkWindowAsFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
@@ -223,7 +223,7 @@ public class FloatingLayoutPluginTests
 				}
 			);
 
-		FloatingLayoutPlugin plugin = CreateSut(context);
+		ProxyFloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		plugin.MarkWindowAsFloating(window);
@@ -236,11 +236,11 @@ public class FloatingLayoutPluginTests
 	#endregion
 
 	#region MarkWindowAsDocked
-	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutPluginCustomization>]
 	public void MarkWindowAsDocked_WindowIsNotFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
-		FloatingLayoutPlugin plugin = CreateSut(context);
+		ProxyFloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		plugin.MarkWindowAsDocked(window);
@@ -251,7 +251,7 @@ public class FloatingLayoutPluginTests
 		activeWorkspace.DidNotReceive().DoLayout();
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutPluginCustomization>]
 	public void MarkWindowAsDocked_WindowIsFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
@@ -267,7 +267,7 @@ public class FloatingLayoutPluginTests
 				}
 			);
 
-		FloatingLayoutPlugin plugin = CreateSut(context);
+		ProxyFloatingLayoutPlugin plugin = CreateSut(context);
 		plugin.MarkWindowAsFloating(window);
 
 		// When
@@ -280,11 +280,11 @@ public class FloatingLayoutPluginTests
 	#endregion
 
 	#region ToggleWindowFloating
-	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutPluginCustomization>]
 	public void ToggleWindowFloating_NoWindow(IContext context)
 	{
 		// Given
-		FloatingLayoutPlugin plugin = CreateSut(context);
+		ProxyFloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		plugin.ToggleWindowFloating(null);
@@ -293,7 +293,7 @@ public class FloatingLayoutPluginTests
 		Assert.Empty(plugin.FloatingWindows);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutPluginCustomization>]
 	public void ToggleWindowFloating_ToFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
@@ -309,7 +309,7 @@ public class FloatingLayoutPluginTests
 				}
 			);
 
-		FloatingLayoutPlugin plugin = CreateSut(context);
+		ProxyFloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		plugin.ToggleWindowFloating(window);
@@ -319,7 +319,7 @@ public class FloatingLayoutPluginTests
 		Assert.Equal(window, plugin.FloatingWindows.Keys.First());
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutPluginCustomization>]
 	public void ToggleWindowFloating_ToDocked(IContext context, IWindow window, IWorkspace activeWorkspace)
 	{
 		// Given
@@ -335,7 +335,7 @@ public class FloatingLayoutPluginTests
 				}
 			);
 
-		FloatingLayoutPlugin plugin = CreateSut(context);
+		ProxyFloatingLayoutPlugin plugin = CreateSut(context);
 
 		plugin.MarkWindowAsFloating(window);
 
@@ -347,11 +347,11 @@ public class FloatingLayoutPluginTests
 	}
 	#endregion
 
-	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutPluginCustomization>]
 	public void SaveState(IContext context)
 	{
 		// Given
-		FloatingLayoutPlugin plugin = CreateSut(context);
+		ProxyFloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		JsonElement? json = plugin.SaveState();
@@ -360,11 +360,11 @@ public class FloatingLayoutPluginTests
 		Assert.Null(json);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutPluginCustomization>]
 	public void LoadState(IContext context)
 	{
 		// Given
-		FloatingLayoutPlugin plugin = CreateSut(context);
+		ProxyFloatingLayoutPlugin plugin = CreateSut(context);
 
 		// When
 		plugin.LoadState(JsonDocument.Parse("{}").RootElement);
@@ -374,7 +374,7 @@ public class FloatingLayoutPluginTests
 	}
 
 	#region MarkWindowAsDockedInLayoutEngine
-	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutPluginCustomization>]
 	public void MarkWindowAsDockedInLayoutEngine_WindowIsNotFloating(
 		IContext context,
 		IWindow window,
@@ -383,7 +383,7 @@ public class FloatingLayoutPluginTests
 	{
 		// Given
 		ILayoutEngine layoutEngine = activeWorkspace.ActiveLayoutEngine;
-		FloatingLayoutPlugin plugin = CreateSut(context);
+		ProxyFloatingLayoutPlugin plugin = CreateSut(context);
 
 		Assert.Empty(plugin.FloatingWindows);
 
@@ -394,7 +394,7 @@ public class FloatingLayoutPluginTests
 		Assert.Empty(plugin.FloatingWindows);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutPluginCustomization>]
 	public void MarkWindowAsDockedInLayoutEngine_WindowIsFloating(
 		IContext context,
 		IWindow window,
@@ -415,7 +415,7 @@ public class FloatingLayoutPluginTests
 				}
 			);
 
-		FloatingLayoutPlugin plugin = CreateSut(context);
+		ProxyFloatingLayoutPlugin plugin = CreateSut(context);
 		plugin.MarkWindowAsFloating(window);
 
 		AssertFloatingWindowsEqual(
@@ -436,7 +436,7 @@ public class FloatingLayoutPluginTests
 		Assert.Empty(plugin.FloatingWindows);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutPluginCustomization>]
+	[Theory, AutoSubstituteData<ProxyFloatingLayoutPluginCustomization>]
 	public void MarkWindowAsDocked_WindowIsFloatingInMultipleLayoutEngines(
 		IContext context,
 		IWindow window,
@@ -461,7 +461,7 @@ public class FloatingLayoutPluginTests
 			);
 
 		// When
-		FloatingLayoutPlugin plugin = CreateSut(context);
+		ProxyFloatingLayoutPlugin plugin = CreateSut(context);
 		plugin.MarkWindowAsFloating(window);
 
 		activeWorkspace.ActiveLayoutEngine.Returns(layoutEngine2);

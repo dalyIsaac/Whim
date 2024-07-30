@@ -4,7 +4,7 @@ using System.Text.Json;
 namespace Whim.FloatingLayout;
 
 /// <inheritdoc />
-public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayoutPlugin
+public class ProxyFloatingLayoutPlugin : IProxyFloatingLayoutPlugin, IInternalProxyFloatingLayoutPlugin
 {
 	private readonly IContext _context;
 
@@ -22,7 +22,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 	/// Creates a new instance of the floating layout plugin.
 	/// </summary>
 	/// <param name="context"></param>
-	public FloatingLayoutPlugin(IContext context)
+	public ProxyFloatingLayoutPlugin(IContext context)
 	{
 		_context = context;
 	}
@@ -30,7 +30,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
-		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new FloatingLayoutEngine(_context, this, layout));
+		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new ProxyFloatingLayoutEngine(_context, this, layout));
 		_context.WindowManager.WindowRemoved += WindowManager_WindowRemoved;
 	}
 
@@ -38,7 +38,7 @@ public class FloatingLayoutPlugin : IFloatingLayoutPlugin, IInternalFloatingLayo
 	public void PostInitialize() { }
 
 	/// <inheritdoc />
-	public IPluginCommands PluginCommands => new FloatingLayoutCommands(this);
+	public IPluginCommands PluginCommands => new ProxyFloatingLayoutCommands(this);
 
 	private void WindowManager_WindowRemoved(object? sender, WindowEventArgs e) => _floatingWindows.Remove(e.Window);
 

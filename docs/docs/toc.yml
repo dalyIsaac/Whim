@@ -22,7 +22,7 @@ items:
   - name: Plugins
   - href: plugins/bar.md
   - href: plugins/command-palette.md
-  - href: plugins/floating-layout.md
+  - href: plugins/proxy-floating-layout.md
   - href: plugins/focus-indicator.md
   - href: plugins/gaps.md
   - href: plugins/layout-preview.md
