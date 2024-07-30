@@ -7,13 +7,15 @@ namespace Whim;
 /// </summary>
 public class FirefoxWindowProcessor : IWindowProcessor
 {
+	private readonly IContext _ctx;
 	private bool _hasSeenFirstCloaked;
 
 	/// <inheritdoc/>
 	public IWindow Window { get; }
 
-	private FirefoxWindowProcessor(IWindow window)
+	private FirefoxWindowProcessor(IContext ctx, IWindow window)
 	{
+		_ctx = ctx;
 		Window = window;
 	}
 
@@ -21,7 +23,7 @@ public class FirefoxWindowProcessor : IWindowProcessor
 	/// Creates a new instance of the implementing class, if the given window matches the processor.
 	/// </summary>
 	public static IWindowProcessor? Create(IContext ctx, IWindow window) =>
-		window.ProcessFileName == "firefox.exe" ? new FirefoxWindowProcessor(window) : null;
+		window.ProcessFileName == "firefox.exe" ? new FirefoxWindowProcessor(ctx, window) : null;
 
 	/// <summary>
 	/// Indicates whether the event should be ignored by Whim.
@@ -51,6 +53,7 @@ public class FirefoxWindowProcessor : IWindowProcessor
 	/// </list>
 	///
 	/// To deal with these issues, we ignore all events until the first <see cref="PInvoke.EVENT_OBJECT_CLOAKED"/> event is received.
+	/// If Firefox is already visible, we process all events.
 	/// </remarks>
 	/// <param name="eventType"></param>
 	/// <param name="idObject"></param>
@@ -66,6 +69,16 @@ public class FirefoxWindowProcessor : IWindowProcessor
 		uint dwmsEventTime
 	)
 	{
+		if (eventType == PInvoke.EVENT_OBJECT_DESTROY)
+		{
+			return WindowProcessorResult.RemoveProcessor;
+		}
+
+		if (_ctx.Store.Pick(PickIsStartupWindow(Window.Handle)))
+		{
+			return WindowProcessorResult.Process;
+		}
+
 		if (eventType == PInvoke.EVENT_OBJECT_CLOAKED)
 		{
 			if (!_hasSeenFirstCloaked)
@@ -73,11 +86,6 @@ public class FirefoxWindowProcessor : IWindowProcessor
 				_hasSeenFirstCloaked = true;
 				return WindowProcessorResult.Ignore;
 			}
-		}
-
-		if (eventType == PInvoke.EVENT_OBJECT_DESTROY)
-		{
-			return WindowProcessorResult.RemoveProcessor;
 		}
 
 		if (!_hasSeenFirstCloaked)

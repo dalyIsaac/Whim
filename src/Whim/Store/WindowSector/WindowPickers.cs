@@ -19,4 +19,12 @@ public static partial class Pickers
 			rootSector.WindowSector.Windows.TryGetValue(handle, out IWindow? w)
 				? Result.FromValue(w)
 				: Result.FromException<IWindow>(StoreExceptions.WindowNotFound(handle));
+
+	/// <summary>
+	/// Returns whether a window was open when Whim started.
+	/// </summary>
+	/// <param name="handle"></param>
+	/// <returns></returns>
+	public static PurePicker<bool> PickIsStartupWindow(HWND handle) =>
+		(rootSector) => rootSector.WindowSector.StartupWindows.Contains(handle);
 }
