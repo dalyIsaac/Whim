@@ -7,7 +7,7 @@
 	mc:Ignorable="d">
 
 	<RelativePanel>
-		<!-- Windows 11 uses 8px radii -->
+		<!--  Windows 11 uses 8px radii  -->
 		<Rectangle
 			RadiusX="8"
 			RadiusY="8"
@@ -16,7 +16,7 @@
 			RelativePanel.AlignRightWithPanel="True"
 			RelativePanel.AlignTopWithPanel="True"
 			Stroke="{x:Bind Path=FocusIndicatorConfig.Color, Mode=OneWay}"
-			StrokeThickness="{x:Bind Path=FocusIndicatorConfig.BorderSize, Mode=OneWay}"/>
+			StrokeThickness="{x:Bind Path=FocusIndicatorConfig.BorderSize, Mode=OneWay}" />
 
 	</RelativePanel>
 </Window>
