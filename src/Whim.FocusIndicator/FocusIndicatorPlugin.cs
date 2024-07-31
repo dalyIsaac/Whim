@@ -2,7 +2,6 @@
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.UI.Xaml;
 using Windows.Win32.Foundation;
 
 namespace Whim.FocusIndicator;
@@ -13,9 +12,10 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	private bool _isEnabled = true;
 	private readonly IContext _context;
 	private readonly FocusIndicatorConfig _focusIndicatorConfig;
-	private readonly CancellationToken _cancellationToken = new();
+	private readonly CancellationTokenSource _cancellationTokenSource;
+	private readonly CancellationToken _cancellationToken;
 	private FocusIndicatorWindow? _focusIndicatorWindow;
-	private DispatcherTimer? _dispatcherTimer;
+	private int _lastFocusStartTime;
 	private bool _disposedValue;
 
 	/// <summary>
@@ -35,12 +35,21 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	{
 		_context = context;
 		_focusIndicatorConfig = focusIndicatorConfig;
+
+		_cancellationTokenSource = new CancellationTokenSource();
+		_cancellationToken = _cancellationTokenSource.Token;
 	}
 
 	/// <inheritdoc/>
 	public void PreInitialize()
 	{
 		_context.FilterManager.AddTitleMatchFilter(FocusIndicatorConfig.Title);
+		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
+	}
+
+	private void WindowManager_WindowFocused(object? sender, WindowFocusedEventArgs e)
+	{
+		_lastFocusStartTime = Environment.TickCount;
 	}
 
 	/// <inheritdoc/>
@@ -53,7 +62,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 		_focusIndicatorWindow.Activate();
 		_focusIndicatorWindow.Hide(_context);
 
-		// TODO: Start loop.
+		// TODO: cancellation
 		Task.Factory.StartNew(
 			LongRunningTask,
 			_cancellationToken,
@@ -62,22 +71,40 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 		);
 	}
 
+	// TODO: Rename
 	private void LongRunningTask()
 	{
 		while (true)
 		{
-			// TODO: Get the focused window.
-			Show();
-			Thread.Sleep(10);
+			NewMethod();
+
+			Thread.Sleep(16);
 		}
 	}
 
-	// TODO: Hide
-	// private void DispatcherTimer_Tick(object? sender, object e)
-	// {
-	// 	Logger.Verbose("Focus indicator timer ticked");
-	// 	Hide();
-	// }
+	// TODO: Rename
+	private void NewMethod()
+	{
+		if (_isEnabled)
+		{
+			if (_focusIndicatorConfig.FadeEnabled)
+			{
+				int now = Environment.TickCount;
+				if (now - _lastFocusStartTime >= _focusIndicatorConfig.FadeTimeout.TotalMilliseconds)
+				{
+					Hide();
+					return;
+				}
+			}
+
+			// If the fade is not enabled, or the fade is not over, show the focus indicator.
+			Show();
+		}
+		else if (IsVisible)
+		{
+			Hide();
+		}
+	}
 
 	/// <inheritdoc/>
 	public void Show(IWindow? window = null)
@@ -107,37 +134,8 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 			return;
 		}
 
-		// Get the window rectangle.
-
-		// Get the window rectangle.
-		// IWindowState? windowRect = activeWorkspace.TryGetWindowState(window);
-		// if (windowRect == null)
-		// {
-		// 	Logger.Error($"Could not find window rectangle for window {window}");
-		// 	Hide();
-		// 	return;
-		// }
-
-		// if (windowRect.WindowSize == WindowSize.Minimized)
-		// {
-		// 	Logger.Verbose($"Window {window} is minimized");
-		// 	Hide();
-		// 	return;
-		// }
-
 		IsVisible = true;
 		_focusIndicatorWindow?.Activate(handle, rect);
-
-		// If the fade is enabled, start the timer.
-		// if (_focusIndicatorConfig.FadeEnabled)
-		// {
-		// 	_dispatcherTimer?.Stop();
-
-		// 	_dispatcherTimer = new DispatcherTimer();
-		// 	_dispatcherTimer.Tick += DispatcherTimer_Tick;
-		// 	_dispatcherTimer.Interval = _focusIndicatorConfig.FadeTimeout;
-		// 	_dispatcherTimer.Start();
-		// }
 	}
 
 	/// <inheritdoc/>
@@ -146,12 +144,6 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 		Logger.Verbose("Hiding focus indicator");
 		_focusIndicatorWindow?.Hide(_context);
 		IsVisible = false;
-
-		// if (_dispatcherTimer != null)
-		// {
-		// 	_dispatcherTimer.Stop();
-		// 	_dispatcherTimer.Tick -= DispatcherTimer_Tick;
-		// }
 	}
 
 	/// <inheritdoc/>
@@ -192,8 +184,10 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
+				_cancellationTokenSource.Dispose();
 				_focusIndicatorWindow?.Dispose();
 				_focusIndicatorWindow?.Close();
+				_context.WindowManager.WindowFocused -= WindowManager_WindowFocused;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
