@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
+using Windows.Win32.Foundation;
 
 namespace Whim.FocusIndicator;
 
@@ -10,6 +13,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	private bool _isEnabled = true;
 	private readonly IContext _context;
 	private readonly FocusIndicatorConfig _focusIndicatorConfig;
+	private readonly CancellationToken _cancellationToken = new();
 	private FocusIndicatorWindow? _focusIndicatorWindow;
 	private DispatcherTimer? _dispatcherTimer;
 	private bool _disposedValue;
@@ -37,9 +41,6 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	public void PreInitialize()
 	{
 		_context.FilterManager.AddTitleMatchFilter(FocusIndicatorConfig.Title);
-
-		_context.WindowManager.WindowMoveStart += WindowManager_WindowMoveStart;
-		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
 	}
 
 	/// <inheritdoc/>
@@ -52,97 +53,105 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 		_focusIndicatorWindow.Activate();
 		_focusIndicatorWindow.Hide(_context);
 
-		// Only subscribe to workspace changes once the indicator window has been created - we shouldn't
-		// show a window which doesn't yet exist (it'll just crash Whim).
-		_context.WorkspaceManager.WorkspaceLayoutStarted += WorkspaceManager_WorkspaceLayoutStarted;
-		_context.WorkspaceManager.WorkspaceLayoutCompleted += WorkspaceManager_WorkspaceLayoutCompleted;
+		// TODO: Start loop.
+		Task.Factory.StartNew(
+			LongRunningTask,
+			_cancellationToken,
+			TaskCreationOptions.LongRunning,
+			TaskScheduler.Default
+		);
 	}
 
-	private void DispatcherTimer_Tick(object? sender, object e)
+	private void LongRunningTask()
 	{
-		Logger.Debug("Focus indicator timer ticked");
-		Hide();
+		while (true)
+		{
+			// TODO: Get the focused window.
+			Show();
+			Thread.Sleep(10);
+		}
 	}
 
-	private void WindowManager_WindowMoveStart(object? sender, WindowMoveStartedEventArgs e) => Hide();
-
-	private void WindowManager_WindowFocused(object? sender, WindowFocusedEventArgs e)
-	{
-		if (!_isEnabled)
-		{
-			Logger.Debug("Focus indicator is disabled");
-			return;
-		}
-
-		if (e.Window == null)
-		{
-			Hide();
-			return;
-		}
-
-		Show();
-	}
-
-	private void WorkspaceManager_WorkspaceLayoutStarted(object? sender, WorkspaceEventArgs e) => Hide();
-
-	private void WorkspaceManager_WorkspaceLayoutCompleted(object? sender, WorkspaceEventArgs e) => Show();
+	// TODO: Hide
+	// private void DispatcherTimer_Tick(object? sender, object e)
+	// {
+	// 	Logger.Verbose("Focus indicator timer ticked");
+	// 	Hide();
+	// }
 
 	/// <inheritdoc/>
 	public void Show(IWindow? window = null)
 	{
-		Logger.Debug("Showing focus indicator");
-		IWorkspace activeWorkspace = _context.WorkspaceManager.ActiveWorkspace;
-		window ??= activeWorkspace.LastFocusedWindow;
-		if (window == null)
+		Logger.Verbose("Showing focus indicator");
+
+		HWND handle = window?.Handle ?? default;
+		if (handle == default)
 		{
-			Logger.Debug("No window to show focus indicator for");
+			if (_context.Store.Pick(Pickers.PickLastFocusedWindowHandle()).TryGet(out HWND hwnd))
+			{
+				handle = hwnd;
+			}
+			else
+			{
+				Logger.Verbose("No last focused window to show focus indicator for");
+				Hide();
+				return;
+			}
+		}
+
+		IRectangle<int>? rect = _context.NativeManager.DwmGetWindowRectangle(handle);
+		if (rect == null)
+		{
+			Logger.Error($"Could not find window rectangle for window {handle}");
 			Hide();
 			return;
 		}
 
 		// Get the window rectangle.
-		IWindowState? windowRect = activeWorkspace.TryGetWindowState(window);
-		if (windowRect == null)
-		{
-			Logger.Error($"Could not find window rectangle for window {window}");
-			Hide();
-			return;
-		}
 
-		if (windowRect.WindowSize == WindowSize.Minimized)
-		{
-			Logger.Debug($"Window {window} is minimized");
-			Hide();
-			return;
-		}
+		// Get the window rectangle.
+		// IWindowState? windowRect = activeWorkspace.TryGetWindowState(window);
+		// if (windowRect == null)
+		// {
+		// 	Logger.Error($"Could not find window rectangle for window {window}");
+		// 	Hide();
+		// 	return;
+		// }
+
+		// if (windowRect.WindowSize == WindowSize.Minimized)
+		// {
+		// 	Logger.Verbose($"Window {window} is minimized");
+		// 	Hide();
+		// 	return;
+		// }
 
 		IsVisible = true;
-		_focusIndicatorWindow?.Activate(windowRect);
+		_focusIndicatorWindow?.Activate(handle, rect);
 
 		// If the fade is enabled, start the timer.
-		if (_focusIndicatorConfig.FadeEnabled)
-		{
-			_dispatcherTimer?.Stop();
+		// if (_focusIndicatorConfig.FadeEnabled)
+		// {
+		// 	_dispatcherTimer?.Stop();
 
-			_dispatcherTimer = new DispatcherTimer();
-			_dispatcherTimer.Tick += DispatcherTimer_Tick;
-			_dispatcherTimer.Interval = _focusIndicatorConfig.FadeTimeout;
-			_dispatcherTimer.Start();
-		}
+		// 	_dispatcherTimer = new DispatcherTimer();
+		// 	_dispatcherTimer.Tick += DispatcherTimer_Tick;
+		// 	_dispatcherTimer.Interval = _focusIndicatorConfig.FadeTimeout;
+		// 	_dispatcherTimer.Start();
+		// }
 	}
 
 	/// <inheritdoc/>
 	private void Hide()
 	{
-		Logger.Debug("Hiding focus indicator");
+		Logger.Verbose("Hiding focus indicator");
 		_focusIndicatorWindow?.Hide(_context);
 		IsVisible = false;
 
-		if (_dispatcherTimer != null)
-		{
-			_dispatcherTimer.Stop();
-			_dispatcherTimer.Tick -= DispatcherTimer_Tick;
-		}
+		// if (_dispatcherTimer != null)
+		// {
+		// 	_dispatcherTimer.Stop();
+		// 	_dispatcherTimer.Tick -= DispatcherTimer_Tick;
+		// }
 	}
 
 	/// <inheritdoc/>
@@ -183,9 +192,6 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_context.WindowManager.WindowFocused -= WindowManager_WindowFocused;
-				_context.WorkspaceManager.WorkspaceLayoutStarted -= WorkspaceManager_WorkspaceLayoutStarted;
-				_context.WorkspaceManager.WorkspaceLayoutCompleted -= WorkspaceManager_WorkspaceLayoutCompleted;
 				_focusIndicatorWindow?.Dispose();
 				_focusIndicatorWindow?.Close();
 			}
