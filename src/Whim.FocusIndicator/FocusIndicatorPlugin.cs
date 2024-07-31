@@ -62,28 +62,24 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 		_focusIndicatorWindow.Activate();
 		_focusIndicatorWindow.Hide(_context);
 
-		// TODO: cancellation
 		Task.Factory.StartNew(
-			LongRunningTask,
+			ContinuousPolling,
 			_cancellationToken,
 			TaskCreationOptions.LongRunning,
 			TaskScheduler.Default
 		);
 	}
 
-	// TODO: Rename
-	private void LongRunningTask()
+	private void ContinuousPolling()
 	{
 		while (true)
 		{
-			NewMethod();
-
+			Poll();
 			Thread.Sleep(16);
 		}
 	}
 
-	// TODO: Rename
-	private void NewMethod()
+	private void Poll()
 	{
 		if (_isEnabled)
 		{
@@ -155,6 +151,12 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 		}
 		else
 		{
+			// Reset the last focus start time so the fade timer starts over.
+			if (_focusIndicatorConfig.FadeEnabled)
+			{
+				_lastFocusStartTime = Environment.TickCount;
+			}
+
 			Show();
 		}
 	}
@@ -168,6 +170,12 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 		_isEnabled = !_isEnabled;
 		if (_isEnabled)
 		{
+			// Reset the last focus start time so the fade timer starts over.
+			if (_focusIndicatorConfig.FadeEnabled)
+			{
+				_lastFocusStartTime = Environment.TickCount;
+			}
+
 			Show();
 		}
 		else
