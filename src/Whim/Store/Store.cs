@@ -106,7 +106,7 @@ public class Store : IStore
 		{
 			return Task.Run(() =>
 			{
-				Logger.Debug($"Entering task, executing picker {picker}");
+				Logger.Verbose($"Entering task, executing picker {picker}");
 
 				try
 				{
@@ -120,7 +120,7 @@ public class Store : IStore
 			}).Result;
 		}
 
-		Logger.Debug($"Executing picker {picker}");
+		Logger.Verbose($"Executing picker {picker}");
 		return PickFn(picker);
 	}
 
@@ -133,7 +133,7 @@ public class Store : IStore
 		{
 			return Task.Run(() =>
 			{
-				Logger.Debug($"Entering task, executing picker {picker}");
+				Logger.Verbose($"Entering task, executing picker {picker}");
 				try
 				{
 					_lock.EnterReadLock();
@@ -146,7 +146,7 @@ public class Store : IStore
 			}).Result;
 		}
 
-		Logger.Debug($"Executing picker {picker}");
+		Logger.Verbose($"Executing picker {picker}");
 		return PurePickFn(picker);
 	}
 

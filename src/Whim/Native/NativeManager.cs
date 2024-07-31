@@ -77,7 +77,7 @@ internal partial class NativeManager : INativeManager
 
 	public bool ShowWindowNoActivate(HWND hwnd)
 	{
-		Logger.Debug($"Showing window HWND {hwnd} no activate");
+		Logger.Verbose($"Showing window HWND {hwnd} no activate");
 		return (bool)PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_SHOWNOACTIVATE);
 	}
 

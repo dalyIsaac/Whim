@@ -44,7 +44,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 	/// <param name="internalContext"></param>
 	internal DeferWindowPosHandle(IContext context, IInternalContext internalContext)
 	{
-		Logger.Debug("Creating new WindowDeferPosHandle");
+		Logger.Verbose("Creating new WindowDeferPosHandle");
 		_context = context;
 		_internalContext = internalContext;
 	}
@@ -85,7 +85,9 @@ public sealed class DeferWindowPosHandle : IDisposable
 	/// </param>
 	public void DeferWindowPos(DeferWindowPosState posState, bool forceTwoPasses = false)
 	{
-		Logger.Debug($"Adding window {posState.Handle} after {posState.HandleInsertAfter} with flags {posState.Flags}");
+		Logger.Verbose(
+			$"Adding window {posState.Handle} after {posState.HandleInsertAfter} with flags {posState.Flags}"
+		);
 
 		if (forceTwoPasses)
 		{
@@ -109,11 +111,11 @@ public sealed class DeferWindowPosHandle : IDisposable
 	/// <inheritdoc />
 	public void Dispose()
 	{
-		Logger.Debug("Disposing WindowDeferPosHandle");
+		Logger.Verbose("Disposing WindowDeferPosHandle");
 
 		if (_windowStates.Count == 0 && _minimizedWindowStates.Count == 0)
 		{
-			Logger.Debug("No windows to set position for");
+			Logger.Verbose("No windows to set position for");
 			return;
 		}
 
@@ -129,7 +131,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 			}
 		}
 
-		Logger.Debug($"Setting window position {numPasses} times for {_windowStates.Count} windows");
+		Logger.Verbose($"Setting window position {numPasses} times for {_windowStates.Count} windows");
 
 		// Set the window positions for non-minimized windows first, then minimized windows.
 		// This was done to prevent the minimized windows being hidden, and Windows focusing the previous window.
@@ -165,7 +167,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 			}
 		}
 
-		Logger.Debug("Finished setting window position");
+		Logger.Verbose("Finished setting window position");
 	}
 
 	private void SetWindowPos(DeferWindowPosState source)

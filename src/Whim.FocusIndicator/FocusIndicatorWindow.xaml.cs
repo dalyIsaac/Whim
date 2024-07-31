@@ -32,7 +32,7 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window, S
 	/// <param name="windowRectangle">The rectangle of the window to activate behind.</param>
 	public void Activate(HWND handle, IRectangle<int> windowRectangle)
 	{
-		Logger.Debug("Activating focus indicator window");
+		Logger.Verbose("Activating focus indicator window");
 		int borderSize = FocusIndicatorConfig.BorderSize;
 
 		IRectangle<int> borderRect = new Rectangle<int>()
