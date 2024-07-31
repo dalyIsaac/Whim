@@ -7,9 +7,10 @@
 	mc:Ignorable="d">
 
 	<RelativePanel>
+		<!-- Windows 11 uses 8px radii -->
 		<Rectangle
-			RadiusX="12"
-			RadiusY="12"
+			RadiusX="8"
+			RadiusY="8"
 			RelativePanel.AlignBottomWithPanel="True"
 			RelativePanel.AlignLeftWithPanel="True"
 			RelativePanel.AlignRightWithPanel="True"
