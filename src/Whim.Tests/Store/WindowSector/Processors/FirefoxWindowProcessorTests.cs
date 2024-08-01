@@ -65,7 +65,7 @@ public class FirefoxWindowProcessorTests
 		WindowProcessorResult result = processor.ProcessEvent(eventType, 0, 0, 0, 0);
 
 		// Then the event should be ignored
-		Assert.Equal(WindowProcessorResult.Ignore, result);
+		Assert.Equal(WindowProcessorResult.IgnoreAndLayout, result);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -108,7 +108,7 @@ public class FirefoxWindowProcessorTests
 		WindowProcessorResult result = processor.ProcessEvent(PInvoke.EVENT_OBJECT_DESTROY, 0, 0, 0, 0);
 
 		// Then the processor should be removed
-		Assert.Equal(WindowProcessorResult.RemoveProcessor, result);
+		Assert.Equal(WindowProcessorResult.ProcessAndRemove, result);
 	}
 
 	[Theory, AutoSubstituteData]

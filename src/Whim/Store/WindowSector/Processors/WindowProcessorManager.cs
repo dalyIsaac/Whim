@@ -44,11 +44,14 @@ internal class WindowProcessorManager
 		);
 		switch (result)
 		{
-			case WindowProcessorResult.Process:
-				return false;
 			case WindowProcessorResult.Ignore:
 				return true;
-			case WindowProcessorResult.RemoveProcessor:
+			case WindowProcessorResult.IgnoreAndLayout:
+				_ctx.Store.Dispatch(new LayoutAllActiveWorkspacesTransform());
+				return true;
+			case WindowProcessorResult.Process:
+				return false;
+			case WindowProcessorResult.ProcessAndRemove:
 				_processors.Remove(window.Handle);
 				return false;
 			default:
