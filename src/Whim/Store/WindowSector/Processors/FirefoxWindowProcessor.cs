@@ -8,7 +8,10 @@ namespace Whim;
 public class FirefoxWindowProcessor : IWindowProcessor
 {
 	private readonly IContext _ctx;
+	private readonly int _startTime;
+	private bool _hasExceededStartTime;
 	private bool _hasSeenFirstCloaked;
+	private const int _maxStartupTimeMs = 5000;
 
 	/// <inheritdoc/>
 	public IWindow Window { get; }
@@ -16,7 +19,13 @@ public class FirefoxWindowProcessor : IWindowProcessor
 	private FirefoxWindowProcessor(IContext ctx, IWindow window)
 	{
 		_ctx = ctx;
+		_startTime = Environment.TickCount;
 		Window = window;
+
+		if (_ctx.Store.Pick(PickIsStartupWindow(Window.Handle)))
+		{
+			_hasExceededStartTime = true;
+		}
 	}
 
 	/// <summary>
@@ -69,13 +78,22 @@ public class FirefoxWindowProcessor : IWindowProcessor
 		uint dwmsEventTime
 	)
 	{
+		Logger.Debug($"Processing Firefox event 0x{eventType:X4}");
+
 		if (eventType == PInvoke.EVENT_OBJECT_DESTROY)
 		{
-			return WindowProcessorResult.RemoveProcessor;
+			return WindowProcessorResult.ProcessAndRemove;
 		}
 
-		if (_ctx.Store.Pick(PickIsStartupWindow(Window.Handle)))
+		if (_hasSeenFirstCloaked)
 		{
+			return WindowProcessorResult.Process;
+		}
+
+		if (_hasExceededStartTime || Environment.TickCount - _startTime > _maxStartupTimeMs)
+		{
+			Logger.Debug("Firefox has exceeded startup time, listening to all events");
+			_hasExceededStartTime = true;
 			return WindowProcessorResult.Process;
 		}
 
@@ -83,16 +101,12 @@ public class FirefoxWindowProcessor : IWindowProcessor
 		{
 			if (!_hasSeenFirstCloaked)
 			{
+				Logger.Debug("Firefox has been cloaked for the first time, listening to all events");
 				_hasSeenFirstCloaked = true;
 				return WindowProcessorResult.Ignore;
 			}
 		}
 
-		if (!_hasSeenFirstCloaked)
-		{
-			return WindowProcessorResult.Ignore;
-		}
-
-		return WindowProcessorResult.Process;
+		return WindowProcessorResult.IgnoreAndLayout;
 	}
 }
