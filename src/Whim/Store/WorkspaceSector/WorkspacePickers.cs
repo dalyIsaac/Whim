@@ -80,6 +80,11 @@ public static partial class Pickers
 		Func<IWorkspace, Result<TResult>> operation
 	)
 	{
+		if (workspaceId == default)
+		{
+			workspaceId = PickActiveWorkspaceId()(rootSector);
+		}
+
 		if (!rootSector.WorkspaceSector.Workspaces.TryGetValue(workspaceId, out Workspace? workspace))
 		{
 			return Result.FromException<TResult>(StoreExceptions.WorkspaceNotFound(workspaceId));
@@ -145,8 +150,8 @@ public static partial class Pickers
 	/// <summary>
 	/// Get the last focused window in the provided workspace.
 	/// </summary>
-	/// <param name="workspaceId">The workspace to get the last focused window for.</param>
-	public static PurePicker<Result<IWindow>> PickLastFocusedWindow(WorkspaceId workspaceId) =>
+	/// <param name="workspaceId">The workspace to get the last focused window for. Defaults to the active workspace</param>
+	public static PurePicker<Result<IWindow>> PickLastFocusedWindow(WorkspaceId workspaceId = default) =>
 		(IRootSector rootSector) =>
 			BaseWorkspacePicker(
 				workspaceId,
@@ -159,6 +164,27 @@ public static partial class Pickers
 					}
 
 					return PickWindowByHandle(workspace.LastFocusedWindowHandle)(rootSector);
+				}
+			);
+
+	/// <summary>
+	/// Get the last focused window handle in the provided workspace.
+	/// </summary>
+	/// <param name="workspaceId">The workspace to get the last focused window handle for. Defaults to the active workspace</param>
+	/// <returns></returns>
+	public static PurePicker<Result<HWND>> PickLastFocusedWindowHandle(WorkspaceId workspaceId = default) =>
+		(IRootSector rootSector) =>
+			BaseWorkspacePicker(
+				workspaceId,
+				rootSector,
+				workspace =>
+				{
+					if (workspace.LastFocusedWindowHandle.IsNull)
+					{
+						return Result.FromException<HWND>(new WhimException("No last focused window in workspace"));
+					}
+
+					return Result.FromValue(workspace.LastFocusedWindowHandle);
 				}
 			);
 

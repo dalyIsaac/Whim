@@ -254,6 +254,69 @@ public class WorkspacePickersTests
 		Assert.False(result.IsSuccessful);
 	}
 
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickLastFocusedWindowHandle_DefaultWorkspace(IContext ctx, MutableRootSector root)
+	{
+		// Given the workspaces and windows
+		Workspace workspace = CreateWorkspace(ctx);
+		IWindow lastFocusedWindow = Setup_LastFocusedWindow(ctx, root, workspace);
+
+		root.WorkspaceSector.Workspaces = root.WorkspaceSector.Workspaces.SetItem(
+			workspace.Id,
+			workspace with
+			{
+				LastFocusedWindowHandle = lastFocusedWindow.Handle
+			}
+		);
+
+		// When we get the last focused window handle
+		Result<HWND> result = ctx.Store.Pick(Pickers.PickLastFocusedWindowHandle());
+
+		// Then we get the last focused window handle
+		Assert.True(result.IsSuccessful);
+		Assert.Equal(lastFocusedWindow.Handle, result.Value);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickLastFocusedWindowHandle_WorkspaceNotFound(IContext ctx, MutableRootSector root)
+	{
+		// Given the workspaces and windows exist, but the workspace to search for doesn't exist
+		Workspace workspace = CreateWorkspace(ctx);
+		IWindow lastFocusedWindow = Setup_LastFocusedWindow(ctx, root, workspace);
+
+		root.WorkspaceSector.Workspaces = root.WorkspaceSector.Workspaces.SetItem(
+			workspace.Id,
+			workspace with
+			{
+				LastFocusedWindowHandle = lastFocusedWindow.Handle
+			}
+		);
+
+		Guid workspaceToSearchFor = Guid.NewGuid();
+
+		// When we get the last focused window handle
+		Result<HWND> result = ctx.Store.Pick(Pickers.PickLastFocusedWindowHandle(workspaceToSearchFor));
+
+		// Then we get an error
+		Assert.False(result.IsSuccessful);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickLastFocusedWindowHandle_NoLastFocusedWindow(IContext ctx, MutableRootSector root)
+	{
+		// Given the workspaces and windows, but the last focused window isn't set
+		Workspace workspace = CreateWorkspace(ctx);
+		IWindow lastFocusedWindow = Setup_LastFocusedWindow(ctx, root, workspace);
+
+		root.WorkspaceSector.Workspaces = root.WorkspaceSector.Workspaces.SetItem(workspace.Id, workspace);
+
+		// When we get the last focused window handle
+		Result<HWND> result = ctx.Store.Pick(Pickers.PickLastFocusedWindowHandle());
+
+		// Then we get an error
+		Assert.False(result.IsSuccessful);
+	}
+
 	private static IWindow Setup_WindowPosition(IContext ctx, MutableRootSector root, Workspace workspace)
 	{
 		IMonitor monitor = CreateMonitor((HMONITOR)1);

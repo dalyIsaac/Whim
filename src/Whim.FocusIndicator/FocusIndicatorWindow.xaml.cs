@@ -1,4 +1,5 @@
-﻿using Windows.Win32.UI.WindowsAndMessaging;
+﻿using Windows.Win32.Foundation;
+using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim.FocusIndicator;
 
@@ -27,19 +28,19 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window, S
 	/// <summary>
 	/// Activates the window behind the given window.
 	/// </summary>
-	/// <param name="targetWindowState">The window to show the indicator for.</param>
-	public void Activate(IWindowState targetWindowState)
+	/// <param name="handle">The handle of the window to activate behind.</param>
+	/// <param name="windowRectangle">The rectangle of the window to activate behind.</param>
+	public void Activate(HWND handle, IRectangle<int> windowRectangle)
 	{
-		Logger.Debug("Activating focus indicator window");
-		IRectangle<int> focusedWindowRect = targetWindowState.Rectangle;
+		Logger.Verbose("Activating focus indicator window");
 		int borderSize = FocusIndicatorConfig.BorderSize;
 
 		IRectangle<int> borderRect = new Rectangle<int>()
 		{
-			X = focusedWindowRect.X - borderSize,
-			Y = focusedWindowRect.Y - borderSize,
-			Height = focusedWindowRect.Height + (borderSize * 2),
-			Width = focusedWindowRect.Width + (borderSize * 2)
+			X = windowRectangle.X - borderSize,
+			Y = windowRectangle.Y - borderSize,
+			Height = windowRectangle.Height + (borderSize * 2),
+			Width = windowRectangle.Width + (borderSize * 2)
 		};
 
 		// Prevent the window from being activated.
@@ -53,7 +54,7 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window, S
 				_window.Handle,
 				WindowSize.Normal,
 				borderRect,
-				targetWindowState.Window.Handle,
+				handle,
 				SET_WINDOW_POS_FLAGS.SWP_NOREDRAW | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE
 			)
 		);
