@@ -11,6 +11,11 @@ public enum WindowProcessorResult
 	Ignore,
 
 	/// <summary>
+	/// The event should be ignored, and the active workspaces should be laid out.
+	/// </summary>
+	IgnoreAndLayout,
+
+	/// <summary>
 	/// The event should be processed.
 	/// </summary>
 	Process,
@@ -18,5 +23,5 @@ public enum WindowProcessorResult
 	/// <summary>
 	/// The event should be processed and the processor should be removed.
 	/// </summary>
-	RemoveProcessor
+	ProcessAndRemove
 }

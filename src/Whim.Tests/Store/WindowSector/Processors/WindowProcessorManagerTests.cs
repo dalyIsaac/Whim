@@ -63,4 +63,19 @@ public class WindowProcessorManagerTests
 		Assert.False(firstProcessorResult);
 		Assert.True(secondProcessorResult);
 	}
+
+	[Theory, AutoSubstituteData]
+	public void ShouldBeIgnored_LayoutAllActiveWorkspacesTransform(IContext ctx, IWindow window)
+	{
+		// Given a window which is a Firefox window
+		window.ProcessFileName.Returns("firefox.exe");
+		WindowProcessorManager sut = new(ctx);
+
+		// When ShouldBeIgnored is called with a ProcessAndRemove result
+		bool result = sut.ShouldBeIgnored(window, default, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, 0, 0, 0, 0);
+
+		// Then the result should be true, and a LayoutAllActiveWorkspacesTransform should be dispatched
+		Assert.True(result);
+		ctx.Store.Received().Dispatch(Arg.Any<LayoutAllActiveWorkspacesTransform>());
+	}
 }
