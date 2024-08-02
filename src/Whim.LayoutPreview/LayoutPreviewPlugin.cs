@@ -69,6 +69,8 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 		// Only run if the window is being dragged. If the window is being resized, we don't want to do anything.
 		if (e.CursorDraggedPoint is not IPoint<int> cursorDraggedPoint || e.MovedEdges is not null)
 		{
+			_layoutPreviewWindow?.Hide(_context);
+			DraggedWindow = null;
 			return;
 		}
 
@@ -78,6 +80,8 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 		IWorkspace? workspace = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor);
 		if (workspace == null)
 		{
+			_layoutPreviewWindow?.Hide(_context);
+			DraggedWindow = null;
 			return;
 		}
 
@@ -87,6 +91,9 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 		{
 			// To be renamed when FreeLayoutEngine will be renamed
 			Logger.Debug("Skip LayoutPreview as LeafLayoutEngine is a FreeLayoutEngine");
+
+			_layoutPreviewWindow?.Hide(_context);
+			DraggedWindow = null;
 			return;
 		}
 
