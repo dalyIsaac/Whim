@@ -1,6 +1,7 @@
 using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim.LayoutPreview;
@@ -140,6 +141,12 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 				flags: SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE | SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW
 			)
 		);
+	}
+
+	private void LayoutPreviewCanvas_PointerPressed(object sender, PointerRoutedEventArgs e)
+	{
+		// Hide the window when the user clicks on it.
+		this.Hide(_context);
 	}
 
 	private void Dispose(bool disposing)

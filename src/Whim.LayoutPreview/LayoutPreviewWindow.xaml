@@ -7,6 +7,6 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 
-	<Canvas x:Name="LayoutPreviewCanvas" />
+	<Canvas x:Name="LayoutPreviewCanvas" PointerPressed="LayoutPreviewCanvas_PointerPressed"/>
 
 </Window>
