@@ -11,7 +11,7 @@ public class BaseProxyFloatingLayoutEngineTests : ProxyLayoutEngineBaseTests
 		{
 			IContext context = Substitute.For<IContext>();
 			IMonitor monitor = Substitute.For<IMonitor>();
-			IInternalProxyFloatingLayoutPlugin plugin = Substitute.For<IInternalProxyFloatingLayoutPlugin>();
+			IInternalFloatingWindowPlugin plugin = Substitute.For<IInternalFloatingWindowPlugin>();
 			ILayoutEngine innerLayoutEngine = Substitute.For<ILayoutEngine>();
 
 			context

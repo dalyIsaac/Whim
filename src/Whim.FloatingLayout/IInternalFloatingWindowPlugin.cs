@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Whim.FloatingLayout;
 
-internal interface IInternalProxyFloatingLayoutPlugin
+internal interface IInternalFloatingWindowPlugin
 {
 	/// <summary>
 	/// Mapping of floating windows to the layout engines that they are floating in.

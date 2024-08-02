@@ -1,9 +1,9 @@
 namespace Whim.FloatingLayout;
 
 /// <summary>
-/// ProxyFloatingLayoutPlugin lets windows escape the layout engine and be free-floating.
+/// FloatingWindowPlugin lets windows escape the layout engine and be free-floating.
 /// </summary>
-public interface IProxyFloatingLayoutPlugin : IPlugin
+public interface IFloatingWindowPlugin : IPlugin
 {
 	/// <summary>
 	/// Mark the given <paramref name="window"/> as a floating window

@@ -5,12 +5,12 @@ using System.Linq;
 namespace Whim.FloatingLayout;
 
 /// <summary>
-/// A proxy layout engine to allow windows to be free-floating.
+/// A proxy layout engine to allow windows to be free-floating within another layout.
 /// </summary>
 internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 {
 	private readonly IContext _context;
-	private readonly IInternalProxyFloatingLayoutPlugin _plugin;
+	private readonly IInternalFloatingWindowPlugin _plugin;
 	private readonly ImmutableDictionary<IWindow, IRectangle<double>> _floatingWindowRects;
 
 	/// <inheritdoc />
@@ -24,7 +24,7 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <param name="innerLayoutEngine"></param>
 	public ProxyFloatingLayoutEngine(
 		IContext context,
-		IInternalProxyFloatingLayoutPlugin plugin,
+		IInternalFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine
 	)
 		: base(innerLayoutEngine)
