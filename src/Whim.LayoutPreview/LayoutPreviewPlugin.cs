@@ -12,8 +12,6 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 	private LayoutPreviewWindow? _layoutPreviewWindow;
 	private bool _disposedValue;
 
-	private readonly object _previewLock = new();
-
 	/// <summary>
 	/// The window that is currently being dragged.
 	/// </summary>
@@ -68,79 +66,67 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 
 	private void WindowMoved(object? sender, WindowMoveEventArgs e)
 	{
-		lock (_previewLock)
+		// Only run if the window is being dragged. If the window is being resized, we don't want to do anything.
+		if (e.CursorDraggedPoint is not IPoint<int> cursorDraggedPoint || e.MovedEdges is not null)
 		{
-			// Only run if the window is being dragged. If the window is being resized, we don't want to do anything.
-			if (e.CursorDraggedPoint is not IPoint<int> cursorDraggedPoint || e.MovedEdges is not null)
-			{
-				return;
-			}
-
-			IMonitor monitor = _context.MonitorManager.GetMonitorAtPoint(cursorDraggedPoint);
-			IPoint<double> normalizedPoint = monitor.WorkingArea.NormalizeAbsolutePoint(cursorDraggedPoint);
-
-			IWorkspace? workspace = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor);
-			if (workspace == null)
-			{
-				return;
-			}
-
-			DraggedWindow = e.Window;
-			ILayoutEngine layoutEngine = workspace.ActiveLayoutEngine.MoveWindowToPoint(e.Window, normalizedPoint);
-			if (layoutEngine.GetLayoutEngine<FreeLayoutEngine>() is not null)
-			{
-				// To be renamed when FreeLayoutEngine will be renamed
-				Logger.Debug("Skip LayoutPreview as LeafLayoutEngine is a FreeLayoutEngine");
-				return;
-			}
-
-			Rectangle<int> rect = new() { Height = monitor.WorkingArea.Height, Width = monitor.WorkingArea.Width };
-
-			// Adjust the cursor point so that it's relative to the monitor's rectangle.
-			Point<int> adjustedCursorPoint =
-				new()
-				{
-					X = cursorDraggedPoint.X - monitor.WorkingArea.X,
-					Y = cursorDraggedPoint.Y - monitor.WorkingArea.Y
-				};
-
-			_layoutPreviewWindow?.Update(
-				layoutEngine.DoLayout(rect, monitor).ToArray(),
-				adjustedCursorPoint,
-				e.Window,
-				monitor
-			);
+			return;
 		}
+
+		IMonitor monitor = _context.MonitorManager.GetMonitorAtPoint(cursorDraggedPoint);
+		IPoint<double> normalizedPoint = monitor.WorkingArea.NormalizeAbsolutePoint(cursorDraggedPoint);
+
+		IWorkspace? workspace = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor);
+		if (workspace == null)
+		{
+			return;
+		}
+
+		DraggedWindow = e.Window;
+		ILayoutEngine layoutEngine = workspace.ActiveLayoutEngine.MoveWindowToPoint(e.Window, normalizedPoint);
+		if (layoutEngine.GetLayoutEngine<FreeLayoutEngine>() is not null)
+		{
+			// To be renamed when FreeLayoutEngine will be renamed
+			Logger.Debug("Skip LayoutPreview as LeafLayoutEngine is a FreeLayoutEngine");
+			return;
+		}
+
+		Rectangle<int> rect = new() { Height = monitor.WorkingArea.Height, Width = monitor.WorkingArea.Width };
+
+		// Adjust the cursor point so that it's relative to the monitor's rectangle.
+		Point<int> adjustedCursorPoint =
+			new()
+			{
+				X = cursorDraggedPoint.X - monitor.WorkingArea.X,
+				Y = cursorDraggedPoint.Y - monitor.WorkingArea.Y
+			};
+
+		_layoutPreviewWindow?.Update(
+			layoutEngine.DoLayout(rect, monitor).ToArray(),
+			adjustedCursorPoint,
+			e.Window,
+			monitor
+		);
 	}
 
 	private void WindowManager_WindowRemoved(object? sender, WindowEventArgs e)
 	{
-		lock (_previewLock)
+		if (DraggedWindow == e.Window)
 		{
-			if (DraggedWindow == e.Window)
-			{
-				_layoutPreviewWindow?.Hide(_context);
-				DraggedWindow = null;
-			}
+			_layoutPreviewWindow?.Hide(_context);
+			DraggedWindow = null;
 		}
 	}
 
 	private void WindowManager_WindowFocused(object? sender, WindowFocusedEventArgs e)
 	{
-		lock (_previewLock)
-		{
-			_layoutPreviewWindow?.Hide(_context);
-			DraggedWindow = null;
-		}
+		_layoutPreviewWindow?.Hide(_context);
+		DraggedWindow = null;
 	}
 
 	private void WindowManager_WindowMoveEnd(object? sender, WindowEventArgs e)
 	{
-		lock (_previewLock)
-		{
-			_layoutPreviewWindow?.Hide(_context);
-			DraggedWindow = null;
-		}
+		_layoutPreviewWindow?.Hide(_context);
+		DraggedWindow = null;
 	}
 
 	/// <inheritdoc />
