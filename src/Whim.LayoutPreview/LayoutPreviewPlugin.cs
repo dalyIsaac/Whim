@@ -67,18 +67,14 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 	private void WindowMoved(object? sender, WindowMoveEventArgs e)
 	{
 		// Only run if the window is being dragged. If the window is being resized, we don't want to do anything.
-		if (e.CursorDraggedPoint is not IPoint<int> cursorDraggedPoint || e.MovedEdges is not null)
-		{
-			_layoutPreviewWindow?.Hide(_context);
-			DraggedWindow = null;
-			return;
-		}
-
-		IMonitor monitor = _context.MonitorManager.GetMonitorAtPoint(cursorDraggedPoint);
-		IPoint<double> normalizedPoint = monitor.WorkingArea.NormalizeAbsolutePoint(cursorDraggedPoint);
-
-		IWorkspace? workspace = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor);
-		if (workspace == null)
+		// If the given point does not correspond to a monitor, ignore it.
+		// If the given point does not correspond to a workspace, ignore it.
+		if (
+			e.CursorDraggedPoint is not IPoint<int> cursorDraggedPoint
+			|| e.MovedEdges is not null
+			|| !_context.Store.Pick(Pickers.PickMonitorAtPoint(cursorDraggedPoint)).TryGet(out IMonitor monitor)
+			|| !_context.Store.Pick(Pickers.PickWorkspaceByMonitor(monitor.Handle)).TryGet(out IWorkspace workspace)
+		)
 		{
 			_layoutPreviewWindow?.Hide(_context);
 			DraggedWindow = null;
@@ -86,6 +82,8 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 		}
 
 		DraggedWindow = e.Window;
+
+		IPoint<double> normalizedPoint = monitor.WorkingArea.NormalizeAbsolutePoint(cursorDraggedPoint);
 		ILayoutEngine layoutEngine = workspace.ActiveLayoutEngine.MoveWindowToPoint(e.Window, normalizedPoint);
 		if (layoutEngine.GetLayoutEngine<FreeLayoutEngine>() is not null)
 		{
