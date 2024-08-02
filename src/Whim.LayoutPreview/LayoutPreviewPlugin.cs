@@ -36,11 +36,11 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 	/// <inheritdoc	/>
 	public void PreInitialize()
 	{
-		_context.WindowManager.WindowMoveStart += WindowManager_WindowMoveStart;
-		_context.WindowManager.WindowMoved += WindowMoved;
-		_context.WindowManager.WindowMoveEnd += WindowManager_WindowMoveEnd;
-		_context.WindowManager.WindowRemoved += WindowManager_WindowRemoved;
-		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
+		_context.Store.WindowEvents.WindowMoveStarted += WindowManager_WindowMoveStart;
+		_context.Store.WindowEvents.WindowMoved += WindowMoved;
+		_context.Store.WindowEvents.WindowMoveEnded += WindowManager_WindowMoveEnd;
+		_context.Store.WindowEvents.WindowRemoved += WindowManager_WindowRemoved;
+		_context.Store.WindowEvents.WindowFocused += WindowManager_WindowFocused;
 		_context.FilterManager.AddTitleMatchFilter(LayoutPreviewWindow.WindowTitle);
 	}
 
