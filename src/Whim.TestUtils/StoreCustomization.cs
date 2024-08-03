@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
 using DotNext;
 using NSubstitute;
@@ -23,31 +24,46 @@ internal class StoreWrapper : Store
 	}
 }
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
+[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "<Pending>")]
 public class StoreCustomization : ICustomization
 {
+#pragma warning disable CA1051 // Do not declare visible instance fields
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+	protected IContext _ctx;
+	private protected IInternalContext _internalCtx;
+	private protected StoreWrapper _store;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+#pragma warning restore CA1051 // Do not declare visible instance fields
+
 	public void Customize(IFixture fixture)
 	{
-		IContext ctx = fixture.Freeze<IContext>();
-		IInternalContext internalCtx = fixture.Freeze<IInternalContext>();
+		_ctx = fixture.Freeze<IContext>();
+		_internalCtx = fixture.Freeze<IInternalContext>();
 
-		StoreWrapper store = new(ctx, internalCtx);
-		ctx.Store.Returns(store);
+		_store = new(_ctx, _internalCtx);
+		_ctx.Store.Returns(_store);
 
-		fixture.Inject(store._root);
-		fixture.Inject(store._root.MutableRootSector);
+		fixture.Inject(_store._root);
+		fixture.Inject(_store._root.MutableRootSector);
 
-		store._root.MutableRootSector.MonitorSector.MonitorsChangedDelay = 0;
+		_store._root.MutableRootSector.MonitorSector.MonitorsChangedDelay = 0;
 
 		// First IsStaThread() returns true, then all further calls return false.
 		// This is to ensure that the first Dispatch runs in a Task.
 		// All further calls will run in the same thread.
-		internalCtx.CoreNativeManager.IsStaThread().Returns(_ => true, _ => false);
+		_internalCtx.CoreNativeManager.IsStaThread().Returns(_ => true, _ => false);
 		DeferWindowPosHandle.ParallelOptions = new() { MaxDegreeOfParallelism = 1 };
 
 		// Assume that all windows are windows.
-		internalCtx.CoreNativeManager.IsWindow(Arg.Any<HWND>()).Returns(true);
+		_internalCtx.CoreNativeManager.IsWindow(Arg.Any<HWND>()).Returns(true);
 
-		NativeManagerUtils.SetupTryEnqueue(ctx);
+		NativeManagerUtils.SetupTryEnqueue(_ctx);
+
+		PostCustomize(fixture);
 	}
+
+	/// <summary>
+	/// A method to allow child classes to customize the setup.
+	/// </summary>
+	protected virtual void PostCustomize(IFixture fixture) { }
 }
