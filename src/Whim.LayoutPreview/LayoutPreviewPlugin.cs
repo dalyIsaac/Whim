@@ -12,8 +12,6 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 	private LayoutPreviewWindow? _layoutPreviewWindow;
 	private bool _disposedValue;
 
-	private readonly object _previewLock = new();
-
 	/// <summary>
 	/// The window that is currently being dragged.
 	/// </summary>
@@ -38,11 +36,11 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 	/// <inheritdoc	/>
 	public void PreInitialize()
 	{
-		_context.WindowManager.WindowMoveStart += WindowManager_WindowMoveStart;
-		_context.WindowManager.WindowMoved += WindowMoved;
-		_context.WindowManager.WindowMoveEnd += WindowManager_WindowMoveEnd;
-		_context.WindowManager.WindowRemoved += WindowManager_WindowRemoved;
-		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
+		_context.Store.WindowEvents.WindowMoveStarted += WindowEvents_WindowMoveStart;
+		_context.Store.WindowEvents.WindowMoved += WindowMoved;
+		_context.Store.WindowEvents.WindowMoveEnded += WindowEvents_WindowMoveEnd;
+		_context.Store.WindowEvents.WindowRemoved += WindowEvents_WindowRemoved;
+		_context.Store.WindowEvents.WindowFocused += WindowEvents_WindowFocused;
 		_context.FilterManager.AddTitleMatchFilter(LayoutPreviewWindow.WindowTitle);
 	}
 
@@ -55,91 +53,80 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 	/// <inheritdoc />
 	public JsonElement? SaveState() => null;
 
-	private void WindowManager_WindowMoveStart(object? sender, WindowMoveStartedEventArgs e)
+	private void WindowEvents_WindowMoveStart(object? sender, WindowMoveStartedEventArgs e)
 	{
 		if (e.CursorDraggedPoint == null)
 		{
 			return;
 		}
 
+		// We don't hit this code path in tests to avoid UI code not working in tests.
 		_layoutPreviewWindow ??= new(_context);
 		WindowMoved(this, e);
 	}
 
 	private void WindowMoved(object? sender, WindowMoveEventArgs e)
 	{
-		lock (_previewLock)
+		// Only run if the window is being dragged. If the window is being resized, we don't want to do anything.
+		// If the given point does not correspond to a monitor, ignore it.
+		// If the given point does not correspond to a workspace, ignore it.
+		if (
+			e.CursorDraggedPoint is not IPoint<int> cursorDraggedPoint
+			|| e.MovedEdges is not null
+			|| !_context.Store.Pick(Pickers.PickMonitorAtPoint(cursorDraggedPoint)).TryGet(out IMonitor monitor)
+			|| !_context.Store.Pick(Pickers.PickWorkspaceByMonitor(monitor.Handle)).TryGet(out IWorkspace workspace)
+		)
 		{
-			// Only run if the window is being dragged. If the window is being resized, we don't want to do anything.
-			if (e.CursorDraggedPoint is not IPoint<int> cursorDraggedPoint || e.MovedEdges is not null)
+			Hide();
+			return;
+		}
+
+		DraggedWindow = e.Window;
+
+		IPoint<double> normalizedPoint = monitor.WorkingArea.NormalizeAbsolutePoint(cursorDraggedPoint);
+		ILayoutEngine layoutEngine = workspace.ActiveLayoutEngine.MoveWindowToPoint(e.Window, normalizedPoint);
+		if (layoutEngine.GetLayoutEngine<FloatingLayoutEngine>() is not null)
+		{
+			Logger.Debug("Skip LayoutPreview as LeafLayoutEngine is a FloatingLayoutEngine");
+
+			Hide();
+			return;
+		}
+
+		Rectangle<int> rect = new() { Height = monitor.WorkingArea.Height, Width = monitor.WorkingArea.Width };
+
+		// Adjust the cursor point so that it's relative to the monitor's rectangle.
+		Point<int> adjustedCursorPoint =
+			new()
 			{
-				return;
-			}
+				X = cursorDraggedPoint.X - monitor.WorkingArea.X,
+				Y = cursorDraggedPoint.Y - monitor.WorkingArea.Y
+			};
 
-			IMonitor monitor = _context.MonitorManager.GetMonitorAtPoint(cursorDraggedPoint);
-			IPoint<double> normalizedPoint = monitor.WorkingArea.NormalizeAbsolutePoint(cursorDraggedPoint);
+		_layoutPreviewWindow?.Update(
+			layoutEngine.DoLayout(rect, monitor).ToArray(),
+			adjustedCursorPoint,
+			e.Window,
+			monitor
+		);
+	}
 
-			IWorkspace? workspace = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor);
-			if (workspace == null)
-			{
-				return;
-			}
-
-			DraggedWindow = e.Window;
-			ILayoutEngine layoutEngine = workspace.ActiveLayoutEngine.MoveWindowToPoint(e.Window, normalizedPoint);
-			if (layoutEngine.GetLayoutEngine<FloatingLayoutEngine>() is not null)
-			{
-				Logger.Debug("Skip LayoutPreview as LeafLayoutEngine is a FloatingLayoutEngine");
-				return;
-			}
-
-			Rectangle<int> rect = new() { Height = monitor.WorkingArea.Height, Width = monitor.WorkingArea.Width };
-
-			// Adjust the cursor point so that it's relative to the monitor's rectangle.
-			Point<int> adjustedCursorPoint =
-				new()
-				{
-					X = cursorDraggedPoint.X - monitor.WorkingArea.X,
-					Y = cursorDraggedPoint.Y - monitor.WorkingArea.Y
-				};
-
-			_layoutPreviewWindow?.Update(
-				layoutEngine.DoLayout(rect, monitor).ToArray(),
-				adjustedCursorPoint,
-				e.Window,
-				monitor
-			);
+	private void WindowEvents_WindowRemoved(object? sender, WindowEventArgs e)
+	{
+		if (DraggedWindow == e.Window)
+		{
+			Hide();
 		}
 	}
 
-	private void WindowManager_WindowRemoved(object? sender, WindowEventArgs e)
-	{
-		lock (_previewLock)
-		{
-			if (DraggedWindow == e.Window)
-			{
-				_layoutPreviewWindow?.Hide(_context);
-				DraggedWindow = null;
-			}
-		}
-	}
+	private void WindowEvents_WindowFocused(object? sender, WindowFocusedEventArgs e) => Hide();
 
-	private void WindowManager_WindowFocused(object? sender, WindowFocusedEventArgs e)
-	{
-		lock (_previewLock)
-		{
-			_layoutPreviewWindow?.Hide(_context);
-			DraggedWindow = null;
-		}
-	}
+	private void WindowEvents_WindowMoveEnd(object? sender, WindowEventArgs e) => Hide();
 
-	private void WindowManager_WindowMoveEnd(object? sender, WindowEventArgs e)
+	private void Hide()
 	{
-		lock (_previewLock)
-		{
-			_layoutPreviewWindow?.Hide(_context);
-			DraggedWindow = null;
-		}
+		_layoutPreviewWindow?.Hide(_context);
+		DraggedWindow = null;
 	}
 
 	/// <inheritdoc />

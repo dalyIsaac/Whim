@@ -40,5 +40,6 @@
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Whim.Tests" />
+    <InternalsVisibleTo Include="Whim.LayoutPreview.Tests" />
   </ItemGroup>
 </Project>
