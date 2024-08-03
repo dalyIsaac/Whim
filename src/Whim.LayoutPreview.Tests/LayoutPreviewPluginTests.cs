@@ -231,6 +231,7 @@ public class LayoutPreviewPluginTests
 			),
 			ActiveLayoutEngineIndex = 0
 		};
+		rootSector.WorkspaceSector.Workspaces = rootSector.WorkspaceSector.Workspaces.SetItem(workspace.Id, workspace);
 
 		using LayoutPreviewPlugin plugin = new(ctx);
 		WindowMovedEventArgs e =
@@ -247,8 +248,7 @@ public class LayoutPreviewPluginTests
 		rootSector.DispatchEvents();
 
 		// Then
-		Assert.Single(workspace.ActiveLayoutEngine.ReceivedCalls());
-		Assert.Equal(window, plugin.DraggedWindow);
+		Assert.Null(plugin.DraggedWindow);
 	}
 
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]

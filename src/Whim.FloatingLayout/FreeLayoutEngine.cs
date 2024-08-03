@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using DotNext;
 
 namespace Whim.FloatingLayout;
 
@@ -133,7 +134,11 @@ public class FreeLayoutEngine : ILayoutEngine
 			return this;
 		}
 
-		IMonitor newMonitor = _context.MonitorManager.GetMonitorAtPoint(newActualRectangle);
+		if (!_context.Store.Pick(Pickers.PickMonitorAtPoint(newActualRectangle)).TryGet(out IMonitor newMonitor))
+		{
+			return this;
+		}
+
 		IRectangle<double> newUnitSquareRectangle = newMonitor.WorkingArea.NormalizeRectangle(newActualRectangle);
 		if (newUnitSquareRectangle.Equals(oldRectangle))
 		{
