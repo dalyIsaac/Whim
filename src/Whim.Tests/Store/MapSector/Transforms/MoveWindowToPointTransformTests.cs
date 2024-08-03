@@ -4,6 +4,21 @@ namespace Whim.Tests;
 public class MoveWindowToPointTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void NoMonitorAtPoint(IContext ctx)
+	{
+		// Given there is monitor at the given point
+		Point<int> point = new(10, 10);
+
+		MoveWindowToPointTransform sut = new((HWND)10, point);
+
+		// When we execute the transform
+		var result = ctx.Store.Dispatch(sut);
+
+		// Then we fail
+		Assert.False(result.IsSuccessful);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void NoWorkspaceForMonitor(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		// Given there is no workspace for the monitor at the given point
