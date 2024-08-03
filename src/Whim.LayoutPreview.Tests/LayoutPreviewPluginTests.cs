@@ -19,6 +19,7 @@ public class LayoutPreviewPluginCustomization : StoreCustomization
 		fixture.Inject(workspace);
 
 		IMonitor monitor = StoreTestUtils.CreateMonitor((HMONITOR)1);
+		fixture.Inject(monitor);
 
 		StoreTestUtils.SetupMonitorAtPoint(
 			_ctx,
@@ -220,7 +221,8 @@ public class LayoutPreviewPluginTests
 		IContext ctx,
 		MutableRootSector rootSector,
 		IWindow window,
-		Workspace workspace
+		Workspace workspace,
+		IMonitor monitor
 	)
 	{
 		// Given
@@ -232,6 +234,7 @@ public class LayoutPreviewPluginTests
 			ActiveLayoutEngineIndex = 0
 		};
 		rootSector.WorkspaceSector.Workspaces = rootSector.WorkspaceSector.Workspaces.SetItem(workspace.Id, workspace);
+		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitor);
 
 		using LayoutPreviewPlugin plugin = new(ctx);
 		WindowMovedEventArgs e =
