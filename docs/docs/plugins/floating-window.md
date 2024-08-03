@@ -1,12 +1,10 @@
 # Floating Window Plugin
 
-The <xref:Whim.FloatingLayout.FloatingWindowPlugin> adds a `ProxyFloatingLayoutEngine` proxy engine to Whim. This adds the ability for windows to float outside of any other layouts.
+The <xref:Whim.FloatingLayout.FloatingWindowPlugin> adds a `ProxyFloatingLayoutEngine` proxy engine to Whim. This adds the ability for windows to float outside of any other layouts. If you want to have a layout of free-floating windows, see the <xref:Whim.FloatingLayout.FloatingLayoutEngine>.
 
 The <xref:Whim.FloatingLayout.FloatingWindowPlugin> has no configuration options.
 
 ![Floating window demo](../../images/floating-window-demo.gif)
-
-Notice that this plugin is not related to the `FloatingLayoutEngine`.
 
 ## Example Config
 
