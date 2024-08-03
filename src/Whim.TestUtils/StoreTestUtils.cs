@@ -161,7 +161,13 @@ internal static class StoreTestUtils
 		return workspace;
 	}
 
-	internal static void SetupMonitorAtPoint(IInternalContext internalCtx, IPoint<int> point, IMonitor monitor)
+	internal static void SetupMonitorAtPoint(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector rootSector,
+		IPoint<int> point,
+		IMonitor monitor
+	)
 	{
 		internalCtx
 			.CoreNativeManager.MonitorFromPoint(
@@ -178,5 +184,7 @@ internal static class StoreTestUtils
 
 				return default;
 			});
+
+		AddMonitorsToManager(ctx, rootSector, monitor);
 	}
 }

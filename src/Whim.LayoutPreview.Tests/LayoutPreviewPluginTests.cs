@@ -18,7 +18,13 @@ public class LayoutPreviewPluginCustomization : StoreCustomization
 
 		IMonitor monitor = StoreTestUtils.CreateMonitor((HMONITOR)1);
 
-		StoreTestUtils.SetupMonitorAtPoint(_internalCtx, new Point<int>(0, 0), monitor);
+		StoreTestUtils.SetupMonitorAtPoint(
+			_ctx,
+			_internalCtx,
+			_store._root.MutableRootSector,
+			new Point<int>(0, 0),
+			monitor
+		);
 		StoreTestUtils.PopulateMonitorWorkspaceMap(_ctx, _store._root.MutableRootSector, monitor, workspace);
 	}
 }
