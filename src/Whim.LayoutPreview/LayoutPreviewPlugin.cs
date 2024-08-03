@@ -36,11 +36,11 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 	/// <inheritdoc	/>
 	public void PreInitialize()
 	{
-		_context.Store.WindowEvents.WindowMoveStarted += WindowManager_WindowMoveStart;
+		_context.Store.WindowEvents.WindowMoveStarted += WindowEvents_WindowMoveStart;
 		_context.Store.WindowEvents.WindowMoved += WindowMoved;
-		_context.Store.WindowEvents.WindowMoveEnded += WindowManager_WindowMoveEnd;
-		_context.Store.WindowEvents.WindowRemoved += WindowManager_WindowRemoved;
-		_context.Store.WindowEvents.WindowFocused += WindowManager_WindowFocused;
+		_context.Store.WindowEvents.WindowMoveEnded += WindowEvents_WindowMoveEnd;
+		_context.Store.WindowEvents.WindowRemoved += WindowEvents_WindowRemoved;
+		_context.Store.WindowEvents.WindowFocused += WindowEvents_WindowFocused;
 		_context.FilterManager.AddTitleMatchFilter(LayoutPreviewWindow.WindowTitle);
 	}
 
@@ -53,13 +53,14 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 	/// <inheritdoc />
 	public JsonElement? SaveState() => null;
 
-	private void WindowManager_WindowMoveStart(object? sender, WindowMoveStartedEventArgs e)
+	private void WindowEvents_WindowMoveStart(object? sender, WindowMoveStartedEventArgs e)
 	{
 		if (e.CursorDraggedPoint == null)
 		{
 			return;
 		}
 
+		// We don't hit this code path in tests to avoid UI code not working in tests.
 		_layoutPreviewWindow ??= new(_context);
 		WindowMoved(this, e);
 	}
@@ -111,7 +112,7 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 		);
 	}
 
-	private void WindowManager_WindowRemoved(object? sender, WindowEventArgs e)
+	private void WindowEvents_WindowRemoved(object? sender, WindowEventArgs e)
 	{
 		if (DraggedWindow == e.Window)
 		{
@@ -119,9 +120,9 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 		}
 	}
 
-	private void WindowManager_WindowFocused(object? sender, WindowFocusedEventArgs e) => Hide();
+	private void WindowEvents_WindowFocused(object? sender, WindowFocusedEventArgs e) => Hide();
 
-	private void WindowManager_WindowMoveEnd(object? sender, WindowEventArgs e) => Hide();
+	private void WindowEvents_WindowMoveEnd(object? sender, WindowEventArgs e) => Hide();
 
 	private void Hide()
 	{

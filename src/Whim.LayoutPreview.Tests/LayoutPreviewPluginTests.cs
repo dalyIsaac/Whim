@@ -1,7 +1,9 @@
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using AutoFixture;
 using NSubstitute;
+using Whim.FloatingLayout;
 using Whim.TestUtils;
 using Windows.Win32.Graphics.Gdi;
 using Xunit;
@@ -214,6 +216,42 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	internal void WindowMoved_Dragged_IgnoreFloatingLayoutEngine(
+		IContext ctx,
+		MutableRootSector rootSector,
+		IWindow window,
+		Workspace workspace
+	)
+	{
+		// Given
+		workspace = workspace with
+		{
+			LayoutEngines = ImmutableList<ILayoutEngine>.Empty.Add(
+				new FreeLayoutEngine(ctx, new LayoutEngineIdentity())
+			),
+			ActiveLayoutEngineIndex = 0
+		};
+
+		using LayoutPreviewPlugin plugin = new(ctx);
+		WindowMovedEventArgs e =
+			new()
+			{
+				Window = window,
+				CursorDraggedPoint = new Rectangle<int>(),
+				MovedEdges = null
+			};
+
+		// When
+		plugin.PreInitialize();
+		rootSector.WindowSector.QueueEvent(e);
+		rootSector.DispatchEvents();
+
+		// Then
+		Assert.Single(workspace.ActiveLayoutEngine.ReceivedCalls());
+		Assert.Equal(window, plugin.DraggedWindow);
+	}
+
+	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
 	internal void WindowMoved_Dragged_Success(
 		IContext ctx,
 		MutableRootSector rootSector,
@@ -268,7 +306,7 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
-	internal void WindowManager_WindowRemoved_NotHidden(
+	internal void WindowEvents_WindowRemoved_NotHidden(
 		IContext ctx,
 		MutableRootSector rootSector,
 		IWindow movedWindow,
@@ -296,7 +334,7 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
-	internal void WindowManager_WindowRemoved_Shown(IContext ctx, MutableRootSector rootSector, IWindow movedWindow)
+	internal void WindowEvents_WindowRemoved_Hidden(IContext ctx, MutableRootSector rootSector, IWindow movedWindow)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -308,13 +346,12 @@ public class LayoutPreviewPluginTests
 				CursorDraggedPoint = new Rectangle<int>(),
 				MovedEdges = null
 			};
-
 		WindowEventArgs removeArgs = new WindowRemovedEventArgs() { Window = movedWindow };
 
 		// When
 		plugin.PreInitialize();
-		rootSector.QueueEvent(moveArgs);
-		rootSector.QueueEvent(removeArgs);
+		rootSector.WindowSector.QueueEvent(moveArgs);
+		rootSector.WindowSector.QueueEvent(removeArgs);
 		rootSector.DispatchEvents();
 
 		// Then
@@ -322,7 +359,7 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
-	internal void WindowManager_WindowFocused(IContext ctx, MutableRootSector rootSector, IWindow movedWindow)
+	internal void WindowEvents_WindowFocused(IContext ctx, MutableRootSector rootSector, IWindow movedWindow)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -339,8 +376,8 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		rootSector.QueueEvent(moveArgs);
-		rootSector.QueueEvent(focusArgs);
+		rootSector.WindowSector.QueueEvent(moveArgs);
+		rootSector.WindowSector.QueueEvent(focusArgs);
 		rootSector.DispatchEvents();
 
 		// Then

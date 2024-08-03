@@ -143,11 +143,8 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 		);
 	}
 
-	private void LayoutPreviewCanvas_PointerPressed(object sender, PointerRoutedEventArgs e)
-	{
-		// Hide the window when the user clicks on it.
-		this.Hide(_context);
-	}
+	// Hide the window when the user clicks on it.
+	private void LayoutPreviewCanvas_PointerPressed(object sender, PointerRoutedEventArgs e) => this.Hide(_context);
 
 	private void Dispose(bool disposing)
 	{
