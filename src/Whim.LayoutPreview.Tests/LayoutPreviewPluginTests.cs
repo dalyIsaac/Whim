@@ -115,7 +115,7 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
-	internal void WindowMoveStarted_NotDragged(IContext ctx)
+	internal void WindowMoveStarted_NotDragged(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -129,10 +129,8 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		ctx.Store.WindowEvents.WindowMoveStarted += Raise.Event<EventHandler<WindowMoveStartedEventArgs>>(
-			ctx.WindowManager,
-			e
-		);
+		rootSector.WindowSector.QueueEvent(e);
+		rootSector.DispatchEvents();
 
 		// Then
 		Assert.Null(plugin.DraggedWindow);
@@ -248,7 +246,7 @@ public class LayoutPreviewPluginTests
 	#endregion
 
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
-	internal void WindowMoveEnded(IContext ctx)
+	internal void WindowMoveEnded(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -262,10 +260,8 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		ctx.Store.WindowEvents.WindowMoveEnded += Raise.Event<EventHandler<WindowMoveEndedEventArgs>>(
-			ctx.WindowManager,
-			e
-		);
+		rootSector.WindowSector.QueueEvent(e);
+		rootSector.DispatchEvents();
 
 		// Then
 		Assert.Null(plugin.DraggedWindow);
