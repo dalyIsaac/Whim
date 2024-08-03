@@ -161,8 +161,22 @@ internal static class StoreTestUtils
 		return workspace;
 	}
 
-	public static void SetupMonitorAtPoint(IContext ctx, IPoint<int> point, IMonitor monitor)
+	internal static void SetupMonitorAtPoint(IInternalContext internalCtx, IPoint<int> point, IMonitor monitor)
 	{
-		ctx.MonitorManager.GetMonitorAtPoint(point).Returns(monitor);
+		internalCtx
+			.CoreNativeManager.MonitorFromPoint(
+				Arg.Any<System.Drawing.Point>(),
+				MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
+			)
+			.Returns(callInfo =>
+			{
+				System.Drawing.Point calledPoint = callInfo.Arg<System.Drawing.Point>();
+				if (calledPoint.X == point.X && calledPoint.Y == point.Y)
+				{
+					return monitor.Handle;
+				}
+
+				return default;
+			});
 	}
 }

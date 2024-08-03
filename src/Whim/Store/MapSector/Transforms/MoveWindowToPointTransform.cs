@@ -15,7 +15,10 @@ public record MoveWindowToPointTransform(HWND WindowHandle, IPoint<int> Point) :
 	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		// Get the monitor.
-		IMonitor targetMonitor = ctx.MonitorManager.GetMonitorAtPoint(Point);
+		if (!ctx.Store.Pick(PickMonitorAtPoint(Point)).TryGet(out IMonitor targetMonitor))
+		{
+			return Result.FromException<Unit>(StoreExceptions.NoMonitorFoundAtPoint(Point));
+		}
 
 		// Get the target workspace.
 		Result<IWorkspace> targetWorkspaceResult = ctx.Store.Pick(PickWorkspaceByMonitor(targetMonitor.Handle));

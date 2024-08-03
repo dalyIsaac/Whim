@@ -4,12 +4,12 @@ namespace Whim.Tests;
 public class MoveWindowToPointTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void NoWorkspaceForMonitor(IContext ctx)
+	internal void NoWorkspaceForMonitor(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given there is no workspace for the monitor at the given point
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
 		Point<int> point = new(10, 10);
-		SetupMonitorAtPoint(ctx, point, monitor);
+		SetupMonitorAtPoint(internalCtx, point, monitor);
 
 		MoveWindowToPointTransform sut = new((HWND)10, point);
 
@@ -21,7 +21,7 @@ public class MoveWindowToPointTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void NoWorkspaceForWindow(IContext ctx, MutableRootSector rootSector)
+	internal void NoWorkspaceForWindow(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		// Given there is no workspace for the window
 		IWindow window = CreateWindow((HWND)10);
@@ -30,7 +30,7 @@ public class MoveWindowToPointTransformTests
 		Point<int> point = new(10, 10);
 
 		AddWindowToSector(rootSector, window);
-		SetupMonitorAtPoint(ctx, point, monitor);
+		SetupMonitorAtPoint(internalCtx, point, monitor);
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, workspace);
 
 		MoveWindowToPointTransform sut = new(window.Handle, point);
@@ -43,7 +43,11 @@ public class MoveWindowToPointTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void MoveWindowToPointOnSameMonitor(IContext ctx, MutableRootSector rootSector)
+	internal void MoveWindowToPointOnSameMonitor(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector rootSector
+	)
 	{
 		// Given there is a workspace for the window
 		IWindow window = CreateWindow((HWND)10);
@@ -52,7 +56,7 @@ public class MoveWindowToPointTransformTests
 		Point<int> point = new(10, 10);
 
 		AddWindowToSector(rootSector, window);
-		SetupMonitorAtPoint(ctx, point, monitor);
+		SetupMonitorAtPoint(internalCtx, point, monitor);
 		PopulateThreeWayMap(ctx, rootSector, monitor, workspace, window);
 
 		MoveWindowToPointTransform sut = new(window.Handle, point);
@@ -77,7 +81,11 @@ public class MoveWindowToPointTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void MoveWindowToPointOnDifferentMonitor(IContext ctx, MutableRootSector rootSector)
+	internal void MoveWindowToPointOnDifferentMonitor(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector rootSector
+	)
 	{
 		// Given there is a workspace for the window
 		IWindow window = CreateWindow((HWND)10);
@@ -90,7 +98,7 @@ public class MoveWindowToPointTransformTests
 		Point<int> point = new(10, 10);
 
 		AddWindowToSector(rootSector, window);
-		SetupMonitorAtPoint(ctx, point, targetMonitor);
+		SetupMonitorAtPoint(internalCtx, point, targetMonitor);
 		PopulateThreeWayMap(ctx, rootSector, sourceMonitor, sourceWorkspace, window);
 		PopulateMonitorWorkspaceMap(ctx, rootSector, targetMonitor, targetWorkspace);
 
