@@ -76,8 +76,7 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 			|| !_context.Store.Pick(Pickers.PickWorkspaceByMonitor(monitor.Handle)).TryGet(out IWorkspace workspace)
 		)
 		{
-			_layoutPreviewWindow?.Hide(_context);
-			DraggedWindow = null;
+			Hide();
 			return;
 		}
 
@@ -90,8 +89,7 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 			// To be renamed when FreeLayoutEngine will be renamed
 			Logger.Debug("Skip LayoutPreview as LeafLayoutEngine is a FreeLayoutEngine");
 
-			_layoutPreviewWindow?.Hide(_context);
-			DraggedWindow = null;
+			Hide();
 			return;
 		}
 
@@ -117,18 +115,15 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 	{
 		if (DraggedWindow == e.Window)
 		{
-			_layoutPreviewWindow?.Hide(_context);
-			DraggedWindow = null;
+			Hide();
 		}
 	}
 
-	private void WindowManager_WindowFocused(object? sender, WindowFocusedEventArgs e)
-	{
-		_layoutPreviewWindow?.Hide(_context);
-		DraggedWindow = null;
-	}
+	private void WindowManager_WindowFocused(object? sender, WindowFocusedEventArgs e) => Hide();
 
-	private void WindowManager_WindowMoveEnd(object? sender, WindowEventArgs e)
+	private void WindowManager_WindowMoveEnd(object? sender, WindowEventArgs e) => Hide();
+
+	private void Hide()
 	{
 		_layoutPreviewWindow?.Hide(_context);
 		DraggedWindow = null;

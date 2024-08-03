@@ -32,7 +32,7 @@ public class LayoutPreviewPluginCustomization : StoreCustomization
 public class LayoutPreviewPluginTests
 {
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
-	public void Name(IContext ctx)
+	internal void Name(IContext ctx)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -45,7 +45,7 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
-	public void PluginCommands(IContext ctx)
+	internal void PluginCommands(IContext ctx)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -59,7 +59,7 @@ public class LayoutPreviewPluginTests
 
 	[Theory, AutoSubstituteData]
 	[SuppressMessage("Usage", "NS5000:Received check.")]
-	public void PreInitialize(IContext ctx)
+	internal void PreInitialize(IContext ctx)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -76,7 +76,7 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
-	public void PostInitialize(IContext ctx)
+	internal void PostInitialize(IContext ctx)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -89,7 +89,7 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
-	public void LoadState(IContext ctx)
+	internal void LoadState(IContext ctx)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -102,7 +102,7 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
-	public void SaveState(IContext ctx)
+	internal void SaveState(IContext ctx)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -115,7 +115,7 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
-	public void WindowMoveStart_NotDragged(IContext ctx)
+	internal void WindowMoveStarted_NotDragged(IContext ctx)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -129,7 +129,7 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		ctx.WindowManager.WindowMoveStart += Raise.Event<EventHandler<WindowMoveStartedEventArgs>>(
+		ctx.Store.WindowEvents.WindowMoveStarted += Raise.Event<EventHandler<WindowMoveStartedEventArgs>>(
 			ctx.WindowManager,
 			e
 		);
@@ -140,7 +140,7 @@ public class LayoutPreviewPluginTests
 
 	#region WindowMoved
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
-	public void WindowMoved_NotDragged(IContext ctx)
+	internal void WindowMoved_NotDragged(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -154,7 +154,8 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, e);
+		rootSector.WindowSector.QueueEvent(e);
+		rootSector.DispatchEvents();
 
 		// Then
 		ctx.MonitorManager.DidNotReceive().GetMonitorAtPoint(Arg.Any<IPoint<int>>());
@@ -162,7 +163,7 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
-	public void WindowMoved_MovingEdges(IContext ctx)
+	internal void WindowMoved_MovingEdges(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -176,7 +177,8 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, e);
+		rootSector.WindowSector.QueueEvent(e);
+		rootSector.DispatchEvents();
 
 		// Then
 		ctx.MonitorManager.DidNotReceive().GetMonitorAtPoint(Arg.Any<IPoint<int>>());
@@ -184,7 +186,11 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
-	public void WindowMoved_Dragged_CannotFindWorkspace(IContext ctx, IWorkspace workspace)
+	internal void WindowMoved_Dragged_CannotFindWorkspace(
+		IContext ctx,
+		MutableRootSector rootSector,
+		IWorkspace workspace
+	)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -195,13 +201,14 @@ public class LayoutPreviewPluginTests
 				CursorDraggedPoint = new Rectangle<int>(),
 				MovedEdges = null
 			};
-		ctx.Butler.Pantry.GetWorkspaceForMonitor(Arg.Any<IMonitor>()).Returns((IWorkspace?)null);
+		rootSector.MapSector.MonitorWorkspaceMap = rootSector.MapSector.MonitorWorkspaceMap.Clear();
 
 		workspace.ActiveLayoutEngine.ClearReceivedCalls();
 
 		// When
 		plugin.PreInitialize();
-		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, e);
+		rootSector.WindowSector.QueueEvent(e);
+		rootSector.DispatchEvents();
 
 		// Then
 		Assert.Empty(workspace.ActiveLayoutEngine.ReceivedCalls());
@@ -241,7 +248,7 @@ public class LayoutPreviewPluginTests
 	#endregion
 
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
-	public void WindowMoveEnd(IContext ctx)
+	internal void WindowMoveEnded(IContext ctx)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -255,7 +262,10 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		ctx.WindowManager.WindowMoveEnd += Raise.Event<EventHandler<WindowMoveEndedEventArgs>>(ctx.WindowManager, e);
+		ctx.Store.WindowEvents.WindowMoveEnded += Raise.Event<EventHandler<WindowMoveEndedEventArgs>>(
+			ctx.WindowManager,
+			e
+		);
 
 		// Then
 		Assert.Null(plugin.DraggedWindow);
@@ -290,7 +300,7 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
-	public void WindowManager_WindowRemoved_Shown(IContext ctx, IWindow movedWindow)
+	internal void WindowManager_WindowRemoved_Shown(IContext ctx, MutableRootSector rootSector, IWindow movedWindow)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -307,18 +317,16 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, moveArgs);
-		ctx.WindowManager.WindowRemoved += Raise.Event<EventHandler<WindowRemovedEventArgs>>(
-			ctx.WindowManager,
-			removeArgs
-		);
+		rootSector.QueueEvent(moveArgs);
+		rootSector.QueueEvent(removeArgs);
+		rootSector.DispatchEvents();
 
 		// Then
 		Assert.Null(plugin.DraggedWindow);
 	}
 
 	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
-	public void WindowManager_WindowFocused(IContext ctx, IWindow movedWindow)
+	internal void WindowManager_WindowFocused(IContext ctx, MutableRootSector rootSector, IWindow movedWindow)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -335,11 +343,9 @@ public class LayoutPreviewPluginTests
 
 		// When
 		plugin.PreInitialize();
-		ctx.WindowManager.WindowMoved += Raise.Event<EventHandler<WindowMovedEventArgs>>(ctx.WindowManager, moveArgs);
-		ctx.WindowManager.WindowFocused += Raise.Event<EventHandler<WindowFocusedEventArgs>>(
-			ctx.WindowManager,
-			focusArgs
-		);
+		rootSector.QueueEvent(moveArgs);
+		rootSector.QueueEvent(focusArgs);
+		rootSector.DispatchEvents();
 
 		// Then
 		Assert.Null(plugin.DraggedWindow);
