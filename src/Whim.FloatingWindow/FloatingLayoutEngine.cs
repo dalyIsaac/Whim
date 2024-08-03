@@ -2,7 +2,7 @@
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace Whim.FloatingLayout;
+namespace Whim.FloatingWindow;
 
 /// <summary>
 /// Layout engine that lays out all windows as free-floating.

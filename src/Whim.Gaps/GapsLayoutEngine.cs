@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Whim.FloatingLayout;
+using Whim.FloatingWindow;
 
 namespace Whim.Gaps;
 

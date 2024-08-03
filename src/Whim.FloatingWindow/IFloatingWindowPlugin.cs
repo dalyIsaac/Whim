@@ -1,4 +1,4 @@
-namespace Whim.FloatingLayout;
+namespace Whim.FloatingWindow;
 
 /// <summary>
 /// FloatingWindowPlugin lets windows escape the layout engine and be free-floating.

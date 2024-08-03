@@ -1,6 +1,6 @@
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
-namespace Whim.FloatingLayout;
+namespace Whim.FloatingWindow;
 
 /// <summary>
 /// The commands for the floating window plugin.

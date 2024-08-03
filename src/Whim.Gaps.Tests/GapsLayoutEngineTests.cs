@@ -1,6 +1,6 @@
 using FluentAssertions;
 using NSubstitute;
-using Whim.FloatingLayout;
+using Whim.FloatingWindow;
 using Whim.TestUtils;
 using Xunit;
 

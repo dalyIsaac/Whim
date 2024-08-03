@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace Whim.FloatingLayout;
+namespace Whim.FloatingWindow;
 
 /// <summary>
 /// A proxy layout engine to allow windows to be free-floating within another layout.

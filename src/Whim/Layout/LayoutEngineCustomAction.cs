@@ -12,7 +12,7 @@ public record LayoutEngineCustomAction
 
 	/// <summary>
 	/// The window that triggered the action, if any. Proxy layout engines may use this for their
-	/// own purposes - for example, the FloatingLayoutEngine.
+	/// own purposes - for example, the ProxyFloatingLayoutEngine.
 	///
 	/// This is deliberately set to required to force the specification of the triggering window, where possible.
 	/// </summary>

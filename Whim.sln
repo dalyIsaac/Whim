@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Gaps", "src\Whim.Gaps\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Tests", "src\Whim.Tests\Whim.Tests.csproj", "{B2BA068D-D77A-4B7B-9B64-2C23701F48B5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.FloatingLayout", "src\Whim.FloatingLayout\Whim.FloatingLayout.csproj", "{636EA561-2625-4D2A-9A8A-890E5AEF18B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.FloatingWindow", "src\Whim.FloatingWindow\Whim.FloatingWindow.csproj", "{636EA561-2625-4D2A-9A8A-890E5AEF18B9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Runner", "src\Whim.Runner\Whim.Runner.csproj", "{D74F1389-F4D1-4A1C-ACE3-D91D70472DBB}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -43,7 +43,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.CommandPalette.Tests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.TreeLayout.Bar", "src\Whim.TreeLayout.Bar\Whim.TreeLayout.Bar.csproj", "{4F66FB22-C4B3-494F-BEE0-9F878349621E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.FloatingLayout.Tests", "src\Whim.FloatingLayout.Tests\Whim.FloatingLayout.Tests.csproj", "{2E407C3C-FCE9-4851-9091-61C6CC687AFD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.FloatingWindow.Tests", "src\Whim.FloatingWindow.Tests\Whim.FloatingWindow.Tests.csproj", "{2E407C3C-FCE9-4851-9091-61C6CC687AFD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Gaps.Tests", "src\Whim.Gaps.Tests\Whim.Gaps.Tests.csproj", "{3771BD98-746A-446D-BEA9-22C97B719299}"
 EndProject

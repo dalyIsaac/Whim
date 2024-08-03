@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Json;
 
-namespace Whim.FloatingLayout;
+namespace Whim.FloatingWindow;
 
 /// <inheritdoc />
 public class FloatingWindowPlugin : IFloatingWindowPlugin, IInternalFloatingWindowPlugin

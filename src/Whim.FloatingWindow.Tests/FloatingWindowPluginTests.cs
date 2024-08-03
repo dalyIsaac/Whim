@@ -4,7 +4,7 @@ using NSubstitute;
 using Whim.TestUtils;
 using Xunit;
 
-namespace Whim.FloatingLayout.Tests;
+namespace Whim.FloatingWindow.Tests;
 
 public class FloatingWindowPluginCustomization : ICustomization
 {

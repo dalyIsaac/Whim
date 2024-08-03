@@ -2,7 +2,7 @@ using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 
-namespace Whim.FloatingLayout.Tests;
+namespace Whim.FloatingWindow.Tests;
 
 public class BaseProxyFloatingLayoutEngineTests : ProxyLayoutEngineBaseTests
 {

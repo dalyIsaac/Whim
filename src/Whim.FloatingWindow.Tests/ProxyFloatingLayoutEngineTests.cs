@@ -5,7 +5,7 @@ using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Xunit;
 
-namespace Whim.FloatingLayout.Tests;
+namespace Whim.FloatingWindow.Tests;
 
 public class ProxyFloatingLayoutEngineCustomization : ICustomization
 {

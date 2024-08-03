@@ -2,7 +2,7 @@
 #r "WHIM_PATH\whim.dll"
 #r "WHIM_PATH\plugins\Whim.Bar\Whim.Bar.dll"
 #r "WHIM_PATH\plugins\Whim.CommandPalette\Whim.CommandPalette.dll"
-#r "WHIM_PATH\plugins\Whim.FloatingLayout\Whim.FloatingLayout.dll"
+#r "WHIM_PATH\plugins\Whim.FloatingWindow\Whim.FloatingWindow.dll"
 #r "WHIM_PATH\plugins\Whim.FocusIndicator\Whim.FocusIndicator.dll"
 #r "WHIM_PATH\plugins\Whim.Gaps\Whim.Gaps.dll"
 #r "WHIM_PATH\plugins\Whim.LayoutPreview\Whim.LayoutPreview.dll"
@@ -19,7 +19,7 @@ using Microsoft.UI.Xaml.Media;
 using Whim;
 using Whim.Bar;
 using Whim.CommandPalette;
-using Whim.FloatingLayout;
+using Whim.FloatingWindow;
 using Whim.FocusIndicator;
 using Whim.Gaps;
 using Whim.LayoutPreview;

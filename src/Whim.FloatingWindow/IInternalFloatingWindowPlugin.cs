@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Whim.FloatingLayout;
+namespace Whim.FloatingWindow;
 
 internal interface IInternalFloatingWindowPlugin
 {
