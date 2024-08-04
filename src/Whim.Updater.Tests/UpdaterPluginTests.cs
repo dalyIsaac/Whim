@@ -44,7 +44,7 @@ public class UpdaterPluginTests
 
 	#region GetNotInstalledReleases
 	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
-	public async void GetNotInstalledReleases_WhenNoReleases(IContext ctx, IGitHubClient client)
+	public async Task GetNotInstalledReleases_WhenNoReleases(IContext ctx, IGitHubClient client)
 	{
 		// Given
 		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
@@ -57,7 +57,7 @@ public class UpdaterPluginTests
 	}
 
 	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
-	public async void GetNotInstalledReleases_InvalidVersion(IContext ctx, IGitHubClient client)
+	public async Task GetNotInstalledReleases_InvalidVersion(IContext ctx, IGitHubClient client)
 	{
 		// Given
 		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
@@ -73,7 +73,7 @@ public class UpdaterPluginTests
 	}
 
 	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
-	public async void GetNotInstalledReleases_DifferentChannel(IContext ctx, IGitHubClient client)
+	public async Task GetNotInstalledReleases_DifferentChannel(IContext ctx, IGitHubClient client)
 	{
 		// Given
 		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
@@ -89,7 +89,7 @@ public class UpdaterPluginTests
 	}
 
 	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
-	public async void GetNotInstalledReleases_OlderVersion(IContext ctx, IGitHubClient client)
+	public async Task GetNotInstalledReleases_OlderVersion(IContext ctx, IGitHubClient client)
 	{
 		// Given
 		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
@@ -105,7 +105,7 @@ public class UpdaterPluginTests
 	}
 
 	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
-	public async void GetNotInstalledReleases_Ordered(IContext ctx, IGitHubClient client)
+	public async Task GetNotInstalledReleases_Ordered(IContext ctx, IGitHubClient client)
 	{
 		// Given
 		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig() { ReleaseChannel = ReleaseChannel.Alpha });
@@ -170,7 +170,7 @@ public class UpdaterPluginTests
 
 	#region CheckForUpdates
 	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
-	public async void CheckForUpdates_WhenNoReleases(IContext ctx, IGitHubClient client)
+	public async Task CheckForUpdates_WhenNoReleases(IContext ctx, IGitHubClient client)
 	{
 		// Given
 		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
@@ -183,7 +183,7 @@ public class UpdaterPluginTests
 	}
 
 	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
-	public async void CheckForUpdates_ReleaseIsSkipped(IContext ctx, IGitHubClient client)
+	public async Task CheckForUpdates_ReleaseIsSkipped(IContext ctx, IGitHubClient client)
 	{
 		// Given
 		Release release = Data.CreateRelease242(tagName: "v0.1.265-alpha+bc5c56c4");
@@ -233,7 +233,7 @@ public class UpdaterPluginTests
 
 	#region InstallRelease
 	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
-	public async void InstallRelease_NoAssets(IContext ctx)
+	public async Task InstallRelease_NoAssets(IContext ctx)
 	{
 		// Given
 		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
@@ -247,7 +247,7 @@ public class UpdaterPluginTests
 	}
 
 	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
-	public async void InstallRelease_DownloadThrows(IContext ctx)
+	public async Task InstallRelease_DownloadThrows(IContext ctx)
 	{
 		// Given
 		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
@@ -264,7 +264,7 @@ public class UpdaterPluginTests
 	}
 
 	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
-	public async void InstallRelease_InstallerExitsWithNonZeroCode(IContext ctx)
+	public async Task InstallRelease_InstallerExitsWithNonZeroCode(IContext ctx)
 	{
 		// Given
 		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
@@ -282,7 +282,7 @@ public class UpdaterPluginTests
 	}
 
 	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
-	public async void InstallRelease_InstallerThrows(IContext ctx)
+	public async Task InstallRelease_InstallerThrows(IContext ctx)
 	{
 		// Given
 		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
@@ -301,7 +301,7 @@ public class UpdaterPluginTests
 	}
 
 	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
-	public async void InstallRelease_InstallerExitsWithZeroCode(IContext ctx)
+	public async Task InstallRelease_InstallerExitsWithZeroCode(IContext ctx)
 	{
 		// Given
 		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
