@@ -164,8 +164,8 @@ public class WindowFocusedTransformTests
 		CustomAssert.Layout(
 			rootSector,
 			() => ctx.Store.Dispatch(sut),
-			layoutWorkspaceIds: new[] { workspace4.Id },
-			noLayoutWorkspaceIds: new[] { workspace1.Id, workspace2.Id, workspace3.Id }
+			layoutWorkspaceIds: [workspace4.Id],
+			noLayoutWorkspaceIds: [workspace1.Id, workspace2.Id, workspace3.Id]
 		);
 
 		// Then the active monitor index is updated based on MonitorFromWindow		Assert.Equal(HMONITOR_1, rootSector.MonitorSector.ActiveMonitorHandle);

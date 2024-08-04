@@ -68,15 +68,15 @@ public class WindowEventListenerTests
 {
 	private static void InitializeCoreNativeManagerMock(IInternalContext internalCtx)
 	{
-		(uint, uint)[] events = new[]
-		{
+		(uint, uint)[] events =
+		[
 			(PInvoke.EVENT_OBJECT_DESTROY, PInvoke.EVENT_OBJECT_HIDE),
 			(PInvoke.EVENT_OBJECT_CLOAKED, PInvoke.EVENT_OBJECT_UNCLOAKED),
 			(PInvoke.EVENT_SYSTEM_MOVESIZESTART, PInvoke.EVENT_SYSTEM_MOVESIZEEND),
 			(PInvoke.EVENT_SYSTEM_FOREGROUND, PInvoke.EVENT_SYSTEM_FOREGROUND),
 			(PInvoke.EVENT_OBJECT_LOCATIONCHANGE, PInvoke.EVENT_OBJECT_LOCATIONCHANGE),
 			(PInvoke.EVENT_SYSTEM_MINIMIZESTART, PInvoke.EVENT_SYSTEM_MINIMIZEEND)
-		};
+		];
 
 		foreach (var (eventMin, eventMax) in events)
 		{

@@ -26,7 +26,7 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 		ImmutableDictionary<WorkspaceId, Workspace>.Empty;
 
 	public Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; } =
-		() => new CreateLeafLayoutEngine[] { (id) => new ColumnLayoutEngine(id) };
+		() => [(id) => new ColumnLayoutEngine(id)];
 
 	public ImmutableList<ProxyLayoutEngineCreator> ProxyLayoutEngineCreators { get; set; } = [];
 

@@ -45,8 +45,7 @@ public class AddWindowTests
 		windowStates
 			.Should()
 			.Equal(
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window1,
@@ -71,7 +70,7 @@ public class AddWindowTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 	}
 
@@ -104,8 +103,7 @@ public class AddWindowTests
 		windowStates
 			.Should()
 			.Equal(
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window1,
@@ -142,7 +140,7 @@ public class AddWindowTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 	}
 
@@ -175,8 +173,7 @@ public class AddWindowTests
 		windowStates
 			.Should()
 			.Equal(
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window1,
@@ -213,7 +210,7 @@ public class AddWindowTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 	}
 
@@ -248,8 +245,7 @@ public class AddWindowTests
 		windowStates
 			.Should()
 			.Equal(
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window1,
@@ -286,7 +282,7 @@ public class AddWindowTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 	}
 
@@ -321,8 +317,7 @@ public class AddWindowTests
 		windowStates
 			.Should()
 			.Equal(
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window1,
@@ -359,7 +354,7 @@ public class AddWindowTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 	}
 
@@ -387,8 +382,7 @@ public class AddWindowTests
 		windowStates
 			.Should()
 			.Equal(
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window1,
@@ -413,7 +407,7 @@ public class AddWindowTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 	}
 
@@ -441,8 +435,7 @@ public class AddWindowTests
 		windowStates
 			.Should()
 			.Equal(
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window,
@@ -455,7 +448,7 @@ public class AddWindowTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 	}
 }

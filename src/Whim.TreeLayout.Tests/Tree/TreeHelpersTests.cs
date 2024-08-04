@@ -51,7 +51,7 @@ public class TreeHelpersTests
 	internal void GetNodeAtPath_CurrentNodeIsNotSplitNode(INode root)
 	{
 		// Given
-		int[] path = { 0 };
+		int[] path = [0];
 
 		// When
 		var result = root.GetNodeAtPath(path);
@@ -65,7 +65,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		int[] path = { 1 };
+		int[] path = [1];
 
 		// When
 		var result = tree.Root.GetNodeAtPath(path);
@@ -89,7 +89,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		int[] path = { 1, 0 };
+		int[] path = [1, 0];
 
 		// When
 		var result = tree.Root.GetNodeAtPath(path);
@@ -114,7 +114,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		int[] path = { 1, 0, 0, 1, 1, 1 };
+		int[] path = [1, 0, 0, 1, 1, 1];
 
 		// When
 		var result = tree.Root.GetNodeAtPath(path);
@@ -657,7 +657,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		IReadOnlyList<int> pathToNode = new[] { 0, 0, 0, 0, 0 };
+		IReadOnlyList<int> pathToNode = [0, 0, 0, 0, 0];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
@@ -676,7 +676,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		IReadOnlyList<int> pathToNode = new[] { 0 };
+		IReadOnlyList<int> pathToNode = [0];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
@@ -695,7 +695,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		IReadOnlyList<int> pathToNode = new[] { 1, 0, 0, 1, 0 };
+		IReadOnlyList<int> pathToNode = [1, 0, 0, 1, 0];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
@@ -714,7 +714,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		IReadOnlyList<int> pathToNode = new[] { 1, 0, 0, 1, 0 };
+		IReadOnlyList<int> pathToNode = [1, 0, 0, 1, 0];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
@@ -733,7 +733,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		IReadOnlyList<int> pathToNode = new[] { 1, 0, 0, 1, 0 };
+		IReadOnlyList<int> pathToNode = [1, 0, 0, 1, 0];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
@@ -752,7 +752,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		IReadOnlyList<int> pathToNode = new[] { 1, 0, 0, 1, 0 };
+		IReadOnlyList<int> pathToNode = [1, 0, 0, 1, 0];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
@@ -771,7 +771,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		SimpleTestTree tree = new();
-		IReadOnlyList<int> pathToNode = new[] { 1, 0 };
+		IReadOnlyList<int> pathToNode = [1, 0];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
@@ -790,7 +790,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		SimpleTestTree tree = new();
-		IReadOnlyList<int> pathToNode = new[] { 0, 0 };
+		IReadOnlyList<int> pathToNode = [0, 0];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
@@ -809,7 +809,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		SimpleTestTree tree = new();
-		IReadOnlyList<int> pathToNode = new[] { 1, 1 };
+		IReadOnlyList<int> pathToNode = [1, 1];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
@@ -828,7 +828,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		SimpleTestTree tree = new();
-		IReadOnlyList<int> pathToNode = new[] { 0, 1 };
+		IReadOnlyList<int> pathToNode = [0, 1];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
@@ -862,8 +862,8 @@ public class TreeHelpersTests
 	internal void GetLastCommonAncestor_SomeCommonAncestor()
 	{
 		// Given
-		IReadOnlyList<int> pathToNode1 = new[] { 1, 0, 0, 1, 0 };
-		IReadOnlyList<int> pathToNode2 = new[] { 1, 0, 0, 1, 1 };
+		IReadOnlyList<int> pathToNode1 = [1, 0, 0, 1, 0];
+		IReadOnlyList<int> pathToNode2 = [1, 0, 0, 1, 1];
 
 		// When
 		int? result = TreeHelpers.GetLastCommonAncestorIndex(pathToNode1, pathToNode2);
@@ -876,8 +876,8 @@ public class TreeHelpersTests
 	internal void GetLastCommonAncestor_NoCommonAncestor()
 	{
 		// Given
-		IReadOnlyList<int> pathToNode1 = new[] { 1, 0, 0, 1, 0 };
-		IReadOnlyList<int> pathToNode2 = new[] { 0, 0, 0, 1, 1 };
+		IReadOnlyList<int> pathToNode1 = [1, 0, 0, 1, 0];
+		IReadOnlyList<int> pathToNode2 = [0, 0, 0, 1, 1];
 
 		// When
 		int? result = TreeHelpers.GetLastCommonAncestorIndex(pathToNode1, pathToNode2);
@@ -890,8 +890,8 @@ public class TreeHelpersTests
 	internal void GetLastCommonAncestor_SamePath()
 	{
 		// Given
-		IReadOnlyList<int> pathToNode1 = new[] { 1, 0, 0, 1, 0 };
-		IReadOnlyList<int> pathToNode2 = new[] { 1, 0, 0, 1, 0 };
+		IReadOnlyList<int> pathToNode1 = [1, 0, 0, 1, 0];
+		IReadOnlyList<int> pathToNode2 = [1, 0, 0, 1, 0];
 
 		// When
 		int? result = TreeHelpers.GetLastCommonAncestorIndex(pathToNode1, pathToNode2);

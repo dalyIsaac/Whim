@@ -271,8 +271,8 @@ public class BarLayoutEngineTests
 		monitor.ScaleFactor.Returns(100);
 		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
 
-		IWindowState[] expectedWindowStates = new[]
-		{
+		IWindowState[] expectedWindowStates =
+		[
 			new WindowState()
 			{
 				Window = window1,
@@ -296,7 +296,7 @@ public class BarLayoutEngineTests
 				},
 				WindowSize = WindowSize.Normal
 			}
-		};
+		];
 
 		Rectangle<int> expectedGivenRect =
 			new()

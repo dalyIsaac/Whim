@@ -98,7 +98,7 @@ public class SelectVariantRowViewModelTests
 		IVariantRowModel<SelectOption> newModelMock = CreateModelMock(true, false);
 		newModelMock.Title.Returns("Test");
 
-		FilterTextMatch[] matches = new FilterTextMatch[] { new(0, 4) };
+		FilterTextMatch[] matches = [new(0, 4)];
 		MatcherResult<SelectOption> newMatcherResult = new(newModelMock, matches, 0);
 
 		// When

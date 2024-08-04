@@ -22,7 +22,7 @@ public class BarPluginTests
 			{
 				AddedMonitors = Array.Empty<IMonitor>(),
 				UnchangedMonitors = Array.Empty<IMonitor>(),
-				RemovedMonitors = new[] { monitor }
+				RemovedMonitors = [monitor]
 			}
 		);
 

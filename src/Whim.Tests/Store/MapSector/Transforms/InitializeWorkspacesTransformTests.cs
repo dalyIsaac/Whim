@@ -200,8 +200,7 @@ public class InitializeWorkspacesTransformTests
 		internalCtx.CoreNativeManager.IsStandardWindow(Arg.Any<HWND>()).Returns(true);
 		internalCtx.CoreNativeManager.HasNoVisibleOwner(Arg.Any<HWND>()).Returns(true);
 
-		rootSector.WorkspaceSector.CreateLayoutEngines = () =>
-			new CreateLeafLayoutEngine[] { id => new ImmutableTestLayoutEngine() };
+		rootSector.WorkspaceSector.CreateLayoutEngines = () => [id => new ImmutableTestLayoutEngine()];
 
 		InitializeWorkspacesTransform sut = new();
 

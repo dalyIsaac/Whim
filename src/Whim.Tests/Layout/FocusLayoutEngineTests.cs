@@ -168,8 +168,8 @@ public class FocusLayoutEngineTests
 		// Then
 		Assert.Equal(3, result.Length);
 
-		IWindowState[] expected = new IWindowState[]
-		{
+		IWindowState[] expected =
+		[
 			new WindowState()
 			{
 				Window = window1,
@@ -188,7 +188,7 @@ public class FocusLayoutEngineTests
 				Rectangle = rectangle,
 				WindowSize = WindowSize.Normal
 			}
-		};
+		];
 
 		expected.Should().BeEquivalentTo(result);
 	}
@@ -310,8 +310,8 @@ public class FocusLayoutEngineTests
 		Assert.NotSame(sut, result);
 		Assert.Equal(2, result.Count);
 
-		IWindowState[] expected = new IWindowState[]
-		{
+		IWindowState[] expected =
+		[
 			new WindowState()
 			{
 				Window = window1,
@@ -324,7 +324,7 @@ public class FocusLayoutEngineTests
 				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Minimized
 			}
-		};
+		];
 
 		expected.Should().BeEquivalentTo(windowStates);
 	}

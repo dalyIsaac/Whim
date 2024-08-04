@@ -287,10 +287,10 @@ public class SliceLayoutEngineTests
 
 		int third = 100 / 3;
 		IRectangle<int> rectangle = new Rectangle<int>(0, 0, 100, 100);
-		ParentArea area = SliceLayouts.CreateMultiColumnArea(new uint[] { 2, 1, 0 });
+		ParentArea area = SliceLayouts.CreateMultiColumnArea([2, 1, 0]);
 
-		IWindowState[] expectedWindowStates = new IWindowState[]
-		{
+		IWindowState[] expectedWindowStates =
+		[
 			new WindowState()
 			{
 				Rectangle = new Rectangle<int>(0, 0, third, 50),
@@ -340,7 +340,7 @@ public class SliceLayoutEngineTests
 				Window = minimizedWindows[1],
 				WindowSize = WindowSize.Minimized
 			},
-		};
+		];
 
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, area);
 

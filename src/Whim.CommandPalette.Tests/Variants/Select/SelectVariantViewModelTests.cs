@@ -13,7 +13,7 @@ public class SelectVariantViewModelTests
 	{
 		return variantRowModels.Select(v => new MatcherResult<SelectOption>(
 			v,
-			new[] { new FilterTextMatch(0, v.Title.Length) },
+			[new FilterTextMatch(0, v.Title.Length)],
 			0
 		));
 	}
@@ -214,7 +214,7 @@ public class SelectVariantViewModelTests
 			.Returns(
 				options.Select(o => new MatcherResult<SelectOption>(
 					new SelectVariantRowModel(o),
-					new[] { new FilterTextMatch(0, o.Title.Length) },
+					[new FilterTextMatch(0, o.Title.Length)],
 					0
 				))
 			);

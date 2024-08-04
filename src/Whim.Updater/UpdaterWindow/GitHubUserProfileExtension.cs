@@ -26,7 +26,7 @@ internal partial class GitHubUserProfileParser : InlineParser
 {
 	public GitHubUserProfileParser()
 	{
-		OpeningCharacters = new[] { 'b' };
+		OpeningCharacters = ['b'];
 	}
 
 	public override bool Match(InlineProcessor processor, ref StringSlice slice)

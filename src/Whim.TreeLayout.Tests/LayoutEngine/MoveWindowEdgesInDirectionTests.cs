@@ -143,8 +143,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				Direction.Left,
 				new Point<double>() { X = -0.1 },
 				leftEdgeLeftWindows,
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = leftEdgeLeftWindows[0],
@@ -181,7 +180,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			// Move left edge to the right.
@@ -190,8 +189,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				Direction.Left,
 				new Point<double>() { X = 0.1 },
 				leftEdgeRightWindows,
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = leftEdgeRightWindows[0],
@@ -228,7 +226,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			// Move right edge to the left.
@@ -237,8 +235,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				Direction.Right,
 				new Point<double>() { X = -0.1 },
 				rightEdgeLeftWindows,
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = rightEdgeLeftWindows[0],
@@ -275,7 +272,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			// Move right edge to the right.
@@ -284,8 +281,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				Direction.Right,
 				new Point<double>() { X = 0.1 },
 				rightEdgeRightWindows,
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = rightEdgeRightWindows[0],
@@ -322,7 +318,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			return data;
@@ -377,8 +373,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				Direction.Up,
 				new Point<double>() { Y = -0.1 },
 				topEdgeUpWindows,
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = topEdgeUpWindows[0],
@@ -415,7 +410,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			// Move top edge down.
@@ -424,8 +419,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				Direction.Up,
 				new Point<double>() { Y = 0.1 },
 				topEdgeDownWindows,
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = topEdgeDownWindows[0],
@@ -462,7 +456,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			// Move bottom edge up.
@@ -471,8 +465,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				Direction.Down,
 				new Point<double>() { Y = -0.1 },
 				bottomEdgeUpWindows,
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = bottomEdgeUpWindows[0],
@@ -501,7 +494,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			// Move bottom edge down.
@@ -510,8 +503,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				Direction.Down,
 				new Point<double>() { Y = 0.1 },
 				bottomEdgeDownWindows,
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = bottomEdgeDownWindows[0],
@@ -540,7 +532,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			return data;
@@ -597,8 +589,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				Direction.RightDown,
 				new Point<double>() { X = -0.1, Y = -0.1 },
 				windows1,
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = windows1[0],
@@ -639,7 +630,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			// Move top left window's bottom-right edge down and right.
@@ -649,8 +640,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				Direction.RightDown,
 				new Point<double>() { X = 0.1, Y = 0.1 },
 				windows2,
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = windows2[0],
@@ -691,7 +681,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			// Move top right window's bottom-left edge up and right.
@@ -701,8 +691,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				Direction.LeftDown,
 				new Point<double>() { X = 0.1, Y = -0.1 },
 				windows3,
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = windows3[0],
@@ -743,7 +732,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			// Move top right window's bottom-left edge down and left.
@@ -753,8 +742,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				Direction.LeftDown,
 				new Point<double>() { X = -0.1, Y = 0.1 },
 				windows4,
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = windows4[0],
@@ -795,7 +783,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			// Move bottom left window's top-right edge up and left.
@@ -805,8 +793,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				Direction.RightUp,
 				new Point<double>() { X = -0.1, Y = -0.1 },
 				windows5,
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = windows5[0],
@@ -847,7 +834,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			// Move bottom left window's top-right edge down and right.
@@ -857,8 +844,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				Direction.RightUp,
 				new Point<double>() { X = 0.1, Y = 0.1 },
 				windows6,
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = windows6[0],
@@ -899,7 +885,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			// Move bottom right window's top-left edge up and right.
@@ -909,8 +895,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				Direction.LeftUp,
 				new Point<double>() { X = 0.1, Y = -0.1 },
 				windows7,
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = windows7[0],
@@ -951,7 +936,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			// Move bottom right window's top-left edge down and left.
@@ -961,8 +946,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				Direction.LeftUp,
 				new Point<double>() { X = -0.1, Y = 0.1 },
 				windows8,
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = windows8[0],
@@ -1003,7 +987,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			return data;

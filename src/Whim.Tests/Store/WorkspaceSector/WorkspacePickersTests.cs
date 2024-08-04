@@ -388,11 +388,7 @@ public class WorkspacePickersTests
 	{
 		// Given the workspaces and windows
 		Func<CreateLeafLayoutEngine[]> createLayoutEngines = () =>
-			new CreateLeafLayoutEngine[]
-			{
-				(id) => Substitute.For<ILayoutEngine>(),
-				(id) => Substitute.For<ILayoutEngine>(),
-			};
+			[(id) => Substitute.For<ILayoutEngine>(), (id) => Substitute.For<ILayoutEngine>(),];
 
 		root.WorkspaceSector.CreateLayoutEngines = createLayoutEngines;
 

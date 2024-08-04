@@ -20,7 +20,7 @@ public class MenuVariantRowViewModelTests
 		// New
 		newModelMock.Title.Returns("Test");
 
-		FilterTextMatch[] matches = new[] { new FilterTextMatch(0, 4) };
+		FilterTextMatch[] matches = [new FilterTextMatch(0, 4)];
 		MatcherResult<MenuVariantRowModelData> newMatcherResult = new(newModelMock, matches, 0);
 
 		// When

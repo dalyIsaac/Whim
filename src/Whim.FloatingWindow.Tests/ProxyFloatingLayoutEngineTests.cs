@@ -596,8 +596,7 @@ public class ProxyFloatingLayoutEngineTests
 		newInnerLayoutEngine
 			.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
 			.Returns(
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window1,
@@ -610,7 +609,7 @@ public class ProxyFloatingLayoutEngineTests
 						Rectangle = new Rectangle<int>(),
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 		newInnerLayoutEngine.Count.Returns(2);
 
@@ -633,8 +632,8 @@ public class ProxyFloatingLayoutEngineTests
 		// Then
 		Assert.Equal(3, windowStates.Length);
 
-		IWindowState[] expected = new IWindowState[]
-		{
+		IWindowState[] expected =
+		[
 			new WindowState()
 			{
 				Window = floatingWindow,
@@ -659,7 +658,7 @@ public class ProxyFloatingLayoutEngineTests
 				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			}
-		};
+		];
 
 		windowStates.Should().Equal(expected);
 

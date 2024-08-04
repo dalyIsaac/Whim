@@ -16,7 +16,7 @@ public static class ColorExtensions
 	/// <returns></returns>
 	public static Color GetTextColor(this Color backgroundColor)
 	{
-		double[] uiColors = new double[] { backgroundColor.R / 255, backgroundColor.G / 255, backgroundColor.B / 255 };
+		double[] uiColors = [backgroundColor.R / 255, backgroundColor.G / 255, backgroundColor.B / 255];
 
 		double[] cColors = new double[3];
 		for (int idx = 0; idx < 3; idx++)

@@ -379,7 +379,7 @@ public class MenuVariantViewModelTests
 
 		for (int i = 0; i < itemCount; i++)
 		{
-			FilterTextMatch[] segments = new FilterTextMatch[] { new(0, 1) };
+			FilterTextMatch[] segments = [new(0, 1)];
 			items.Add(new(new MenuVariantRowModel(new Command($"id{i}", $"title{i}", () => { }), null), segments, 0));
 		}
 

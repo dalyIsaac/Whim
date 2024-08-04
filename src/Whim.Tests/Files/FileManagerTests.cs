@@ -31,7 +31,7 @@ public class FileManagerTests
 	public void WhimDir_WithDirArg()
 	{
 		// Given
-		string[] args = { DIR_ARG, ExpectedAltWhimDir };
+		string[] args = [DIR_ARG, ExpectedAltWhimDir];
 		IFileManager fileManager = new FileManager(args);
 
 		// When
@@ -45,7 +45,7 @@ public class FileManagerTests
 	public void WhimDir_WithDirArg_WithExtraArg()
 	{
 		// Given
-		string[] args = { DIR_ARG, ExpectedAltWhimDir, "--extra" };
+		string[] args = [DIR_ARG, ExpectedAltWhimDir, "--extra"];
 		IFileManager fileManager = new FileManager(args);
 
 		// When
@@ -59,7 +59,7 @@ public class FileManagerTests
 	public void WhimDir_WithDirArg_StartsWithExtraArg()
 	{
 		// Given
-		string[] args = { "--extra", DIR_ARG, ExpectedAltWhimDir };
+		string[] args = ["--extra", DIR_ARG, ExpectedAltWhimDir];
 		IFileManager fileManager = new FileManager(args);
 
 		// When
@@ -73,7 +73,7 @@ public class FileManagerTests
 	public void WhimDir_WithDirArg_NextIsNotArg()
 	{
 		// Given
-		string[] args = { DIR_ARG, "--extra", ExpectedAltWhimDir };
+		string[] args = [DIR_ARG, "--extra", ExpectedAltWhimDir];
 		IFileManager fileManager = new FileManager(args);
 
 		// When
@@ -87,7 +87,7 @@ public class FileManagerTests
 	public void WhimDir_WithDirArg_EmptyString()
 	{
 		// Given
-		string[] args = { DIR_ARG, string.Empty };
+		string[] args = [DIR_ARG, string.Empty];
 		IFileManager fileManager = new FileManager(args);
 
 		// When
@@ -101,7 +101,7 @@ public class FileManagerTests
 	public void WhimDir_WithDirArg_Equals()
 	{
 		// Given
-		string[] args = { DIR_ARG + "=" + ExpectedAltWhimDir };
+		string[] args = [DIR_ARG + "=" + ExpectedAltWhimDir];
 		IFileManager fileManager = new FileManager(args);
 
 		// When

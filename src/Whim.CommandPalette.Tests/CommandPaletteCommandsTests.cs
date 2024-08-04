@@ -236,7 +236,7 @@ public class CommandPaletteCommandsTests
 		commands.MoveMultipleWindowsToWorkspaceCallback(options);
 
 		// Then
-		string[] expectedWorkspaces = new string[] { "Workspace", "Other workspace" };
+		string[] expectedWorkspaces = ["Workspace", "Other workspace"];
 		wrapper
 			.Plugin.Received(1)
 			.Activate(

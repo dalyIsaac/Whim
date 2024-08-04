@@ -43,8 +43,8 @@ public class LayoutPreviewWindowTests
 	public void ShouldContinue_DifferentWindowState()
 	{
 		// Given
-		IWindowState[] prevWindowStates = new IWindowState[]
-		{
+		IWindowState[] prevWindowStates =
+		[
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
@@ -57,10 +57,10 @@ public class LayoutPreviewWindowTests
 				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			},
-		};
+		];
 		int prevHoveredIndex = -1;
-		IWindowState[] windowStates = new IWindowState[]
-		{
+		IWindowState[] windowStates =
+		[
 			prevWindowStates[0],
 			new WindowState()
 			{
@@ -68,7 +68,7 @@ public class LayoutPreviewWindowTests
 				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Maximized
 			},
-		};
+		];
 		IPoint<int> cursorPoint = new Rectangle<int>();
 
 		// When
@@ -88,8 +88,8 @@ public class LayoutPreviewWindowTests
 	{
 		// Given
 		Rectangle<int> rect = new() { Height = 100, Width = 100 };
-		IWindowState[] prevWindowStates = new IWindowState[]
-		{
+		IWindowState[] prevWindowStates =
+		[
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
@@ -102,10 +102,10 @@ public class LayoutPreviewWindowTests
 				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			},
-		};
+		];
 		int prevHoveredIndex = 0;
-		IWindowState[] windowStates = new IWindowState[]
-		{
+		IWindowState[] windowStates =
+		[
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
@@ -118,7 +118,7 @@ public class LayoutPreviewWindowTests
 				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			},
-		};
+		];
 		IPoint<int> cursorPoint = new Rectangle<int>() { X = 100, Y = 101 };
 
 		// When
@@ -138,8 +138,8 @@ public class LayoutPreviewWindowTests
 	{
 		// Given
 		Rectangle<int> rect = new() { Height = 100, Width = 100 };
-		IWindowState[] prevWindowStates = new IWindowState[]
-		{
+		IWindowState[] prevWindowStates =
+		[
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
@@ -152,7 +152,7 @@ public class LayoutPreviewWindowTests
 				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal
 			},
-		};
+		];
 		int prevHoveredIndex = 0;
 		IPoint<int> cursorPoint = new Rectangle<int>() { X = 50, Y = 50 };
 

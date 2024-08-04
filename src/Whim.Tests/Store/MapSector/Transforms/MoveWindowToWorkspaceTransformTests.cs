@@ -144,7 +144,7 @@ public class MoveWindowToWorkspaceTransformTests
 		CustomAssert.Layout(
 			rootSector,
 			() => result = AssertDoesNotRaise(ctx, rootSector, sut),
-			new[] { workspace1.Id, workspace2.Id }
+			[workspace1.Id, workspace2.Id]
 		);
 
 		// Then we succeed

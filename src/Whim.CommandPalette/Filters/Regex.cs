@@ -14,7 +14,7 @@ public static partial class PaletteFilters
 		Match match = regexp.Match(wordToMatchAgainst);
 		if (match.Success)
 		{
-			return new[] { new FilterTextMatch(match.Index, match.Index + match.Length) };
+			return [new FilterTextMatch(match.Index, match.Index + match.Length)];
 		}
 
 		return null;

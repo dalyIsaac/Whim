@@ -15,7 +15,7 @@ public static partial class PaletteFilters
 			return null;
 		}
 
-		return new[] { new FilterTextMatch(index, index + word.Length) };
+		return [new FilterTextMatch(index, index + word.Length)];
 	}
 
 	/// <summary>

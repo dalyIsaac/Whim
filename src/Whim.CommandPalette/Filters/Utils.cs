@@ -40,7 +40,7 @@ public static partial class PaletteFilters
 	{
 		if (tail.Length == 0)
 		{
-			tail = new[] { head };
+			tail = [head];
 		}
 		else if (head.End == tail[0].Start)
 		{

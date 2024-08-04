@@ -8,7 +8,7 @@ namespace Whim.Bar;
 /// </summary>
 public partial class FocusedWindowWidget : UserControl
 {
-	private static readonly char[] _titleSeparators = new[] { '-', '—', '|' };
+	private static readonly char[] _titleSeparators = ['-', '—', '|'];
 
 	/// <summary>
 	/// The focused window view model.

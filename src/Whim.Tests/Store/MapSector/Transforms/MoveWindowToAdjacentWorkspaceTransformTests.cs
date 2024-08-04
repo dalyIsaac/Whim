@@ -98,7 +98,7 @@ public class MoveWindowToAdjacentWorkspaceTransformTests
 
 		// When
 		Result<Unit>? result = null;
-		CustomAssert.Layout(rootSector, () => result = ctx.Store.Dispatch(sut), new[] { workspace1.Id, workspace2.Id });
+		CustomAssert.Layout(rootSector, () => result = ctx.Store.Dispatch(sut), [workspace1.Id, workspace2.Id]);
 
 		// Then
 		Assert.True(result!.Value.IsSuccessful);

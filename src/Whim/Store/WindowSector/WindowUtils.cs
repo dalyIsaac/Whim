@@ -99,7 +99,7 @@ internal static class WindowUtils
 		{
 			INPUT input = new() { type = INPUT_TYPE.INPUT_MOUSE };
 			// Send empty mouse event. This makes this thread the last to send input, and hence allows it to pass foreground permission checks
-			_ = internalCtx.CoreNativeManager.SendInput(new[] { input }, sizeof(INPUT));
+			_ = internalCtx.CoreNativeManager.SendInput([input], sizeof(INPUT));
 		}
 
 		internalCtx.CoreNativeManager.SetForegroundWindow(handle);

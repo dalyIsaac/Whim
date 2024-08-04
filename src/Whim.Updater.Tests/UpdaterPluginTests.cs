@@ -63,7 +63,7 @@ public class UpdaterPluginTests
 		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
 		client
 			.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
-			.Returns(new[] { Data.CreateRelease242(tagName: "welp") });
+			.Returns([Data.CreateRelease242(tagName: "welp")]);
 
 		// When
 		IEnumerable<ReleaseInfo> releases = await plugin.GetNotInstalledReleases(client);
@@ -79,7 +79,7 @@ public class UpdaterPluginTests
 		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
 		client
 			.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
-			.Returns(new[] { Data.CreateRelease242(tagName: "v0.1.263-beta+bc5c56c4") });
+			.Returns([Data.CreateRelease242(tagName: "v0.1.263-beta+bc5c56c4")]);
 
 		// When
 		IEnumerable<ReleaseInfo> releases = await plugin.GetNotInstalledReleases(client);
@@ -95,7 +95,7 @@ public class UpdaterPluginTests
 		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
 		client
 			.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
-			.Returns(new[] { Data.CreateRelease242(tagName: "v0.1.261-alpha+bc5c56c4") });
+			.Returns([Data.CreateRelease242(tagName: "v0.1.261-alpha+bc5c56c4")]);
 
 		// When
 		IEnumerable<ReleaseInfo> releases = await plugin.GetNotInstalledReleases(client);
@@ -111,20 +111,15 @@ public class UpdaterPluginTests
 		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig() { ReleaseChannel = ReleaseChannel.Alpha });
 
 		string[] orderedReleases =
-		{
+		[
 			"v0.1.261-alpha+bc5c56c4",
 			"v0.1.262-beta+bc5c56c4",
 			"v0.1.263-stable+bc5c56c4",
 			"v0.1.264-alpha+bc5c56c4",
 			"v0.2.265-alpha+bc5c56c4",
 			"v1.1.266-alpha+bc5c56c4"
-		};
-		string[] expectedReleases = new[]
-		{
-			"v0.1.264-alpha+bc5c56c4",
-			"v0.2.265-alpha+bc5c56c4",
-			"v1.1.266-alpha+bc5c56c4"
-		};
+		];
+		string[] expectedReleases = ["v0.1.264-alpha+bc5c56c4", "v0.2.265-alpha+bc5c56c4", "v1.1.266-alpha+bc5c56c4"];
 
 		client
 			.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
@@ -192,7 +187,7 @@ public class UpdaterPluginTests
 	{
 		// Given
 		Release release = Data.CreateRelease242(tagName: "v0.1.265-alpha+bc5c56c4");
-		client.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>()).Returns(new[] { release });
+		client.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>()).Returns([release]);
 
 		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig() { ReleaseChannel = ReleaseChannel.Alpha });
 		plugin.SkipRelease(release);

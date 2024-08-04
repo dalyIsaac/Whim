@@ -72,7 +72,7 @@ public class MonitorsChangedTransformTests
 		Workspace workspace3 = CreateWorkspace(ctx);
 		AddWorkspacesToManager(ctx, rootSector, workspace1, workspace2, workspace3);
 		rootSector.WorkspaceSector.HasInitialized = true;
-		return new[] { workspace1, workspace2, workspace3 };
+		return [workspace1, workspace2, workspace3];
 	}
 
 	/// <summary>
@@ -105,7 +105,7 @@ public class MonitorsChangedTransformTests
 				}
 			);
 		rootSector.WorkspaceSector.HasInitialized = true;
-		return new[] { workspace1, workspace2, workspace3 };
+		return [workspace1, workspace2, workspace3];
 	}
 
 	private static void AssertContainsTransform(IContext ctx, Guid workspaceId, int times = 1)
@@ -172,8 +172,8 @@ public class MonitorsChangedTransformTests
 		var raisedEvent = DispatchTransformEvent(
 			ctx,
 			rootSector,
-			new[] { workspaces[0].Id, workspaces[2].Id },
-			new[] { workspaces[1].Id }
+			[workspaces[0].Id, workspaces[2].Id],
+			[workspaces[1].Id]
 		);
 
 		Assert.Empty(raisedEvent.Arguments.AddedMonitors);
@@ -211,7 +211,7 @@ public class MonitorsChangedTransformTests
 		var raisedEvent = DispatchTransformEvent(
 			ctx,
 			rootSector,
-			new[] { workspaces[0].Id, workspaces[1].Id, workspaces[2].Id }
+			[workspaces[0].Id, workspaces[1].Id, workspaces[2].Id]
 		);
 
 		Assert.Single(raisedEvent.Arguments.AddedMonitors);
@@ -255,7 +255,7 @@ public class MonitorsChangedTransformTests
 		var raisedEvent = DispatchTransformEvent(
 			ctx,
 			rootSector,
-			new[] { workspaces[0].Id, workspaces[1].Id, workspaces[2].Id }
+			[workspaces[0].Id, workspaces[1].Id, workspaces[2].Id]
 		);
 
 		Assert.Equal(2, raisedEvent.Arguments.AddedMonitors.Count());
@@ -283,7 +283,7 @@ public class MonitorsChangedTransformTests
 
 		// When we add monitors
 		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup });
-		var raisedEvent = DispatchTransformEvent(ctx, rootSector, new[] { workspaces[0].Id, workspaces[1].Id });
+		var raisedEvent = DispatchTransformEvent(ctx, rootSector, [workspaces[0].Id, workspaces[1].Id]);
 
 		// Then the resulting event will have a monitor added, and the other monitors in the sector will be set.
 		Assert.Equal(2, raisedEvent.Arguments.AddedMonitors.Count());
@@ -311,7 +311,7 @@ public class MonitorsChangedTransformTests
 
 		// When we add monitors
 		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup });
-		var raisedEvent = DispatchTransformEvent(ctx, rootSector, new[] { workspaces[0].Id, workspaces[1].Id });
+		var raisedEvent = DispatchTransformEvent(ctx, rootSector, [workspaces[0].Id, workspaces[1].Id]);
 
 		// Then the resulting event will have a monitor added, and the other monitors in the sector will be set.
 		Assert.Equal(2, raisedEvent.Arguments.AddedMonitors.Count());
@@ -344,7 +344,7 @@ public class MonitorsChangedTransformTests
 		var raisedEvent = DispatchTransformEvent(
 			ctx,
 			rootSector,
-			notLayoutWorkspaceIds: new[] { workspaces[0].Id, workspaces[1].Id, workspaces[2].Id }
+			notLayoutWorkspaceIds: [workspaces[0].Id, workspaces[1].Id, workspaces[2].Id]
 		);
 
 		Assert.Empty(raisedEvent.Arguments.AddedMonitors);
