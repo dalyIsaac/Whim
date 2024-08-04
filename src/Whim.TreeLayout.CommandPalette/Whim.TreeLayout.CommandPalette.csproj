@@ -21,8 +21,8 @@
     <Nullable>enable</Nullable>
     <Platforms>x64;arm64;Any CPU</Platforms>
     <RootNamespace>Whim.TreeLayout.Bar</RootNamespace>
-    <RuntimeIdentifiers>win10-x64;win10-arm64</RuntimeIdentifiers>
-    <TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
+    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <UseWinUI>true</UseWinUI>
     <Version>0.7.0</Version>

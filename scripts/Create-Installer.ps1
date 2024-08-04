@@ -9,7 +9,7 @@ param (
 	[string]$Architecture
 )
 
-$buildDir = "src\Whim.Runner\bin\${Architecture}\Release\net7.0-windows10.0.19041.0"
+$buildDir = "src\Whim.Runner\bin\${Architecture}\Release\net8.0-windows10.0.19041.0"
 $version = (Get-Item "${buildDir}\Whim.Runner.exe").VersionInfo.ProductVersion
 $installerName = "WhimInstaller-${Architecture}-${version}"
 
@@ -23,7 +23,8 @@ $path = $output.Split("\n")[-1]
 # Test if the installer exists.
 if (Test-Path $path) {
 	return $path
-} else {
+}
+else {
 	Write-Host "Failed to create installer"
 	Write-Host $output
 	exit 1

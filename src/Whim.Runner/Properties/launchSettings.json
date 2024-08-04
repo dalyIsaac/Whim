@@ -1,8 +1,5 @@
 {
   "profiles": {
-    "Whim.Runner (Package)": {
-      "commandName": "MsixPackage"
-    },
     "Whim.Runner (Unpackaged)": {
       "commandName": "Project"
     }

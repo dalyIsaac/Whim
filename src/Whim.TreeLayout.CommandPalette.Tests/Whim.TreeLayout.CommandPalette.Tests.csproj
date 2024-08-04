@@ -21,7 +21,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Platforms>x64;arm64;Any CPU</Platforms>
-    <TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <Version>0.7.0</Version>
   </PropertyGroup>
   <ItemGroup>
@@ -39,7 +39,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Whim.TestUtils\Whim.TestUtils.csproj" />
-    <ProjectReference Include="..\Whim.TreeLayout.CommandPalette\Whim.TreeLayout.CommandPalette.csproj" />
+    <ProjectReference
+      Include="..\Whim.TreeLayout.CommandPalette\Whim.TreeLayout.CommandPalette.csproj" />
     <ProjectReference Include="..\Whim.TreeLayout\Whim.TreeLayout.csproj" />
   </ItemGroup>
 </Project>

@@ -22,10 +22,6 @@ public class StoreTests
 		}
 	}
 
-	// TODO: Add tests for Pure pickers
-
-	// TODO: Add tests for pickers
-
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void Dispatch_IsStaThread_NoQueuedEvents(IContext ctx)
 	{
