@@ -7,7 +7,7 @@ namespace Whim.FloatingWindow;
 /// <summary>
 /// Layout engine that lays out all windows as free-floating.
 /// </summary>
-public class FloatingLayoutEngine : ILayoutEngine
+public record FloatingLayoutEngine : ILayoutEngine
 {
 	private readonly IContext _context;
 	private readonly ImmutableDictionary<IWindow, IRectangle<double>> _dict;
