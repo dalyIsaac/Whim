@@ -39,7 +39,7 @@ public class InitializeWorkspacesTransformTests
 
 	private static void AddWorkspacesToSavedState(IInternalContext internalCtx, params SavedWorkspace[] workspaces)
 	{
-		internalCtx.CoreSavedStateManager.SavedState.Returns(new CoreSavedState(workspaces.ToList()));
+		internalCtx.CoreSavedStateManager.SavedState.Returns(new CoreSavedState([.. workspaces]));
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]

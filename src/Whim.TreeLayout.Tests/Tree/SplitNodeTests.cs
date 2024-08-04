@@ -22,7 +22,7 @@ public class SplitNodeTests
 
 		// When
 		SplitNode splitNode = new(focusedNode, newNode, Direction.Right);
-		(double, INode)[] children = splitNode.ToArray();
+		(double, INode)[] children = [.. splitNode];
 
 		// Then
 		Assert.Equal(2, children.Length);
@@ -40,7 +40,7 @@ public class SplitNodeTests
 
 		// When
 		SplitNode splitNode = new(focusedNode, newNode, Direction.Left);
-		(double, INode)[] children = splitNode.ToArray();
+		(double, INode)[] children = [.. splitNode];
 
 		// Then
 		Assert.Equal(2, children.Length);
@@ -58,7 +58,7 @@ public class SplitNodeTests
 
 		// When
 		SplitNode splitNode = new(focusedNode, newNode, Direction.Up);
-		(double, INode)[] children = splitNode.ToArray();
+		(double, INode)[] children = [.. splitNode];
 
 		// Then
 		Assert.Equal(2, children.Length);
@@ -76,7 +76,7 @@ public class SplitNodeTests
 
 		// When
 		SplitNode splitNode = new(focusedNode, newNode, Direction.Down);
-		(double, INode)[] children = splitNode.ToArray();
+		(double, INode)[] children = [.. splitNode];
 
 		// Then
 		Assert.Equal(2, children.Length);
@@ -113,7 +113,7 @@ public class SplitNodeTests
 
 		// When
 		ISplitNode result = splitNode.Add(focusedNode, newNode, insertAfter: false);
-		(double, INode)[] children = result.ToArray();
+		(double, INode)[] children = [.. result];
 
 		// Then
 		double aThird = 1d / 3;
@@ -133,7 +133,7 @@ public class SplitNodeTests
 
 		// When
 		ISplitNode result = splitNode.Add(focusedNode, newNode, insertAfter: true);
-		(double, INode)[] children = result.ToArray();
+		(double, INode)[] children = [.. result];
 
 		// Then
 		double aThird = 1d / 3;
@@ -155,7 +155,7 @@ public class SplitNodeTests
 		// When
 		ISplitNode result = splitNode.ToggleEqualWeight();
 		ISplitNode result2 = result.Add(focusedNode, newNode, insertAfter: true);
-		(double, INode)[] children = result2.ToArray();
+		(double, INode)[] children = [.. result2];
 
 		// Then
 		Assert.NotSame(splitNode, result);
@@ -368,7 +368,7 @@ public class SplitNodeTests
 
 		// When
 		ISplitNode result = splitNode.Replace(oldNodeIndex, newNode);
-		(double, INode)[] children = result.ToArray();
+		(double, INode)[] children = [.. result];
 
 		// Then
 		Assert.NotSame(splitNode, result);
@@ -412,7 +412,7 @@ public class SplitNodeTests
 
 		// When
 		ISplitNode result = splitNode.Swap(aIndex, bIndex);
-		(double, INode)[] children = result.ToArray();
+		(double, INode)[] children = [.. result];
 
 		// Then
 		Assert.NotSame(splitNode, result);
@@ -453,7 +453,7 @@ public class SplitNodeTests
 
 		// When
 		ISplitNode result = splitNode.AdjustChildWeight(index, 0.1);
-		(double, INode)[] children = result.ToArray();
+		(double, INode)[] children = [.. result];
 
 		// Then
 		Assert.NotSame(splitNode, result);
@@ -478,7 +478,7 @@ public class SplitNodeTests
 
 		// When
 		ISplitNode result = splitNode.AdjustChildWeight(index, 0.1);
-		(double, INode)[] children = result.ToArray();
+		(double, INode)[] children = [.. result];
 
 		// Then
 		Assert.NotSame(splitNode, result);

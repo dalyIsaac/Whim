@@ -299,12 +299,8 @@ public class TreeHelpersTests
 			new(
 				equalWeight: false,
 				isHorizontal: true,
-				new INode[]
-				{
-					new WindowNode(Substitute.For<IWindow>()),
-					new WindowNode(Substitute.For<IWindow>())
-				}.ToImmutableList(),
-				new double[] { 0.5, 0.25 }.ToImmutableList()
+				[new WindowNode(Substitute.For<IWindow>()), new WindowNode(Substitute.For<IWindow>())],
+				[0.5, 0.25]
 			);
 
 		Point<double> point = new() { X = 0.8, Y = 0.4 };
@@ -597,8 +593,9 @@ public class TreeHelpersTests
 		TestTree tree = new();
 		IRectangle<int> rectangle = new Rectangle<int>() { Width = 1920, Height = 1080 };
 
-		IWindowState[] expectedStates = TestTreeWindowStates
-			.GetAllWindowStates(
+		IWindowState[] expectedStates =
+		[
+			.. TestTreeWindowStates.GetAllWindowStates(
 				rectangle,
 				tree.Left.Window,
 				tree.RightTopLeftTop.Window,
@@ -610,7 +607,7 @@ public class TreeHelpersTests
 				tree.RightTopRight3.Window,
 				tree.RightBottom.Window
 			)
-			.ToArray();
+		];
 
 		// When
 		WindowNodeRectangleState[] windowRectangles = tree.Root.GetWindowRectangles(rectangle).ToArray();

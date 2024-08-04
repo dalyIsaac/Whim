@@ -223,7 +223,7 @@ public class PluginManagerTests
 
 		// I want to verify that the command passed into Add is equivalent to the one created in the mocks
 		Assert.Equal(4, commandManager.Count);
-		List<ICommand> commands = commandManager.ToList();
+		List<ICommand> commands = [.. commandManager];
 		Assert.Equal("whim.plugin1.command1", commands[0].Id);
 		Assert.Equal("whim.plugin2.command2", commands[1].Id);
 		Assert.Equal("whim.plugin2.command22", commands[2].Id);

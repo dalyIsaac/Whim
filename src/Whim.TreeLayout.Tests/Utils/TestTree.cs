@@ -88,8 +88,8 @@ internal sealed class TestTree
 		RightTopRight = new SplitNode(
 			equalWeight: true,
 			isHorizontal: false,
-			new INode[] { RightTopRight1, RightTopRight2, RightTopRight3 }.ToImmutableList(),
-			new double[] { 1d / 3, 1d / 3, 1d / 3 }.ToImmutableList()
+			[RightTopRight1, RightTopRight2, RightTopRight3],
+			[1d / 3, 1d / 3, 1d / 3]
 		);
 
 		RightTopLeftBottomRightBottom = new WindowNode(rightTopLeftBottomRightBottomWindow);
@@ -99,8 +99,8 @@ internal sealed class TestTree
 		RightTopLeftBottomRight = new SplitNode(
 			equalWeight: false,
 			isHorizontal: false,
-			new INode[] { RightTopLeftBottomRightTop, RightTopLeftBottomRightBottom }.ToImmutableList(),
-			new double[] { 0.7, 0.3 }.ToImmutableList()
+			[RightTopLeftBottomRightTop, RightTopLeftBottomRightBottom],
+			[0.7, 0.3]
 		);
 
 		RightTopLeftBottomLeft = new WindowNode(rightTopLeftBottomLeftWindow);
@@ -108,8 +108,8 @@ internal sealed class TestTree
 		RightTopLeftBottom = new SplitNode(
 			equalWeight: true,
 			isHorizontal: true,
-			new INode[] { RightTopLeftBottomLeft, RightTopLeftBottomRight }.ToImmutableList(),
-			new double[] { 0.5, 0.5 }.ToImmutableList()
+			[RightTopLeftBottomLeft, RightTopLeftBottomRight],
+			[0.5, 0.5]
 		);
 
 		RightTopLeftTop = new WindowNode(rightTopLeftTopWindow);
@@ -119,31 +119,16 @@ internal sealed class TestTree
 		RightTopLeft = new SplitNode(
 			equalWeight: true,
 			isHorizontal: false,
-			new INode[] { RightTopLeftTop, RightTopLeftBottom }.ToImmutableList(),
-			new double[] { 0.5, 0.5 }.ToImmutableList()
+			[RightTopLeftTop, RightTopLeftBottom],
+			[0.5, 0.5]
 		);
 
-		RightTop = new SplitNode(
-			equalWeight: true,
-			isHorizontal: true,
-			new INode[] { RightTopLeft, RightTopRight }.ToImmutableList(),
-			new double[] { 0.5, 0.5 }.ToImmutableList()
-		);
+		RightTop = new SplitNode(equalWeight: true, isHorizontal: true, [RightTopLeft, RightTopRight], [0.5, 0.5]);
 
-		Right = new SplitNode(
-			equalWeight: true,
-			isHorizontal: false,
-			new INode[] { RightTop, RightBottom }.ToImmutableList(),
-			new double[] { 0.5, 0.5 }.ToImmutableList()
-		);
+		Right = new SplitNode(equalWeight: true, isHorizontal: false, [RightTop, RightBottom], [0.5, 0.5]);
 
 		Left = new WindowNode(leftWindow);
 
-		Root = new SplitNode(
-			equalWeight: true,
-			isHorizontal: true,
-			new INode[] { Left, Right }.ToImmutableList(),
-			new double[] { 0.5, 0.5 }.ToImmutableList()
-		);
+		Root = new SplitNode(equalWeight: true, isHorizontal: true, [Left, Right], [0.5, 0.5]);
 	}
 }

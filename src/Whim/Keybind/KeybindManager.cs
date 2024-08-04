@@ -31,7 +31,7 @@ internal class KeybindManager : IKeybindManager
 
 	private void UnifyKeybinds()
 	{
-		KeyValuePair<string, IKeybind>[] keybinds = _commandsKeybindsMap.ToArray();
+		KeyValuePair<string, IKeybind>[] keybinds = [.. _commandsKeybindsMap];
 		_commandsKeybindsMap.Clear();
 		_keybindsCommandsMap.Clear();
 
@@ -84,7 +84,7 @@ internal class KeybindManager : IKeybindManager
 				}
 			}
 
-			return commands.ToArray();
+			return [.. commands];
 		}
 
 		return Array.Empty<ICommand>();

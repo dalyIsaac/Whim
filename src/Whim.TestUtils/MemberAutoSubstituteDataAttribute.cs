@@ -45,9 +45,7 @@ public abstract class BaseMemberAutoSubstituteDataAttribute : MemberDataAttribut
 			fixture.Customize(CreateCustomization());
 		}
 
-		return values
-			.Concat(testMethod.GetParameters().Skip(values.Length).Select(p => GetSpecimen(fixture, p)))
-			.ToArray();
+		return [.. values, .. testMethod.GetParameters().Skip(values.Length).Select(p => GetSpecimen(fixture, p))];
 	}
 
 	private static object GetSpecimen(IFixture fixture, ParameterInfo parameter)

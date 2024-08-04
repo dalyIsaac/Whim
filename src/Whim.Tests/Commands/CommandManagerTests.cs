@@ -74,7 +74,7 @@ public class CommandManagerTests
 		commandManager.AddPluginCommand(command);
 
 		// Then
-		List<ICommand> allCommands = commandManager.ToList();
+		List<ICommand> allCommands = [.. commandManager];
 		Assert.Single(allCommands);
 		Assert.Equal(command, allCommands[0]);
 	}

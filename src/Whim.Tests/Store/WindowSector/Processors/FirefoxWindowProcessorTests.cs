@@ -35,7 +35,7 @@ public class FirefoxWindowProcessorTests
 	{
 		// Given a Firefox window which was open when Whim started
 		window.ProcessFileName.Returns("firefox.exe");
-		rootSector.WindowSector.StartupWindows = new[] { window.Handle }.ToImmutableHashSet();
+		rootSector.WindowSector.StartupWindows = [window.Handle];
 		IWindowProcessor processor = FirefoxWindowProcessor.Create(ctx, window)!;
 
 		// When `ProcessEvent` is called

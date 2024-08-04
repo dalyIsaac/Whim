@@ -48,7 +48,7 @@ public static partial class PaletteFilters
 		}
 		else
 		{
-			tail = new[] { head }.Concat(tail).ToArray();
+			tail = [head, .. tail];
 		}
 
 		return tail;

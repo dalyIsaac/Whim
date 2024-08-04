@@ -42,7 +42,7 @@ internal static class MonitorUtils
 			currentMonitors[i] = new Monitor(internalCtx, hmonitor, isPrimaryHMonitor);
 		}
 
-		return currentMonitors.OrderBy(m => m.WorkingArea.X).ThenBy(m => m.WorkingArea.Y).ToArray().ToImmutableArray();
+		return [.. currentMonitors.OrderBy(m => m.WorkingArea.X).ThenBy(m => m.WorkingArea.Y)];
 	}
 
 	public static HMONITOR OrActiveMonitor(this HMONITOR handle, IRootSector rootSector) =>

@@ -404,7 +404,7 @@ public class CoreCommandsTests
 		// Given
 		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
-		List<IWorkspace> workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(2).ToList();
+		List<IWorkspace> workspaces = [.. TestUtils.WorkspaceUtils.CreateWorkspaces(2)];
 		ctx.WorkspaceManager.GetEnumerator().Returns(workspaces.GetEnumerator());
 
 		int index = 3;
@@ -427,7 +427,7 @@ public class CoreCommandsTests
 		// Given
 		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
-		List<IWorkspace> workspaces = TestUtils.WorkspaceUtils.CreateWorkspaces(10).ToList();
+		List<IWorkspace> workspaces = [.. TestUtils.WorkspaceUtils.CreateWorkspaces(10)];
 		ctx.WorkspaceManager.GetEnumerator().Returns(workspaces.GetEnumerator());
 
 		ICommand command = testUtils.GetCommand($"whim.core.activate_workspace_{index}");

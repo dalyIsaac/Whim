@@ -62,7 +62,7 @@ internal static class StoreTestUtils
 			return;
 		}
 
-		List<IWorkspace> workspaces = ctx.WorkspaceManager.ToList();
+		List<IWorkspace> workspaces = [.. ctx.WorkspaceManager];
 		workspaces.Add(workspace);
 		ctx.WorkspaceManager.GetEnumerator().Returns(_ => workspaces.GetEnumerator());
 
@@ -87,11 +87,11 @@ internal static class StoreTestUtils
 
 	public static void AddMonitorsToManager(IContext ctx, MutableRootSector rootSector, params IMonitor[] newMonitors)
 	{
-		List<IMonitor> monitors = ctx.MonitorManager.ToList();
+		List<IMonitor> monitors = [.. ctx.MonitorManager];
 		monitors.AddRange(newMonitors);
 
 		ctx.MonitorManager.GetEnumerator().Returns(_ => monitors.GetEnumerator());
-		rootSector.MonitorSector.Monitors = newMonitors.ToImmutableArray();
+		rootSector.MonitorSector.Monitors = [.. newMonitors];
 	}
 
 	public static void AddWindowToSector(MutableRootSector rootSector, IWindow window)

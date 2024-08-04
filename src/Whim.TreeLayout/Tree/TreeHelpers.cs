@@ -152,7 +152,7 @@ internal static class TreeHelpers
 		}
 
 		// NOTE: This assumes that window nodes are always at the end of the path.
-		return new WindowNodeState((WindowNode)currentNode, splitNodes, pathBuilder.ToImmutableArray());
+		return new WindowNodeState((WindowNode)currentNode, splitNodes, [.. pathBuilder]);
 	}
 
 	/// <summary>
