@@ -50,7 +50,7 @@ public class WindowTests
 	internal void Handle(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		HWND handle = window.Handle;
@@ -65,7 +65,7 @@ public class WindowTests
 		// Given
 		internalCtx.CoreNativeManager.GetWindowText(Arg.Any<HWND>()).Returns("title");
 
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		string title = window.Title;
@@ -80,7 +80,7 @@ public class WindowTests
 		// Given
 		ctx.NativeManager.GetClassName(Arg.Any<HWND>()).Returns("windowClass");
 
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		string windowClass = window.WindowClass;
@@ -93,7 +93,7 @@ public class WindowTests
 	internal void Rectangle(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		IRectangle<int> rect = window.Rectangle;
@@ -109,7 +109,7 @@ public class WindowTests
 	internal void ProcessId(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		int processId = window.ProcessId;
@@ -122,7 +122,7 @@ public class WindowTests
 	internal void ProcessFileName(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		string? processFileName = window.ProcessFileName;
@@ -140,7 +140,7 @@ public class WindowTests
 		// However, I can't be bothered to mock that out.
 		internalCtx.CoreNativeManager.GetProcessNameAndPath(Arg.Any<int>()).Returns((string.Empty, null));
 
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		string? processFileName = window.ProcessFileName;
@@ -155,7 +155,7 @@ public class WindowTests
 		// Given
 		internalCtx.CoreNativeManager.GetForegroundWindow().Returns(new HWND(123));
 
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		bool isFocused = window.IsFocused;
@@ -170,7 +170,7 @@ public class WindowTests
 		// Given
 		internalCtx.CoreNativeManager.IsWindowMinimized(Arg.Any<HWND>()).Returns((BOOL)true);
 
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		bool isMinimized = window.IsMinimized;
@@ -185,7 +185,7 @@ public class WindowTests
 		// Given
 		internalCtx.CoreNativeManager.IsWindowMaximized(Arg.Any<HWND>()).Returns((BOOL)true);
 
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		bool isMaximized = window.IsMaximized;
@@ -200,7 +200,7 @@ public class WindowTests
 		// Given
 		internalCtx.CoreNativeManager.BringWindowToTop(Arg.Any<HWND>());
 
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		window.BringToTop();
@@ -215,7 +215,7 @@ public class WindowTests
 		// Given
 		ctx.NativeManager.QuitWindow(Arg.Any<HWND>());
 
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		window.Close();
@@ -230,7 +230,7 @@ public class WindowTests
 		// Given
 		internalCtx.CoreNativeManager.SetForegroundWindow(Arg.Any<HWND>());
 
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		window.Focus();
@@ -247,7 +247,7 @@ public class WindowTests
 		// Given
 		ctx.NativeManager.HideWindow(Arg.Any<HWND>());
 
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		window.Hide();
@@ -262,7 +262,7 @@ public class WindowTests
 		// Given
 		ctx.NativeManager.ShowWindowMaximized(Arg.Any<HWND>());
 
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		window.ShowMaximized();
@@ -277,7 +277,7 @@ public class WindowTests
 		// Given
 		ctx.NativeManager.ShowWindowMinimized(Arg.Any<HWND>());
 
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		window.ShowMinimized();
@@ -292,7 +292,7 @@ public class WindowTests
 		// Given
 		ctx.NativeManager.ShowWindowNoActivate(Arg.Any<HWND>());
 
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		window.ShowNormal();
@@ -307,7 +307,7 @@ public class WindowTests
 		// Given
 		ctx.NativeManager.RestoreWindow(Arg.Any<HWND>());
 
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		window.Restore();
@@ -325,7 +325,7 @@ public class WindowTests
 			.Do(x => throw new Win32Exception());
 
 		// When
-		IWindow? window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow? window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// Then
 		Assert.Null(window);
@@ -335,7 +335,7 @@ public class WindowTests
 	internal void Equals_Null(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		IWindow? window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow? window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		bool equals = window.Equals(null);
@@ -348,7 +348,7 @@ public class WindowTests
 	internal void Equals_WrongType(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		IWindow? window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow? window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		bool equals = window.Equals(new object());
@@ -361,7 +361,7 @@ public class WindowTests
 	internal void Equals_NotWindow(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		IWindow? window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow? window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		bool equals = window.Equals(Substitute.For<IWindow>());
@@ -374,8 +374,8 @@ public class WindowTests
 	internal void Equals_Success(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		IWindow? window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
-		IWindow? window2 = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow? window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
+		IWindow? window2 = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		bool equals = window.Equals(window2);
@@ -388,8 +388,8 @@ public class WindowTests
 	internal void Equals_Operator_Success(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Window? window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!.OrDefault()! as Window;
-		Window? window2 = Window.CreateWindow(ctx, internalCtx, new HWND(123))!.OrDefault()! as Window;
+		Window? window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!.ValueOrDefault! as Window;
+		Window? window2 = Window.CreateWindow(ctx, internalCtx, new HWND(123))!.ValueOrDefault! as Window;
 
 		// When
 		bool equals = window == window2;
@@ -402,8 +402,8 @@ public class WindowTests
 	internal void NotEquals_Operator_Success(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		Window? window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!.OrDefault()! as Window;
-		Window? window2 = Window.CreateWindow(ctx, internalCtx, new HWND(1234))!.OrDefault()! as Window;
+		Window? window = Window.CreateWindow(ctx, internalCtx, new HWND(123))!.ValueOrDefault! as Window;
+		Window? window2 = Window.CreateWindow(ctx, internalCtx, new HWND(1234))!.ValueOrDefault! as Window;
 
 		// When
 		bool equals = window != window2;
@@ -416,7 +416,7 @@ public class WindowTests
 	internal void GetHashCode_Success(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
-		IWindow? window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow? window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		int hashCode = window.GetHashCode();
@@ -434,7 +434,7 @@ public class WindowTests
 			.CoreNativeManager.GetProcessNameAndPath(Arg.Any<int>())
 			.Returns(("processName", "app/ApplicationFrameHost.exe"));
 
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		bool isUwp = window.IsUwp;
@@ -451,7 +451,7 @@ public class WindowTests
 			.CoreNativeManager.GetProcessNameAndPath(Arg.Any<int>())
 			.Returns(("processName", "processFileName"));
 
-		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).OrDefault()!;
+		IWindow window = Window.CreateWindow(ctx, internalCtx, new HWND(123)).ValueOrDefault!;
 
 		// When
 		bool isUwp = window.IsUwp;

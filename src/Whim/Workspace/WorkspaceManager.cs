@@ -43,7 +43,7 @@ internal class WorkspaceManager : IWorkspaceManager
 	}
 
 	public IWorkspace? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null) =>
-		_context.Store.Dispatch(new AddWorkspaceTransform(name, createLayoutEngines)).OrDefault();
+		_context.Store.Dispatch(new AddWorkspaceTransform(name, createLayoutEngines)).ValueOrDefault;
 
 	public void AddProxyLayoutEngine(ProxyLayoutEngineCreator proxyLayoutEngineCreator) =>
 		_context.Store.Dispatch(new AddProxyLayoutEngineTransform(proxyLayoutEngineCreator));

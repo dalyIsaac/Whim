@@ -170,6 +170,6 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 			MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST
 		);
 
-		return ctx.Store.Pick(PickWorkspaceByMonitor(hmonitor)).OrDefault();
+		return ctx.Store.Pick(PickWorkspaceByMonitor(hmonitor)).ValueOrDefault;
 	}
 }
