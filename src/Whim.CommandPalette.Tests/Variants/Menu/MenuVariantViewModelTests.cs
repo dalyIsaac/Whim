@@ -350,7 +350,7 @@ public class MenuVariantViewModelTests
 		// Given
 		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 
-		vm.Activate(new MenuVariantConfig() { Commands = Array.Empty<ICommand>() });
+		vm.Activate(new MenuVariantConfig() { Commands = [] });
 
 		// When
 		vm.Update();
@@ -388,7 +388,7 @@ public class MenuVariantViewModelTests
 			.Match(Arg.Any<string>(), Arg.Any<IReadOnlyList<IVariantRowModel<MenuVariantRowModelData>>>())
 			.Returns(items);
 
-		MenuVariantConfig config = new() { Matcher = matcher, Commands = Array.Empty<ICommand>() };
+		MenuVariantConfig config = new() { Matcher = matcher, Commands = [] };
 		return config;
 	}
 

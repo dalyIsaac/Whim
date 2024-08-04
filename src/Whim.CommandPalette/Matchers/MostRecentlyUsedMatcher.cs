@@ -33,7 +33,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 			// If there are no matches and the query is not empty, return an empty list.
 			if (!string.IsNullOrEmpty(query))
 			{
-				return Array.Empty<MatcherResult<T>>();
+				return [];
 			}
 
 			// If there are no matches and the query is empty, return the most recently used items.

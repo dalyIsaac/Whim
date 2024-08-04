@@ -38,7 +38,7 @@ public class TreeHelpersTests
 	internal void GetNodeAtPath_WithEmptyPath_ReturnsRoot(INode root)
 	{
 		// When
-		var result = root.GetNodeAtPath(Array.Empty<int>());
+		var result = root.GetNodeAtPath([]);
 
 		// Then
 		Assert.NotNull(result);
@@ -630,7 +630,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		WindowNode root = new(window);
-		IReadOnlyList<int> pathToNode = Array.Empty<int>();
+		IReadOnlyList<int> pathToNode = [];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(root, pathToNode, Direction.Right, monitor);
@@ -643,7 +643,7 @@ public class TreeHelpersTests
 	internal void GetAdjacentNode_RootIsNotISplitNode(INode root, IMonitor monitor)
 	{
 		// Given
-		IReadOnlyList<int> pathToNode = Array.Empty<int>();
+		IReadOnlyList<int> pathToNode = [];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(root, pathToNode, Direction.Right, monitor);
@@ -848,8 +848,8 @@ public class TreeHelpersTests
 	internal void GetLastCommonAncestor_EmptyList()
 	{
 		// Given
-		IReadOnlyList<int> pathToNode1 = Array.Empty<int>();
-		IReadOnlyList<int> pathToNode2 = Array.Empty<int>();
+		IReadOnlyList<int> pathToNode1 = [];
+		IReadOnlyList<int> pathToNode2 = [];
 
 		// When
 		int? result = TreeHelpers.GetLastCommonAncestorIndex(pathToNode1, pathToNode2);

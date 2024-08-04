@@ -80,7 +80,7 @@ public class WorkspaceManagerTests
 		WorkspaceManager sut = new(ctx);
 
 		// When
-		var _ = sut.Add("test", Array.Empty<CreateLeafLayoutEngine>());
+		var _ = sut.Add("test", []);
 
 		// Then
 		ctx.Store.Received(1).Dispatch(Arg.Any<AddWorkspaceTransform>());

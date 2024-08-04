@@ -20,8 +20,8 @@ public class BarPluginTests
 		context.MonitorManager.MonitorsChanged += Raise.EventWith(
 			new MonitorsChangedEventArgs()
 			{
-				AddedMonitors = Array.Empty<IMonitor>(),
-				UnchangedMonitors = Array.Empty<IMonitor>(),
+				AddedMonitors = [],
+				UnchangedMonitors = [],
 				RemovedMonitors = [monitor]
 			}
 		);

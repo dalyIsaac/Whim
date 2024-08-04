@@ -62,7 +62,7 @@ internal static class TreeHelpers
 		Rectangle<double> rect = Rectangle.UnitSquare<double>();
 		if (path.Count == 0)
 		{
-			return new NodeState(root, Array.Empty<ISplitNode>(), rect);
+			return new NodeState(root, [], rect);
 		}
 
 		ISplitNode[] ancestors = new ISplitNode[path.Count];

@@ -19,7 +19,7 @@ public record ImmutableTestLayoutEngine : ILayoutEngine
 	public bool ContainsWindow(IWindow window) => false;
 
 	public IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor) =>
-		Array.Empty<IWindowState>();
+		[];
 
 	public ILayoutEngine FocusWindowInDirection(Direction direction, IWindow window) => this;
 

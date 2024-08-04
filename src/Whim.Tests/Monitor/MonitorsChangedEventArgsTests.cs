@@ -9,9 +9,9 @@ public class MonitorsChangedEventArgsTests
 		MonitorsChangedEventArgs args =
 			new()
 			{
-				UnchangedMonitors = Array.Empty<IMonitor>(),
-				RemovedMonitors = Array.Empty<IMonitor>(),
-				AddedMonitors = Array.Empty<IMonitor>(),
+				UnchangedMonitors = [],
+				RemovedMonitors = [],
+				AddedMonitors = [],
 			};
 
 		// When
@@ -35,7 +35,7 @@ public class MonitorsChangedEventArgsTests
 			new()
 			{
 				UnchangedMonitors = [unchangedMonitor1, unchangedMonitor2],
-				RemovedMonitors = Array.Empty<IMonitor>(),
+				RemovedMonitors = [],
 				AddedMonitors = [addedMonitor1, addedMonitor2],
 			};
 
@@ -68,7 +68,7 @@ public class MonitorsChangedEventArgsTests
 			{
 				UnchangedMonitors = [unchangedMonitor1, unchangedMonitor2],
 				RemovedMonitors = [removedMonitor1, removedMonitor2],
-				AddedMonitors = Array.Empty<IMonitor>(),
+				AddedMonitors = [],
 			};
 
 		// When
