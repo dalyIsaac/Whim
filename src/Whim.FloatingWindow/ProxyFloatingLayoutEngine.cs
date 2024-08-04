@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -150,36 +151,21 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 
 	private (ProxyFloatingLayoutEngine, bool error) UpdateWindowRectangle(IWindow window)
 	{
-		// Try get the old rectangle.
-		IRectangle<double>? oldRectangle = _floatingWindowRects.TryGetValue(window, out IRectangle<double>? rectangle)
-			? rectangle
-			: null;
+		(ImmutableDictionary<IWindow, IRectangle<double>> maybeNewDict, UpdateWindowStatus status) =
+			FloatingUtils.UpdateWindowRectangle(_context, _floatingWindowRects, window);
 
-		// Since the window is floating, we update the rectangle, and return.
-		IRectangle<int>? newActualRectangle = _context.NativeManager.DwmGetWindowRectangle(window.Handle);
-		if (newActualRectangle == null)
+		switch (status)
 		{
-			Logger.Error($"Could not obtain rectangle for floating window {window}");
-			return (this, true);
+			case UpdateWindowStatus.Error:
+				return (this, true);
+			case UpdateWindowStatus.NoChange:
+				return (this, false);
+			case UpdateWindowStatus.Updated:
+				ILayoutEngine innerLayoutEngine = InnerLayoutEngine.RemoveWindow(window);
+				return (new ProxyFloatingLayoutEngine(this, innerLayoutEngine, maybeNewDict), false);
+			default:
+				throw new ArgumentOutOfRangeException($"UpdateWindowStatus ${status} does not exists");
 		}
-
-		IMonitor newMonitor = _context.MonitorManager.GetMonitorAtPoint(newActualRectangle);
-		IRectangle<double> newUnitSquareRectangle = newMonitor.WorkingArea.NormalizeRectangle(newActualRectangle);
-		if (newUnitSquareRectangle.Equals(oldRectangle))
-		{
-			Logger.Debug($"Rectangle for window {window} has not changed");
-			return (this, false);
-		}
-
-		ILayoutEngine innerLayoutEngine = InnerLayoutEngine.RemoveWindow(window);
-		return (
-			new ProxyFloatingLayoutEngine(
-				this,
-				innerLayoutEngine,
-				_floatingWindowRects.SetItem(window, newUnitSquareRectangle)
-			),
-			false
-		);
 	}
 
 	/// <inheritdoc />

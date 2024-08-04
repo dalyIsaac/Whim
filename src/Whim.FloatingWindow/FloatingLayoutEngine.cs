@@ -122,29 +122,9 @@ public record FloatingLayoutEngine : ILayoutEngine
 
 	private FloatingLayoutEngine UpdateWindowRectangle(IWindow window)
 	{
-		// Try get the old rectangle.
-		IRectangle<double>? oldRectangle = _dict.TryGetValue(window, out IRectangle<double>? rectangle)
-			? rectangle
-			: null;
+		(ImmutableDictionary<IWindow, IRectangle<double>> maybeNewDict, UpdateWindowStatus status) =
+			FloatingUtils.UpdateWindowRectangle(_context, _dict, window);
 
-		// Since the window is floating, we update the rectangle, and return.
-		IRectangle<int>? newActualRectangle = _context.NativeManager.DwmGetWindowRectangle(window.Handle);
-		if (newActualRectangle == null)
-		{
-			Logger.Error($"Could not obtain rectangle for floating window {window}");
-			return this;
-		}
-
-		IMonitor newMonitor = _context.MonitorManager.GetMonitorAtPoint(newActualRectangle);
-		IRectangle<double> newUnitSquareRectangle = newMonitor.WorkingArea.NormalizeRectangle(newActualRectangle);
-		if (newUnitSquareRectangle.Equals(oldRectangle))
-		{
-			Logger.Debug($"Rectangle for window {window} has not changed");
-			return this;
-		}
-
-		ImmutableDictionary<IWindow, IRectangle<double>> newDict = _dict.SetItem(window, newUnitSquareRectangle);
-
-		return new FloatingLayoutEngine(this, newDict);
+		return status == UpdateWindowStatus.Updated ? new FloatingLayoutEngine(this, maybeNewDict) : this;
 	}
 }
