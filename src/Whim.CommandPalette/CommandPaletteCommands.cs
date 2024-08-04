@@ -196,7 +196,7 @@ public class CommandPaletteCommands : PluginCommands
 	{
 		IEnumerable<string> selectedWindowNames = options.Where(o => o.IsSelected).Select(o => o.Title);
 
-		IReadOnlyList<IWorkspace> workspaces = _context.WorkspaceManager.ToArray();
+		IReadOnlyList<IWorkspace> workspaces = [.. _context.WorkspaceManager];
 		IReadOnlyList<IWindow> windows = workspaces
 			.SelectMany(w => w.Windows)
 			.Where(w => selectedWindowNames.Contains(w.Title))

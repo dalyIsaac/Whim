@@ -5,7 +5,7 @@ namespace Whim;
 /// </summary>
 internal class WindowSector(IContext ctx, IInternalContext internalCtx) : SectorBase, IWindowSector, IDisposable, IWindowSectorEvents
 {
-	private readonly WindowEventListener _listener = new WindowEventListener(ctx, internalCtx);
+	private readonly WindowEventListener _listener = new(ctx, internalCtx);
 	private bool _disposedValue;
 
 	public ImmutableDictionary<HWND, IWindow> Windows { get; internal set; } = ImmutableDictionary<HWND, IWindow>.Empty;

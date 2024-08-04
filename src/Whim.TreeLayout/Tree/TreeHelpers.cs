@@ -164,7 +164,7 @@ internal static class TreeHelpers
 	/// <returns></returns>
 	public static WindowNodeStateAtPoint? GetNodeContainingPoint(this INode rootNode, IPoint<double> searchPoint)
 	{
-		IRectangle<double> parentRect = Rectangle.UnitSquare<double>();
+		Rectangle<double> parentRect = Rectangle.UnitSquare<double>();
 		if (!parentRect.ContainsPoint(searchPoint))
 		{
 			return null;
