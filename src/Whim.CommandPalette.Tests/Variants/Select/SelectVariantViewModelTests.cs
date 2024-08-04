@@ -27,7 +27,7 @@ public class SelectVariantViewModelTests
 		List<IVariantRowView<SelectOption, SelectVariantRowViewModel>>
 	) SelectRowFactoryWithMocks()
 	{
-		List<IVariantRowView<SelectOption, SelectVariantRowViewModel>> variantRows = new();
+		List<IVariantRowView<SelectOption, SelectVariantRowViewModel>> variantRows = [];
 
 		IVariantRowView<SelectOption, SelectVariantRowViewModel> selectRowFactory(
 			MatcherResult<SelectOption> matcherResult,
@@ -180,30 +180,29 @@ public class SelectVariantViewModelTests
 		commandPaletteWindowViewModel.Text.Returns("ti");
 
 		List<SelectOption> options =
+		[
 			new()
 			{
-				new()
-				{
-					Id = "id",
-					Title = "title",
-					IsSelected = false,
-					IsEnabled = false,
-				},
-				new()
-				{
-					Id = "id2",
-					Title = "title2",
-					IsSelected = false,
-					IsEnabled = false,
-				},
-				new()
-				{
-					Id = "id3",
-					Title = "title3",
-					IsSelected = false,
-					IsEnabled = false,
-				}
-			};
+				Id = "id",
+				Title = "title",
+				IsSelected = false,
+				IsEnabled = false,
+			},
+			new()
+			{
+				Id = "id2",
+				Title = "title2",
+				IsSelected = false,
+				IsEnabled = false,
+			},
+			new()
+			{
+				Id = "id3",
+				Title = "title3",
+				IsSelected = false,
+				IsEnabled = false,
+			}
+		];
 
 		(var selectRowFactory, var selectRowFactoryResults) = SelectRowFactoryWithMocks();
 		SelectVariantViewModel selectVariantViewModel = new(commandPaletteWindowViewModel, selectRowFactory);
@@ -252,9 +251,7 @@ public class SelectVariantViewModelTests
 			IMatcher<SelectOption> matcherMock,
 			_
 		) = CreateOptionsStubs();
-		matcherMock
-			.Match(Arg.Any<string>(), Arg.Any<IReadOnlyList<IVariantRowModel<SelectOption>>>())
-			.Returns(new List<MatcherResult<SelectOption>>());
+		matcherMock.Match(Arg.Any<string>(), Arg.Any<IReadOnlyList<IVariantRowModel<SelectOption>>>()).Returns([]);
 
 		selectVariantViewModel.Activate(activationConfig);
 
@@ -430,8 +427,7 @@ public class SelectVariantViewModelTests
 
 		// When
 		selectVariantViewModel.PopulateItems(
-			new List<SelectOption>
-			{
+			[
 				new()
 				{
 					Id = "4",
@@ -453,7 +449,7 @@ public class SelectVariantViewModelTests
 					IsSelected = false,
 					IsEnabled = false
 				},
-			}
+			]
 		);
 
 		// Then
@@ -474,8 +470,7 @@ public class SelectVariantViewModelTests
 
 		// When
 		selectVariantViewModel.PopulateItems(
-			new List<SelectOption>
-			{
+			[
 				options[0],
 				new()
 				{
@@ -484,7 +479,7 @@ public class SelectVariantViewModelTests
 					IsSelected = false,
 					IsEnabled = false
 				},
-			}
+			]
 		);
 
 		// Then
@@ -542,7 +537,7 @@ public class SelectVariantViewModelTests
 				IsEnabled = false
 			};
 
-		List<SelectOption> updatedOptions = new() { options[0], newOption, options[2], };
+		List<SelectOption> updatedOptions = [options[0], newOption, options[2],];
 
 		List<SelectVariantRowModel> updatedVariantItems = updatedOptions
 			.Select(o => new SelectVariantRowModel(o))
@@ -600,7 +595,7 @@ public class SelectVariantViewModelTests
 				IsSelected = false,
 				IsEnabled = false
 			};
-		List<SelectOption> secondOptions = new() { secondNewOption };
+		List<SelectOption> secondOptions = [secondNewOption];
 		List<SelectVariantRowModel> secondVariantItems = secondOptions
 			.Select(o => new SelectVariantRowModel(o))
 			.ToList();
@@ -627,7 +622,7 @@ public class SelectVariantViewModelTests
 				IsSelected = false,
 				IsEnabled = false
 			};
-		List<SelectOption> thirdOptions = new() { secondNewOption, thirdNewOption };
+		List<SelectOption> thirdOptions = [secondNewOption, thirdNewOption];
 		List<SelectVariantRowModel> thirdVariantItems = thirdOptions.Select(o => new SelectVariantRowModel(o)).ToList();
 
 		matcherMock

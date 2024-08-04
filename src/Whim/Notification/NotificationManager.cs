@@ -8,7 +8,7 @@ internal class NotificationManager : INotificationManager
 	private bool _initialized;
 
 	private readonly IContext _context;
-	private readonly Dictionary<string, Action<AppNotificationActivatedEventArgs>> _notificationHandlers = new();
+	private readonly Dictionary<string, Action<AppNotificationActivatedEventArgs>> _notificationHandlers = [];
 
 	public NotificationManager(IContext context)
 	{

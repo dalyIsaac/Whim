@@ -4,7 +4,7 @@ namespace Whim;
 
 internal class CommandManager : ICommandManager
 {
-	private readonly Dictionary<string, ICommand> _commands = new();
+	private readonly Dictionary<string, ICommand> _commands = [];
 
 	public int Count => _commands.Count;
 

@@ -61,7 +61,7 @@ public class CommandPaletteCommands : PluginCommands
 				callback: () =>
 				{
 					IWorkspace activeWorkspace = _context.WorkspaceManager.ActiveWorkspace;
-					List<ICommand> items = new();
+					List<ICommand> items = [];
 					foreach (IWorkspace workspace in _context.WorkspaceManager)
 					{
 						if (workspace != activeWorkspace)
@@ -123,7 +123,7 @@ public class CommandPaletteCommands : PluginCommands
 	private void ActivateWorkspaceCallback()
 	{
 		IWorkspace activeWorkspace = _context.WorkspaceManager.ActiveWorkspace;
-		List<ICommand> items = new();
+		List<ICommand> items = [];
 		foreach (IWorkspace workspace in _context.WorkspaceManager)
 		{
 			if (workspace != activeWorkspace)

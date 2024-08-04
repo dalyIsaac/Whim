@@ -11,7 +11,7 @@ public class BarPluginTests
 	public void MonitorManager_MonitorsChanged_RemovedMonitors(IContext context, IMonitor monitor)
 	{
 		// Given
-		BarConfig barConfig = new(new List<BarComponent>(), new List<BarComponent>(), new List<BarComponent>());
+		BarConfig barConfig = new([], [], []);
 		BarPlugin barPlugin = new(context, barConfig);
 		NativeManagerUtils.SetupTryEnqueue(context);
 

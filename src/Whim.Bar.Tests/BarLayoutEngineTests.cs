@@ -10,14 +10,7 @@ public class BarLayoutEngineTests
 {
 	private static BarLayoutEngine CreateSut(ILayoutEngine innerLayoutEngine) =>
 		new(
-			new BarConfig(
-				leftComponents: new List<BarComponent>(),
-				centerComponents: new List<BarComponent>(),
-				rightComponents: new List<BarComponent>()
-			)
-			{
-				Height = 30
-			},
+			new BarConfig(leftComponents: [], centerComponents: [], rightComponents: []) { Height = 30 },
 			innerLayoutEngine
 		);
 

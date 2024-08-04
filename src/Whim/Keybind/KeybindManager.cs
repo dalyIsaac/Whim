@@ -5,8 +5,8 @@ namespace Whim;
 internal class KeybindManager : IKeybindManager
 {
 	private readonly IContext _context;
-	private readonly Dictionary<IKeybind, List<string>> _keybindsCommandsMap = new();
-	private readonly Dictionary<string, IKeybind> _commandsKeybindsMap = new();
+	private readonly Dictionary<IKeybind, List<string>> _keybindsCommandsMap = [];
+	private readonly Dictionary<string, IKeybind> _commandsKeybindsMap = [];
 
 	public KeybindManager(IContext context)
 	{
@@ -53,7 +53,7 @@ internal class KeybindManager : IKeybindManager
 
 		if (!_keybindsCommandsMap.TryGetValue(keybind, out List<string>? value))
 		{
-			value = new List<string>();
+			value = [];
 			_keybindsCommandsMap.Add(keybind, value);
 		}
 
@@ -68,7 +68,7 @@ internal class KeybindManager : IKeybindManager
 
 		if (_keybindsCommandsMap.TryGetValue(keybind, out List<string>? commandIds))
 		{
-			List<ICommand> commands = new();
+			List<ICommand> commands = [];
 
 			foreach (string commandId in commandIds)
 			{

@@ -518,7 +518,7 @@ public class SplitNodeTests
 
 		// When
 		IEnumerator enumerator = (splitNode as IEnumerable).GetEnumerator();
-		List<(double, INode)> items = new();
+		List<(double, INode)> items = [];
 		while (enumerator.MoveNext())
 		{
 			if (enumerator.Current is (double weight, INode node))

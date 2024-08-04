@@ -8,12 +8,7 @@ public class BarConfigTests
 	public void Height_PropertyChanged()
 	{
 		// Given
-		BarConfig config =
-			new(
-				leftComponents: new List<BarComponent>(),
-				centerComponents: new List<BarComponent>(),
-				rightComponents: new List<BarComponent>()
-			);
+		BarConfig config = new(leftComponents: [], centerComponents: [], rightComponents: []);
 
 		// When
 		// Then

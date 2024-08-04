@@ -20,9 +20,9 @@ internal record MonitorsChangedTransform : Transform
 		ImmutableArray<IMonitor> previousMonitors = sector.Monitors;
 		UpdateMonitorSector(ctx, internalCtx, mutableRootSector);
 
-		List<IMonitor> unchangedMonitors = new();
-		List<IMonitor> removedMonitors = new();
-		List<IMonitor> addedMonitors = new();
+		List<IMonitor> unchangedMonitors = [];
+		List<IMonitor> removedMonitors = [];
+		List<IMonitor> addedMonitors = [];
 
 		// For each monitor in the previous set, check if it's in the current set.
 		foreach (IMonitor monitor in previousMonitors)

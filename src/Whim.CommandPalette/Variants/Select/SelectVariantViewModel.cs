@@ -18,12 +18,12 @@ internal class SelectVariantViewModel : IVariantViewModel
 	/// The rows which are currently unused and can be reused for new matches.
 	/// Keeping these around avoids the need to create new rows every time the palette is shown.
 	/// </summary>
-	internal readonly List<IVariantRowView<SelectOption, SelectVariantRowViewModel>> _unusedRows = new();
+	internal readonly List<IVariantRowView<SelectOption, SelectVariantRowViewModel>> _unusedRows = [];
 
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="SelectRows"/> are drawn.
 	/// </summary>
-	internal readonly List<SelectVariantRowModel> _allItems = new();
+	internal readonly List<SelectVariantRowModel> _allItems = [];
 
 	/// <summary>
 	/// Factory to create select rows to make it possible to use xunit.
@@ -35,7 +35,7 @@ internal class SelectVariantViewModel : IVariantViewModel
 		IVariantRowView<SelectOption, SelectVariantRowViewModel>
 	> _selectRowFactory;
 
-	public readonly ObservableCollection<IVariantRowView<SelectOption, SelectVariantRowViewModel>> SelectRows = new();
+	public readonly ObservableCollection<IVariantRowView<SelectOption, SelectVariantRowViewModel>> SelectRows = [];
 
 	public string? ConfirmButtonText => _activationConfig?.ConfirmButtonText;
 

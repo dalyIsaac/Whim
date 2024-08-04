@@ -116,7 +116,7 @@ internal class CoreNativeManager : ICoreNativeManager
 
 	public IEnumerable<HWND> GetAllWindows()
 	{
-		List<HWND> windows = new();
+		List<HWND> windows = [];
 
 		PInvoke.EnumWindows(
 			(handle, param) =>
@@ -132,7 +132,7 @@ internal class CoreNativeManager : ICoreNativeManager
 
 	public IEnumerable<HWND> GetChildWindows(HWND hwnd)
 	{
-		List<HWND> windows = new();
+		List<HWND> windows = [];
 
 		PInvoke.EnumChildWindows(
 			hwnd,
@@ -188,7 +188,13 @@ internal class CoreNativeManager : ICoreNativeManager
 	}
 
 	private readonly HashSet<string> _systemClasses =
-		new() { "SysListView32", "WorkerW", "Shell_TrayWnd", "Shell_SecondaryTrayWnd", "Progman" };
+	[
+		"SysListView32",
+		"WorkerW",
+		"Shell_TrayWnd",
+		"Shell_SecondaryTrayWnd",
+		"Progman"
+	];
 
 	public bool IsSystemWindow(HWND hwnd, string className)
 	{

@@ -12,7 +12,7 @@ internal class StoreWrapper : Store
 	/// <summary>
 	/// All the transforms that have been executed.
 	/// </summary>
-	public List<object> Transforms { get; } = new();
+	public List<object> Transforms { get; } = [];
 
 	public StoreWrapper(IContext ctx, IInternalContext internalCtx)
 		: base(ctx, internalCtx) { }

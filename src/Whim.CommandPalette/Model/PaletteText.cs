@@ -31,7 +31,7 @@ public record PaletteText
 	/// <summary>
 	/// The segments of text.
 	/// </summary>
-	public IList<PaletteTextSegment> Segments { get; } = new List<PaletteTextSegment>();
+	public IList<PaletteTextSegment> Segments { get; } = [];
 
 	/// <summary>
 	/// Creates an empty instance of the <see cref="PaletteText"/> class.

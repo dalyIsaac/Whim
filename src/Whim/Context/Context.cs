@@ -56,7 +56,7 @@ internal class Context : IContext
 		WindowManager = new WindowManager(this, _internalContext);
 		MonitorManager = new MonitorManager(this);
 		WorkspaceManager = new WorkspaceManager(this);
-		_commandManager = new CommandManager();
+		_commandManager = [];
 		PluginManager = new PluginManager(this, _commandManager);
 		KeybindManager = new KeybindManager(this);
 		NotificationManager = new NotificationManager(this);

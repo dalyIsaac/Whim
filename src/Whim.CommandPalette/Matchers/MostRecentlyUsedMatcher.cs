@@ -13,7 +13,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 {
 	private static readonly MatcherItemComparer<T> _sorter = new();
 
-	internal readonly Dictionary<string, long> _commandLastExecutionTime = new();
+	internal readonly Dictionary<string, long> _commandLastExecutionTime = [];
 
 	/// <summary>
 	/// The filter to use when matching commands.

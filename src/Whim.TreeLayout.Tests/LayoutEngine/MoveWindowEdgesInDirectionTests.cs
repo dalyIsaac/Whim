@@ -135,7 +135,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 	{
 		get
 		{
-			TheoryData<Direction, IPoint<double>, IWindow[], IWindowState[]> data = new();
+			TheoryData<Direction, IPoint<double>, IWindow[], IWindowState[]> data = [];
 
 			// Move left edge to the left.
 			IWindow[] leftEdgeLeftWindows = CreateWindows(3);
@@ -369,7 +369,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 	{
 		get
 		{
-			TheoryData<Direction, IPoint<double>, IWindow[], IWindowState[]> data = new();
+			TheoryData<Direction, IPoint<double>, IWindow[], IWindowState[]> data = [];
 
 			// Move top edge up.
 			IWindow[] topEdgeUpWindows = CreateWindows(3);
@@ -588,7 +588,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 	{
 		get
 		{
-			TheoryData<string, Direction, IPoint<double>, IWindow[], IWindowState[]> data = new();
+			TheoryData<string, Direction, IPoint<double>, IWindow[], IWindowState[]> data = [];
 
 			// Move top left window's bottom-right edge up and left.
 			IWindow[] windows1 = CreateWindows(4);

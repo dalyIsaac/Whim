@@ -5,7 +5,7 @@ namespace Whim;
 internal class RouterManager : IRouterManager
 {
 	private readonly IContext _context;
-	private readonly List<Router> _routers = new();
+	private readonly List<Router> _routers = [];
 
 	public RouterOptions RouterOptions { get; set; } = RouterOptions.RouteToLaunchedWorkspace;
 

@@ -13,7 +13,7 @@ internal static class MonitorUtils
 	/// <exception cref="Exception">When no monitors are found.</exception>
 	public static unsafe ImmutableArray<IMonitor> GetCurrentMonitors(IInternalContext internalCtx)
 	{
-		List<HMONITOR> hmonitors = new();
+		List<HMONITOR> hmonitors = [];
 		HMONITOR primaryHMonitor = internalCtx.CoreNativeManager.MonitorFromPoint(
 			new Point(0, 0),
 			MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY

@@ -138,7 +138,7 @@ public class CommandPaletteWindowViewModelTests
 				Hint = "Hint"
 			};
 
-		IEnumerable<ICommand> ICommands = new List<ICommand>() { new Command("id", "title", () => { }) };
+		IEnumerable<ICommand> ICommands = [new Command("id", "title", () => { })];
 
 		// When
 		Assert.Raises<EventArgs>(

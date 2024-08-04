@@ -42,8 +42,8 @@ public class CommandPaletteCommandsTests
 			Windows[2] = Substitute.For<IWindow>();
 			Windows[2].Title.Returns("Window 2");
 
-			Workspace.Windows.Returns((_) => new List<IWindow>() { Windows[0], Windows[1] });
-			OtherWorkspace.Windows.Returns((_) => new List<IWindow>() { Windows[2] });
+			Workspace.Windows.Returns((_) => [Windows[0], Windows[1]]);
+			OtherWorkspace.Windows.Returns((_) => [Windows[2]]);
 
 			Commands = new(Context, Plugin);
 		}
@@ -210,27 +210,26 @@ public class CommandPaletteCommandsTests
 		// Given
 		Wrapper wrapper = new();
 		List<SelectOption> options =
-			new()
+		[
+			new SelectOption()
 			{
-				new SelectOption()
-				{
-					Id = "0",
-					Title = "Window 0",
-					IsSelected = true
-				},
-				new SelectOption()
-				{
-					Id = "1",
-					Title = "Window 1",
-					IsSelected = false
-				},
-				new SelectOption()
-				{
-					Id = "2",
-					Title = "Window 2",
-					IsSelected = true
-				},
-			};
+				Id = "0",
+				Title = "Window 0",
+				IsSelected = true
+			},
+			new SelectOption()
+			{
+				Id = "1",
+				Title = "Window 1",
+				IsSelected = false
+			},
+			new SelectOption()
+			{
+				Id = "2",
+				Title = "Window 2",
+				IsSelected = true
+			},
+		];
 
 		// When
 		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);

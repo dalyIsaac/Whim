@@ -14,7 +14,7 @@ public class GapsLayoutEngineTests
 	{
 		get
 		{
-			TheoryData<GapsConfig, IWindow[], int, IWindowState[]> data = new();
+			TheoryData<GapsConfig, IWindow[], int, IWindowState[]> data = [];
 
 			IWindow window1 = Substitute.For<IWindow>();
 			data.Add(
@@ -136,7 +136,7 @@ public class GapsLayoutEngineTests
 	{
 		get
 		{
-			TheoryData<GapsConfig, IWindow, Rectangle<int>, IWindowState[]> data = new();
+			TheoryData<GapsConfig, IWindow, Rectangle<int>, IWindowState[]> data = [];
 
 			// A window whose width returned by the layout engine as less than zero should not have the
 			// gap applied in the x direction

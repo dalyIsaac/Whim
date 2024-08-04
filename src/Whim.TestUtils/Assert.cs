@@ -176,13 +176,13 @@ public static class CustomAssert
 	)
 	{
 		// Populate the dictionaries with the remaining workspace ids for each event.
-		Dictionary<Guid, int> workspaceStartedRemainingIds = new();
+		Dictionary<Guid, int> workspaceStartedRemainingIds = [];
 		foreach (Guid id in layoutWorkspaceIds ?? Array.Empty<Guid>())
 		{
 			workspaceStartedRemainingIds[id] = workspaceStartedRemainingIds.GetValueOrDefault(id, 0) + 1;
 		}
 
-		Dictionary<Guid, int> workspaceCompletedRemainingIds = new();
+		Dictionary<Guid, int> workspaceCompletedRemainingIds = [];
 		foreach (Guid id in layoutWorkspaceIds ?? Array.Empty<Guid>())
 		{
 			workspaceCompletedRemainingIds[id] = workspaceCompletedRemainingIds.GetValueOrDefault(id, 0) + 1;

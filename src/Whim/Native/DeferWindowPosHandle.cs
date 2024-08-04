@@ -17,8 +17,8 @@ public sealed class DeferWindowPosHandle : IDisposable
 	private readonly IContext _context;
 	private readonly IInternalContext _internalContext;
 
-	private readonly List<DeferWindowPosState> _windowStates = new();
-	private readonly List<DeferWindowPosState> _minimizedWindowStates = new();
+	private readonly List<DeferWindowPosState> _windowStates = [];
+	private readonly List<DeferWindowPosState> _minimizedWindowStates = [];
 
 	private bool _forceTwoPasses;
 

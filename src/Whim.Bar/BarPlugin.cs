@@ -11,7 +11,7 @@ public class BarPlugin : IBarPlugin
 	private readonly IContext _context;
 	private readonly BarConfig _barConfig;
 
-	private readonly Dictionary<IMonitor, BarWindow> _monitorBarMap = new();
+	private readonly Dictionary<IMonitor, BarWindow> _monitorBarMap = [];
 	private bool _disposedValue;
 
 	/// <summary>

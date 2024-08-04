@@ -9,7 +9,7 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 {
 	private readonly IContext _context;
 
-	private readonly Dictionary<LayoutEngineIdentity, Direction> _addNodeDirections = new();
+	private readonly Dictionary<LayoutEngineIdentity, Direction> _addNodeDirections = [];
 	private const Direction DefaultAddNodeDirection = Direction.Right;
 
 	/// <summary>

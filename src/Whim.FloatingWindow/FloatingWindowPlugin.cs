@@ -13,7 +13,7 @@ public class FloatingWindowPlugin : IFloatingWindowPlugin, IInternalFloatingWind
 	/// </summary>
 	public string Name => "whim.floating_window";
 
-	private readonly Dictionary<IWindow, ISet<LayoutEngineIdentity>> _floatingWindows = new();
+	private readonly Dictionary<IWindow, ISet<LayoutEngineIdentity>> _floatingWindows = [];
 
 	/// <inheritdoc/>
 	public IReadOnlyDictionary<IWindow, ISet<LayoutEngineIdentity>> FloatingWindows => _floatingWindows;

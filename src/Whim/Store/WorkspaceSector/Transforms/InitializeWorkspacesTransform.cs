@@ -53,10 +53,10 @@ internal record InitializeWorkspacesTransform : Transform
 
 		// Add the saved windows at their saved locations inside their saved workspaces.
 		// Other windows are routed to the monitor they're on.
-		List<HWND> processedWindows = new();
+		List<HWND> processedWindows = [];
 
 		// Route windows to their saved workspaces.
-		foreach (SavedWorkspace savedWorkspace in internalCtx.CoreSavedStateManager.SavedState?.Workspaces ?? new())
+		foreach (SavedWorkspace savedWorkspace in internalCtx.CoreSavedStateManager.SavedState?.Workspaces ?? [])
 		{
 			Workspace? workspace = workspaceSector.Workspaces.Values.FirstOrDefault(w =>
 				w.BackingName == savedWorkspace.Name

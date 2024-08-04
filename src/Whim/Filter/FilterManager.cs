@@ -6,15 +6,15 @@ namespace Whim;
 internal class FilterManager : IFilterManager
 {
 	#region Filters for specific properties
-	private readonly HashSet<string> _ignoreWindowClasses = new();
-	private readonly HashSet<string> _ignoreProcessFileNames = new();
-	private readonly HashSet<string> _ignoreTitles = new();
+	private readonly HashSet<string> _ignoreWindowClasses = [];
+	private readonly HashSet<string> _ignoreProcessFileNames = [];
+	private readonly HashSet<string> _ignoreTitles = [];
 	#endregion
 
 	/// <summary>
 	/// Generic filter for windows.
 	/// </summary>
-	private readonly List<Filter> _filters = new();
+	private readonly List<Filter> _filters = [];
 
 	public void Add(Filter filter)
 	{

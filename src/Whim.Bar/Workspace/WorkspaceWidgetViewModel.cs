@@ -19,7 +19,7 @@ internal class WorkspaceWidgetViewModel : IDisposable
 	/// <summary>
 	/// The workspaces for the monitor.
 	/// </summary>
-	public VeryObservableCollection<WorkspaceModel> Workspaces { get; } = new();
+	public VeryObservableCollection<WorkspaceModel> Workspaces { get; } = [];
 
 	/// <summary>
 	/// Creates a new instance of <see cref="WorkspaceWidgetViewModel"/>.
