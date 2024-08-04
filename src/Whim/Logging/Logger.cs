@@ -17,7 +17,7 @@ public class Logger : IDisposable
 	/// <summary>
 	/// Serilog <see cref="ILogger"/> instance.
 	/// </summary>
-	private ILogger? _logger;
+	private Serilog.Core.Logger? _logger;
 
 	/// <summary>
 	/// Serilog <see cref="LoggerConfiguration"/> instance.

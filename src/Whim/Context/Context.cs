@@ -11,7 +11,7 @@ namespace Whim;
 /// </summary>
 internal class Context : IContext
 {
-	private readonly IInternalContext _internalContext;
+	private readonly InternalContext _internalContext;
 	public IButler Butler { get; }
 	public IFileManager FileManager { get; }
 	public IResourceManager ResourceManager { get; }
