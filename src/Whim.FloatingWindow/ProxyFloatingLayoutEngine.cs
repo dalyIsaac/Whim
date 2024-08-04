@@ -143,8 +143,9 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 		return UpdateInner(InnerLayoutEngine.MoveWindowEdgesInDirection(edge, deltas, window), window);
 	}
 
-	private bool IsWindowFloating(IWindow window) =>
-		_plugin.FloatingWindows.TryGetValue(window, out ISet<LayoutEngineIdentity>? layoutEngines)
+	private bool IsWindowFloating(IWindow? window) =>
+		window != null
+		&& _plugin.FloatingWindows.TryGetValue(window, out ISet<LayoutEngineIdentity>? layoutEngines)
 		&& layoutEngines.Contains(InnerLayoutEngine.Identity);
 
 	private (ProxyFloatingLayoutEngine, bool error) UpdateWindowRectangle(IWindow window)
@@ -262,7 +263,7 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <inheritdoc />
 	public override ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action)
 	{
-		if (action.Window != null && IsWindowFloating(action.Window))
+		if (IsWindowFloating(action.Window))
 		{
 			// At this stage, we don't have a way to get the window in a child layout engine at
 			// a given point.
