@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using static Whim.TestUtils.MonitorTestUtils;
 
 namespace Whim.Tests;
 
+[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class MonitorsChangedTransformTests
 {
 	private static readonly (RECT Rect, HMONITOR Handle) RightMonitorSetup = (
