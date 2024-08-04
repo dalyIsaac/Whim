@@ -58,7 +58,7 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 		_context.Store.Pick(PickAdjacentMonitor(monitor.Handle, reverse: false, getFirst: true)).Value;
 
 	public IMonitor? GetMonitorByHandle(HMONITOR hmonitor) =>
-		_context.Store.Pick(PickMonitorByHandle(hmonitor)).OrDefault();
+		_context.Store.Pick(PickMonitorByHandle(hmonitor)).ValueOrDefault;
 
 	protected virtual void Dispose(bool disposing)
 	{

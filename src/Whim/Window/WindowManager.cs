@@ -75,7 +75,7 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 		return Window.CreateWindow(_context, _internalContext, hwnd);
 	}
 
-	public IWindow? AddWindow(HWND hwnd) => _context.Store.Dispatch(new WindowAddedTransform(hwnd)).OrDefault();
+	public IWindow? AddWindow(HWND hwnd) => _context.Store.Dispatch(new WindowAddedTransform(hwnd)).ValueOrDefault;
 
 	public void OnWindowFocused(IWindow? window) => _context.Store.Dispatch(new WindowFocusedTransform(window));
 

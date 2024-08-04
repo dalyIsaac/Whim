@@ -3,32 +3,32 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="DotNext" Version="4.15.2" />
-    <PackageVersion Include="Markdig" Version="0.33.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Scripting" Version="4.8.0" />
-    <PackageVersion Include="Microsoft.Win32.SystemEvents" Version="7.0.0" />
+    <PackageVersion Include="DotNext" Version="5.11.0" />
+    <PackageVersion Include="Markdig" Version="0.37.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Scripting" Version="4.10.0" />
+    <PackageVersion Include="Microsoft.Win32.SystemEvents" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Windows.CsWin32" Version="0.3.106" />
-    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.5.240607001" />
-    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.3233" />
-    <PackageVersion Include="Octokit" Version="9.0.0" />
-    <PackageVersion Include="Serilog" Version="3.1.1" />
-    <PackageVersion Include="Serilog.Sinks.Async" Version="1.5.0" />
-    <PackageVersion Include="Serilog.Sinks.Debug" Version="2.0.0" />
-    <PackageVersion Include="Serilog.Sinks.File" Version="5.0.0" />
-    <PackageVersion Include="System.Drawing.Common" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.5.240627000" />
+    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1" />
+    <PackageVersion Include="Octokit" Version="13.0.1" />
+    <PackageVersion Include="Serilog" Version="4.0.1" />
+    <PackageVersion Include="Serilog.Sinks.Async" Version="2.0.0" />
+    <PackageVersion Include="Serilog.Sinks.Debug" Version="3.0.0" />
+    <PackageVersion Include="Serilog.Sinks.File" Version="6.0.0" />
+    <PackageVersion Include="System.Drawing.Common" Version="8.0.7" />
   </ItemGroup>
   <!-- Test dependencies -->
   <ItemGroup>
     <PackageVersion Include="AutoFixture" Version="4.18.1" />
     <PackageVersion Include="AutoFixture.AutoNSubstitute" Version="4.18.1" />
     <PackageVersion Include="AutoFixture.Xunit2" Version="4.18.1" />
-    <PackageVersion Include="coverlet.collector" Version="6.0.1" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.2" />
     <PackageVersion Include="FluentAssertions" Version="6.12.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
     <PackageVersion Include="NSubstitute" Version="5.1.0" />
-    <PackageVersion Include="NSubstitute.Analyzers.CSharp" Version="1.0.16" />
-    <PackageVersion Include="xunit" Version="2.7.0" />
-    <PackageVersion Include="xunit.analyzers" Version="1.11.0" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.4" />
+    <PackageVersion Include="NSubstitute.Analyzers.CSharp" Version="1.0.17" />
+    <PackageVersion Include="xunit" Version="2.9.0" />
+    <PackageVersion Include="xunit.analyzers" Version="1.15.0" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
   </ItemGroup>
 </Project>
