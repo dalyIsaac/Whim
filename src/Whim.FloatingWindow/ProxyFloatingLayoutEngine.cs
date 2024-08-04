@@ -204,20 +204,8 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public override IWindow? GetFirstWindow()
-	{
-		if (InnerLayoutEngine.GetFirstWindow() is IWindow window)
-		{
-			return window;
-		}
-
-		if (_floatingWindowRects.Count > 0)
-		{
-			return _floatingWindowRects.Keys.First();
-		}
-
-		return null;
-	}
+	public override IWindow? GetFirstWindow() =>
+		InnerLayoutEngine.GetFirstWindow() ?? _floatingWindowRects.Keys.FirstOrDefault();
 
 	/// <inheritdoc />
 	public override ILayoutEngine FocusWindowInDirection(Direction direction, IWindow window)
