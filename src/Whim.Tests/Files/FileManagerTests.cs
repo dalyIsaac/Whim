@@ -18,7 +18,7 @@ public class FileManagerTests
 	public void WhimDir()
 	{
 		// Given
-		IFileManager fileManager = new FileManager(Array.Empty<string>());
+		IFileManager fileManager = new FileManager([]);
 
 		// When
 		string whimDir = fileManager.WhimDir;
@@ -115,7 +115,7 @@ public class FileManagerTests
 	public void SavedStateDir()
 	{
 		// Given
-		IFileManager fileManager = new FileManager(Array.Empty<string>());
+		IFileManager fileManager = new FileManager([]);
 
 		// When
 		string savedStateDir = fileManager.SavedStateDir;
@@ -128,7 +128,7 @@ public class FileManagerTests
 	public void GetWhimFileDir()
 	{
 		// Given
-		IFileManager fileManager = new FileManager(Array.Empty<string>());
+		IFileManager fileManager = new FileManager([]);
 
 		// When
 		string whimFileDir = fileManager.GetWhimFileDir("test");
@@ -141,7 +141,7 @@ public class FileManagerTests
 	public void GetWhimFileDir_WithSubDir()
 	{
 		// Given
-		IFileManager fileManager = new FileManager(Array.Empty<string>());
+		IFileManager fileManager = new FileManager([]);
 
 		// When
 		string whimFileDir = fileManager.GetWhimFileDir(Path.Combine("test", "subdir"));

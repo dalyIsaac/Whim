@@ -22,7 +22,7 @@ public class LayoutPreviewWindowTests
 	public void ShouldContinue_DifferentLength()
 	{
 		// Given
-		IWindowState[] prevWindowStates = Array.Empty<IWindowState>();
+		IWindowState[] prevWindowStates = [];
 		int prevHoveredIndex = -1;
 		IWindowState[] windowStates = new IWindowState[1];
 		IPoint<int> cursorPoint = new Rectangle<int>();

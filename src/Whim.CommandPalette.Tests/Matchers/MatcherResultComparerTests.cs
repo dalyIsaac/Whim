@@ -9,11 +9,7 @@ public class MatcherResultComparerTests
 	{
 		ICommand command = Substitute.For<ICommand>();
 		command.Title.Returns(title);
-		return new MatcherResult<MenuVariantRowModelData>(
-			new MenuVariantRowModel(command, null),
-			Array.Empty<FilterTextMatch>(),
-			score
-		);
+		return new MatcherResult<MenuVariantRowModelData>(new MenuVariantRowModel(command, null), [], score);
 	}
 
 	[Fact]

@@ -35,7 +35,7 @@ public static partial class PaletteFilters
 	{
 		if (wordStart == word.Length)
 		{
-			return Array.Empty<FilterTextMatch>();
+			return [];
 		}
 		if (wordMatchStart == wordToMatchAgainst.Length)
 		{

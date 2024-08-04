@@ -19,7 +19,7 @@ public class MostRecentlyUsedMatcherTests
 			MenuVariantRowModel menuItem = new(new Command(items[i], items[i], ActionSink), null);
 
 			menuItems[i] = menuItem;
-			matcherItems[i] = new(menuItem, Array.Empty<FilterTextMatch>(), 0);
+			matcherItems[i] = new(menuItem, [], 0);
 		}
 
 		return (menuItems, matcherItems);

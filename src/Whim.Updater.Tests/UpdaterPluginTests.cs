@@ -242,7 +242,7 @@ public class UpdaterPluginTests
 	{
 		// Given
 		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
-		Release release = Data.CreateRelease242(assets: Array.Empty<ReleaseAsset>());
+		Release release = Data.CreateRelease242(assets: []);
 
 		// When
 		await plugin.InstallRelease(release);

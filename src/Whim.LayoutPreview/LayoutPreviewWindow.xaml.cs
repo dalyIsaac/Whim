@@ -19,7 +19,7 @@ internal sealed partial class LayoutPreviewWindow : Window, IDisposable
 	private readonly IContext _context;
 	private readonly IWindow _window;
 	private readonly TransparentWindowController _transparentWindowController;
-	private IWindowState[] _prevWindowStates = Array.Empty<IWindowState>();
+	private IWindowState[] _prevWindowStates = [];
 	private int _prevHoveredIndex = -1;
 	private bool _disposedValue;
 

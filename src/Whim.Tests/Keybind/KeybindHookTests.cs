@@ -178,7 +178,7 @@ public class KeybindHookTests
 		// Given
 		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
 		KeybindHook keybindHook = new(ctx, internalCtx);
-		SetupKey(ctx, internalCtx, new VIRTUAL_KEY[] { key }, VIRTUAL_KEY.None, Array.Empty<ICommand>());
+		SetupKey(ctx, internalCtx, new VIRTUAL_KEY[] { key }, VIRTUAL_KEY.None, []);
 
 		// When
 		keybindHook.PostInitialize();
@@ -256,7 +256,7 @@ public class KeybindHookTests
 		// Given
 		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
 		KeybindHook keybindHook = new(ctx, internalCtx);
-		SetupKey(ctx, internalCtx, Array.Empty<VIRTUAL_KEY>(), VIRTUAL_KEY.VK_A, Array.Empty<ICommand>());
+		SetupKey(ctx, internalCtx, [], VIRTUAL_KEY.VK_A, []);
 
 		// When
 		keybindHook.PostInitialize();
@@ -274,7 +274,7 @@ public class KeybindHookTests
 		// Given
 		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
 		KeybindHook keybindHook = new(ctx, internalCtx);
-		SetupKey(ctx, internalCtx, new[] { VIRTUAL_KEY.VK_LWIN }, VIRTUAL_KEY.VK_U, Array.Empty<ICommand>());
+		SetupKey(ctx, internalCtx, new[] { VIRTUAL_KEY.VK_LWIN }, VIRTUAL_KEY.VK_U, []);
 
 		// When
 		keybindHook.PostInitialize();
@@ -324,7 +324,7 @@ public class KeybindHookTests
 		// Given
 		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
 		KeybindHook keybindHook = new(ctx, internalCtx);
-		SetupKey(ctx, internalCtx, Array.Empty<VIRTUAL_KEY>(), VIRTUAL_KEY.VK_A, Array.Empty<ICommand>());
+		SetupKey(ctx, internalCtx, [], VIRTUAL_KEY.VK_A, []);
 
 		// When
 		keybindHook.PostInitialize();

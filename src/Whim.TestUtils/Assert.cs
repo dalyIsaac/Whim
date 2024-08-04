@@ -177,13 +177,13 @@ public static class CustomAssert
 	{
 		// Populate the dictionaries with the remaining workspace ids for each event.
 		Dictionary<Guid, int> workspaceStartedRemainingIds = [];
-		foreach (Guid id in layoutWorkspaceIds ?? Array.Empty<Guid>())
+		foreach (Guid id in layoutWorkspaceIds ?? [])
 		{
 			workspaceStartedRemainingIds[id] = workspaceStartedRemainingIds.GetValueOrDefault(id, 0) + 1;
 		}
 
 		Dictionary<Guid, int> workspaceCompletedRemainingIds = [];
-		foreach (Guid id in layoutWorkspaceIds ?? Array.Empty<Guid>())
+		foreach (Guid id in layoutWorkspaceIds ?? [])
 		{
 			workspaceCompletedRemainingIds[id] = workspaceCompletedRemainingIds.GetValueOrDefault(id, 0) + 1;
 		}
@@ -220,7 +220,7 @@ public static class CustomAssert
 		}
 
 		// Assert that the remaining workspace ids are 0.
-		foreach (Guid id in layoutWorkspaceIds ?? Array.Empty<Guid>())
+		foreach (Guid id in layoutWorkspaceIds ?? [])
 		{
 			int remaining = workspaceStartedRemainingIds[id];
 			if (remaining != 0)
@@ -229,7 +229,7 @@ public static class CustomAssert
 			}
 		}
 
-		foreach (Guid id in layoutWorkspaceIds ?? Array.Empty<Guid>())
+		foreach (Guid id in layoutWorkspaceIds ?? [])
 		{
 			int remaining = workspaceCompletedRemainingIds[id];
 			if (remaining != 0)
@@ -238,7 +238,7 @@ public static class CustomAssert
 			}
 		}
 
-		foreach (Guid id in noLayoutWorkspaceIds ?? Array.Empty<Guid>())
+		foreach (Guid id in noLayoutWorkspaceIds ?? [])
 		{
 			if (workspaceCompletedRemainingIds.ContainsKey(id))
 			{

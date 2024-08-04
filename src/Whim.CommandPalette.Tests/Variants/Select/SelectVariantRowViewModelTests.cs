@@ -25,7 +25,7 @@ public class SelectVariantRowViewModelTests
 	{
 		// Given
 		IVariantRowModel<SelectOption> modelMock = CreateModelMock(false, false);
-		MatcherResult<SelectOption> matcherResult = new(modelMock, Array.Empty<FilterTextMatch>(), 0);
+		MatcherResult<SelectOption> matcherResult = new(modelMock, [], 0);
 
 		SelectVariantRowViewModel vm = new(matcherResult);
 
@@ -41,7 +41,7 @@ public class SelectVariantRowViewModelTests
 	{
 		// Given
 		IVariantRowModel<SelectOption> modelMock = CreateModelMock(true, false);
-		MatcherResult<SelectOption> matcherResult = new(modelMock, Array.Empty<FilterTextMatch>(), 0);
+		MatcherResult<SelectOption> matcherResult = new(modelMock, [], 0);
 
 		SelectVariantRowViewModel vm = new(matcherResult);
 
@@ -57,7 +57,7 @@ public class SelectVariantRowViewModelTests
 	{
 		// Given
 		IVariantRowModel<SelectOption> modelMock = CreateModelMock(false, false);
-		MatcherResult<SelectOption> matcherResult = new(modelMock, Array.Empty<FilterTextMatch>(), 0);
+		MatcherResult<SelectOption> matcherResult = new(modelMock, [], 0);
 
 		SelectVariantRowViewModel vm = new(matcherResult);
 
@@ -73,7 +73,7 @@ public class SelectVariantRowViewModelTests
 	{
 		// Given
 		IVariantRowModel<SelectOption> modelMock = CreateModelMock(false, true);
-		MatcherResult<SelectOption> matcherResult = new(modelMock, Array.Empty<FilterTextMatch>(), 0);
+		MatcherResult<SelectOption> matcherResult = new(modelMock, [], 0);
 
 		SelectVariantRowViewModel vm = new(matcherResult);
 
@@ -91,7 +91,7 @@ public class SelectVariantRowViewModelTests
 		// Old
 		IVariantRowModel<SelectOption> modelMock = CreateModelMock(false, true);
 
-		MatcherResult<SelectOption> matcherResult = new(modelMock, Array.Empty<FilterTextMatch>(), 0);
+		MatcherResult<SelectOption> matcherResult = new(modelMock, [], 0);
 		SelectVariantRowViewModel vm = new(matcherResult);
 
 		// New

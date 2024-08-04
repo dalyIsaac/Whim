@@ -84,7 +84,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 		foreach (IVariantRowModel<T> item in items)
 		{
 			long lastExecutionTime = _commandLastExecutionTime.TryGetValue(item.Id, out long value) ? value : 0;
-			matches[matchCount++] = new MatcherResult<T>(item, Array.Empty<FilterTextMatch>(), lastExecutionTime);
+			matches[matchCount++] = new MatcherResult<T>(item, [], lastExecutionTime);
 		}
 
 		return matchCount;

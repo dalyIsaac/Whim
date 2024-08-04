@@ -70,7 +70,7 @@ public record FocusLayoutEngine : ILayoutEngine
 	{
 		Identity = identity;
 		_maximized = maximized;
-		_list = ImmutableList<IWindow>.Empty;
+		_list = [];
 	}
 
 	private FocusLayoutEngine(

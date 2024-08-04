@@ -70,7 +70,7 @@ public record TreeLayoutEngine : ILayoutEngine
 		Identity = identity;
 		_root = null;
 		_windows = WindowPathDict.Empty;
-		_minimizedWindows = ImmutableHashSet<IWindow>.Empty;
+		_minimizedWindows = [];
 	}
 
 	/// <summary>

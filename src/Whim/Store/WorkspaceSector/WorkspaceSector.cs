@@ -14,13 +14,13 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 
 	public bool HasInitialized { get; set; }
 
-	public ImmutableList<WorkspaceToCreate> WorkspacesToCreate { get; set; } = ImmutableList<WorkspaceToCreate>.Empty;
+	public ImmutableList<WorkspaceToCreate> WorkspacesToCreate { get; set; } = [];
 
-	public ImmutableHashSet<WorkspaceId> WorkspacesToLayout { get; set; } = ImmutableHashSet<WorkspaceId>.Empty;
+	public ImmutableHashSet<WorkspaceId> WorkspacesToLayout { get; set; } = [];
 
 	public HWND WindowHandleToFocus { get; set; }
 
-	public ImmutableArray<WorkspaceId> WorkspaceOrder { get; set; } = ImmutableArray<WorkspaceId>.Empty;
+	public ImmutableArray<WorkspaceId> WorkspaceOrder { get; set; } = [];
 
 	public ImmutableDictionary<WorkspaceId, Workspace> Workspaces { get; set; } =
 		ImmutableDictionary<WorkspaceId, Workspace>.Empty;
@@ -28,8 +28,7 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 	public Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; } =
 		() => new CreateLeafLayoutEngine[] { (id) => new ColumnLayoutEngine(id) };
 
-	public ImmutableList<ProxyLayoutEngineCreator> ProxyLayoutEngineCreators { get; set; } =
-		ImmutableList<ProxyLayoutEngineCreator>.Empty;
+	public ImmutableList<ProxyLayoutEngineCreator> ProxyLayoutEngineCreators { get; set; } = [];
 
 	public event EventHandler<WorkspaceAddedEventArgs>? WorkspaceAdded;
 

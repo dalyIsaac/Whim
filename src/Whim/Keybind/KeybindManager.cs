@@ -87,7 +87,7 @@ internal class KeybindManager : IKeybindManager
 			return [.. commands];
 		}
 
-		return Array.Empty<ICommand>();
+		return [];
 	}
 
 	public IKeybind? TryGetKeybind(string commandId)

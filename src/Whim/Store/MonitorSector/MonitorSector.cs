@@ -8,7 +8,7 @@ internal class MonitorSector : SectorBase, IDisposable, IMonitorSector, IMonitor
 
 	public int MonitorsChangingTasks { get; set; }
 	public int MonitorsChangedDelay { get; set; } = 3 * 1000;
-	public ImmutableArray<IMonitor> Monitors { get; set; } = ImmutableArray<IMonitor>.Empty;
+	public ImmutableArray<IMonitor> Monitors { get; set; } = [];
 	public HMONITOR ActiveMonitorHandle { get; set; }
 	public HMONITOR PrimaryMonitorHandle { get; set; }
 	public HMONITOR LastWhimActiveMonitorHandle { get; set; }
