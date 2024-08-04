@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace Whim;
 
 internal class KeybindManager(IContext context) : IKeybindManager

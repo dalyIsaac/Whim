@@ -1,5 +1,3 @@
-using System;
-
 namespace Whim.CommandPalette;
 
 internal record struct CamelCaseAnalysis(float Upper, float Lower, float Alpha, float Numeric);

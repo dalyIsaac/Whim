@@ -1,5 +1,4 @@
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using AutoFixture;
 using Windows.Win32.UI.Input.KeyboardAndMouse;

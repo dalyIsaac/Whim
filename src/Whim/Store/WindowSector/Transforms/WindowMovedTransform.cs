@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-
 namespace Whim;
 
 internal record WindowMovedTransform(IWindow Window) : Transform

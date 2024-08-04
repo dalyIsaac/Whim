@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace Whim.CommandPalette;
+﻿namespace Whim.CommandPalette;
 
 /// <summary>
 /// Utilities for palette filters.
