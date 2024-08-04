@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Whim\Whim.csproj" />
-    <ProjectReference Include="..\Whim.FloatingLayout\Whim.FloatingLayout.csproj" />
+    <ProjectReference Include="..\Whim.FloatingWindow\Whim.FloatingWindow.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Page Update="LayoutPreviewWindowItem.xaml">

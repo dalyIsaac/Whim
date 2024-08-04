@@ -2,7 +2,7 @@
 #r "WHIM_PATH\whim.dll"
 #r "WHIM_PATH\plugins\Whim.Bar\Whim.Bar.dll"
 #r "WHIM_PATH\plugins\Whim.CommandPalette\Whim.CommandPalette.dll"
-#r "WHIM_PATH\plugins\Whim.FloatingLayout\Whim.FloatingLayout.dll"
+#r "WHIM_PATH\plugins\Whim.FloatingWindow\Whim.FloatingWindow.dll"
 #r "WHIM_PATH\plugins\Whim.FocusIndicator\Whim.FocusIndicator.dll"
 #r "WHIM_PATH\plugins\Whim.Gaps\Whim.Gaps.dll"
 #r "WHIM_PATH\plugins\Whim.LayoutPreview\Whim.LayoutPreview.dll"
@@ -19,7 +19,7 @@ using Microsoft.UI.Xaml.Media;
 using Whim;
 using Whim.Bar;
 using Whim.CommandPalette;
-using Whim.FloatingLayout;
+using Whim.FloatingWindow;
 using Whim.FocusIndicator;
 using Whim.Gaps;
 using Whim.LayoutPreview;
@@ -59,8 +59,8 @@ void DoConfig(IContext context)
 	context.PluginManager.AddPlugin(gapsPlugin);
 
 	// Floating window plugin.
-	FloatingLayoutPlugin floatingLayoutPlugin = new(context);
-	context.PluginManager.AddPlugin(floatingLayoutPlugin);
+	FloatingWindowPlugin floatingWindowPlugin = new(context);
+	context.PluginManager.AddPlugin(floatingWindowPlugin);
 
 	// Focus indicator.
 	FocusIndicatorConfig focusIndicatorConfig = new() { Color = new SolidColorBrush(Colors.Red), FadeEnabled = true };
@@ -114,7 +114,7 @@ void DoConfig(IContext context)
 			(id) => SliceLayouts.CreateSecondaryPrimaryLayout(context, sliceLayoutPlugin, id),
 			(id) => new FocusLayoutEngine(id),
 			(id) => new TreeLayoutEngine(context, treeLayoutPlugin, id),
-			(id) => new FreeLayoutEngine(context, id)
+			(id) => new FloatingLayoutEngine(context, id)
 		};
 }
 

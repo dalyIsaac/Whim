@@ -139,7 +139,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Whim.Bar\Whim.Bar.csproj" />
     <ProjectReference Include="..\Whim.CommandPalette\Whim.CommandPalette.csproj" />
-    <ProjectReference Include="..\Whim.FloatingLayout\Whim.FloatingLayout.csproj" />
+    <ProjectReference Include="..\Whim.FloatingWindow\Whim.FloatingWindow.csproj" />
     <ProjectReference Include="..\Whim.FocusIndicator\Whim.FocusIndicator.csproj" />
     <ProjectReference Include="..\Whim.Gaps\Whim.Gaps.csproj" />
     <ProjectReference Include="..\Whim.LayoutPreview\Whim.LayoutPreview.csproj" />
@@ -173,9 +173,9 @@
     <Copy SourceFiles="@(CommandPaletteSourceFile)" DestinationFiles="@(CommandPaletteDestinationFile)" SkipUnchangedFiles="true" />
     <Copy SourceFiles="$(SolutionDir)src\Whim.CommandPalette\$(OutDir)Whim.CommandPalette.dll" DestinationFolder="$(TargetDir)plugins\Whim.CommandPalette\" SkipUnchangedFiles="true" />
   </Target>
-  <!--Whim.FloatingLayout-->
-  <Target Name="CopyFloatingLayoutAfterBuild" AfterTargets="Build;Publish">
-    <Copy SourceFiles="$(SolutionDir)src\Whim.FloatingLayout\$(OutDir)Whim.FloatingLayout.dll" DestinationFolder="$(TargetDir)plugins\Whim.FloatingLayout\" SkipUnchangedFiles="true" />
+  <!--Whim.FloatingWindow-->
+  <Target Name="CopyFloatingWindowAfterBuild" AfterTargets="Build;Publish">
+    <Copy SourceFiles="$(SolutionDir)src\Whim.FloatingWindow\$(OutDir)Whim.FloatingWindow.dll" DestinationFolder="$(TargetDir)plugins\Whim.FloatingWindow\" SkipUnchangedFiles="true" />
   </Target>
   <!--Whim.FocusIndicator-->
   <Target Name="CopyFocusIndicatorAfterBuild" AfterTargets="Build;Publish">

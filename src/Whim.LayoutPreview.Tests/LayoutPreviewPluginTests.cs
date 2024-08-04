@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using AutoFixture;
 using NSubstitute;
-using Whim.FloatingLayout;
+using Whim.FloatingWindow;
 using Whim.TestUtils;
 using Windows.Win32.Graphics.Gdi;
 using Xunit;
@@ -229,7 +229,7 @@ public class LayoutPreviewPluginTests
 		workspace = workspace with
 		{
 			LayoutEngines = ImmutableList<ILayoutEngine>.Empty.Add(
-				new FreeLayoutEngine(ctx, new LayoutEngineIdentity())
+				new FloatingLayoutEngine(ctx, new LayoutEngineIdentity())
 			),
 			ActiveLayoutEngineIndex = 0
 		};
