@@ -77,7 +77,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 		}
 	}
 
-	private IGitHubClient CreateGitHubClient() => new GitHubClient(new ProductHeaderValue(Name));
+	private GitHubClient CreateGitHubClient() => new (new ProductHeaderValue(Name));
 
 	/// <inheritdoc />
 	public void PreInitialize()

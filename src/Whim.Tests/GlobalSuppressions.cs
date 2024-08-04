@@ -19,3 +19,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task")]
 [assembly: SuppressMessage("Performance", "CA1852:Seal internal types")]
 [assembly: SuppressMessage("Performance", "CA1861:Avoid constant arrays as arguments")]
+[assembly: SuppressMessage("Performance", "CA1859:Use concrete types when possible for improved performance")]

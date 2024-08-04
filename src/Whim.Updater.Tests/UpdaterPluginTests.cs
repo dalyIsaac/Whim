@@ -29,7 +29,7 @@ public class UpdaterPluginTests
 	public void PreInitialize(IContext ctx)
 	{
 		// Given
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
 
 		// When
 		plugin.PreInitialize();
@@ -47,7 +47,7 @@ public class UpdaterPluginTests
 	public async Task GetNotInstalledReleases_WhenNoReleases(IContext ctx, IGitHubClient client)
 	{
 		// Given
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
 
 		// When
 		IEnumerable<ReleaseInfo> releases = await plugin.GetNotInstalledReleases(client);
@@ -60,7 +60,7 @@ public class UpdaterPluginTests
 	public async Task GetNotInstalledReleases_InvalidVersion(IContext ctx, IGitHubClient client)
 	{
 		// Given
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
 		client
 			.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
 			.Returns([Data.CreateRelease242(tagName: "welp")]);
@@ -76,7 +76,7 @@ public class UpdaterPluginTests
 	public async Task GetNotInstalledReleases_DifferentChannel(IContext ctx, IGitHubClient client)
 	{
 		// Given
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
 		client
 			.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
 			.Returns([Data.CreateRelease242(tagName: "v0.1.263-beta+bc5c56c4")]);
@@ -92,7 +92,7 @@ public class UpdaterPluginTests
 	public async Task GetNotInstalledReleases_OlderVersion(IContext ctx, IGitHubClient client)
 	{
 		// Given
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
 		client
 			.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
 			.Returns([Data.CreateRelease242(tagName: "v0.1.261-alpha+bc5c56c4")]);
@@ -108,7 +108,7 @@ public class UpdaterPluginTests
 	public async Task GetNotInstalledReleases_Ordered(IContext ctx, IGitHubClient client)
 	{
 		// Given
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig() { ReleaseChannel = ReleaseChannel.Alpha });
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig() { ReleaseChannel = ReleaseChannel.Alpha });
 
 		string[] orderedReleases =
 		[
@@ -138,7 +138,7 @@ public class UpdaterPluginTests
 	public void LoadState_InvalidFormat(IContext ctx)
 	{
 		// Given
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
 		JsonElement json = JsonDocument.Parse("[]").RootElement;
 
 		// When
@@ -152,7 +152,7 @@ public class UpdaterPluginTests
 	public void LoadState_Valid(IContext ctx)
 	{
 		// Given
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
 		JsonElement json = JsonDocument
 			.Parse(
 				"{\"SkippedReleaseTagName\":\"v0.1.263-alpha+bc5c56c4\",\"LastCheckedForUpdates\":\"2021-09-05T21:00:00.0000000Z\"}"
@@ -173,7 +173,7 @@ public class UpdaterPluginTests
 	public async Task CheckForUpdates_WhenNoReleases(IContext ctx, IGitHubClient client)
 	{
 		// Given
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
 
 		// When
 		await plugin.CheckForUpdates(client);
@@ -189,7 +189,7 @@ public class UpdaterPluginTests
 		Release release = Data.CreateRelease242(tagName: "v0.1.265-alpha+bc5c56c4");
 		client.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>()).Returns([release]);
 
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig() { ReleaseChannel = ReleaseChannel.Alpha });
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig() { ReleaseChannel = ReleaseChannel.Alpha });
 		plugin.SkipRelease(release);
 
 		// When
@@ -204,7 +204,7 @@ public class UpdaterPluginTests
 	public void SkipRelease(IContext ctx)
 	{
 		// Given
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
 		Release release = Data.CreateRelease242();
 
 		// When
@@ -218,7 +218,7 @@ public class UpdaterPluginTests
 	public void SaveState(IContext ctx)
 	{
 		// Given
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
 		Release skippedRelease = Data.CreateRelease242();
 		plugin.SkipRelease(skippedRelease);
 
@@ -236,7 +236,7 @@ public class UpdaterPluginTests
 	public async Task InstallRelease_NoAssets(IContext ctx)
 	{
 		// Given
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
 		Release release = Data.CreateRelease242(assets: []);
 
 		// When
@@ -250,7 +250,7 @@ public class UpdaterPluginTests
 	public async Task InstallRelease_DownloadThrows(IContext ctx)
 	{
 		// Given
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
 		Release release = Data.CreateRelease242();
 
 		ctx.NativeManager.DownloadFileAsync(Arg.Any<Uri>(), Arg.Any<string>()).ThrowsAsync(new Exception());
@@ -267,7 +267,7 @@ public class UpdaterPluginTests
 	public async Task InstallRelease_InstallerExitsWithNonZeroCode(IContext ctx)
 	{
 		// Given
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
 		Release release = Data.CreateRelease242();
 
 		ctx.NativeManager.DownloadFileAsync(Arg.Any<Uri>(), Arg.Any<string>()).Returns(Task.CompletedTask);
@@ -285,7 +285,7 @@ public class UpdaterPluginTests
 	public async Task InstallRelease_InstallerThrows(IContext ctx)
 	{
 		// Given
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
 		Release release = Data.CreateRelease242();
 
 		ctx.NativeManager.DownloadFileAsync(Arg.Any<Uri>(), Arg.Any<string>()).Returns(Task.CompletedTask);
@@ -304,7 +304,7 @@ public class UpdaterPluginTests
 	public async Task InstallRelease_InstallerExitsWithZeroCode(IContext ctx)
 	{
 		// Given
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
 		Release release = Data.CreateRelease242();
 
 		ctx.NativeManager.DownloadFileAsync(Arg.Any<Uri>(), Arg.Any<string>()).Returns(Task.CompletedTask);
@@ -324,7 +324,7 @@ public class UpdaterPluginTests
 	public void Dispose(IContext ctx)
 	{
 		// Given
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
 
 		// When
 		plugin.Dispose();
@@ -338,7 +338,7 @@ public class UpdaterPluginTests
 	public void PluginCommands(IContext ctx)
 	{
 		// Given
-		IUpdaterPlugin plugin = new UpdaterPlugin(ctx, new UpdaterConfig());
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
 
 		// When
 		IPluginCommands pluginCommands = plugin.PluginCommands;

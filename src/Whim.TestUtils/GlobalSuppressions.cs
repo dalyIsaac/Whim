@@ -24,3 +24,4 @@ using System.Diagnostics.CodeAnalysis;
 	"CA1019:Define accessors for attribute arguments",
 	Justification = "It's fine for InlineData"
 )]
+[assembly: SuppressMessage("Performance", "CA1859:Use concrete types when possible for improved performance")]
