@@ -30,11 +30,7 @@ internal static class StoreTestUtils
 
 		ILayoutEngine engine = Substitute.For<ITestLayoutEngine>();
 
-		return new Workspace(ctx, workspaceId)
-		{
-			LayoutEngines = ImmutableList.Create(engine),
-			ActiveLayoutEngineIndex = 0
-		};
+		return new Workspace(ctx, workspaceId) { LayoutEngines = [engine], ActiveLayoutEngineIndex = 0 };
 	}
 
 	public static IMonitor CreateMonitor(HMONITOR handle)

@@ -116,7 +116,7 @@ public record TreeLayoutEngine : ILayoutEngine
 	/// <param name="window"></param>
 	/// <returns></returns>
 	private static WindowPathDict CreateRootNodeDict(IWindow window) =>
-		ImmutableDictionary.Create<IWindow, ImmutableArray<int>>().Add(window, ImmutableArray.Create(0));
+		ImmutableDictionary.Create<IWindow, ImmutableArray<int>>().Add(window, [0]);
 
 	/// <summary>
 	/// Creates a new dictionary with the top-level split node.
@@ -130,7 +130,7 @@ public record TreeLayoutEngine : ILayoutEngine
 		int idx = 0;
 		foreach (INode child in splitNode.Children)
 		{
-			dictBuilder.Add(((WindowNode)child).Window, ImmutableArray.Create(idx));
+			dictBuilder.Add(((WindowNode)child).Window, [idx]);
 			idx++;
 		}
 

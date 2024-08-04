@@ -50,7 +50,7 @@ public class WorkspaceSectorTests
 				}
 			});
 
-		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = ImmutableList.Create(engine) };
+		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [engine] };
 		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), workspace);
 
 		ctx.NativeManager.DeferWindowPos().Returns(new DeferWindowPosHandle(ctx, internalCtx));

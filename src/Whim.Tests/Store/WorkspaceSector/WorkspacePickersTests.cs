@@ -142,7 +142,7 @@ public class WorkspacePickersTests
 
 		Workspace activeWorkspace = CreateWorkspace(ctx) with
 		{
-			LayoutEngines = ImmutableList.Create(layoutEngine1, layoutEngine2),
+			LayoutEngines = [layoutEngine1, layoutEngine2],
 			ActiveLayoutEngineIndex = 1
 		};
 		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), activeWorkspace);

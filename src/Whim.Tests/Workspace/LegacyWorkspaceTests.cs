@@ -60,7 +60,7 @@ public class LegacyWorkspaceTests
 		// Given
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
-			LayoutEngines = ImmutableList.Create(engine)
+			LayoutEngines = [engine]
 		};
 		AddWorkspaceToManager(ctx, root, workspace);
 

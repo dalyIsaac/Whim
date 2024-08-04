@@ -110,7 +110,8 @@ public class InitializeWorkspacesTransformTests
 
 	private static void Setup_UserCreatedWorkspaces(MutableRootSector root)
 	{
-		root.WorkspaceSector.WorkspacesToCreate = ImmutableList.Create(
+		root.WorkspaceSector.WorkspacesToCreate =
+		[
 			new WorkspaceToCreate(BrowserWorkspaceName, null),
 			new WorkspaceToCreate(
 				CodeWorkspaceName,
@@ -119,8 +120,8 @@ public class InitializeWorkspacesTransformTests
 					(id) => new ImmutableTestLayoutEngine(),
 					(id) => new ImmutableTestLayoutEngine(),
 				}
-			)
-		);
+			),
+		];
 	}
 
 	private static void Setup_SavedState(IInternalContext internalCtx)

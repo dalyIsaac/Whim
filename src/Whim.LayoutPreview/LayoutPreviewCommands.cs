@@ -16,6 +16,5 @@ internal class LayoutPreviewCommands : IPluginCommands
 
 	public IEnumerable<ICommand> Commands => [];
 
-	public IEnumerable<(string commandId, IKeybind keybind)> Keybinds =>
-		[];
+	public IEnumerable<(string commandId, IKeybind keybind)> Keybinds => [];
 }

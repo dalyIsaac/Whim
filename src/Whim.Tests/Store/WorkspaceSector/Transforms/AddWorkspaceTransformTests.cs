@@ -50,10 +50,11 @@ public class AddWorkspaceTransformTests
 		string name = "Test";
 		List<CreateLeafLayoutEngine> createLeafLayoutEngines = new() { (id) => engine1, (id) => engine2 };
 
-		root.WorkspaceSector.ProxyLayoutEngineCreators = ImmutableList.Create<ProxyLayoutEngineCreator>(
+		root.WorkspaceSector.ProxyLayoutEngineCreators =
+		[
 			(engine) => Substitute.For<TestProxyLayoutEngine>(engine),
 			(engine) => Substitute.For<TestProxyLayoutEngine>(engine)
-		);
+		];
 
 		AddWorkspaceTransform sut = new(name, createLeafLayoutEngines);
 

@@ -24,7 +24,7 @@ public class FocusWindowInDirectionTransformTests
 			window,
 			CreateWorkspace(ctx) with
 			{
-				LayoutEngines = ImmutableList.Create(engine1, engine2),
+				LayoutEngines = [engine1, engine2],
 				ActiveLayoutEngineIndex = 1
 			}
 		);
@@ -65,7 +65,7 @@ public class FocusWindowInDirectionTransformTests
 			window,
 			CreateWorkspace(ctx) with
 			{
-				LayoutEngines = ImmutableList.Create(engine1, engine2),
+				LayoutEngines = [engine1, engine2],
 				ActiveLayoutEngineIndex = 1
 			}
 		);

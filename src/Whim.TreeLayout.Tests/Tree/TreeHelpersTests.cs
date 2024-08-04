@@ -911,7 +911,7 @@ public class TreeHelpersTests
 			IWindow,
 			ImmutableArray<int>
 		>.Empty;
-		ImmutableArray<int> pathToNode = ImmutableArray.Create(1, 0, 0, 1, 0);
+		ImmutableArray<int> pathToNode = [1, 0, 0, 1, 0];
 
 		// When
 		ImmutableDictionary<IWindow, ImmutableArray<int>> result = TreeHelpers.CreateUpdatedPaths(
@@ -967,8 +967,8 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		ImmutableArray<int> initialPath = ImmutableArray.Create(0);
-		ImmutableArray<int> pathToNode = ImmutableArray.Create(1, 0, 1);
+		ImmutableArray<int> initialPath = [0];
+		ImmutableArray<int> pathToNode = [1, 0, 1];
 
 		// When
 		ImmutableDictionary<IWindow, ImmutableArray<int>> originalDict = TreeHelpers.CreateUpdatedPaths(
@@ -1006,8 +1006,8 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		ImmutableArray<int> initialPath = ImmutableArray.Create(0);
-		ImmutableArray<int> pathToNode = ImmutableArray.Create(0, 0);
+		ImmutableArray<int> initialPath = [0];
+		ImmutableArray<int> pathToNode = [0, 0];
 
 		// When
 		ImmutableDictionary<IWindow, ImmutableArray<int>> originalDict = TreeHelpers.CreateUpdatedPaths(

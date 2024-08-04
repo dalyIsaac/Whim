@@ -47,22 +47,12 @@ internal sealed class SimpleTestTree
 		Bottom = new SplitNode(
 			equalWeight: true,
 			isHorizontal: true,
-			children: ImmutableList.Create<INode>(BottomLeft, BottomRight),
-			weights: ImmutableList.Create(0.5, 0.5)
+			children: [BottomLeft, BottomRight],
+			weights: [0.5, 0.5]
 		);
 
-		Top = new SplitNode(
-			equalWeight: true,
-			isHorizontal: true,
-			children: ImmutableList.Create<INode>(TopLeft, TopRight),
-			weights: ImmutableList.Create(0.5, 0.5)
-		);
+		Top = new SplitNode(equalWeight: true, isHorizontal: true, children: [TopLeft, TopRight], weights: [0.5, 0.5]);
 
-		Root = new SplitNode(
-			equalWeight: true,
-			isHorizontal: false,
-			children: ImmutableList.Create<INode>(Top, Bottom),
-			weights: ImmutableList.Create(0.5, 0.5)
-		);
+		Root = new SplitNode(equalWeight: true, isHorizontal: false, children: [Top, Bottom], weights: [0.5, 0.5]);
 	}
 }

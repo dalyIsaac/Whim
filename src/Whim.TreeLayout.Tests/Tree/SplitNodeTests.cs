@@ -192,8 +192,8 @@ public class SplitNodeTests
 		INode node1 = CreateWindowNode();
 		INode node2 = CreateWindowNode();
 
-		ImmutableList<INode> nodes = ImmutableList.Create(node1, node2);
-		ImmutableList<double> weights = ImmutableList.Create(0.75, 0.25);
+		ImmutableList<INode> nodes = [node1, node2];
+		ImmutableList<double> weights = [0.75, 0.25];
 		SplitNode splitNode = new(equalWeight: false, isHorizontal: true, nodes, weights);
 
 		// When
@@ -215,8 +215,8 @@ public class SplitNodeTests
 		INode node1 = CreateWindowNode();
 		INode node2 = CreateWindowNode();
 
-		ImmutableList<INode> nodes = ImmutableList.Create(node1, node2);
-		ImmutableList<double> weights = ImmutableList.Create(0.75, 0.25);
+		ImmutableList<INode> nodes = [node1, node2];
+		ImmutableList<double> weights = [0.75, 0.25];
 		SplitNode splitNode = new(equalWeight: false, isHorizontal: true, nodes, weights);
 
 		// When
@@ -239,8 +239,8 @@ public class SplitNodeTests
 		INode node2 = CreateWindowNode();
 		INode node3 = CreateWindowNode();
 
-		ImmutableList<INode> nodes = ImmutableList.Create(node1, node2, node3);
-		ImmutableList<double> weights = ImmutableList.Create(0.5, 0.25, 0.25);
+		ImmutableList<INode> nodes = [node1, node2, node3];
+		ImmutableList<double> weights = [0.5, 0.25, 0.25];
 		SplitNode splitNode = new(equalWeight: false, isHorizontal: true, nodes, weights);
 
 		// When
@@ -265,8 +265,8 @@ public class SplitNodeTests
 		INode node2 = CreateWindowNode();
 		INode node3 = CreateWindowNode();
 
-		ImmutableList<INode> nodes = ImmutableList.Create(node1, node2, node3);
-		ImmutableList<double> weights = ImmutableList.Create(0.25, 0.25, 0.5);
+		ImmutableList<INode> nodes = [node1, node2, node3];
+		ImmutableList<double> weights = [0.25, 0.25, 0.5];
 		SplitNode splitNode = new(equalWeight: false, isHorizontal: true, nodes, weights);
 
 		// When
@@ -291,8 +291,8 @@ public class SplitNodeTests
 		INode node2 = CreateWindowNode();
 		INode node3 = CreateWindowNode();
 
-		ImmutableList<INode> nodes = ImmutableList.Create(node1, node2, node3);
-		ImmutableList<double> weights = ImmutableList.Create(0.5, 0.25, 0.25);
+		ImmutableList<INode> nodes = [node1, node2, node3];
+		ImmutableList<double> weights = [0.5, 0.25, 0.25];
 		SplitNode splitNode = new(equalWeight: false, isHorizontal: true, nodes, weights);
 
 		// When

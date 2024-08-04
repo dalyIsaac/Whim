@@ -172,12 +172,7 @@ internal static class TreeHelpers
 
 		if (rootNode is WindowNode rootWindowNode)
 		{
-			return new WindowNodeStateAtPoint(
-				rootWindowNode,
-				ImmutableArray.Create<ISplitNode>(),
-				ImmutableArray.Create<int>(),
-				parentRect.GetDirectionToPoint(searchPoint)
-			);
+			return new WindowNodeStateAtPoint(rootWindowNode, [], [], parentRect.GetDirectionToPoint(searchPoint));
 		}
 
 		if (rootNode is not SplitNode rootSplitNode)
