@@ -169,6 +169,7 @@ internal static class StoreTestUtils
 		IMonitor monitor
 	)
 	{
+		// We need to compare the coordinates by value, so we can't pass in the `point` directly.
 		internalCtx
 			.CoreNativeManager.MonitorFromPoint(
 				Arg.Any<System.Drawing.Point>(),
