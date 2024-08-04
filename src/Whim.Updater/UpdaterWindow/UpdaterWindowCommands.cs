@@ -7,7 +7,7 @@ internal class SkipReleaseCommand(IUpdaterPlugin plugin, UpdaterWindowViewModel 
 	private readonly IUpdaterPlugin _plugin = plugin;
 	private readonly UpdaterWindowViewModel _viewModel = viewModel;
 
-	public event EventHandler? CanExecuteChanged;
+	public event EventHandler? CanExecuteChanged { add { } remove { } }
 
 	public bool CanExecute(object? parameter) => true;
 
@@ -26,7 +26,7 @@ internal class InstallReleaseCommand(IUpdaterPlugin plugin, UpdaterWindowViewMod
 	private readonly IUpdaterPlugin _plugin = plugin;
 	private readonly UpdaterWindowViewModel _viewModel = viewModel;
 
-	public event EventHandler? CanExecuteChanged;
+	public event EventHandler? CanExecuteChanged { add { } remove { } }
 
 	public bool CanExecute(object? parameter) => true;
 
@@ -45,7 +45,7 @@ internal class CloseUpdaterWindowCommand(IUpdaterPlugin plugin) : System.Windows
 {
 	private readonly IUpdaterPlugin _plugin = plugin;
 
-	public event EventHandler? CanExecuteChanged;
+	public event EventHandler? CanExecuteChanged { add { } remove { } }
 
 	public bool CanExecute(object? parameter) => true;
 

@@ -16,7 +16,7 @@ internal class NextLayoutEngineCommand(IContext context, ActiveLayoutWidgetViewM
 	private readonly ActiveLayoutWidgetViewModel _viewModel = viewModel;
 
 	/// <inheritdoc/>
-	public event EventHandler? CanExecuteChanged;
+	public event EventHandler? CanExecuteChanged { add { } remove { } }
 
 	/// <inheritdoc/>
 	public bool CanExecute(object? parameter) => true;
