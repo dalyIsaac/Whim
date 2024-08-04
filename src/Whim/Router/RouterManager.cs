@@ -57,7 +57,7 @@ internal class RouterManager(IContext context) : IRouterManager
 		Logger.Debug($"Routing title: {title} to workspace {workspaceName}");
 		Add(window =>
 		{
-			if (window.Title.ToLower() == title)
+			if (window.Title.Equals(title, StringComparison.CurrentCultureIgnoreCase))
 			{
 				return _context.WorkspaceManager.TryGet(workspaceName);
 			}
@@ -72,7 +72,7 @@ internal class RouterManager(IContext context) : IRouterManager
 		Logger.Debug($"Routing title: {title} to workspace {workspace}");
 		Add(window =>
 		{
-			if (window.Title.ToLower() == title)
+			if (window.Title.Equals(title, StringComparison.CurrentCultureIgnoreCase))
 			{
 				return workspace;
 			}
@@ -134,7 +134,7 @@ internal class RouterManager(IContext context) : IRouterManager
 		Logger.Debug($"Routing window class: {windowClass} to workspace {workspaceName}");
 		Add(window =>
 		{
-			if (window.WindowClass.ToLower() == windowClass)
+			if (window.WindowClass.Equals(windowClass, StringComparison.CurrentCultureIgnoreCase))
 			{
 				return _context.WorkspaceManager.TryGet(workspaceName);
 			}
@@ -149,7 +149,7 @@ internal class RouterManager(IContext context) : IRouterManager
 		Logger.Debug($"Routing window class: {windowClass} to workspace {workspace}");
 		Add(window =>
 		{
-			if (window.WindowClass.ToLower() == windowClass)
+			if (window.WindowClass.Equals(windowClass, StringComparison.CurrentCultureIgnoreCase))
 			{
 				return workspace;
 			}
