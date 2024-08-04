@@ -1,9 +1,9 @@
 namespace Whim;
 
-internal class MonitorSector : SectorBase, IDisposable, IMonitorSector, IMonitorSectorEvents
+internal class MonitorSector(IContext ctx, IInternalContext internalCtx) : SectorBase, IDisposable, IMonitorSector, IMonitorSectorEvents
 {
-	private readonly IContext _ctx;
-	private readonly MonitorEventListener _listener;
+	private readonly IContext _ctx = ctx;
+	private readonly MonitorEventListener _listener = new(ctx, internalCtx);
 	private bool _disposedValue;
 
 	public int MonitorsChangingTasks { get; set; }
@@ -14,12 +14,6 @@ internal class MonitorSector : SectorBase, IDisposable, IMonitorSector, IMonitor
 	public HMONITOR LastWhimActiveMonitorHandle { get; set; }
 
 	public event EventHandler<MonitorsChangedEventArgs>? MonitorsChanged;
-
-	public MonitorSector(IContext ctx, IInternalContext internalCtx)
-	{
-		_ctx = ctx;
-		_listener = new(ctx, internalCtx);
-	}
 
 	public override void Initialize()
 	{

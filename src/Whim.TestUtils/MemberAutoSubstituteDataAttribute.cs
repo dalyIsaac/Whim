@@ -68,15 +68,13 @@ public abstract class BaseMemberAutoSubstituteDataAttribute : MemberDataAttribut
 /// Creates an AutoFixture fixture with NSubstitute support and injects the given arguments, to be
 /// used like <c>MemberData</c> for an xunit <c>Theory</c>.
 /// </summary>
-public class MemberAutoSubstituteDataAttribute : BaseMemberAutoSubstituteDataAttribute
+/// <remarks>
+/// Creates a new instance of <see cref="MemberAutoSubstituteDataAttribute"/>.
+/// </remarks>
+/// <param name="memberName"></param>
+/// <param name="parameters"></param>
+public class MemberAutoSubstituteDataAttribute(string memberName, params object[] parameters) : BaseMemberAutoSubstituteDataAttribute(memberName, parameters)
 {
-	/// <summary>
-	/// Creates a new instance of <see cref="MemberAutoSubstituteDataAttribute"/>.
-	/// </summary>
-	/// <param name="memberName"></param>
-	/// <param name="parameters"></param>
-	public MemberAutoSubstituteDataAttribute(string memberName, params object[] parameters)
-		: base(memberName, parameters) { }
 }
 
 /// <summary>

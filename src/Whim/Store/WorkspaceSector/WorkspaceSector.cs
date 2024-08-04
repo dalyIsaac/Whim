@@ -7,10 +7,10 @@ namespace Whim;
 /// <param name="CreateLeafLayoutEngines"></param>
 internal record WorkspaceToCreate(string? Name, IEnumerable<CreateLeafLayoutEngine>? CreateLeafLayoutEngines);
 
-internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorEvents, IDisposable
+internal class WorkspaceSector(IContext ctx, IInternalContext internalCtx) : SectorBase, IWorkspaceSector, IWorkspaceSectorEvents, IDisposable
 {
-	private readonly IContext _ctx;
-	private readonly IInternalContext _internalCtx;
+	private readonly IContext _ctx = ctx;
+	private readonly IInternalContext _internalCtx = internalCtx;
 
 	public bool HasInitialized { get; set; }
 
@@ -41,12 +41,6 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 	public event EventHandler<WorkspaceLayoutStartedEventArgs>? WorkspaceLayoutStarted;
 
 	public event EventHandler<WorkspaceLayoutCompletedEventArgs>? WorkspaceLayoutCompleted;
-
-	public WorkspaceSector(IContext ctx, IInternalContext internalCtx)
-	{
-		_ctx = ctx;
-		_internalCtx = internalCtx;
-	}
 
 	public override void Initialize()
 	{

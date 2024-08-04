@@ -18,7 +18,17 @@ public delegate UserControl BarComponent(IContext context, IMonitor monitor, Mic
 /// <remarks>
 /// The components lists can be changed up until when Whim is initialized.
 /// </remarks>
-public class BarConfig : INotifyPropertyChanged
+/// <remarks>
+/// Creates a new bar configuration.
+/// </remarks>
+/// <param name="leftComponents">The components to display on the left side of the bar.</param>
+/// <param name="centerComponents">The components to display in the center of the bar.</param>
+/// <param name="rightComponents">The components to display on the right side of the bar.</param>
+public class BarConfig(
+	IList<BarComponent> leftComponents,
+	IList<BarComponent> centerComponents,
+	IList<BarComponent> rightComponents
+	) : INotifyPropertyChanged
 {
 	/// <inheritdoc/>
 	public event PropertyChangedEventHandler? PropertyChanged;
@@ -26,17 +36,17 @@ public class BarConfig : INotifyPropertyChanged
 	/// <summary>
 	/// The components to display on the left side of the bar.
 	/// </summary>
-	internal IList<BarComponent> LeftComponents;
+	internal IList<BarComponent> LeftComponents = leftComponents;
 
 	/// <summary>
 	/// The components to display in the center of the bar.
 	/// </summary>
-	internal IList<BarComponent> CenterComponents;
+	internal IList<BarComponent> CenterComponents = centerComponents;
 
 	/// <summary>
 	/// The components to display on the right side of the bar.
 	/// </summary>
-	internal IList<BarComponent> RightComponents;
+	internal IList<BarComponent> RightComponents = rightComponents;
 
 	private int _height = GetHeightFromResourceDictionary() ?? 30;
 
@@ -74,23 +84,6 @@ public class BarConfig : INotifyPropertyChanged
 	/// To change the opacity for the bar's background color, make sure the hex color includes the alpha values.
 	/// </remarks>
 	public WindowBackdropConfig Backdrop { get; set; } = new(BackdropType.Mica, AlwaysShowBackdrop: true);
-
-	/// <summary>
-	/// Creates a new bar configuration.
-	/// </summary>
-	/// <param name="leftComponents">The components to display on the left side of the bar.</param>
-	/// <param name="centerComponents">The components to display in the center of the bar.</param>
-	/// <param name="rightComponents">The components to display on the right side of the bar.</param>
-	public BarConfig(
-		IList<BarComponent> leftComponents,
-		IList<BarComponent> centerComponents,
-		IList<BarComponent> rightComponents
-	)
-	{
-		LeftComponents = leftComponents;
-		CenterComponents = centerComponents;
-		RightComponents = rightComponents;
-	}
 
 	private static int? GetHeightFromResourceDictionary()
 	{

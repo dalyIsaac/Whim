@@ -5,24 +5,18 @@ namespace Whim.Bar;
 /// <summary>
 /// Command to switch to the next layout engine.
 /// </summary>
-internal class NextLayoutEngineCommand : System.Windows.Input.ICommand
+/// <remarks>
+/// Creates a new instance of <see cref="NextLayoutEngineCommand"/>.
+/// </remarks>
+/// <param name="context"></param>
+/// <param name="viewModel"></param>
+internal class NextLayoutEngineCommand(IContext context, ActiveLayoutWidgetViewModel viewModel) : System.Windows.Input.ICommand
 {
-	private readonly IContext _context;
-	private readonly ActiveLayoutWidgetViewModel _viewModel;
+	private readonly IContext _context = context;
+	private readonly ActiveLayoutWidgetViewModel _viewModel = viewModel;
 
 	/// <inheritdoc/>
 	public event EventHandler? CanExecuteChanged;
-
-	/// <summary>
-	/// Creates a new instance of <see cref="NextLayoutEngineCommand"/>.
-	/// </summary>
-	/// <param name="context"></param>
-	/// <param name="viewModel"></param>
-	public NextLayoutEngineCommand(IContext context, ActiveLayoutWidgetViewModel viewModel)
-	{
-		_context = context;
-		_viewModel = viewModel;
-	}
 
 	/// <inheritdoc/>
 	public bool CanExecute(object? parameter) => true;

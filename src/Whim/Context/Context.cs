@@ -55,6 +55,7 @@ internal class Context : IContext
 		FilterManager = new FilterManager();
 		WindowManager = new WindowManager(this, _internalContext);
 		MonitorManager = new MonitorManager(this);
+
 		WorkspaceManager = new WorkspaceManager(this);
 		_commandManager = [];
 		PluginManager = new PluginManager(this, _commandManager);

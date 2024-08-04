@@ -2,10 +2,10 @@ using System.Collections;
 
 namespace Whim;
 
-internal class WindowManager : IWindowManager, IInternalWindowManager
+internal class WindowManager(IContext context, IInternalContext internalContext) : IWindowManager, IInternalWindowManager
 {
-	private readonly IContext _context;
-	private readonly IInternalContext _internalContext;
+	private readonly IContext _context = context;
+	private readonly IInternalContext _internalContext = internalContext;
 
 	public event EventHandler<WindowAddedEventArgs>? WindowAdded;
 	public event EventHandler<WindowFocusedEventArgs>? WindowFocused;
@@ -20,12 +20,6 @@ internal class WindowManager : IWindowManager, IInternalWindowManager
 	/// Indicates whether values have been disposed.
 	/// </summary>
 	private bool _disposedValue;
-
-	public WindowManager(IContext context, IInternalContext internalContext)
-	{
-		_context = context;
-		_internalContext = internalContext;
-	}
 
 	public void Initialize()
 	{

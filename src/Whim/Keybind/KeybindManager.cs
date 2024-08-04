@@ -2,17 +2,11 @@ using System.Linq;
 
 namespace Whim;
 
-internal class KeybindManager : IKeybindManager
+internal class KeybindManager(IContext context) : IKeybindManager
 {
-	private readonly IContext _context;
+	private readonly IContext _context = context;
 	private readonly Dictionary<IKeybind, List<string>> _keybindsCommandsMap = [];
 	private readonly Dictionary<string, IKeybind> _commandsKeybindsMap = [];
-
-	public KeybindManager(IContext context)
-	{
-		_context = context;
-	}
-
 	private bool _uniqueKeyModifiers = true;
 	public bool UnifyKeyModifiers
 	{

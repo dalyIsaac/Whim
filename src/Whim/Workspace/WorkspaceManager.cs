@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace Whim;
 
-internal class WorkspaceManager : IWorkspaceManager
+internal class WorkspaceManager(IContext context) : IWorkspaceManager
 {
-	private readonly IContext _context;
+	private readonly IContext _context = context;
 
 	public event EventHandler<WorkspaceAddedEventArgs>? WorkspaceAdded;
 
@@ -35,11 +35,6 @@ internal class WorkspaceManager : IWorkspaceManager
 			Logger.Debug($"Getting active workspace for monitor {activeMonitor}");
 			return _context.Store.Pick(PickActiveWorkspace());
 		}
-	}
-
-	public WorkspaceManager(IContext context)
-	{
-		_context = context;
 	}
 
 	public IWorkspace? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null) =>

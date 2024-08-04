@@ -3,17 +3,11 @@ namespace Whim;
 /// <summary>
 /// Listens for events which aren't specific to slices.
 /// </summary>
-internal class RootEventListener : IDisposable
+internal class RootEventListener(IContext ctx, IInternalContext internalCtx) : IDisposable
 {
-	private readonly IContext _ctx;
-	private readonly IInternalContext _internalCtx;
+	private readonly IContext _ctx = ctx;
+	private readonly IInternalContext _internalCtx = internalCtx;
 	private bool _disposedValue;
-
-	public RootEventListener(IContext ctx, IInternalContext internalCtx)
-	{
-		_ctx = ctx;
-		_internalCtx = internalCtx;
-	}
 
 	public void Initialize()
 	{

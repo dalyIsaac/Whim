@@ -2,17 +2,11 @@ using System.Threading.Tasks;
 
 namespace Whim;
 
-internal class MonitorEventListener : IDisposable
+internal class MonitorEventListener(IContext ctx, IInternalContext internalCtx) : IDisposable
 {
-	private readonly IContext _ctx;
-	private readonly IInternalContext _internalCtx;
+	private readonly IContext _ctx = ctx;
+	private readonly IInternalContext _internalCtx = internalCtx;
 	private bool _disposedValue;
-
-	public MonitorEventListener(IContext ctx, IInternalContext internalCtx)
-	{
-		_ctx = ctx;
-		_internalCtx = internalCtx;
-	}
 
 	public void Initialize()
 	{

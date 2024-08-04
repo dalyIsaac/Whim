@@ -3,14 +3,9 @@ namespace Whim;
 /// <summary>
 /// Event arguments for mouse events.
 /// </summary>
-internal class MouseEventArgs : EventArgs
+internal class MouseEventArgs(IPoint<int> point) : EventArgs
 {
-	public IPoint<int> Point { get; }
-
-	public MouseEventArgs(IPoint<int> point)
-	{
-		Point = point;
-	}
+	public IPoint<int> Point { get; } = point;
 }
 
 internal interface IMouseHook : IDisposable

@@ -6,9 +6,13 @@ namespace Whim.TreeLayout.Bar;
 /// <summary>
 /// This plugin contains the tree layout engine widget for the <see cref="IBarPlugin"/>.
 /// </summary>
-public class TreeLayoutBarPlugin : IPlugin
+/// <remarks>
+/// Create a new instance of the <see cref="TreeLayoutBarPlugin"/> class.
+/// </remarks>
+/// <param name="plugin"></param>
+public class TreeLayoutBarPlugin(ITreeLayoutPlugin plugin) : IPlugin
 {
-	private readonly ITreeLayoutPlugin _plugin;
+	private readonly ITreeLayoutPlugin _plugin = plugin;
 
 	/// <summary>
 	/// <c>whim.tree_layout.bar</c>
@@ -17,15 +21,6 @@ public class TreeLayoutBarPlugin : IPlugin
 
 	/// <inheritdoc/>
 	public IPluginCommands PluginCommands => new PluginCommands(Name);
-
-	/// <summary>
-	/// Create a new instance of the <see cref="TreeLayoutBarPlugin"/> class.
-	/// </summary>
-	/// <param name="plugin"></param>
-	public TreeLayoutBarPlugin(ITreeLayoutPlugin plugin)
-	{
-		_plugin = plugin;
-	}
 
 	/// <inheritdoc/>
 	public void PreInitialize() { }

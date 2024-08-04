@@ -1,28 +1,23 @@
 namespace Whim;
 
 /// <inheritdoc />
-public class PluginCommands : IPluginCommands
+/// <summary>
+/// Creates a new instance of the plugin commands.
+/// </summary>
+/// <param name="pluginName">The name of the plugin.</param>
+public class PluginCommands(string pluginName) : IPluginCommands
 {
 	private readonly List<ICommand> _commands = [];
 	private readonly List<(string commandId, IKeybind keybind)> _keybinds = [];
 
 	/// <inheritdoc />
-	public string PluginName { get; init; }
+	public string PluginName { get; init; } = pluginName;
 
 	/// <inheritdoc />
 	public IEnumerable<ICommand> Commands => _commands;
 
 	/// <inheritdoc />
 	public IEnumerable<(string commandId, IKeybind keybind)> Keybinds => _keybinds;
-
-	/// <summary>
-	/// Creates a new instance of the plugin commands.
-	/// </summary>
-	/// <param name="pluginName">The name of the plugin.</param>
-	public PluginCommands(string pluginName)
-	{
-		PluginName = pluginName;
-	}
 
 	/// <summary>
 	/// Add a command to the plugin.

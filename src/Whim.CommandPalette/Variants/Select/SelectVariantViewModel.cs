@@ -8,9 +8,16 @@ using Windows.System;
 
 namespace Whim.CommandPalette;
 
-internal class SelectVariantViewModel : IVariantViewModel
+internal class SelectVariantViewModel(
+	ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
+	Func<
+			MatcherResult<SelectOption>,
+			SelectVariantConfig,
+			IVariantRowView<SelectOption, SelectVariantRowViewModel>
+		>? selectRowFactory = null
+	) : IVariantViewModel
 {
-	private readonly ICommandPaletteWindowViewModel _commandPaletteWindowViewModel;
+	private readonly ICommandPaletteWindowViewModel _commandPaletteWindowViewModel = commandPaletteWindowViewModel;
 
 	private SelectVariantConfig? _activationConfig;
 
@@ -33,7 +40,9 @@ internal class SelectVariantViewModel : IVariantViewModel
 		MatcherResult<SelectOption>,
 		SelectVariantConfig,
 		IVariantRowView<SelectOption, SelectVariantRowViewModel>
-	> _selectRowFactory;
+	> _selectRowFactory =
+			selectRowFactory
+			?? ((MatcherResult<SelectOption> item, SelectVariantConfig config) => new SelectVariantRowView(item));
 
 	public readonly ObservableCollection<IVariantRowView<SelectOption, SelectVariantRowViewModel>> SelectRows = [];
 
@@ -84,21 +93,6 @@ internal class SelectVariantViewModel : IVariantViewModel
 	public event PropertyChangedEventHandler? PropertyChanged;
 
 	public event EventHandler<EventArgs>? ScrollIntoViewRequested;
-
-	public SelectVariantViewModel(
-		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		Func<
-			MatcherResult<SelectOption>,
-			SelectVariantConfig,
-			IVariantRowView<SelectOption, SelectVariantRowViewModel>
-		>? selectRowFactory = null
-	)
-	{
-		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
-		_selectRowFactory =
-			selectRowFactory
-			?? ((MatcherResult<SelectOption> item, SelectVariantConfig config) => new SelectVariantRowView(item));
-	}
 
 	public void Activate(BaseVariantConfig activationConfig)
 	{

@@ -6,10 +6,15 @@ using Windows.Win32.Graphics.Dwm;
 namespace Whim.Bar;
 
 /// <inheritdoc/>
-public class BarPlugin : IBarPlugin
+/// <summary>
+/// Create the bar plugin.
+/// </summary>
+/// <param name="context"></param>
+/// <param name="barConfig"></param>
+public class BarPlugin(IContext context, BarConfig barConfig) : IBarPlugin
 {
-	private readonly IContext _context;
-	private readonly BarConfig _barConfig;
+	private readonly IContext _context = context;
+	private readonly BarConfig _barConfig = barConfig;
 
 	private readonly Dictionary<IMonitor, BarWindow> _monitorBarMap = [];
 	private bool _disposedValue;
@@ -18,17 +23,6 @@ public class BarPlugin : IBarPlugin
 	/// <c>whim.bar</c>
 	/// </summary>
 	public string Name => "whim.bar";
-
-	/// <summary>
-	/// Create the bar plugin.
-	/// </summary>
-	/// <param name="context"></param>
-	/// <param name="barConfig"></param>
-	public BarPlugin(IContext context, BarConfig barConfig)
-	{
-		_context = context;
-		_barConfig = barConfig;
-	}
 
 	/// <inheritdoc />
 	public void PreInitialize()

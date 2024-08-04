@@ -1,13 +1,8 @@
 namespace Whim;
 
-internal class ButlerPantry : IButlerPantry
+internal class ButlerPantry(IContext context) : IButlerPantry
 {
-	private readonly IContext _ctx;
-
-	public ButlerPantry(IContext context)
-	{
-		_ctx = context;
-	}
+	private readonly IContext _ctx = context;
 
 	public IWorkspace? GetAdjacentWorkspace(IWorkspace workspace, bool reverse = false, bool skipActive = false) =>
 		_ctx.Store.Pick(PickAdjacentWorkspace(workspace.Id, reverse, skipActive)).ValueOrDefault;

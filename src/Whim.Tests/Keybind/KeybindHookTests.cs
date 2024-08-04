@@ -18,18 +18,12 @@ public class KeybindHookCustomization : ICustomization
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class KeybindHookTests
 {
-	private class FakeSafeHandle : UnhookWindowsHookExSafeHandle
+	private class FakeSafeHandle(bool isInvalid) : UnhookWindowsHookExSafeHandle(default, default)
 	{
 		public bool HasDisposed { get; private set; }
 
-		private readonly bool _isInvalid;
+		private readonly bool _isInvalid = isInvalid;
 		public override bool IsInvalid => _isInvalid;
-
-		public FakeSafeHandle(bool isInvalid)
-			: base(default, default)
-		{
-			_isInvalid = isInvalid;
-		}
 
 		protected override bool ReleaseHandle()
 		{

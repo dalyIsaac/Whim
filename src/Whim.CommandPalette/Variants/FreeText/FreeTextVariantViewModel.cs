@@ -3,9 +3,9 @@ using Windows.System;
 
 namespace Whim.CommandPalette;
 
-internal class FreeTextVariantViewModel : IVariantViewModel
+internal class FreeTextVariantViewModel(ICommandPaletteWindowViewModel windowViewModel) : IVariantViewModel
 {
-	private readonly ICommandPaletteWindowViewModel _commandPaletteWindowViewModel;
+	private readonly ICommandPaletteWindowViewModel _commandPaletteWindowViewModel = windowViewModel;
 	private FreeTextVariantConfig? _activationConfig;
 
 	public string Prompt => _activationConfig?.Prompt ?? "";
@@ -13,11 +13,6 @@ internal class FreeTextVariantViewModel : IVariantViewModel
 	public string? ConfirmButtonText => _activationConfig?.ConfirmButtonText;
 
 	public event PropertyChangedEventHandler? PropertyChanged;
-
-	public FreeTextVariantViewModel(ICommandPaletteWindowViewModel windowViewModel)
-	{
-		_commandPaletteWindowViewModel = windowViewModel;
-	}
 
 	public void Activate(BaseVariantConfig activationConfig)
 	{

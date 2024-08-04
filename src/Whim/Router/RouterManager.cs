@@ -2,17 +2,12 @@ using System.Text.RegularExpressions;
 
 namespace Whim;
 
-internal class RouterManager : IRouterManager
+internal class RouterManager(IContext context) : IRouterManager
 {
-	private readonly IContext _context;
+	private readonly IContext _context = context;
 	private readonly List<Router> _routers = [];
 
 	public RouterOptions RouterOptions { get; set; } = RouterOptions.RouteToLaunchedWorkspace;
-
-	public RouterManager(IContext context)
-	{
-		_context = context;
-	}
 
 	public void Add(Router router)
 	{

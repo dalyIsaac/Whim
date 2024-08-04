@@ -7,15 +7,12 @@ using Windows.Win32.Foundation;
 
 namespace Whim.TestUtils;
 
-internal class StoreWrapper : Store
+internal class StoreWrapper(IContext ctx, IInternalContext internalCtx) : Store(ctx, internalCtx)
 {
 	/// <summary>
 	/// All the transforms that have been executed.
 	/// </summary>
 	public List<object> Transforms { get; } = [];
-
-	public StoreWrapper(IContext ctx, IInternalContext internalCtx)
-		: base(ctx, internalCtx) { }
 
 	protected override Result<TResult> DispatchFn<TResult>(Transform<TResult> transform)
 	{

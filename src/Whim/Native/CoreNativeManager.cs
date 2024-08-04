@@ -12,14 +12,9 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
-internal class CoreNativeManager : ICoreNativeManager
+internal class CoreNativeManager(IContext context) : ICoreNativeManager
 {
-	private readonly IContext _context;
-
-	public CoreNativeManager(IContext context)
-	{
-		_context = context;
-	}
+	private readonly IContext _context = context;
 
 	public UnhookWinEventSafeHandle SetWinEventHook(uint eventMin, uint eventMax, WINEVENTPROC lpfnWinEventProc) =>
 		PInvoke.SetWinEventHook(eventMin, eventMax, null, lpfnWinEventProc, 0, 0, PInvoke.WINEVENT_OUTOFCONTEXT);

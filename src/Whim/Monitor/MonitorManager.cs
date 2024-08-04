@@ -5,9 +5,16 @@ namespace Whim;
 /// <summary>
 /// Implementation of <see cref="IMonitorManager"/>.
 /// </summary>
-internal class MonitorManager : IInternalMonitorManager, IMonitorManager
+/// <remarks>
+/// Creates a new instance of <see cref="MonitorManager"/>.
+/// </remarks>
+/// <exception cref="Exception">
+/// When no monitors are found, or there is no primary monitor.
+/// </exception>
+/// <param name="context"></param>
+internal class MonitorManager(IContext context) : IInternalMonitorManager, IMonitorManager
 {
-	private readonly IContext _context;
+	private readonly IContext _context = context;
 
 	private bool _disposedValue;
 
@@ -24,18 +31,6 @@ internal class MonitorManager : IInternalMonitorManager, IMonitorManager
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 	public event EventHandler<MonitorsChangedEventArgs>? MonitorsChanged;
-
-	/// <summary>
-	/// Creates a new instance of <see cref="MonitorManager"/>.
-	/// </summary>
-	/// <exception cref="Exception">
-	/// When no monitors are found, or there is no primary monitor.
-	/// </exception>
-	/// <param name="context"></param>
-	public MonitorManager(IContext context)
-	{
-		_context = context;
-	}
 
 	public void Initialize()
 	{

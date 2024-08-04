@@ -2,11 +2,11 @@ using System.ComponentModel;
 
 namespace Whim.CommandPalette;
 
-internal class SelectVariantRowViewModel : IVariantRowViewModel<SelectOption>
+internal class SelectVariantRowViewModel(MatcherResult<SelectOption> matcherResult) : IVariantRowViewModel<SelectOption>
 {
-	public IVariantRowModel<SelectOption> Model { get; private set; }
+	public IVariantRowModel<SelectOption> Model { get; private set; } = matcherResult.Model;
 
-	public PaletteText FormattedTitle { get; private set; }
+	public PaletteText FormattedTitle { get; private set; } = matcherResult.FormattedTitle;
 
 	public bool IsSelected
 	{
@@ -35,12 +35,6 @@ internal class SelectVariantRowViewModel : IVariantRowViewModel<SelectOption>
 	}
 
 	public event PropertyChangedEventHandler? PropertyChanged;
-
-	public SelectVariantRowViewModel(MatcherResult<SelectOption> matcherResult)
-	{
-		Model = matcherResult.Model;
-		FormattedTitle = matcherResult.FormattedTitle;
-	}
 
 	public void Update(MatcherResult<SelectOption> matcherResult)
 	{
