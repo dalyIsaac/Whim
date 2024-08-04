@@ -102,7 +102,8 @@ public partial class App : Application
 		}
 		else
 		{
-			new ExceptionWindow(this, e).Activate();
+			using ExceptionWindow window = new(this, e);
+			window.Activate();
 		}
 	}
 
