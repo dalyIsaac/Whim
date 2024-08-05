@@ -3,27 +3,6 @@
 namespace Whim.FloatingWindow;
 
 /// <summary>
-/// Describe the result of the UpdateWindowRectangle
-/// </summary>
-internal enum UpdateWindowStatus
-{
-	/// <summary>
-	/// Could not obtain the rectangle for the window
-	/// </summary>
-	Error,
-
-	/// <summary>
-	/// Nothing was changed.
-	/// </summary>
-	NoChange,
-
-	/// <summary>
-	/// The new position was calculated, and the dict updated.
-	/// </summary>
-	Updated,
-}
-
-/// <summary>
 /// Provide methods for the floating engines
 /// </summary>
 internal static class FloatingUtils
@@ -34,11 +13,12 @@ internal static class FloatingUtils
 	/// <param name="context"></param>
 	/// <param name="dict"></param>
 	/// <param name="window"></param>
-	/// <returns>A tuple with the maybe updated <paramref name="dict"/>, and its <param cref="UpdateWindowStatus"></param></returns>
-	public static (
-		ImmutableDictionary<IWindow, IRectangle<double>> maybeNewDict,
-		UpdateWindowStatus status
-	) UpdateWindowRectangle(IContext context, ImmutableDictionary<IWindow, IRectangle<double>> dict, IWindow window)
+	/// <returns></returns>
+	public static ImmutableDictionary<IWindow, IRectangle<double>>? UpdateWindowRectangle(
+		IContext context,
+		ImmutableDictionary<IWindow, IRectangle<double>> dict,
+		IWindow window
+	)
 	{
 		// Try get the old rectangle.
 		IRectangle<double>? oldRectangle = dict.TryGetValue(window, out IRectangle<double>? rectangle)
@@ -50,7 +30,7 @@ internal static class FloatingUtils
 		if (newActualRectangle == null)
 		{
 			Logger.Error($"Could not obtain rectangle for floating window {window}");
-			return (dict, UpdateWindowStatus.Error);
+			return null;
 		}
 
 		IMonitor newMonitor = context.MonitorManager.GetMonitorAtPoint(newActualRectangle);
@@ -58,11 +38,11 @@ internal static class FloatingUtils
 		if (newUnitSquareRectangle.Equals(oldRectangle))
 		{
 			Logger.Debug($"Rectangle for window {window} has not changed");
-			return (dict, UpdateWindowStatus.NoChange);
+			return dict;
 		}
 
 		ImmutableDictionary<IWindow, IRectangle<double>> newDict = dict.SetItem(window, newUnitSquareRectangle);
 
-		return (newDict, UpdateWindowStatus.Updated);
+		return newDict;
 	}
 }

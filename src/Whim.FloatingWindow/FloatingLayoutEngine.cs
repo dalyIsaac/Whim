@@ -122,9 +122,17 @@ public record FloatingLayoutEngine : ILayoutEngine
 
 	private FloatingLayoutEngine UpdateWindowRectangle(IWindow window)
 	{
-		(ImmutableDictionary<IWindow, IRectangle<double>> maybeNewDict, UpdateWindowStatus status) =
-			FloatingUtils.UpdateWindowRectangle(_context, _dict, window);
+		ImmutableDictionary<IWindow, IRectangle<double>>? newDict = FloatingUtils.UpdateWindowRectangle(
+			_context,
+			_dict,
+			window
+		);
 
-		return status == UpdateWindowStatus.Updated ? new FloatingLayoutEngine(this, maybeNewDict) : this;
+		if (newDict == null || newDict == _dict)
+		{
+			return this;
+		}
+
+		return new FloatingLayoutEngine(this, newDict);
 	}
 }

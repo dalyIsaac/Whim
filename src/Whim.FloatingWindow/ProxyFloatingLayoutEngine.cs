@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -151,21 +150,24 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 
 	private (ProxyFloatingLayoutEngine, bool error) UpdateWindowRectangle(IWindow window)
 	{
-		(ImmutableDictionary<IWindow, IRectangle<double>> maybeNewDict, UpdateWindowStatus status) =
-			FloatingUtils.UpdateWindowRectangle(_context, _floatingWindowRects, window);
+		ImmutableDictionary<IWindow, IRectangle<double>>? newDict = FloatingUtils.UpdateWindowRectangle(
+			_context,
+			_floatingWindowRects,
+			window
+		);
 
-		switch (status)
+		if (newDict == null)
 		{
-			case UpdateWindowStatus.Error:
-				return (this, true);
-			case UpdateWindowStatus.NoChange:
-				return (this, false);
-			case UpdateWindowStatus.Updated:
-				ILayoutEngine innerLayoutEngine = InnerLayoutEngine.RemoveWindow(window);
-				return (new ProxyFloatingLayoutEngine(this, innerLayoutEngine, maybeNewDict), false);
-			default:
-				throw new ArgumentOutOfRangeException($"UpdateWindowStatus ${status} does not exists");
+			return (this, true);
 		}
+
+		if (newDict == _floatingWindowRects)
+		{
+			return (this, false);
+		}
+
+		ILayoutEngine innerLayoutEngine = InnerLayoutEngine.RemoveWindow(window);
+		return (new ProxyFloatingLayoutEngine(this, innerLayoutEngine, newDict), false);
 	}
 
 	/// <inheritdoc />
