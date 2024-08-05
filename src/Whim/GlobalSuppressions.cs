@@ -19,18 +19,6 @@ using System.Diagnostics.CodeAnalysis;
 	Target = "~T:Whim.ICommandManager"
 )]
 [assembly: SuppressMessage(
-	"Design",
-	"CA1051:Do not declare visible instance fields",
-	Justification = "They are used by subclasses",
-	Scope = "module"
-)]
-[assembly: SuppressMessage(
-	"Design",
-	"CA1002:Do not expose generic lists",
-	Justification = "They are used by subclasses",
-	Scope = "module"
-)]
-[assembly: SuppressMessage(
 	"Naming",
 	"CA1716:Identifiers should not match keywords",
 	Justification = "Not concerned about Visual Basic",
@@ -72,7 +60,7 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage(
 	"Naming",
 	"CA1707:Identifiers should not contain underscores",
-	Justification = "This is Windows.Win32 ",
+	Justification = "This is Windows.Win32",
 	Scope = "namespaceanddescendants",
 	Target = "~N:Windows.Win32"
 )]
@@ -86,7 +74,21 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage(
 	"Design",
 	"CA1001:Types that own disposable fields should be disposable",
-	Justification = "Context isn't supposed to be disposable",
+	Justification = "Items are disposed by the context when it exits - a deliberate decision",
 	Scope = "type",
 	Target = "~T:Whim.Context"
+)]
+[assembly: SuppressMessage(
+	"Naming",
+	"CA1724:Type names should not match namespaces",
+	Justification = "Whim has no paid functionality, thus there is no risk of conflict with ABI.Windows.ApplicationModel.Store",
+	Scope = "type",
+	Target = "~T:Whim.Store"
+)]
+[assembly: SuppressMessage(
+	"Naming",
+	"CA1724:Type names should not match namespaces",
+	Justification = "At this stage, Whim does not directly allow the user to interact with the file system via the UI",
+	Scope = "type",
+	Target = "~T:Whim.Pickers"
 )]
