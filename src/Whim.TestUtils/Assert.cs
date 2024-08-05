@@ -17,8 +17,7 @@ namespace Whim.TestUtils;
 #pragma warning disable CA1032 // Implement standard exception constructors
 public class ShouldNotRaiseException(Type type) : XunitException($"Expected event of type {type} to not be raised.")
 #pragma warning restore CA1032 // Implement standard exception constructors
-{
-}
+{ }
 
 /// <summary>
 /// Exception thrown when an event is raised when it should have been.
@@ -30,8 +29,7 @@ public class ShouldNotRaiseException(Type type) : XunitException($"Expected even
 #pragma warning disable CA1032 // Implement standard exception constructors
 public class ShouldRaiseException(Type type) : XunitException($"Expected event of type {type} to be raised.")
 #pragma warning restore CA1032 // Implement standard exception constructors
-{
-}
+{ }
 
 /// <summary>
 /// Class containing methods with custom assertions.
@@ -157,7 +155,6 @@ public static class CustomAssert
 			throw new ShouldRaiseException(typeof(T));
 		}
 	}
-
 
 	/// <summary>
 	/// Asserts that the <see cref="WorkspaceLayoutCompletedEventArgs"/> is raised with the expected workspace.

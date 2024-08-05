@@ -16,7 +16,7 @@ public class TreeLayoutCommandPalettePlugin(
 	IContext context,
 	ITreeLayoutPlugin treeLayoutPlugin,
 	ICommandPalettePlugin commandPalettePlugin
-	) : IPlugin
+) : IPlugin
 {
 	private readonly IContext _context = context;
 	private readonly ITreeLayoutPlugin _treeLayoutPlugin = treeLayoutPlugin;

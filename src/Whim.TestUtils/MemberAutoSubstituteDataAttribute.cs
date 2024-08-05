@@ -73,9 +73,8 @@ public abstract class BaseMemberAutoSubstituteDataAttribute : MemberDataAttribut
 /// </remarks>
 /// <param name="memberName"></param>
 /// <param name="parameters"></param>
-public class MemberAutoSubstituteDataAttribute(string memberName, params object[] parameters) : BaseMemberAutoSubstituteDataAttribute(memberName, parameters)
-{
-}
+public class MemberAutoSubstituteDataAttribute(string memberName, params object[] parameters)
+	: BaseMemberAutoSubstituteDataAttribute(memberName, parameters) { }
 
 /// <summary>
 /// Creates an AutoFixture fixture with NSubstitute support and injects the given arguments, to be

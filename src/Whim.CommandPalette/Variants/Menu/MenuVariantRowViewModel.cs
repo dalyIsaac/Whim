@@ -2,7 +2,8 @@ using System.ComponentModel;
 
 namespace Whim.CommandPalette;
 
-internal class MenuVariantRowViewModel(MatcherResult<MenuVariantRowModelData> matcherResult) : IVariantRowViewModel<MenuVariantRowModelData>
+internal class MenuVariantRowViewModel(MatcherResult<MenuVariantRowModelData> matcherResult)
+	: IVariantRowViewModel<MenuVariantRowModelData>
 {
 	public IVariantRowModel<MenuVariantRowModelData> Model { get; private set; } = matcherResult.Model;
 

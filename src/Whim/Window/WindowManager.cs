@@ -2,7 +2,9 @@ using System.Collections;
 
 namespace Whim;
 
-internal class WindowManager(IContext context, IInternalContext internalContext) : IWindowManager, IInternalWindowManager
+internal class WindowManager(IContext context, IInternalContext internalContext)
+	: IWindowManager,
+		IInternalWindowManager
 {
 	private readonly IContext _context = context;
 	private readonly IInternalContext _internalContext = internalContext;

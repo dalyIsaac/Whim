@@ -1,5 +1,5 @@
-﻿using Microsoft.UI.Xaml;
-using System;
+﻿using System;
+using Microsoft.UI.Xaml;
 
 namespace Whim.Runner;
 

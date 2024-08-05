@@ -2,12 +2,17 @@ using System;
 
 namespace Whim.Updater;
 
-internal class SkipReleaseCommand(IUpdaterPlugin plugin, UpdaterWindowViewModel viewModel) : System.Windows.Input.ICommand
+internal class SkipReleaseCommand(IUpdaterPlugin plugin, UpdaterWindowViewModel viewModel)
+	: System.Windows.Input.ICommand
 {
 	private readonly IUpdaterPlugin _plugin = plugin;
 	private readonly UpdaterWindowViewModel _viewModel = viewModel;
 
-	public event EventHandler? CanExecuteChanged { add { } remove { } }
+	public event EventHandler? CanExecuteChanged
+	{
+		add { }
+		remove { }
+	}
 
 	public bool CanExecute(object? parameter) => true;
 
@@ -21,12 +26,17 @@ internal class SkipReleaseCommand(IUpdaterPlugin plugin, UpdaterWindowViewModel 
 	}
 }
 
-internal class InstallReleaseCommand(IUpdaterPlugin plugin, UpdaterWindowViewModel viewModel) : System.Windows.Input.ICommand
+internal class InstallReleaseCommand(IUpdaterPlugin plugin, UpdaterWindowViewModel viewModel)
+	: System.Windows.Input.ICommand
 {
 	private readonly IUpdaterPlugin _plugin = plugin;
 	private readonly UpdaterWindowViewModel _viewModel = viewModel;
 
-	public event EventHandler? CanExecuteChanged { add { } remove { } }
+	public event EventHandler? CanExecuteChanged
+	{
+		add { }
+		remove { }
+	}
 
 	public bool CanExecute(object? parameter) => true;
 
@@ -45,7 +55,11 @@ internal class CloseUpdaterWindowCommand(IUpdaterPlugin plugin) : System.Windows
 {
 	private readonly IUpdaterPlugin _plugin = plugin;
 
-	public event EventHandler? CanExecuteChanged { add { } remove { } }
+	public event EventHandler? CanExecuteChanged
+	{
+		add { }
+		remove { }
+	}
 
 	public bool CanExecute(object? parameter) => true;
 

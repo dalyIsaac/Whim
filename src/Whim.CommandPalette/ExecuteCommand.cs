@@ -14,7 +14,11 @@ internal class ConfirmCommand(ICommandPaletteWindowViewModel viewModel) : System
 	private readonly ICommandPaletteWindowViewModel _viewModel = viewModel;
 
 	/// <inheritdoc/>
-	public event EventHandler? CanExecuteChanged { add { } remove { } }
+	public event EventHandler? CanExecuteChanged
+	{
+		add { }
+		remove { }
+	}
 
 	public bool CanExecute(object? parameter) => _viewModel.ActiveVariant != null;
 

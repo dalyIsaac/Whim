@@ -10,13 +10,18 @@ namespace Whim.Bar;
 /// </remarks>
 /// <param name="context"></param>
 /// <param name="viewModel"></param>
-internal class NextLayoutEngineCommand(IContext context, ActiveLayoutWidgetViewModel viewModel) : System.Windows.Input.ICommand
+internal class NextLayoutEngineCommand(IContext context, ActiveLayoutWidgetViewModel viewModel)
+	: System.Windows.Input.ICommand
 {
 	private readonly IContext _context = context;
 	private readonly ActiveLayoutWidgetViewModel _viewModel = viewModel;
 
 	/// <inheritdoc/>
-	public event EventHandler? CanExecuteChanged { add { } remove { } }
+	public event EventHandler? CanExecuteChanged
+	{
+		add { }
+		remove { }
+	}
 
 	/// <inheritdoc/>
 	public bool CanExecute(object? parameter) => true;

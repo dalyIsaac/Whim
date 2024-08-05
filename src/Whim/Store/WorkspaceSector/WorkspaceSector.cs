@@ -7,7 +7,11 @@ namespace Whim;
 /// <param name="CreateLeafLayoutEngines"></param>
 internal record WorkspaceToCreate(string? Name, IEnumerable<CreateLeafLayoutEngine>? CreateLeafLayoutEngines);
 
-internal class WorkspaceSector(IContext ctx, IInternalContext internalCtx) : SectorBase, IWorkspaceSector, IWorkspaceSectorEvents, IDisposable
+internal class WorkspaceSector(IContext ctx, IInternalContext internalCtx)
+	: SectorBase,
+		IWorkspaceSector,
+		IWorkspaceSectorEvents,
+		IDisposable
 {
 	private readonly IContext _ctx = ctx;
 	private readonly IInternalContext _internalCtx = internalCtx;

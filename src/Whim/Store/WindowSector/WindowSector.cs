@@ -3,7 +3,11 @@ namespace Whim;
 /// <summary>
 /// The sector containing windows.
 /// </summary>
-internal class WindowSector(IContext ctx, IInternalContext internalCtx) : SectorBase, IWindowSector, IDisposable, IWindowSectorEvents
+internal class WindowSector(IContext ctx, IInternalContext internalCtx)
+	: SectorBase,
+		IWindowSector,
+		IDisposable,
+		IWindowSectorEvents
 {
 	private readonly WindowEventListener _listener = new(ctx, internalCtx);
 	private bool _disposedValue;

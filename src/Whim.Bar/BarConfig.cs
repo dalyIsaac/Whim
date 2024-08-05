@@ -28,7 +28,7 @@ public class BarConfig(
 	IList<BarComponent> leftComponents,
 	IList<BarComponent> centerComponents,
 	IList<BarComponent> rightComponents
-	) : INotifyPropertyChanged
+) : INotifyPropertyChanged
 {
 	/// <inheritdoc/>
 	public event PropertyChangedEventHandler? PropertyChanged;

@@ -1,6 +1,10 @@
 namespace Whim;
 
-internal class MonitorSector(IContext ctx, IInternalContext internalCtx) : SectorBase, IDisposable, IMonitorSector, IMonitorSectorEvents
+internal class MonitorSector(IContext ctx, IInternalContext internalCtx)
+	: SectorBase,
+		IDisposable,
+		IMonitorSector,
+		IMonitorSectorEvents
 {
 	private readonly IContext _ctx = ctx;
 	private readonly MonitorEventListener _listener = new(ctx, internalCtx);

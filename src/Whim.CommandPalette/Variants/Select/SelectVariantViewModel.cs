@@ -11,11 +11,11 @@ namespace Whim.CommandPalette;
 internal class SelectVariantViewModel(
 	ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
 	Func<
-			MatcherResult<SelectOption>,
-			SelectVariantConfig,
-			IVariantRowView<SelectOption, SelectVariantRowViewModel>
-		>? selectRowFactory = null
-	) : IVariantViewModel
+		MatcherResult<SelectOption>,
+		SelectVariantConfig,
+		IVariantRowView<SelectOption, SelectVariantRowViewModel>
+	>? selectRowFactory = null
+) : IVariantViewModel
 {
 	private readonly ICommandPaletteWindowViewModel _commandPaletteWindowViewModel = commandPaletteWindowViewModel;
 
@@ -41,8 +41,8 @@ internal class SelectVariantViewModel(
 		SelectVariantConfig,
 		IVariantRowView<SelectOption, SelectVariantRowViewModel>
 	> _selectRowFactory =
-			selectRowFactory
-			?? ((MatcherResult<SelectOption> item, SelectVariantConfig config) => new SelectVariantRowView(item));
+		selectRowFactory
+		?? ((MatcherResult<SelectOption> item, SelectVariantConfig config) => new SelectVariantRowView(item));
 
 	public readonly ObservableCollection<IVariantRowView<SelectOption, SelectVariantRowViewModel>> SelectRows = [];
 
