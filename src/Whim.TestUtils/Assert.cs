@@ -158,12 +158,15 @@ public static class CustomAssert
 		}
 	}
 
+
 	/// <summary>
 	/// Asserts that the <see cref="WorkspaceLayoutCompletedEventArgs"/> is raised with the expected workspace.
 	/// </summary>
 	/// <param name="rootSector">The root sector.</param>
 	/// <param name="action">The action to perform.</param>
-	/// <param name="expectedWorkspace">The expected workspace.</param>
+	/// <param name="layoutWorkspaceIds">The workspace ids to throw.</param>
+	/// <param name="noLayoutWorkspaceIds">The workspace ids to throw if they're raised.</param>
+	/// <exception cref="Exception"></exception>
 	internal static void Layout(
 		MutableRootSector rootSector,
 		Action action,

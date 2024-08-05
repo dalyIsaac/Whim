@@ -567,7 +567,7 @@ public class SelectVariantViewModelTests
 	/// <summary>
 	/// Tests <see cref="SelectVariantViewModel.LoadSelectMatches"/> via <see cref="SelectVariantViewModel.Update"/> via
 	/// <see cref="SelectVariantViewModel.Activate(BaseVariantConfig)"/>.
-	/// This test verifies that the unused row is restored, and <see cref="SelectVariantViewModel.RemoveUnusedRows"/> is called.
+	/// This test verifies that the unused row is restored, and <c>SelectVariantViewModel.RemoveUnusedRows</c> is called.
 	/// </summary>
 	[Fact]
 	public void Update_LoadSelectMatches_RestoreUnusedRow()
