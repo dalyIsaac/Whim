@@ -7,7 +7,7 @@ namespace Whim.FloatingWindow;
 /// <summary>
 /// Layout engine that lays out all windows as free-floating.
 /// </summary>
-public class FloatingLayoutEngine : ILayoutEngine
+public record FloatingLayoutEngine : ILayoutEngine
 {
 	private readonly IContext _context;
 	private readonly ImmutableDictionary<IWindow, IRectangle<double>> _dict;
@@ -122,28 +122,16 @@ public class FloatingLayoutEngine : ILayoutEngine
 
 	private FloatingLayoutEngine UpdateWindowRectangle(IWindow window)
 	{
-		// Try get the old rectangle.
-		IRectangle<double>? oldRectangle = _dict.TryGetValue(window, out IRectangle<double>? rectangle)
-			? rectangle
-			: null;
+		ImmutableDictionary<IWindow, IRectangle<double>>? newDict = FloatingUtils.UpdateWindowRectangle(
+			_context,
+			_dict,
+			window
+		);
 
-		// Since the window is floating, we update the rectangle, and return.
-		IRectangle<int>? newActualRectangle = _context.NativeManager.DwmGetWindowRectangle(window.Handle);
-		if (newActualRectangle == null)
+		if (newDict == null || newDict == _dict)
 		{
-			Logger.Error($"Could not obtain rectangle for floating window {window}");
 			return this;
 		}
-
-		IMonitor newMonitor = _context.MonitorManager.GetMonitorAtPoint(newActualRectangle);
-		IRectangle<double> newUnitSquareRectangle = newMonitor.WorkingArea.NormalizeRectangle(newActualRectangle);
-		if (newUnitSquareRectangle.Equals(oldRectangle))
-		{
-			Logger.Debug($"Rectangle for window {window} has not changed");
-			return this;
-		}
-
-		ImmutableDictionary<IWindow, IRectangle<double>> newDict = _dict.SetItem(window, newUnitSquareRectangle);
 
 		return new FloatingLayoutEngine(this, newDict);
 	}

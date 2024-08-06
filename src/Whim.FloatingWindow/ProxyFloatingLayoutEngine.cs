@@ -143,42 +143,31 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 		return UpdateInner(InnerLayoutEngine.MoveWindowEdgesInDirection(edge, deltas, window), window);
 	}
 
-	private bool IsWindowFloating(IWindow window) =>
-		_plugin.FloatingWindows.TryGetValue(window, out ISet<LayoutEngineIdentity>? layoutEngines)
+	private bool IsWindowFloating(IWindow? window) =>
+		window != null
+		&& _plugin.FloatingWindows.TryGetValue(window, out ISet<LayoutEngineIdentity>? layoutEngines)
 		&& layoutEngines.Contains(InnerLayoutEngine.Identity);
 
 	private (ProxyFloatingLayoutEngine, bool error) UpdateWindowRectangle(IWindow window)
 	{
-		// Try get the old rectangle.
-		IRectangle<double>? oldRectangle = _floatingWindowRects.TryGetValue(window, out IRectangle<double>? rectangle)
-			? rectangle
-			: null;
+		ImmutableDictionary<IWindow, IRectangle<double>>? newDict = FloatingUtils.UpdateWindowRectangle(
+			_context,
+			_floatingWindowRects,
+			window
+		);
 
-		// Since the window is floating, we update the rectangle, and return.
-		IRectangle<int>? newActualRectangle = _context.NativeManager.DwmGetWindowRectangle(window.Handle);
-		if (newActualRectangle == null)
+		if (newDict == null)
 		{
-			Logger.Error($"Could not obtain rectangle for floating window {window}");
 			return (this, true);
 		}
 
-		IMonitor newMonitor = _context.MonitorManager.GetMonitorAtPoint(newActualRectangle);
-		IRectangle<double> newUnitSquareRectangle = newMonitor.WorkingArea.NormalizeRectangle(newActualRectangle);
-		if (newUnitSquareRectangle.Equals(oldRectangle))
+		if (newDict == _floatingWindowRects)
 		{
-			Logger.Debug($"Rectangle for window {window} has not changed");
 			return (this, false);
 		}
 
 		ILayoutEngine innerLayoutEngine = InnerLayoutEngine.RemoveWindow(window);
-		return (
-			new ProxyFloatingLayoutEngine(
-				this,
-				innerLayoutEngine,
-				_floatingWindowRects.SetItem(window, newUnitSquareRectangle)
-			),
-			false
-		);
+		return (new ProxyFloatingLayoutEngine(this, innerLayoutEngine, newDict), false);
 	}
 
 	/// <inheritdoc />
@@ -203,20 +192,8 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 	}
 
 	/// <inheritdoc />
-	public override IWindow? GetFirstWindow()
-	{
-		if (InnerLayoutEngine.GetFirstWindow() is IWindow window)
-		{
-			return window;
-		}
-
-		if (_floatingWindowRects.Count > 0)
-		{
-			return _floatingWindowRects.Keys.First();
-		}
-
-		return null;
-	}
+	public override IWindow? GetFirstWindow() =>
+		InnerLayoutEngine.GetFirstWindow() ?? _floatingWindowRects.Keys.FirstOrDefault();
 
 	/// <inheritdoc />
 	public override ILayoutEngine FocusWindowInDirection(Direction direction, IWindow window)
@@ -262,7 +239,7 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <inheritdoc />
 	public override ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action)
 	{
-		if (action.Window != null && IsWindowFloating(action.Window))
+		if (IsWindowFloating(action.Window))
 		{
 			// At this stage, we don't have a way to get the window in a child layout engine at
 			// a given point.
