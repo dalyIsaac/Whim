@@ -81,7 +81,7 @@ public class CommandPaletteWindowViewModelTests
 		CommandPaletteWindowViewModel vm =
 			new(wrapper.Context, wrapper.Plugin, wrapper.MenuVariant, wrapper.FreeTextVariant, wrapper.SelectVariant);
 
-		vm.Activate(new MenuVariantConfig() { Commands = Array.Empty<ICommand>() }, null);
+		vm.Activate(new MenuVariantConfig() { Commands = [] }, null);
 
 		// When
 		vm.OnKeyDown(VirtualKey.Space);
@@ -102,7 +102,7 @@ public class CommandPaletteWindowViewModelTests
 		Assert.Raises<EventArgs>(
 			h => vm.SetWindowPosRequested += h,
 			h => vm.SetWindowPosRequested -= h,
-			() => vm.Activate(new MenuVariantConfig() { Commands = Array.Empty<ICommand>() }, null)
+			() => vm.Activate(new MenuVariantConfig() { Commands = [] }, null)
 		);
 
 		// Then
@@ -133,12 +133,12 @@ public class CommandPaletteWindowViewModelTests
 		MenuVariantConfig config =
 			new()
 			{
-				Commands = Array.Empty<ICommand>(),
+				Commands = [],
 				InitialText = "Initial text",
 				Hint = "Hint"
 			};
 
-		IEnumerable<ICommand> ICommands = new List<ICommand>() { new Command("id", "title", () => { }) };
+		IEnumerable<ICommand> ICommands = [new Command("id", "title", () => { })];
 
 		// When
 		Assert.Raises<EventArgs>(
@@ -158,7 +158,7 @@ public class CommandPaletteWindowViewModelTests
 		{
 			{ new UnknownConfig(), false, "Confirm" },
 			{
-				new MenuVariantConfig() { Commands = Array.Empty<ICommand>() },
+				new MenuVariantConfig() { Commands = [] },
 				true,
 				"Confirm"
 			},
@@ -170,7 +170,7 @@ public class CommandPaletteWindowViewModelTests
 			{
 				new SelectVariantConfig()
 				{
-					Options = Array.Empty<SelectOption>(),
+					Options = [],
 					Callback = (items) => { },
 					ConfirmButtonText = "Save"
 				},
@@ -204,7 +204,7 @@ public class CommandPaletteWindowViewModelTests
 		CommandPaletteWindowViewModel vm =
 			new(wrapper.Context, wrapper.Plugin, wrapper.MenuVariant, wrapper.FreeTextVariant, wrapper.SelectVariant);
 
-		MenuVariantConfig config = new() { Commands = Array.Empty<ICommand>() };
+		MenuVariantConfig config = new() { Commands = [] };
 
 		vm.Activate(config, null);
 
@@ -223,7 +223,7 @@ public class CommandPaletteWindowViewModelTests
 		CommandPaletteWindowViewModel vm =
 			new(wrapper.Context, wrapper.Plugin, wrapper.MenuVariant, wrapper.FreeTextVariant, wrapper.SelectVariant);
 
-		MenuVariantConfig config = new() { Commands = Array.Empty<ICommand>() };
+		MenuVariantConfig config = new() { Commands = [] };
 
 		vm.Activate(config, null);
 

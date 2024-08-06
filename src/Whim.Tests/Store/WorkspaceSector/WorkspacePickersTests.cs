@@ -142,7 +142,7 @@ public class WorkspacePickersTests
 
 		Workspace activeWorkspace = CreateWorkspace(ctx) with
 		{
-			LayoutEngines = ImmutableList.Create(layoutEngine1, layoutEngine2),
+			LayoutEngines = [layoutEngine1, layoutEngine2],
 			ActiveLayoutEngineIndex = 1
 		};
 		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), activeWorkspace);
@@ -388,11 +388,7 @@ public class WorkspacePickersTests
 	{
 		// Given the workspaces and windows
 		Func<CreateLeafLayoutEngine[]> createLayoutEngines = () =>
-			new CreateLeafLayoutEngine[]
-			{
-				(id) => Substitute.For<ILayoutEngine>(),
-				(id) => Substitute.For<ILayoutEngine>(),
-			};
+			[(id) => Substitute.For<ILayoutEngine>(), (id) => Substitute.For<ILayoutEngine>(),];
 
 		root.WorkspaceSector.CreateLayoutEngines = createLayoutEngines;
 

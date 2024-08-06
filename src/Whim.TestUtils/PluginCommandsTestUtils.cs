@@ -6,18 +6,13 @@ namespace Whim.TestUtils;
 /// <summary>
 /// Test utilities for <see cref="_pluginCommands"/>.
 /// </summary>
-public class PluginCommandsTestUtils
+/// <remarks>
+/// Create the plugin commands test utilities.
+/// </remarks>
+/// <param name="pluginCommands"></param>
+public class PluginCommandsTestUtils(PluginCommands pluginCommands)
 {
-	private readonly PluginCommands _pluginCommands;
-
-	/// <summary>
-	/// Create the plugin commands test utilities.
-	/// </summary>
-	/// <param name="pluginCommands"></param>
-	public PluginCommandsTestUtils(PluginCommands pluginCommands)
-	{
-		_pluginCommands = pluginCommands;
-	}
+	private readonly PluginCommands _pluginCommands = pluginCommands;
 
 	/// <summary>
 	/// Get the command with the given identifier.

@@ -18,7 +18,7 @@ public class UpdaterWindowViewModelCustomization : ICustomization
 		Version version242 = Version.Parse(release242.TagName)!;
 		ReleaseInfo releaseInfo242 = new(release242, version242);
 
-		IReadOnlyList<ReleaseInfo> releases = new List<ReleaseInfo> { releaseInfo243, releaseInfo242 };
+		IReadOnlyList<ReleaseInfo> releases = [releaseInfo243, releaseInfo242];
 		fixture.Inject(releases);
 	}
 }
@@ -76,7 +76,7 @@ public class UpdaterWindowViewModelTests
 		UpdaterWindowViewModel viewModel = new(updaterPlugin);
 
 		// When
-		viewModel.Update(new List<ReleaseInfo>());
+		viewModel.Update([]);
 
 		// Then
 		Assert.Null(viewModel.LastRelease);

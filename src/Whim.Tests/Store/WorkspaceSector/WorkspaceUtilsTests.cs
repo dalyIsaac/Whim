@@ -47,7 +47,7 @@ public class WorkspaceUtilsTests
 		// Given
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
-			LayoutEngines = ImmutableList.Create(engine1, engine2, engine3),
+			LayoutEngines = [engine1, engine2, engine3],
 			ActiveLayoutEngineIndex = 1
 		};
 		int newActiveLayoutEngineIndex = 2;
@@ -81,7 +81,7 @@ public class WorkspaceUtilsTests
 		// Given
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
-			LayoutEngines = ImmutableList.Create(engine),
+			LayoutEngines = [engine],
 			ActiveLayoutEngineIndex = 0
 		};
 		int newActiveLayoutEngineIndex = 0;

@@ -4,28 +4,23 @@ using System.Text.Json;
 namespace Whim.FloatingWindow;
 
 /// <inheritdoc />
-public class FloatingWindowPlugin : IFloatingWindowPlugin, IInternalFloatingWindowPlugin
+/// <summary>
+/// Creates a new instance of the floating window plugin.
+/// </summary>
+/// <param name="context"></param>
+public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin, IInternalFloatingWindowPlugin
 {
-	private readonly IContext _context;
+	private readonly IContext _context = context;
 
 	/// <summary>
 	/// <c>whim.floating_window</c>
 	/// </summary>
 	public string Name => "whim.floating_window";
 
-	private readonly Dictionary<IWindow, ISet<LayoutEngineIdentity>> _floatingWindows = new();
+	private readonly Dictionary<IWindow, ISet<LayoutEngineIdentity>> _floatingWindows = [];
 
 	/// <inheritdoc/>
 	public IReadOnlyDictionary<IWindow, ISet<LayoutEngineIdentity>> FloatingWindows => _floatingWindows;
-
-	/// <summary>
-	/// Creates a new instance of the floating window plugin.
-	/// </summary>
-	/// <param name="context"></param>
-	public FloatingWindowPlugin(IContext context)
-	{
-		_context = context;
-	}
 
 	/// <inheritdoc />
 	public void PreInitialize()

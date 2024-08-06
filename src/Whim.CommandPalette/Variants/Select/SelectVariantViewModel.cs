@@ -8,9 +8,16 @@ using Windows.System;
 
 namespace Whim.CommandPalette;
 
-internal class SelectVariantViewModel : IVariantViewModel
+internal class SelectVariantViewModel(
+	ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
+	Func<
+		MatcherResult<SelectOption>,
+		SelectVariantConfig,
+		IVariantRowView<SelectOption, SelectVariantRowViewModel>
+	>? selectRowFactory = null
+) : IVariantViewModel
 {
-	private readonly ICommandPaletteWindowViewModel _commandPaletteWindowViewModel;
+	private readonly ICommandPaletteWindowViewModel _commandPaletteWindowViewModel = commandPaletteWindowViewModel;
 
 	private SelectVariantConfig? _activationConfig;
 
@@ -18,12 +25,12 @@ internal class SelectVariantViewModel : IVariantViewModel
 	/// The rows which are currently unused and can be reused for new matches.
 	/// Keeping these around avoids the need to create new rows every time the palette is shown.
 	/// </summary>
-	internal readonly List<IVariantRowView<SelectOption, SelectVariantRowViewModel>> _unusedRows = new();
+	internal readonly List<IVariantRowView<SelectOption, SelectVariantRowViewModel>> _unusedRows = [];
 
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="SelectRows"/> are drawn.
 	/// </summary>
-	internal readonly List<SelectVariantRowModel> _allItems = new();
+	internal readonly List<SelectVariantRowModel> _allItems = [];
 
 	/// <summary>
 	/// Factory to create select rows to make it possible to use xunit.
@@ -33,9 +40,11 @@ internal class SelectVariantViewModel : IVariantViewModel
 		MatcherResult<SelectOption>,
 		SelectVariantConfig,
 		IVariantRowView<SelectOption, SelectVariantRowViewModel>
-	> _selectRowFactory;
+	> _selectRowFactory =
+		selectRowFactory
+		?? ((MatcherResult<SelectOption> item, SelectVariantConfig config) => new SelectVariantRowView(item));
 
-	public readonly ObservableCollection<IVariantRowView<SelectOption, SelectVariantRowViewModel>> SelectRows = new();
+	public readonly ObservableCollection<IVariantRowView<SelectOption, SelectVariantRowViewModel>> SelectRows = [];
 
 	public string? ConfirmButtonText => _activationConfig?.ConfirmButtonText;
 
@@ -84,21 +93,6 @@ internal class SelectVariantViewModel : IVariantViewModel
 	public event PropertyChangedEventHandler? PropertyChanged;
 
 	public event EventHandler<EventArgs>? ScrollIntoViewRequested;
-
-	public SelectVariantViewModel(
-		ICommandPaletteWindowViewModel commandPaletteWindowViewModel,
-		Func<
-			MatcherResult<SelectOption>,
-			SelectVariantConfig,
-			IVariantRowView<SelectOption, SelectVariantRowViewModel>
-		>? selectRowFactory = null
-	)
-	{
-		_commandPaletteWindowViewModel = commandPaletteWindowViewModel;
-		_selectRowFactory =
-			selectRowFactory
-			?? ((MatcherResult<SelectOption> item, SelectVariantConfig config) => new SelectVariantRowView(item));
-	}
 
 	public void Activate(BaseVariantConfig activationConfig)
 	{

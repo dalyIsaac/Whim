@@ -15,14 +15,6 @@ public class VeryObservableCollection<T> : ObservableCollection<T>
 		: base() { }
 
 	/// <inheritdoc/>
-	public VeryObservableCollection(IEnumerable<T> collection)
-		: base(collection) { }
-
-	/// <inheritdoc/>
-	public VeryObservableCollection(List<T> list)
-		: base(list) { }
-
-	/// <inheritdoc/>
 	protected override void OnCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 	{
 		base.OnCollectionChanged(e);

@@ -12,7 +12,7 @@ public static partial class Pickers
 	public static PurePicker<IEnumerable<IWorkspace>> PickAllActiveWorkspaces() =>
 		rootSector =>
 		{
-			List<IWorkspace> workspaces = new();
+			List<IWorkspace> workspaces = [];
 			foreach (WorkspaceId id in rootSector.MapSector.MonitorWorkspaceMap.Values)
 			{
 				workspaces.Add(rootSector.WorkspaceSector.Workspaces[id]);

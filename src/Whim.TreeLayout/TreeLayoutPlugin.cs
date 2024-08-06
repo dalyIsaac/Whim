@@ -5,11 +5,14 @@ using System.Text.Json;
 namespace Whim.TreeLayout;
 
 /// <inheritdoc/>
-public class TreeLayoutPlugin : ITreeLayoutPlugin
+/// <summary>
+/// Initializes a new instance of the <see cref="TreeLayoutPlugin"/> class.
+/// </summary>
+public class TreeLayoutPlugin(IContext context) : ITreeLayoutPlugin
 {
-	private readonly IContext _context;
+	private readonly IContext _context = context;
 
-	private readonly Dictionary<LayoutEngineIdentity, Direction> _addNodeDirections = new();
+	private readonly Dictionary<LayoutEngineIdentity, Direction> _addNodeDirections = [];
 	private const Direction DefaultAddNodeDirection = Direction.Right;
 
 	/// <summary>
@@ -22,14 +25,6 @@ public class TreeLayoutPlugin : ITreeLayoutPlugin
 
 	/// <inheritdoc	/>
 	public event EventHandler<AddWindowDirectionChangedEventArgs>? AddWindowDirectionChanged;
-
-	/// <summary>
-	/// Initializes a new instance of the <see cref="TreeLayoutPlugin"/> class.
-	/// </summary>
-	public TreeLayoutPlugin(IContext context)
-	{
-		_context = context;
-	}
 
 	/// <inheritdoc	/>
 	public void PreInitialize() { }

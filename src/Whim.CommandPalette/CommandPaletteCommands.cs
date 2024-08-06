@@ -61,7 +61,7 @@ public class CommandPaletteCommands : PluginCommands
 				callback: () =>
 				{
 					IWorkspace activeWorkspace = _context.WorkspaceManager.ActiveWorkspace;
-					List<ICommand> items = new();
+					List<ICommand> items = [];
 					foreach (IWorkspace workspace in _context.WorkspaceManager)
 					{
 						if (workspace != activeWorkspace)
@@ -123,7 +123,7 @@ public class CommandPaletteCommands : PluginCommands
 	private void ActivateWorkspaceCallback()
 	{
 		IWorkspace activeWorkspace = _context.WorkspaceManager.ActiveWorkspace;
-		List<ICommand> items = new();
+		List<ICommand> items = [];
 		foreach (IWorkspace workspace in _context.WorkspaceManager)
 		{
 			if (workspace != activeWorkspace)
@@ -196,7 +196,7 @@ public class CommandPaletteCommands : PluginCommands
 	{
 		IEnumerable<string> selectedWindowNames = options.Where(o => o.IsSelected).Select(o => o.Title);
 
-		IReadOnlyList<IWorkspace> workspaces = _context.WorkspaceManager.ToArray();
+		IReadOnlyList<IWorkspace> workspaces = [.. _context.WorkspaceManager];
 		IReadOnlyList<IWindow> windows = workspaces
 			.SelectMany(w => w.Windows)
 			.Where(w => selectedWindowNames.Contains(w.Title))

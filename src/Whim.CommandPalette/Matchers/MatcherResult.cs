@@ -80,14 +80,8 @@ internal class MatcherItemComparer<T> : IComparer<MatcherResult<T>>
 	public int Compare(MatcherResult<T>? x, MatcherResult<T>? y)
 	{
 		// We throw here because it should never happen.
-		if (x is null)
-		{
-			throw new ArgumentNullException(nameof(x));
-		}
-		else if (y is null)
-		{
-			throw new ArgumentNullException(nameof(y));
-		}
+		ArgumentNullException.ThrowIfNull(x);
+		ArgumentNullException.ThrowIfNull(y);
 
 		// Sort by the last used time.
 		if (x.Score > y.Score)

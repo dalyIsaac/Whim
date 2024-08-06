@@ -10,32 +10,26 @@ namespace Whim.TestUtils;
 /// <summary>
 /// Exception thrown when an event is raised when it should not have been.
 /// </summary>
+/// <remarks>
+/// Creates a new instance of the <see cref="ShouldNotRaiseException"/> class.
+/// </remarks>
+/// <param name="type"></param>
 #pragma warning disable CA1032 // Implement standard exception constructors
-public class ShouldNotRaiseException : XunitException
+public class ShouldNotRaiseException(Type type) : XunitException($"Expected event of type {type} to not be raised.")
 #pragma warning restore CA1032 // Implement standard exception constructors
-{
-	/// <summary>
-	/// Creates a new instance of the <see cref="ShouldNotRaiseException"/> class.
-	/// </summary>
-	/// <param name="type"></param>
-	public ShouldNotRaiseException(Type type)
-		: base($"Expected event of type {type} to not be raised.") { }
-}
+{ }
 
 /// <summary>
 /// Exception thrown when an event is raised when it should have been.
 /// </summary>
+/// <remarks>
+/// Creates a new instance of the <see cref="ShouldRaiseException"/> class.
+/// </remarks>
+/// <param name="type"></param>
 #pragma warning disable CA1032 // Implement standard exception constructors
-public class ShouldRaiseException : XunitException
+public class ShouldRaiseException(Type type) : XunitException($"Expected event of type {type} to be raised.")
 #pragma warning restore CA1032 // Implement standard exception constructors
-{
-	/// <summary>
-	/// Creates a new instance of the <see cref="ShouldRaiseException"/> class.
-	/// </summary>
-	/// <param name="type"></param>
-	public ShouldRaiseException(Type type)
-		: base($"Expected event of type {type} to be raised.") { }
-}
+{ }
 
 /// <summary>
 /// Class containing methods with custom assertions.
@@ -167,7 +161,9 @@ public static class CustomAssert
 	/// </summary>
 	/// <param name="rootSector">The root sector.</param>
 	/// <param name="action">The action to perform.</param>
-	/// <param name="expectedWorkspace">The expected workspace.</param>
+	/// <param name="layoutWorkspaceIds">The workspace ids to throw.</param>
+	/// <param name="noLayoutWorkspaceIds">The workspace ids to throw if they're raised.</param>
+	/// <exception cref="Exception"></exception>
 	internal static void Layout(
 		MutableRootSector rootSector,
 		Action action,
@@ -176,14 +172,14 @@ public static class CustomAssert
 	)
 	{
 		// Populate the dictionaries with the remaining workspace ids for each event.
-		Dictionary<Guid, int> workspaceStartedRemainingIds = new();
-		foreach (Guid id in layoutWorkspaceIds ?? Array.Empty<Guid>())
+		Dictionary<Guid, int> workspaceStartedRemainingIds = [];
+		foreach (Guid id in layoutWorkspaceIds ?? [])
 		{
 			workspaceStartedRemainingIds[id] = workspaceStartedRemainingIds.GetValueOrDefault(id, 0) + 1;
 		}
 
-		Dictionary<Guid, int> workspaceCompletedRemainingIds = new();
-		foreach (Guid id in layoutWorkspaceIds ?? Array.Empty<Guid>())
+		Dictionary<Guid, int> workspaceCompletedRemainingIds = [];
+		foreach (Guid id in layoutWorkspaceIds ?? [])
 		{
 			workspaceCompletedRemainingIds[id] = workspaceCompletedRemainingIds.GetValueOrDefault(id, 0) + 1;
 		}
@@ -220,7 +216,7 @@ public static class CustomAssert
 		}
 
 		// Assert that the remaining workspace ids are 0.
-		foreach (Guid id in layoutWorkspaceIds ?? Array.Empty<Guid>())
+		foreach (Guid id in layoutWorkspaceIds ?? [])
 		{
 			int remaining = workspaceStartedRemainingIds[id];
 			if (remaining != 0)
@@ -229,7 +225,7 @@ public static class CustomAssert
 			}
 		}
 
-		foreach (Guid id in layoutWorkspaceIds ?? Array.Empty<Guid>())
+		foreach (Guid id in layoutWorkspaceIds ?? [])
 		{
 			int remaining = workspaceCompletedRemainingIds[id];
 			if (remaining != 0)
@@ -238,7 +234,7 @@ public static class CustomAssert
 			}
 		}
 
-		foreach (Guid id in noLayoutWorkspaceIds ?? Array.Empty<Guid>())
+		foreach (Guid id in noLayoutWorkspaceIds ?? [])
 		{
 			if (workspaceCompletedRemainingIds.ContainsKey(id))
 			{

@@ -1,4 +1,3 @@
-using System.Linq;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim;
@@ -315,7 +314,7 @@ internal class CoreCommands : PluginCommands
 	{
 		public void Execute(IContext context)
 		{
-			IWorkspace[] workspaces = context.WorkspaceManager.ToArray();
+			IWorkspace[] workspaces = [.. context.WorkspaceManager];
 			if (Index <= workspaces.Length)
 			{
 				context.Butler.Activate(workspaces[Index - 1]);

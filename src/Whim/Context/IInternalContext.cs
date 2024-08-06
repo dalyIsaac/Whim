@@ -3,7 +3,7 @@ namespace Whim;
 /// <summary>
 /// This contains internal core functionality for Whim which should not be exposed to plugins.
 /// </summary>
-internal interface IInternalContext : IDisposable
+internal interface IInternalContext
 {
 	ICoreSavedStateManager CoreSavedStateManager { get; }
 

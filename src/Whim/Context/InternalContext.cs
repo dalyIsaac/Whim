@@ -1,6 +1,6 @@
 namespace Whim;
 
-internal class InternalContext : IInternalContext
+internal class InternalContext : IInternalContext, IDisposable
 {
 	private bool _disposedValue;
 

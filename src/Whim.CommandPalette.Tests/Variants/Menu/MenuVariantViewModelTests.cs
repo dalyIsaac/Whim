@@ -56,12 +56,12 @@ public class MenuVariantViewModelTests
 	internal void Activate_MenuVariantConfig(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		IEnumerable<ICommand> items = new List<ICommand>()
-		{
+		IEnumerable<ICommand> items =
+		[
 			new Command("id", "title", () => { }),
 			new Command("id2", "title2", () => { }),
 			new Command("id3", "title3", () => { })
-		};
+		];
 		ctx.CommandManager.GetEnumerator().Returns(items.GetEnumerator());
 
 		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
@@ -85,12 +85,12 @@ public class MenuVariantViewModelTests
 	)
 	{
 		// Given
-		IEnumerable<ICommand> items = new List<ICommand>()
-		{
+		IEnumerable<ICommand> items =
+		[
 			new Command("id", "title", () => { }),
 			new Command("id2", "title2", () => { }),
 			new Command("id3", "title3", () => { })
-		};
+		];
 		ctx.CommandManager.GetEnumerator().Returns(items.GetEnumerator());
 
 		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
@@ -111,12 +111,12 @@ public class MenuVariantViewModelTests
 	internal void OnKeyDown_UnhandledKeys(IContext ctx, ICommandPaletteWindowViewModel windowViewModel)
 	{
 		// Given
-		IEnumerable<ICommand> items = new List<ICommand>()
-		{
+		IEnumerable<ICommand> items =
+		[
 			new Command("id", "title", () => { }),
 			new Command("id2", "title2", () => { }),
 			new Command("id3", "title3", () => { })
-		};
+		];
 		ctx.CommandManager.GetEnumerator().Returns(items.GetEnumerator());
 
 		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
@@ -134,8 +134,8 @@ public class MenuVariantViewModelTests
 	{
 		// Given
 		bool called = false;
-		IEnumerable<ICommand> items = new List<ICommand>()
-		{
+		IEnumerable<ICommand> items =
+		[
 			new Command(
 				"id",
 				"title",
@@ -144,7 +144,7 @@ public class MenuVariantViewModelTests
 					called = true;
 				}
 			)
-		};
+		];
 		ctx.CommandManager.GetEnumerator().Returns(items.GetEnumerator());
 
 		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
@@ -165,7 +165,7 @@ public class MenuVariantViewModelTests
 		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 
 		// When
-		vm.PopulateItems(new List<ICommand>() { new Command("id", "title", () => { }, () => false) });
+		vm.PopulateItems([new Command("id", "title", () => { }, () => false)]);
 
 		// Then
 		Assert.Empty(vm._allItems);
@@ -178,7 +178,7 @@ public class MenuVariantViewModelTests
 		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 
 		// When
-		vm.PopulateItems(new List<ICommand>() { new Command("id", "title", () => { }) });
+		vm.PopulateItems([new Command("id", "title", () => { })]);
 
 		// Then
 		Assert.Single(vm._allItems);
@@ -190,10 +190,10 @@ public class MenuVariantViewModelTests
 		// Given
 		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 
-		vm.PopulateItems(new List<ICommand>() { new Command("id", "title", () => { }) });
+		vm.PopulateItems([new Command("id", "title", () => { })]);
 
 		// When
-		vm.PopulateItems(new List<ICommand>() { new Command("id", "new title", () => { }) });
+		vm.PopulateItems([new Command("id", "new title", () => { })]);
 
 		// Then
 		Assert.Single(vm._allItems);
@@ -206,10 +206,10 @@ public class MenuVariantViewModelTests
 		// Given
 		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 
-		vm.PopulateItems(new List<ICommand>() { new Command("id", "title", () => { }) });
+		vm.PopulateItems([new Command("id", "title", () => { })]);
 
 		// When
-		vm.PopulateItems(new List<ICommand>());
+		vm.PopulateItems([]);
 
 		// Then
 		Assert.Empty(vm._allItems);
@@ -222,10 +222,10 @@ public class MenuVariantViewModelTests
 		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 
 		Command command = new("id", "title", () => { });
-		vm.PopulateItems(new List<ICommand>() { command });
+		vm.PopulateItems([command]);
 
 		// When
-		vm.PopulateItems(new List<ICommand>() { command });
+		vm.PopulateItems([command]);
 
 		// Then
 		Assert.Single(vm._allItems);
@@ -237,8 +237,8 @@ public class MenuVariantViewModelTests
 	{
 		// Given
 		bool called = false;
-		IEnumerable<ICommand> items = new List<ICommand>()
-		{
+		IEnumerable<ICommand> items =
+		[
 			new Command(
 				"id",
 				"title",
@@ -247,7 +247,7 @@ public class MenuVariantViewModelTests
 					called = true;
 				}
 			)
-		};
+		];
 		ctx.CommandManager.GetEnumerator().Returns(items.GetEnumerator());
 
 		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
@@ -266,7 +266,7 @@ public class MenuVariantViewModelTests
 	{
 		// Given
 		string callbackText = string.Empty;
-		IEnumerable<ICommand> items = new List<ICommand>() { new Command("id", "title", () => { }) };
+		IEnumerable<ICommand> items = [new Command("id", "title", () => { })];
 		ctx.CommandManager.GetEnumerator().Returns(items.GetEnumerator());
 
 		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
@@ -305,9 +305,7 @@ public class MenuVariantViewModelTests
 	{
 		// Given
 		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
-		vm.Activate(
-			new MenuVariantConfig() { Commands = new List<ICommand>() { new Command("id", "title", () => { }) } }
-		);
+		vm.Activate(new MenuVariantConfig() { Commands = [new Command("id", "title", () => { })] });
 		vm.SelectedIndex = index;
 
 		// When
@@ -322,8 +320,8 @@ public class MenuVariantViewModelTests
 	{
 		// Given
 		bool called = false;
-		IEnumerable<ICommand> items = new List<ICommand>()
-		{
+		IEnumerable<ICommand> items =
+		[
 			new Command(
 				"id",
 				"title",
@@ -332,7 +330,7 @@ public class MenuVariantViewModelTests
 					called = true;
 				}
 			)
-		};
+		];
 		ctx.CommandManager.GetEnumerator().Returns(items.GetEnumerator());
 
 		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
@@ -352,7 +350,7 @@ public class MenuVariantViewModelTests
 		// Given
 		MenuVariantViewModel vm = new(ctx, windowViewModel, MenuRowFactory);
 
-		vm.Activate(new MenuVariantConfig() { Commands = Array.Empty<ICommand>() });
+		vm.Activate(new MenuVariantConfig() { Commands = [] });
 
 		// When
 		vm.Update();
@@ -377,11 +375,11 @@ public class MenuVariantViewModelTests
 
 	private static MenuVariantConfig CreateMenuActivationConfig(int itemCount)
 	{
-		List<MatcherResult<MenuVariantRowModelData>> items = new();
+		List<MatcherResult<MenuVariantRowModelData>> items = [];
 
 		for (int i = 0; i < itemCount; i++)
 		{
-			FilterTextMatch[] segments = new FilterTextMatch[] { new(0, 1) };
+			FilterTextMatch[] segments = [new(0, 1)];
 			items.Add(new(new MenuVariantRowModel(new Command($"id{i}", $"title{i}", () => { }), null), segments, 0));
 		}
 
@@ -390,7 +388,7 @@ public class MenuVariantViewModelTests
 			.Match(Arg.Any<string>(), Arg.Any<IReadOnlyList<IVariantRowModel<MenuVariantRowModelData>>>())
 			.Returns(items);
 
-		MenuVariantConfig config = new() { Matcher = matcher, Commands = Array.Empty<ICommand>() };
+		MenuVariantConfig config = new() { Matcher = matcher, Commands = [] };
 		return config;
 	}
 

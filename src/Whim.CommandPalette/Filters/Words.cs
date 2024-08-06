@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace Whim.CommandPalette;
@@ -54,7 +53,7 @@ public static partial class PaletteFilters
 	{
 		if (i == word.Length)
 		{
-			return Array.Empty<FilterTextMatch>();
+			return [];
 		}
 		else if (j == wordToMatchAgainst.Length)
 		{

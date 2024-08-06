@@ -49,7 +49,7 @@ public class FocusIndicatorConfig : INotifyPropertyChanged
 		}
 	}
 
-	private int _borderSize = 10;
+	private int _borderSize = 4;
 
 	/// <summary>
 	/// The size of the focus indicator border, in pixels.

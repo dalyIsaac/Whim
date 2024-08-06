@@ -41,7 +41,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 
 	private readonly Timer _timer = new();
 
-	private List<ReleaseInfo> _notInstalledReleases = new();
+	private List<ReleaseInfo> _notInstalledReleases = [];
 	private bool _disposedValue;
 
 	/// <inheritdoc />
@@ -77,7 +77,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 		}
 	}
 
-	private IGitHubClient CreateGitHubClient() => new GitHubClient(new ProductHeaderValue(Name));
+	private GitHubClient CreateGitHubClient() => new(new ProductHeaderValue(Name));
 
 	/// <inheritdoc />
 	public void PreInitialize()
@@ -207,7 +207,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 			.ConfigureAwait(false);
 
 		// Sort the releases by semver
-		List<ReleaseInfo> sortedReleases = new();
+		List<ReleaseInfo> sortedReleases = [];
 		foreach (Release r in releases)
 		{
 			Version? version = Version.Parse(r.TagName);

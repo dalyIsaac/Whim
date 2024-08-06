@@ -11,13 +11,7 @@ public class TreeLayoutCommandPalettePluginCommands : PluginCommands
 	private readonly IContext _context;
 	private readonly ITreeLayoutPlugin _treeLayoutPlugin;
 
-	private readonly Direction[] _directions = new Direction[]
-	{
-		Direction.Left,
-		Direction.Right,
-		Direction.Up,
-		Direction.Down,
-	};
+	private readonly Direction[] _directions = [Direction.Left, Direction.Right, Direction.Up, Direction.Down,];
 
 	/// <summary>
 	/// Create the tree layout command palette plugin commands.

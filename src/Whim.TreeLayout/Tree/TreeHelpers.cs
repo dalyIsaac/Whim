@@ -62,7 +62,7 @@ internal static class TreeHelpers
 		Rectangle<double> rect = Rectangle.UnitSquare<double>();
 		if (path.Count == 0)
 		{
-			return new NodeState(root, Array.Empty<ISplitNode>(), rect);
+			return new NodeState(root, [], rect);
 		}
 
 		ISplitNode[] ancestors = new ISplitNode[path.Count];
@@ -118,7 +118,7 @@ internal static class TreeHelpers
 	/// <returns></returns>
 	public static WindowNodeState GetRightMostWindow(this ISplitNode ISplitNode)
 	{
-		List<ISplitNode> splitNodes = new();
+		List<ISplitNode> splitNodes = [];
 		ImmutableArray<int>.Builder pathBuilder = ImmutableArray.CreateBuilder<int>();
 
 		INode currentNode = ISplitNode;
@@ -140,8 +140,8 @@ internal static class TreeHelpers
 	/// <returns></returns>
 	public static WindowNodeState GetLeftMostWindow(this ISplitNode rootSplitNode)
 	{
-		List<ISplitNode> splitNodes = new();
-		List<int> pathBuilder = new();
+		List<ISplitNode> splitNodes = [];
+		List<int> pathBuilder = [];
 
 		INode currentNode = rootSplitNode;
 		while (currentNode is ISplitNode split)
@@ -152,7 +152,7 @@ internal static class TreeHelpers
 		}
 
 		// NOTE: This assumes that window nodes are always at the end of the path.
-		return new WindowNodeState((WindowNode)currentNode, splitNodes, pathBuilder.ToImmutableArray());
+		return new WindowNodeState((WindowNode)currentNode, splitNodes, [.. pathBuilder]);
 	}
 
 	/// <summary>
@@ -164,7 +164,7 @@ internal static class TreeHelpers
 	/// <returns></returns>
 	public static WindowNodeStateAtPoint? GetNodeContainingPoint(this INode rootNode, IPoint<double> searchPoint)
 	{
-		IRectangle<double> parentRect = Rectangle.UnitSquare<double>();
+		Rectangle<double> parentRect = Rectangle.UnitSquare<double>();
 		if (!parentRect.ContainsPoint(searchPoint))
 		{
 			return null;
@@ -172,12 +172,7 @@ internal static class TreeHelpers
 
 		if (rootNode is WindowNode rootWindowNode)
 		{
-			return new WindowNodeStateAtPoint(
-				rootWindowNode,
-				ImmutableArray.Create<ISplitNode>(),
-				ImmutableArray.Create<int>(),
-				parentRect.GetDirectionToPoint(searchPoint)
-			);
+			return new WindowNodeStateAtPoint(rootWindowNode, [], [], parentRect.GetDirectionToPoint(searchPoint));
 		}
 
 		if (rootNode is not SplitNode rootSplitNode)
@@ -513,7 +508,7 @@ internal static class TreeHelpers
 		ISplitNode root
 	)
 	{
-		List<(INode, ImmutableArray<int>)> stack = new() { };
+		List<(INode, ImmutableArray<int>)> stack = [];
 		if (windowPaths.IsEmpty)
 		{
 			stack.Add((root, ImmutableArray<int>.Empty));
@@ -538,7 +533,7 @@ internal static class TreeHelpers
 		}
 
 		// Iterate over the tree in-order, and create the updated paths.
-		List<KeyValuePair<IWindow, ImmutableArray<int>>> updatedPaths = new();
+		List<KeyValuePair<IWindow, ImmutableArray<int>>> updatedPaths = [];
 		while (stack.Count > 0)
 		{
 			(INode current, ImmutableArray<int> path) = stack[^1];

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -97,8 +96,8 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		_context = context;
 		_plugin = plugin;
 		Identity = identity;
-		_windows = ImmutableList<IWindow>.Empty;
-		_minimizedWindows = ImmutableList<IWindow>.Empty;
+		_windows = [];
+		_minimizedWindows = [];
 
 		(_rootArea, _windowAreas) = rootArea.SetStartIndexes();
 		_prunedRootArea = _rootArea.Prune(_windows.Count);
@@ -156,7 +155,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	{
 		if (_windows.Count == 0)
 		{
-			return Array.Empty<IWindowState>();
+			return [];
 		}
 
 		// Get the rectangles for each window
@@ -182,7 +181,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	{
 		if (_minimizedWindows.Count == 0)
 		{
-			return Array.Empty<IWindowState>();
+			return [];
 		}
 
 		IWindowState[] minimizedWindowStates = new IWindowState[_minimizedWindows.Count];

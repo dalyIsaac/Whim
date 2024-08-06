@@ -125,7 +125,7 @@ public class CommandPalettePlugin : ICommandPalettePlugin
 	/// <inheritdoc/>
 	public JsonElement? SaveState()
 	{
-		Dictionary<string, JsonElement> state = new();
+		Dictionary<string, JsonElement> state = [];
 
 		if (Config.ActivationConfig.Matcher.SaveState() is JsonElement activationConfig)
 		{

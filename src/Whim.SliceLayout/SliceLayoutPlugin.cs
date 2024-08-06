@@ -3,18 +3,13 @@ using System.Text.Json;
 namespace Whim.SliceLayout;
 
 /// <inheritdoc />
-public class SliceLayoutPlugin : ISliceLayoutPlugin
+/// <summary>
+/// Create a new <see cref="SliceLayoutPlugin"/>.
+/// </summary>
+/// <param name="context"></param>
+public class SliceLayoutPlugin(IContext context) : ISliceLayoutPlugin
 {
-	private readonly IContext _context;
-
-	/// <summary>
-	/// Create a new <see cref="SliceLayoutPlugin"/>.
-	/// </summary>
-	/// <param name="context"></param>
-	public SliceLayoutPlugin(IContext context)
-	{
-		_context = context;
-	}
+	private readonly IContext _context = context;
 
 	/// <summary>
 	/// <c>whim.slice_layout</c>

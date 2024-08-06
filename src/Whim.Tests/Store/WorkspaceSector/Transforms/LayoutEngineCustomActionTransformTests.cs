@@ -31,10 +31,11 @@ public class LayoutEngineCustomActionTransformTests
 		// Given none of the layout engines support the action
 		Workspace workspace = CreateWorkspace(ctx, WorkspaceId) with
 		{
-			LayoutEngines = ImmutableList.Create(
+			LayoutEngines =
+			[
 				CreateLayoutEngineNotSupportingAction<IWindow?>(),
 				CreateLayoutEngineNotSupportingAction<IWindow?>()
-			)
+			]
 		};
 		AddWorkspaceToManager(ctx, rootSector, workspace);
 
@@ -56,11 +57,12 @@ public class LayoutEngineCustomActionTransformTests
 		// Given the first and third layout engines support the action
 		Workspace workspace = CreateWorkspace(ctx, WorkspaceId) with
 		{
-			LayoutEngines = ImmutableList.Create(
+			LayoutEngines =
+			[
 				CreateLayoutEngineSupportingAction<IWindow?>(),
 				CreateLayoutEngineNotSupportingAction<IWindow?>(),
-				CreateLayoutEngineSupportingAction<IWindow?>()
-			)
+				CreateLayoutEngineSupportingAction<IWindow?>(),
+			]
 		};
 		AddWorkspaceToManager(ctx, root, workspace);
 

@@ -7,29 +7,32 @@ namespace Whim;
 /// <param name="CreateLeafLayoutEngines"></param>
 internal record WorkspaceToCreate(string? Name, IEnumerable<CreateLeafLayoutEngine>? CreateLeafLayoutEngines);
 
-internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorEvents, IDisposable
+internal class WorkspaceSector(IContext ctx, IInternalContext internalCtx)
+	: SectorBase,
+		IWorkspaceSector,
+		IWorkspaceSectorEvents,
+		IDisposable
 {
-	private readonly IContext _ctx;
-	private readonly IInternalContext _internalCtx;
+	private readonly IContext _ctx = ctx;
+	private readonly IInternalContext _internalCtx = internalCtx;
 
 	public bool HasInitialized { get; set; }
 
-	public ImmutableList<WorkspaceToCreate> WorkspacesToCreate { get; set; } = ImmutableList<WorkspaceToCreate>.Empty;
+	public ImmutableList<WorkspaceToCreate> WorkspacesToCreate { get; set; } = [];
 
-	public ImmutableHashSet<WorkspaceId> WorkspacesToLayout { get; set; } = ImmutableHashSet<WorkspaceId>.Empty;
+	public ImmutableHashSet<WorkspaceId> WorkspacesToLayout { get; set; } = [];
 
 	public HWND WindowHandleToFocus { get; set; }
 
-	public ImmutableArray<WorkspaceId> WorkspaceOrder { get; set; } = ImmutableArray<WorkspaceId>.Empty;
+	public ImmutableArray<WorkspaceId> WorkspaceOrder { get; set; } = [];
 
 	public ImmutableDictionary<WorkspaceId, Workspace> Workspaces { get; set; } =
 		ImmutableDictionary<WorkspaceId, Workspace>.Empty;
 
 	public Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; } =
-		() => new CreateLeafLayoutEngine[] { (id) => new ColumnLayoutEngine(id) };
+		() => [(id) => new ColumnLayoutEngine(id)];
 
-	public ImmutableList<ProxyLayoutEngineCreator> ProxyLayoutEngineCreators { get; set; } =
-		ImmutableList<ProxyLayoutEngineCreator>.Empty;
+	public ImmutableList<ProxyLayoutEngineCreator> ProxyLayoutEngineCreators { get; set; } = [];
 
 	public event EventHandler<WorkspaceAddedEventArgs>? WorkspaceAdded;
 
@@ -42,12 +45,6 @@ internal class WorkspaceSector : SectorBase, IWorkspaceSector, IWorkspaceSectorE
 	public event EventHandler<WorkspaceLayoutStartedEventArgs>? WorkspaceLayoutStarted;
 
 	public event EventHandler<WorkspaceLayoutCompletedEventArgs>? WorkspaceLayoutCompleted;
-
-	public WorkspaceSector(IContext ctx, IInternalContext internalCtx)
-	{
-		_ctx = ctx;
-		_internalCtx = internalCtx;
-	}
 
 	public override void Initialize()
 	{

@@ -45,25 +45,25 @@ public class DoLayoutTests
 			// Empty
 			{
 				new Rectangle<int>(0, 0, 100, 100),
-				SliceLayouts.CreateMultiColumnArea(new uint[] { 2, 1, 0 }),
+				SliceLayouts.CreateMultiColumnArea([2, 1, 0]),
 				Array.Empty<IRectangle<int>>()
 			},
 			// Single window
 			{
 				new Rectangle<int>(0, 0, 100, 100),
-				SliceLayouts.CreateMultiColumnArea(new uint[] { 2, 1, 0 }),
+				SliceLayouts.CreateMultiColumnArea([2, 1, 0]),
 				new[] { new Rectangle<int>(0, 0, 100, 100), }
 			},
 			// Fill primary
 			{
 				new Rectangle<int>(0, 0, 100, 100),
-				SliceLayouts.CreateMultiColumnArea(new uint[] { 2, 1, 0 }),
+				SliceLayouts.CreateMultiColumnArea([2, 1, 0]),
 				new[] { new Rectangle<int>(0, 0, 100, 50), new Rectangle<int>(0, 50, 100, 50), }
 			},
 			// Fill secondary
 			{
 				new Rectangle<int>(0, 0, 100, 100),
-				SliceLayouts.CreateMultiColumnArea(new uint[] { 2, 1, 0 }),
+				SliceLayouts.CreateMultiColumnArea([2, 1, 0]),
 				new[]
 				{
 					new Rectangle<int>(0, 0, 50, 50),
@@ -75,7 +75,7 @@ public class DoLayoutTests
 
 			{
 				new Rectangle<int>(0, 0, 100, 100),
-				SliceLayouts.CreateMultiColumnArea(new uint[] { 2, 1, 0 }),
+				SliceLayouts.CreateMultiColumnArea([2, 1, 0]),
 				new[]
 				{
 					new Rectangle<int>(0, 0, third, 50),

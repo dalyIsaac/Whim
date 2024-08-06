@@ -9,7 +9,7 @@ internal partial class PluginManager : IPluginManager
 	private readonly IContext _context;
 	private readonly CommandManager _commandManager;
 	private readonly string _savedStateFilePath;
-	private readonly List<IPlugin> _plugins = new();
+	private readonly List<IPlugin> _plugins = [];
 	private bool _disposedValue;
 
 	[GeneratedRegex(@"^\w+\.\w+(\.\w+)*$")]

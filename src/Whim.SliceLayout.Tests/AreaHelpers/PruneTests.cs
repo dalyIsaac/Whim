@@ -28,22 +28,22 @@ public class PruneTests
 		new()
 		{
 			// Empty
-			{ SliceLayouts.CreateMultiColumnArea(new uint[] { 2, 1, 0 }), 0, new ParentArea(isRow: true) },
+			{ SliceLayouts.CreateMultiColumnArea([2, 1, 0]), 0, new ParentArea(isRow: true) },
 			// Single window
 			{
-				SliceLayouts.CreateMultiColumnArea(new uint[] { 2, 1, 0 }),
+				SliceLayouts.CreateMultiColumnArea([2, 1, 0]),
 				1,
 				new ParentArea(isRow: true, (1.0, new SliceArea(order: 0, maxChildren: 2)))
 			},
 			// Fill primary
 			{
-				SliceLayouts.CreateMultiColumnArea(new uint[] { 2, 1, 0 }),
+				SliceLayouts.CreateMultiColumnArea([2, 1, 0]),
 				2,
 				new ParentArea(isRow: true, (1.0, new SliceArea(order: 0, maxChildren: 2)))
 			},
 			// Fill secondary
 			{
-				SliceLayouts.CreateMultiColumnArea(new uint[] { 2, 1, 0 }),
+				SliceLayouts.CreateMultiColumnArea([2, 1, 0]),
 				3,
 				new ParentArea(
 					isRow: true,
@@ -53,7 +53,7 @@ public class PruneTests
 			},
 			// Fill overflow
 			{
-				SliceLayouts.CreateMultiColumnArea(new uint[] { 2, 1, 0 }),
+				SliceLayouts.CreateMultiColumnArea([2, 1, 0]),
 				4,
 				new ParentArea(
 					isRow: true,

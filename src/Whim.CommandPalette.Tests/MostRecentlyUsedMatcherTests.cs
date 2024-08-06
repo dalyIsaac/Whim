@@ -19,7 +19,7 @@ public class MostRecentlyUsedMatcherTests
 			MenuVariantRowModel menuItem = new(new Command(items[i], items[i], ActionSink), null);
 
 			menuItems[i] = menuItem;
-			matcherItems[i] = new(menuItem, Array.Empty<FilterTextMatch>(), 0);
+			matcherItems[i] = new(menuItem, [], 0);
 		}
 
 		return (menuItems, matcherItems);
@@ -30,9 +30,7 @@ public class MostRecentlyUsedMatcherTests
 	{
 		// Given
 		MostRecentlyUsedMatcher<MenuVariantRowModelData> matcher = new();
-		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] matches) = CreateMocks(
-			new string[] { "A", "B" }
-		);
+		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] matches) = CreateMocks(["A", "B"]);
 
 		// When
 		int matchCount = matcher.GetFilteredItems("A", items, matches);
@@ -48,9 +46,7 @@ public class MostRecentlyUsedMatcherTests
 	{
 		// Given
 		MostRecentlyUsedMatcher<MenuVariantRowModelData> matcher = new();
-		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] matches) = CreateMocks(
-			new string[] { "A", "B" }
-		);
+		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] matches) = CreateMocks(["A", "B"]);
 
 		// When
 		int matchCount = matcher.GetMostRecentlyUsedItems(items, matches);
@@ -68,9 +64,7 @@ public class MostRecentlyUsedMatcherTests
 	{
 		// Given
 		MostRecentlyUsedMatcher<MenuVariantRowModelData> matcher = new();
-		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] matches) = CreateMocks(
-			new string[] { "A", "B" }
-		);
+		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] matches) = CreateMocks(["A", "B"]);
 		matcher.OnMatchExecuted(items[1]);
 
 		// When
@@ -88,9 +82,7 @@ public class MostRecentlyUsedMatcherTests
 	{
 		// Given
 		MostRecentlyUsedMatcher<MenuVariantRowModelData> matcher = new();
-		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] _) = CreateMocks(
-			new string[] { "A", "B" }
-		);
+		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] _) = CreateMocks(["A", "B"]);
 
 		// When
 		IEnumerable<MatcherResult<MenuVariantRowModelData>> rowItems = matcher.Match("C", items);
@@ -104,9 +96,7 @@ public class MostRecentlyUsedMatcherTests
 	{
 		// Given
 		MostRecentlyUsedMatcher<MenuVariantRowModelData> matcher = new();
-		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] _) = CreateMocks(
-			new string[] { "A", "B" }
-		);
+		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] _) = CreateMocks(["A", "B"]);
 
 		// When
 		MatcherResult<MenuVariantRowModelData>[] rowItems = matcher.Match("", items).ToArray();
@@ -156,9 +146,7 @@ public class MostRecentlyUsedMatcherTests
 	{
 		// Given
 		MostRecentlyUsedMatcher<MenuVariantRowModelData> matcher = new();
-		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] _) = CreateMocks(
-			new string[] { "C", "D" }
-		);
+		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] _) = CreateMocks(["C", "D"]);
 
 		// When
 		matcher.Match("", items);
@@ -198,9 +186,7 @@ public class MostRecentlyUsedMatcherTests
 	{
 		// Given
 		MostRecentlyUsedMatcher<MenuVariantRowModelData> matcher = new();
-		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] _) = CreateMocks(
-			new string[] { "A", "B" }
-		);
+		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] _) = CreateMocks(["A", "B"]);
 		matcher.Match("", items);
 		matcher.OnMatchExecuted(items[1]);
 

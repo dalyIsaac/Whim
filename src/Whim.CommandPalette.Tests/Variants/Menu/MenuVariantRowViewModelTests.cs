@@ -14,13 +14,13 @@ public class MenuVariantRowViewModelTests
 	{
 		// Given
 		// Old
-		MatcherResult<MenuVariantRowModelData> matcherResult = new(modelMock, Array.Empty<FilterTextMatch>(), 0);
+		MatcherResult<MenuVariantRowModelData> matcherResult = new(modelMock, [], 0);
 		MenuVariantRowViewModel vm = new(matcherResult);
 
 		// New
 		newModelMock.Title.Returns("Test");
 
-		FilterTextMatch[] matches = new[] { new FilterTextMatch(0, 4) };
+		FilterTextMatch[] matches = [new FilterTextMatch(0, 4)];
 		MatcherResult<MenuVariantRowModelData> newMatcherResult = new(newModelMock, matches, 0);
 
 		// When

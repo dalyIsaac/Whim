@@ -23,7 +23,7 @@ public class MoveWindowToPointInWorkspaceTransformTests
 			window,
 			CreateWorkspace(ctx) with
 			{
-				LayoutEngines = ImmutableList.Create(engine1, engine2)
+				LayoutEngines = [engine1, engine2]
 			}
 		);
 		Point<double> point = new(0.5, 0.5);
@@ -56,7 +56,7 @@ public class MoveWindowToPointInWorkspaceTransformTests
 		IWindow window = CreateWindow(handle);
 		AddWindowToSector(root, window);
 
-		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = ImmutableList.Create(engine1, engine2) };
+		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [engine1, engine2] };
 		AddWorkspaceToManager(ctx, root, workspace);
 		Point<double> point = new(0.5, 0.5);
 

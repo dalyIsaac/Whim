@@ -49,8 +49,7 @@ public class MoveWindowToPointTests
 		windowStates
 			.Should()
 			.Equal(
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window1,
@@ -75,7 +74,7 @@ public class MoveWindowToPointTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 	}
 
@@ -104,8 +103,7 @@ public class MoveWindowToPointTests
 		windowStates
 			.Should()
 			.Equal(
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window1,
@@ -130,7 +128,7 @@ public class MoveWindowToPointTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 	}
 
@@ -159,8 +157,7 @@ public class MoveWindowToPointTests
 		windowStates
 			.Should()
 			.Equal(
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window2,
@@ -185,7 +182,7 @@ public class MoveWindowToPointTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 	}
 
@@ -214,8 +211,7 @@ public class MoveWindowToPointTests
 		windowStates
 			.Should()
 			.Equal(
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window2,
@@ -240,7 +236,7 @@ public class MoveWindowToPointTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 	}
 
@@ -298,8 +294,7 @@ public class MoveWindowToPointTests
 		windowStates
 			.Should()
 			.Equal(
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window1,
@@ -336,7 +331,7 @@ public class MoveWindowToPointTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 	}
 
@@ -372,8 +367,7 @@ public class MoveWindowToPointTests
 		windowStates
 			.Should()
 			.Equal(
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window1,
@@ -410,7 +404,7 @@ public class MoveWindowToPointTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 	}
 
@@ -443,8 +437,7 @@ public class MoveWindowToPointTests
 		windowStates
 			.Should()
 			.Equal(
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window,
@@ -457,7 +450,7 @@ public class MoveWindowToPointTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 	}
 }

@@ -38,6 +38,6 @@ public static partial class PaletteFilters
 			return null;
 		}
 
-		return word.Length > 0 ? new[] { new FilterTextMatch(0, word.Length) } : Array.Empty<FilterTextMatch>();
+		return word.Length > 0 ? [new FilterTextMatch(0, word.Length)] : [];
 	}
 }

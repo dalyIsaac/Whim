@@ -6,9 +6,12 @@ using Whim.FloatingWindow;
 namespace Whim.LayoutPreview;
 
 /// <inheritdoc/>
-public class LayoutPreviewPlugin : IPlugin, IDisposable
+/// <summary>
+/// Initializes a new instance of the <see cref="LayoutPreviewPlugin"/> class.
+/// </summary>
+public class LayoutPreviewPlugin(IContext context) : IPlugin, IDisposable
 {
-	private readonly IContext _context;
+	private readonly IContext _context = context;
 	private LayoutPreviewWindow? _layoutPreviewWindow;
 	private bool _disposedValue;
 
@@ -24,14 +27,6 @@ public class LayoutPreviewPlugin : IPlugin, IDisposable
 
 	/// <inheritdoc/>
 	public IPluginCommands PluginCommands => new LayoutPreviewCommands(this);
-
-	/// <summary>
-	/// Initializes a new instance of the <see cref="LayoutPreviewPlugin"/> class.
-	/// </summary>
-	public LayoutPreviewPlugin(IContext context)
-	{
-		_context = context;
-	}
 
 	/// <inheritdoc	/>
 	public void PreInitialize()

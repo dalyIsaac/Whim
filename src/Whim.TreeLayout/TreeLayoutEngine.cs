@@ -70,7 +70,7 @@ public record TreeLayoutEngine : ILayoutEngine
 		Identity = identity;
 		_root = null;
 		_windows = WindowPathDict.Empty;
-		_minimizedWindows = ImmutableHashSet<IWindow>.Empty;
+		_minimizedWindows = [];
 	}
 
 	/// <summary>
@@ -116,7 +116,7 @@ public record TreeLayoutEngine : ILayoutEngine
 	/// <param name="window"></param>
 	/// <returns></returns>
 	private static WindowPathDict CreateRootNodeDict(IWindow window) =>
-		ImmutableDictionary.Create<IWindow, ImmutableArray<int>>().Add(window, ImmutableArray.Create(0));
+		ImmutableDictionary.Create<IWindow, ImmutableArray<int>>().Add(window, [0]);
 
 	/// <summary>
 	/// Creates a new dictionary with the top-level split node.
@@ -130,7 +130,7 @@ public record TreeLayoutEngine : ILayoutEngine
 		int idx = 0;
 		foreach (INode child in splitNode.Children)
 		{
-			dictBuilder.Add(((WindowNode)child).Window, ImmutableArray.Create(idx));
+			dictBuilder.Add(((WindowNode)child).Window, [idx]);
 			idx++;
 		}
 
@@ -167,7 +167,7 @@ public record TreeLayoutEngine : ILayoutEngine
 		}
 	}
 
-	private ILayoutEngine AddToSplitNode(
+	private TreeLayoutEngine AddToSplitNode(
 		WindowNode newWindowNode,
 		ISplitNode rootNode,
 		ImmutableHashSet<IWindow> minimizedWindows
@@ -223,7 +223,7 @@ public record TreeLayoutEngine : ILayoutEngine
 		return intermediateTree.AddWindowAtPoint(window, point);
 	}
 
-	private ILayoutEngine AddWindowAtPoint(IWindow window, IPoint<double> point)
+	private TreeLayoutEngine AddWindowAtPoint(IWindow window, IPoint<double> point)
 	{
 		ImmutableHashSet<IWindow> minimizedWindows = _minimizedWindows.Remove(window);
 		WindowNode newWindowNode = new(window);
@@ -246,7 +246,7 @@ public record TreeLayoutEngine : ILayoutEngine
 		return new TreeLayoutEngine(this, newWindowNode, CreateRootNodeDict(window), minimizedWindows);
 	}
 
-	private ILayoutEngine MoveWindowToPointSplitNode(
+	private TreeLayoutEngine MoveWindowToPointSplitNode(
 		IPoint<double> point,
 		WindowNode newWindowNode,
 		ISplitNode rootNode

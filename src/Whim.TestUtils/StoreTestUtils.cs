@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
 using NSubstitute;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -30,11 +28,7 @@ internal static class StoreTestUtils
 
 		ILayoutEngine engine = Substitute.For<ITestLayoutEngine>();
 
-		return new Workspace(ctx, workspaceId)
-		{
-			LayoutEngines = ImmutableList.Create(engine),
-			ActiveLayoutEngineIndex = 0
-		};
+		return new Workspace(ctx, workspaceId) { LayoutEngines = [engine], ActiveLayoutEngineIndex = 0 };
 	}
 
 	public static IMonitor CreateMonitor(HMONITOR handle)
@@ -62,7 +56,7 @@ internal static class StoreTestUtils
 			return;
 		}
 
-		List<IWorkspace> workspaces = ctx.WorkspaceManager.ToList();
+		List<IWorkspace> workspaces = [.. ctx.WorkspaceManager];
 		workspaces.Add(workspace);
 		ctx.WorkspaceManager.GetEnumerator().Returns(_ => workspaces.GetEnumerator());
 
@@ -87,11 +81,11 @@ internal static class StoreTestUtils
 
 	public static void AddMonitorsToManager(IContext ctx, MutableRootSector rootSector, params IMonitor[] newMonitors)
 	{
-		List<IMonitor> monitors = ctx.MonitorManager.ToList();
+		List<IMonitor> monitors = [.. ctx.MonitorManager];
 		monitors.AddRange(newMonitors);
 
 		ctx.MonitorManager.GetEnumerator().Returns(_ => monitors.GetEnumerator());
-		rootSector.MonitorSector.Monitors = newMonitors.ToImmutableArray();
+		rootSector.MonitorSector.Monitors = [.. newMonitors];
 	}
 
 	public static void AddWindowToSector(MutableRootSector rootSector, IWindow window)

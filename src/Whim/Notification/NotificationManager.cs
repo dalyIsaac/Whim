@@ -2,18 +2,13 @@ using Microsoft.Windows.AppNotifications;
 
 namespace Whim;
 
-internal class NotificationManager : INotificationManager
+internal class NotificationManager(IContext context) : INotificationManager
 {
 	private bool _disposedValue;
 	private bool _initialized;
 
-	private readonly IContext _context;
-	private readonly Dictionary<string, Action<AppNotificationActivatedEventArgs>> _notificationHandlers = new();
-
-	public NotificationManager(IContext context)
-	{
-		_context = context;
-	}
+	private readonly IContext _context = context;
+	private readonly Dictionary<string, Action<AppNotificationActivatedEventArgs>> _notificationHandlers = [];
 
 	public void Initialize()
 	{

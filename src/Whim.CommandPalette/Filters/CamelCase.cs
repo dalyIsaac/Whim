@@ -1,5 +1,3 @@
-using System;
-
 namespace Whim.CommandPalette;
 
 internal record struct CamelCaseAnalysis(float Upper, float Lower, float Alpha, float Numeric);
@@ -20,7 +18,7 @@ public static partial class PaletteFilters
 
 		if (word.Length == 0)
 		{
-			return Array.Empty<FilterTextMatch>();
+			return [];
 		}
 
 		if (!IsCamelCasePattern(word) || wordToMatchAgainst.Length > 60)
@@ -62,7 +60,7 @@ public static partial class PaletteFilters
 	{
 		if (wordStart == word.Length)
 		{
-			return Array.Empty<FilterTextMatch>();
+			return [];
 		}
 		else if (wordMatchStart == wordToMatchAgainst.Length)
 		{

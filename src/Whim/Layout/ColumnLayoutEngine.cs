@@ -35,8 +35,8 @@ public record ColumnLayoutEngine : ILayoutEngine
 	public ColumnLayoutEngine(LayoutEngineIdentity identity)
 	{
 		Identity = identity;
-		_stack = ImmutableList<IWindow>.Empty;
-		_minimizedWindows = ImmutableHashSet<IWindow>.Empty;
+		_stack = [];
+		_minimizedWindows = [];
 	}
 
 	private ColumnLayoutEngine(

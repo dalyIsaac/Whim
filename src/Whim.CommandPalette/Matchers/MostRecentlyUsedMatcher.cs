@@ -13,7 +13,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 {
 	private static readonly MatcherItemComparer<T> _sorter = new();
 
-	internal readonly Dictionary<string, long> _commandLastExecutionTime = new();
+	internal readonly Dictionary<string, long> _commandLastExecutionTime = [];
 
 	/// <summary>
 	/// The filter to use when matching commands.
@@ -33,7 +33,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 			// If there are no matches and the query is not empty, return an empty list.
 			if (!string.IsNullOrEmpty(query))
 			{
-				return Array.Empty<MatcherResult<T>>();
+				return [];
 			}
 
 			// If there are no matches and the query is empty, return the most recently used items.
@@ -84,7 +84,7 @@ public class MostRecentlyUsedMatcher<T> : IMatcher<T>
 		foreach (IVariantRowModel<T> item in items)
 		{
 			long lastExecutionTime = _commandLastExecutionTime.TryGetValue(item.Id, out long value) ? value : 0;
-			matches[matchCount++] = new MatcherResult<T>(item, Array.Empty<FilterTextMatch>(), lastExecutionTime);
+			matches[matchCount++] = new MatcherResult<T>(item, [], lastExecutionTime);
 		}
 
 		return matchCount;

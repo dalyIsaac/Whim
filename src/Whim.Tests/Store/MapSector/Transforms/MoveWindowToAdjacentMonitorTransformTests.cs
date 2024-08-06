@@ -10,7 +10,7 @@ public class MoveWindowToAdjacentMonitorTransformTests
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
 		IWindow window = CreateWindow((HWND)10);
 
-		rootSector.MonitorSector.Monitors = ImmutableArray.Create(monitor);
+		rootSector.MonitorSector.Monitors = [monitor];
 		rootSector.MonitorSector.ActiveMonitorHandle = monitor.Handle;
 		AddWindowToSector(rootSector, window);
 

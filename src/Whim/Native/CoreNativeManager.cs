@@ -12,14 +12,9 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim;
 
-internal class CoreNativeManager : ICoreNativeManager
+internal class CoreNativeManager(IContext context) : ICoreNativeManager
 {
-	private readonly IContext _context;
-
-	public CoreNativeManager(IContext context)
-	{
-		_context = context;
-	}
+	private readonly IContext _context = context;
 
 	public UnhookWinEventSafeHandle SetWinEventHook(uint eventMin, uint eventMax, WINEVENTPROC lpfnWinEventProc) =>
 		PInvoke.SetWinEventHook(eventMin, eventMax, null, lpfnWinEventProc, 0, 0, PInvoke.WINEVENT_OUTOFCONTEXT);
@@ -116,7 +111,7 @@ internal class CoreNativeManager : ICoreNativeManager
 
 	public IEnumerable<HWND> GetAllWindows()
 	{
-		List<HWND> windows = new();
+		List<HWND> windows = [];
 
 		PInvoke.EnumWindows(
 			(handle, param) =>
@@ -132,7 +127,7 @@ internal class CoreNativeManager : ICoreNativeManager
 
 	public IEnumerable<HWND> GetChildWindows(HWND hwnd)
 	{
-		List<HWND> windows = new();
+		List<HWND> windows = [];
 
 		PInvoke.EnumChildWindows(
 			hwnd,
@@ -188,7 +183,13 @@ internal class CoreNativeManager : ICoreNativeManager
 	}
 
 	private readonly HashSet<string> _systemClasses =
-		new() { "SysListView32", "WorkerW", "Shell_TrayWnd", "Shell_SecondaryTrayWnd", "Progman" };
+	[
+		"SysListView32",
+		"WorkerW",
+		"Shell_TrayWnd",
+		"Shell_SecondaryTrayWnd",
+		"Progman"
+	];
 
 	public bool IsSystemWindow(HWND hwnd, string className)
 	{

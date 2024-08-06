@@ -17,8 +17,8 @@ internal class MonitorUtilsTestCustomization : ICustomization
 
 public class MonitorUtilsTests
 {
-	private static readonly (RECT, HMONITOR)[] MULTI_MONITOR_SETUP = new[]
-	{
+	private static readonly (RECT, HMONITOR)[] MULTI_MONITOR_SETUP =
+	[
 		// right
 		(
 			new RECT()
@@ -52,7 +52,7 @@ public class MonitorUtilsTests
 			},
 			(HMONITOR)3
 		),
-	};
+	];
 
 	[Theory, AutoSubstituteData<MonitorUtilsTestCustomization>]
 	internal void SingleMonitor(IInternalContext internalCtx)

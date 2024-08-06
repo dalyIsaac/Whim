@@ -20,7 +20,7 @@ public class ActivateEmptyMonitorTransformTests
 	{
 		// Given the store contains multiple monitors
 		HMONITOR handle = (HMONITOR)123;
-		mutableRootSector.MonitorSector.Monitors = ImmutableArray.Create(monitor, monitor1);
+		mutableRootSector.MonitorSector.Monitors = [monitor, monitor1];
 		mutableRootSector.MonitorSector.ActiveMonitorHandle = handle;
 
 		ActivateEmptyMonitorTransform sut = new(handle);

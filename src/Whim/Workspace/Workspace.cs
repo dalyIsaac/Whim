@@ -21,7 +21,7 @@ public sealed partial record Workspace : IWorkspace
 	public HWND LastFocusedWindowHandle { get; internal set; }
 
 	/// <inheritdoc />
-	public ImmutableList<ILayoutEngine> LayoutEngines { get; internal set; } = ImmutableList<ILayoutEngine>.Empty;
+	public ImmutableList<ILayoutEngine> LayoutEngines { get; internal set; } = [];
 
 	/// <inheritdoc />
 	public ImmutableDictionary<HWND, WindowPosition> WindowPositions { get; internal set; } =

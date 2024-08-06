@@ -76,13 +76,13 @@ internal class CoreSavedStateManager : ICoreSavedStateManager
 
 	private void SaveState()
 	{
-		List<SavedWorkspace> savedWorkspaces = new();
+		List<SavedWorkspace> savedWorkspaces = [];
 		IMonitor monitor = _context.MonitorManager.PrimaryMonitor;
 		IRectangle<int> fakeMonitorRect = new Rectangle<int>() { Height = 1000, Width = 1000 };
 
 		foreach (IWorkspace workspace in _context.WorkspaceManager)
 		{
-			List<SavedWindow> savedWindows = new();
+			List<SavedWindow> savedWindows = [];
 
 			foreach (IWindowState windowState in workspace.ActiveLayoutEngine.DoLayout(fakeMonitorRect, monitor))
 			{

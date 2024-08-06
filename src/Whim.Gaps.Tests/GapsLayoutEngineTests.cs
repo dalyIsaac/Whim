@@ -14,15 +14,14 @@ public class GapsLayoutEngineTests
 	{
 		get
 		{
-			TheoryData<GapsConfig, IWindow[], int, IWindowState[]> data = new();
+			TheoryData<GapsConfig, IWindow[], int, IWindowState[]> data = [];
 
 			IWindow window1 = Substitute.For<IWindow>();
 			data.Add(
 				new GapsConfig() { OuterGap = 10, InnerGap = 5 },
-				new IWindow[] { window1 },
+				[window1],
 				100,
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window1,
@@ -35,17 +34,16 @@ public class GapsLayoutEngineTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			IWindow window2 = Substitute.For<IWindow>();
 			IWindow window3 = Substitute.For<IWindow>();
 			data.Add(
 				new GapsConfig() { OuterGap = 10, InnerGap = 5 },
-				new IWindow[] { window2, window3 },
+				[window2, window3],
 				100,
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window2,
@@ -70,16 +68,15 @@ public class GapsLayoutEngineTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			IWindow window4 = Substitute.For<IWindow>();
 			data.Add(
 				new GapsConfig { OuterGap = 10, InnerGap = 5 },
-				new IWindow[] { window4 },
+				[window4],
 				150,
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window4,
@@ -92,7 +89,7 @@ public class GapsLayoutEngineTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			return data;
@@ -136,7 +133,7 @@ public class GapsLayoutEngineTests
 	{
 		get
 		{
-			TheoryData<GapsConfig, IWindow, Rectangle<int>, IWindowState[]> data = new();
+			TheoryData<GapsConfig, IWindow, Rectangle<int>, IWindowState[]> data = [];
 
 			// A window whose width returned by the layout engine as less than zero should not have the
 			// gap applied in the x direction
@@ -151,8 +148,7 @@ public class GapsLayoutEngineTests
 					Width = -100,
 					Height = 1080
 				},
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window1,
@@ -165,7 +161,7 @@ public class GapsLayoutEngineTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			// A window whose width returned by the layout engine as zero should not have the gap applied
@@ -181,8 +177,7 @@ public class GapsLayoutEngineTests
 					Width = 0,
 					Height = 1080
 				},
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window2,
@@ -195,7 +190,7 @@ public class GapsLayoutEngineTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			// A window whose width is less than the gap should not have the gap applied in the x direction
@@ -210,8 +205,7 @@ public class GapsLayoutEngineTests
 					Width = 5,
 					Height = 1080
 				},
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window3,
@@ -224,7 +218,7 @@ public class GapsLayoutEngineTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			// A window whose height returned by the layout engine as less than zero should not have the
@@ -240,8 +234,7 @@ public class GapsLayoutEngineTests
 					Width = 1920,
 					Height = -100
 				},
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window4,
@@ -254,7 +247,7 @@ public class GapsLayoutEngineTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			// A window whose height returned by the layout engine as zero should not have the gap applied
@@ -270,8 +263,7 @@ public class GapsLayoutEngineTests
 					Width = 1920,
 					Height = 0
 				},
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window5,
@@ -284,7 +276,7 @@ public class GapsLayoutEngineTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			// A window whose height is less than the gap should not have the gap applied in the y direction
@@ -299,8 +291,7 @@ public class GapsLayoutEngineTests
 					Width = 1920,
 					Height = 5
 				},
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window6,
@@ -313,7 +304,7 @@ public class GapsLayoutEngineTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			// A window whose width and height are less than the gap should not have the gap applied in
@@ -329,8 +320,7 @@ public class GapsLayoutEngineTests
 					Width = 5,
 					Height = 5
 				},
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window7,
@@ -343,7 +333,7 @@ public class GapsLayoutEngineTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			// A window whose width and height are zero should not have the gap applied in either direction
@@ -358,8 +348,7 @@ public class GapsLayoutEngineTests
 					Width = 0,
 					Height = 0
 				},
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window8,
@@ -372,7 +361,7 @@ public class GapsLayoutEngineTests
 						},
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 			return data;
@@ -393,15 +382,14 @@ public class GapsLayoutEngineTests
 		innerLayoutEngine
 			.DoLayout(rect, Arg.Any<IMonitor>())
 			.Returns(
-				new IWindowState[]
-				{
+				[
 					new WindowState()
 					{
 						Window = window,
 						Rectangle = rect,
 						WindowSize = WindowSize.Normal
 					}
-				}
+				]
 			);
 
 		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
@@ -419,14 +407,14 @@ public class GapsLayoutEngineTests
 		// Input
 		Rectangle<int> rect = new(0, 0, -300, -300);
 		IWindowState[] inputWindowStates =
-		{
+		[
 			new WindowState()
 			{
 				Window = window,
 				Rectangle = rect,
 				WindowSize = WindowSize.Normal
 			}
-		};
+		];
 
 		// Given
 		ILayoutEngine innerLayoutEngine = Substitute.For<ILayoutEngine>();

@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using FluentAssertions;
 
 namespace Whim.Tests;
@@ -60,7 +59,7 @@ public class LegacyWorkspaceTests
 		// Given
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
-			LayoutEngines = ImmutableList.Create(engine)
+			LayoutEngines = [engine]
 		};
 		AddWorkspaceToManager(ctx, root, workspace);
 

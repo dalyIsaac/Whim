@@ -15,5 +15,5 @@ public abstract record TestProxyLayoutEngine : BaseProxyLayoutEngine
 	/// <summary>
 	/// The proxied layout engine.
 	/// </summary>
-	public ILayoutEngine InnerLayoutEngine => base.InnerLayoutEngine;
+	public new ILayoutEngine InnerLayoutEngine => base.InnerLayoutEngine;
 }

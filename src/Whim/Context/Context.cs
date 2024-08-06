@@ -11,7 +11,7 @@ namespace Whim;
 /// </summary>
 internal class Context : IContext
 {
-	private readonly IInternalContext _internalContext;
+	private readonly InternalContext _internalContext;
 	public IButler Butler { get; }
 	public IFileManager FileManager { get; }
 	public IResourceManager ResourceManager { get; }
@@ -55,8 +55,9 @@ internal class Context : IContext
 		FilterManager = new FilterManager();
 		WindowManager = new WindowManager(this, _internalContext);
 		MonitorManager = new MonitorManager(this);
+
 		WorkspaceManager = new WorkspaceManager(this);
-		_commandManager = new CommandManager();
+		_commandManager = [];
 		PluginManager = new PluginManager(this, _commandManager);
 		KeybindManager = new KeybindManager(this);
 		NotificationManager = new NotificationManager(this);

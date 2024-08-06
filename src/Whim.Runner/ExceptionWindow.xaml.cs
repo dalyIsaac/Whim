@@ -1,11 +1,12 @@
-﻿using Microsoft.UI.Xaml;
+﻿using System;
+using Microsoft.UI.Xaml;
 
 namespace Whim.Runner;
 
 /// <summary>
 /// Exposes the exception encountered during startup to the user.
 /// </summary>
-public sealed partial class ExceptionWindow : Microsoft.UI.Xaml.Window
+public sealed partial class ExceptionWindow : Microsoft.UI.Xaml.Window, IDisposable
 {
 	private readonly App _app;
 	private readonly WindowBackdropController _backdropController;
@@ -35,5 +36,11 @@ public sealed partial class ExceptionWindow : Microsoft.UI.Xaml.Window
 	{
 		Close();
 		_app.Exit();
+	}
+
+	/// <inheritdoc/>
+	public void Dispose()
+	{
+		_backdropController.Dispose();
 	}
 }

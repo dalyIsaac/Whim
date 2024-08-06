@@ -9,7 +9,7 @@ public class SliceLayoutsTests
 	public void CreateMultiColumnArea_MultipleOverflows()
 	{
 		// Given
-		ParentArea sut = SliceLayouts.CreateMultiColumnArea(new uint[] { 2, 1, 0, 0 });
+		ParentArea sut = SliceLayouts.CreateMultiColumnArea([2, 1, 0, 0]);
 
 		// Then
 		new ParentArea(

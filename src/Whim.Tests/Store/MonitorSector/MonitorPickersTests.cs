@@ -18,7 +18,7 @@ public class MonitorPickersTests
 		IMonitor monitor4 = Substitute.For<IMonitor>();
 		monitor4.Handle.Returns((HMONITOR)4);
 
-		root.MonitorSector.Monitors = ImmutableArray.Create(monitor1, monitor2, monitor3, monitor4);
+		root.MonitorSector.Monitors = [monitor1, monitor2, monitor3, monitor4];
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -158,7 +158,7 @@ public class GetMonitorAtPointPickerTests
 			.Returns(foundMonitorHandle);
 
 		monitor.Handle.Returns(monitorHandle);
-		root.MonitorSector.Monitors = ImmutableArray.Create(monitor);
+		root.MonitorSector.Monitors = [monitor];
 	}
 
 	private static readonly IPoint<int> _point = new Point<int>(10, 10);

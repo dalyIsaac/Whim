@@ -10,14 +10,7 @@ public class BarLayoutEngineTests
 {
 	private static BarLayoutEngine CreateSut(ILayoutEngine innerLayoutEngine) =>
 		new(
-			new BarConfig(
-				leftComponents: new List<BarComponent>(),
-				centerComponents: new List<BarComponent>(),
-				rightComponents: new List<BarComponent>()
-			)
-			{
-				Height = 30
-			},
+			new BarConfig(leftComponents: [], centerComponents: [], rightComponents: []) { Height = 30 },
 			innerLayoutEngine
 		);
 
@@ -278,8 +271,8 @@ public class BarLayoutEngineTests
 		monitor.ScaleFactor.Returns(100);
 		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
 
-		IWindowState[] expectedWindowStates = new[]
-		{
+		IWindowState[] expectedWindowStates =
+		[
 			new WindowState()
 			{
 				Window = window1,
@@ -303,7 +296,7 @@ public class BarLayoutEngineTests
 				},
 				WindowSize = WindowSize.Normal
 			}
-		};
+		];
 
 		Rectangle<int> expectedGivenRect =
 			new()

@@ -44,7 +44,7 @@ internal class WindowManagerFakeSafeHandle : UnhookWinEventSafeHandle
 internal class CaptureWinEventProc
 {
 	public WINEVENTPROC? WinEventProc { get; private set; }
-	public List<WindowManagerFakeSafeHandle> Handles { get; } = new();
+	public List<WindowManagerFakeSafeHandle> Handles { get; } = [];
 
 	public static CaptureWinEventProc Create(
 		IInternalContext internalCtx,

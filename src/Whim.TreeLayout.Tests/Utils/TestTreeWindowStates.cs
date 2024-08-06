@@ -63,8 +63,8 @@ internal static class TestTreeWindowStates
 		Height = 0.5 * 1d / 3
 	};
 
-	public static IRectangle<double>[] All = new IRectangle<double>[]
-	{
+	public static IRectangle<double>[] All =
+	[
 		Left,
 		RightTopLeftTop,
 		RightTopLeftBottomLeft,
@@ -74,7 +74,7 @@ internal static class TestTreeWindowStates
 		RightTopRight2,
 		RightTopRight3,
 		RightBottom
-	};
+	];
 
 	public static IWindowState[] GetAllWindowStates(
 		IRectangle<int> screen,
@@ -89,8 +89,8 @@ internal static class TestTreeWindowStates
 		IWindow rightBottomWindow
 	)
 	{
-		return new IWindowState[]
-		{
+		return
+		[
 			new WindowState()
 			{
 				Window = leftWindow,
@@ -145,6 +145,6 @@ internal static class TestTreeWindowStates
 				Rectangle = RightBottom.Scale(screen),
 				WindowSize = WindowSize.Normal
 			}
-		};
+		];
 	}
 }

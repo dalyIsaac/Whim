@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace Whim.CommandPalette;
+﻿namespace Whim.CommandPalette;
 
 /// <summary>
 /// Utilities for palette filters.
@@ -40,7 +38,7 @@ public static partial class PaletteFilters
 	{
 		if (tail.Length == 0)
 		{
-			tail = new[] { head };
+			tail = [head];
 		}
 		else if (head.End == tail[0].Start)
 		{
@@ -48,7 +46,7 @@ public static partial class PaletteFilters
 		}
 		else
 		{
-			tail = new[] { head }.Concat(tail).ToArray();
+			tail = [head, .. tail];
 		}
 
 		return tail;

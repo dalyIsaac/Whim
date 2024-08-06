@@ -1,16 +1,16 @@
 namespace Whim;
 
-internal class MutableRootSector : SectorBase, IDisposable
+internal class MutableRootSector(IContext ctx, IInternalContext internalCtx) : SectorBase, IDisposable
 {
-	private readonly IContext _ctx;
+	private readonly IContext _ctx = ctx;
 	private readonly object _lock = new();
 	private bool _disposedValue;
 	private bool _dispatchEventsScheduled;
 
-	public MonitorSector MonitorSector { get; }
-	public WindowSector WindowSector { get; }
-	public WorkspaceSector WorkspaceSector { get; }
-	public MapSector MapSector { get; }
+	public MonitorSector MonitorSector { get; } = new MonitorSector(ctx, internalCtx);
+	public WindowSector WindowSector { get; } = new WindowSector(ctx, internalCtx);
+	public WorkspaceSector WorkspaceSector { get; } = new WorkspaceSector(ctx, internalCtx);
+	public MapSector MapSector { get; } = new MapSector();
 
 	/// <inheritdoc/>
 	public override bool HasQueuedEvents =>
@@ -18,15 +18,6 @@ internal class MutableRootSector : SectorBase, IDisposable
 		|| WindowSector.HasQueuedEvents
 		|| WorkspaceSector.HasQueuedEvents
 		|| MapSector.HasQueuedEvents;
-
-	public MutableRootSector(IContext ctx, IInternalContext internalCtx)
-	{
-		_ctx = ctx;
-		MonitorSector = new MonitorSector(ctx, internalCtx);
-		WindowSector = new WindowSector(ctx, internalCtx);
-		WorkspaceSector = new WorkspaceSector(ctx, internalCtx);
-		MapSector = new MapSector();
-	}
 
 	public override void Initialize()
 	{

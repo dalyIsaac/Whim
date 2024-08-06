@@ -38,7 +38,7 @@ public class TreeHelpersTests
 	internal void GetNodeAtPath_WithEmptyPath_ReturnsRoot(INode root)
 	{
 		// When
-		var result = root.GetNodeAtPath(Array.Empty<int>());
+		var result = root.GetNodeAtPath([]);
 
 		// Then
 		Assert.NotNull(result);
@@ -51,7 +51,7 @@ public class TreeHelpersTests
 	internal void GetNodeAtPath_CurrentNodeIsNotSplitNode(INode root)
 	{
 		// Given
-		int[] path = { 0 };
+		int[] path = [0];
 
 		// When
 		var result = root.GetNodeAtPath(path);
@@ -65,7 +65,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		int[] path = { 1 };
+		int[] path = [1];
 
 		// When
 		var result = tree.Root.GetNodeAtPath(path);
@@ -89,7 +89,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		int[] path = { 1, 0 };
+		int[] path = [1, 0];
 
 		// When
 		var result = tree.Root.GetNodeAtPath(path);
@@ -114,7 +114,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		int[] path = { 1, 0, 0, 1, 1, 1 };
+		int[] path = [1, 0, 0, 1, 1, 1];
 
 		// When
 		var result = tree.Root.GetNodeAtPath(path);
@@ -299,12 +299,8 @@ public class TreeHelpersTests
 			new(
 				equalWeight: false,
 				isHorizontal: true,
-				new INode[]
-				{
-					new WindowNode(Substitute.For<IWindow>()),
-					new WindowNode(Substitute.For<IWindow>())
-				}.ToImmutableList(),
-				new double[] { 0.5, 0.25 }.ToImmutableList()
+				[new WindowNode(Substitute.For<IWindow>()), new WindowNode(Substitute.For<IWindow>())],
+				[0.5, 0.25]
 			);
 
 		Point<double> point = new() { X = 0.8, Y = 0.4 };
@@ -597,8 +593,9 @@ public class TreeHelpersTests
 		TestTree tree = new();
 		IRectangle<int> rectangle = new Rectangle<int>() { Width = 1920, Height = 1080 };
 
-		IWindowState[] expectedStates = TestTreeWindowStates
-			.GetAllWindowStates(
+		IWindowState[] expectedStates =
+		[
+			.. TestTreeWindowStates.GetAllWindowStates(
 				rectangle,
 				tree.Left.Window,
 				tree.RightTopLeftTop.Window,
@@ -610,7 +607,7 @@ public class TreeHelpersTests
 				tree.RightTopRight3.Window,
 				tree.RightBottom.Window
 			)
-			.ToArray();
+		];
 
 		// When
 		WindowNodeRectangleState[] windowRectangles = tree.Root.GetWindowRectangles(rectangle).ToArray();
@@ -633,7 +630,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		WindowNode root = new(window);
-		IReadOnlyList<int> pathToNode = Array.Empty<int>();
+		IReadOnlyList<int> pathToNode = [];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(root, pathToNode, Direction.Right, monitor);
@@ -646,7 +643,7 @@ public class TreeHelpersTests
 	internal void GetAdjacentNode_RootIsNotISplitNode(INode root, IMonitor monitor)
 	{
 		// Given
-		IReadOnlyList<int> pathToNode = Array.Empty<int>();
+		IReadOnlyList<int> pathToNode = [];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(root, pathToNode, Direction.Right, monitor);
@@ -660,7 +657,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		IReadOnlyList<int> pathToNode = new[] { 0, 0, 0, 0, 0 };
+		IReadOnlyList<int> pathToNode = [0, 0, 0, 0, 0];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
@@ -679,7 +676,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		IReadOnlyList<int> pathToNode = new[] { 0 };
+		IReadOnlyList<int> pathToNode = [0];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
@@ -698,7 +695,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		IReadOnlyList<int> pathToNode = new[] { 1, 0, 0, 1, 0 };
+		IReadOnlyList<int> pathToNode = [1, 0, 0, 1, 0];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
@@ -717,7 +714,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		IReadOnlyList<int> pathToNode = new[] { 1, 0, 0, 1, 0 };
+		IReadOnlyList<int> pathToNode = [1, 0, 0, 1, 0];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
@@ -736,7 +733,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		IReadOnlyList<int> pathToNode = new[] { 1, 0, 0, 1, 0 };
+		IReadOnlyList<int> pathToNode = [1, 0, 0, 1, 0];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
@@ -755,7 +752,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		IReadOnlyList<int> pathToNode = new[] { 1, 0, 0, 1, 0 };
+		IReadOnlyList<int> pathToNode = [1, 0, 0, 1, 0];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
@@ -774,7 +771,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		SimpleTestTree tree = new();
-		IReadOnlyList<int> pathToNode = new[] { 1, 0 };
+		IReadOnlyList<int> pathToNode = [1, 0];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
@@ -793,7 +790,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		SimpleTestTree tree = new();
-		IReadOnlyList<int> pathToNode = new[] { 0, 0 };
+		IReadOnlyList<int> pathToNode = [0, 0];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
@@ -812,7 +809,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		SimpleTestTree tree = new();
-		IReadOnlyList<int> pathToNode = new[] { 1, 1 };
+		IReadOnlyList<int> pathToNode = [1, 1];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
@@ -831,7 +828,7 @@ public class TreeHelpersTests
 	{
 		// Given
 		SimpleTestTree tree = new();
-		IReadOnlyList<int> pathToNode = new[] { 0, 1 };
+		IReadOnlyList<int> pathToNode = [0, 1];
 
 		// When
 		WindowNodeStateAtPoint? result = TreeHelpers.GetAdjacentWindowNode(
@@ -851,8 +848,8 @@ public class TreeHelpersTests
 	internal void GetLastCommonAncestor_EmptyList()
 	{
 		// Given
-		IReadOnlyList<int> pathToNode1 = Array.Empty<int>();
-		IReadOnlyList<int> pathToNode2 = Array.Empty<int>();
+		IReadOnlyList<int> pathToNode1 = [];
+		IReadOnlyList<int> pathToNode2 = [];
 
 		// When
 		int? result = TreeHelpers.GetLastCommonAncestorIndex(pathToNode1, pathToNode2);
@@ -865,8 +862,8 @@ public class TreeHelpersTests
 	internal void GetLastCommonAncestor_SomeCommonAncestor()
 	{
 		// Given
-		IReadOnlyList<int> pathToNode1 = new[] { 1, 0, 0, 1, 0 };
-		IReadOnlyList<int> pathToNode2 = new[] { 1, 0, 0, 1, 1 };
+		IReadOnlyList<int> pathToNode1 = [1, 0, 0, 1, 0];
+		IReadOnlyList<int> pathToNode2 = [1, 0, 0, 1, 1];
 
 		// When
 		int? result = TreeHelpers.GetLastCommonAncestorIndex(pathToNode1, pathToNode2);
@@ -879,8 +876,8 @@ public class TreeHelpersTests
 	internal void GetLastCommonAncestor_NoCommonAncestor()
 	{
 		// Given
-		IReadOnlyList<int> pathToNode1 = new[] { 1, 0, 0, 1, 0 };
-		IReadOnlyList<int> pathToNode2 = new[] { 0, 0, 0, 1, 1 };
+		IReadOnlyList<int> pathToNode1 = [1, 0, 0, 1, 0];
+		IReadOnlyList<int> pathToNode2 = [0, 0, 0, 1, 1];
 
 		// When
 		int? result = TreeHelpers.GetLastCommonAncestorIndex(pathToNode1, pathToNode2);
@@ -893,8 +890,8 @@ public class TreeHelpersTests
 	internal void GetLastCommonAncestor_SamePath()
 	{
 		// Given
-		IReadOnlyList<int> pathToNode1 = new[] { 1, 0, 0, 1, 0 };
-		IReadOnlyList<int> pathToNode2 = new[] { 1, 0, 0, 1, 0 };
+		IReadOnlyList<int> pathToNode1 = [1, 0, 0, 1, 0];
+		IReadOnlyList<int> pathToNode2 = [1, 0, 0, 1, 0];
 
 		// When
 		int? result = TreeHelpers.GetLastCommonAncestorIndex(pathToNode1, pathToNode2);
@@ -914,7 +911,7 @@ public class TreeHelpersTests
 			IWindow,
 			ImmutableArray<int>
 		>.Empty;
-		ImmutableArray<int> pathToNode = ImmutableArray.Create(1, 0, 0, 1, 0);
+		ImmutableArray<int> pathToNode = [1, 0, 0, 1, 0];
 
 		// When
 		ImmutableDictionary<IWindow, ImmutableArray<int>> result = TreeHelpers.CreateUpdatedPaths(
@@ -970,8 +967,8 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		ImmutableArray<int> initialPath = ImmutableArray.Create(0);
-		ImmutableArray<int> pathToNode = ImmutableArray.Create(1, 0, 1);
+		ImmutableArray<int> initialPath = [0];
+		ImmutableArray<int> pathToNode = [1, 0, 1];
 
 		// When
 		ImmutableDictionary<IWindow, ImmutableArray<int>> originalDict = TreeHelpers.CreateUpdatedPaths(
@@ -1009,8 +1006,8 @@ public class TreeHelpersTests
 	{
 		// Given
 		TestTree tree = new();
-		ImmutableArray<int> initialPath = ImmutableArray.Create(0);
-		ImmutableArray<int> pathToNode = ImmutableArray.Create(0, 0);
+		ImmutableArray<int> initialPath = [0];
+		ImmutableArray<int> pathToNode = [0, 0];
 
 		// When
 		ImmutableDictionary<IWindow, ImmutableArray<int>> originalDict = TreeHelpers.CreateUpdatedPaths(

@@ -135,7 +135,7 @@ public class DeferWindowPosHandleTests
 		DeferWindowPosState state3 = new((HWND)3, WindowSize.Maximized, new Rectangle<int>(5, 6, 7, 8));
 		DeferWindowPosState state4 = new((HWND)4, WindowSize.Normal, new Rectangle<int>(9, 10, 11, 12));
 
-		DeferWindowPosHandle sut = new(ctx, internalCtx, new[] { state1, state2, state3, state4 });
+		DeferWindowPosHandle sut = new(ctx, internalCtx, [state1, state2, state3, state4]);
 
 		AddMonitorsToManager(ctx, root, CreateMonitor((HMONITOR)1));
 

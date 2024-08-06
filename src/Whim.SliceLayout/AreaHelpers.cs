@@ -147,9 +147,9 @@ internal static class AreaHelpers
 	private static (List<SliceArea> SliceAreas, OverflowArea? OverflowArea) GetAreasSorted(ParentArea rootArea)
 	{
 		// Iterate through the tree and add the areas to the list, using DFS.
-		List<SliceArea> sliceAreas = new();
+		List<SliceArea> sliceAreas = [];
 		OverflowArea? overflowArea = null;
-		List<IArea> areas = new() { rootArea };
+		List<IArea> areas = [rootArea];
 
 		while (areas.Count > 0)
 		{

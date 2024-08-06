@@ -39,40 +39,39 @@ internal static class Data
 
 	public static Release CreateRelease242(string? tagName = null, ReleaseAsset[]? assets = null)
 	{
-		ReleaseAsset[] defaultAssets = new ReleaseAsset[2];
-
-		defaultAssets[0] = new ReleaseAsset(
-			url: "https://api.github.com/repos/dalyIsaac/Whim/releases/assets/137453491",
-			id: 137453491,
-			nodeId: "RA_kwDOGWZ1Ts4IMV-z",
-			name: "WhimInstaller-arm64-0.1.242-alpha+823a398d.823a398db7a01e1c50dc296c9dd62782007025dd.exe",
-			label: "",
-			contentType: "application/x-msdownload",
-			state: "uploaded",
-			size: 24339890,
-			downloadCount: 1,
-			createdAt: DateTimeOffset.Parse("2023-11-26T02:09:15Z"),
-			updatedAt: DateTimeOffset.Parse("2023-11-26T02:09:16Z"),
-			browserDownloadUrl: "https://github.com/dalyIsaac/Whim/releases/download/v0.1.242-alpha%2B823a398d/WhimInstaller-arm64-0.1.242-alpha%2B823a398d.823a398db7a01e1c50dc296c9dd62782007025dd.exe",
-			uploader: CreateAuthor()
-		);
-
-		defaultAssets[1] = new ReleaseAsset(
-			url: "https://api.github.com/repos/dalyIsaac/Whim/releases/assets/137453051",
-			id: 137453051,
-			nodeId: "RA_kwDOGWZ1Ts4IMV37",
-			name: "WhimInstaller-x64-0.1.242-alpha+823a398d.823a398db7a01e1c50dc296c9dd62782007025dd.exe",
-			label: "",
-			contentType: "application/x-msdownload",
-			state: "uploaded",
-			size: 25963657,
-			downloadCount: 1,
-			createdAt: DateTimeOffset.Parse("2023-11-26T02:04:03Z"),
-			updatedAt: DateTimeOffset.Parse("2023-11-26T02:04:04Z"),
-			browserDownloadUrl: "https://github.com/dalyIsaac/Whim/releases/download/v0.1.242-alpha%2B823a398d/WhimInstaller-x64-0.1.242-alpha%2B823a398d.823a398db7a01e1c50dc296c9dd62782007025dd.exe",
-			uploader: CreateAuthor()
-		);
-
+		ReleaseAsset[] defaultAssets =
+		[
+			new ReleaseAsset(
+				url: "https://api.github.com/repos/dalyIsaac/Whim/releases/assets/137453491",
+				id: 137453491,
+				nodeId: "RA_kwDOGWZ1Ts4IMV-z",
+				name: "WhimInstaller-arm64-0.1.242-alpha+823a398d.823a398db7a01e1c50dc296c9dd62782007025dd.exe",
+				label: "",
+				contentType: "application/x-msdownload",
+				state: "uploaded",
+				size: 24339890,
+				downloadCount: 1,
+				createdAt: DateTimeOffset.Parse("2023-11-26T02:09:15Z"),
+				updatedAt: DateTimeOffset.Parse("2023-11-26T02:09:16Z"),
+				browserDownloadUrl: "https://github.com/dalyIsaac/Whim/releases/download/v0.1.242-alpha%2B823a398d/WhimInstaller-arm64-0.1.242-alpha%2B823a398d.823a398db7a01e1c50dc296c9dd62782007025dd.exe",
+				uploader: CreateAuthor()
+			),
+			new ReleaseAsset(
+				url: "https://api.github.com/repos/dalyIsaac/Whim/releases/assets/137453051",
+				id: 137453051,
+				nodeId: "RA_kwDOGWZ1Ts4IMV37",
+				name: "WhimInstaller-x64-0.1.242-alpha+823a398d.823a398db7a01e1c50dc296c9dd62782007025dd.exe",
+				label: "",
+				contentType: "application/x-msdownload",
+				state: "uploaded",
+				size: 25963657,
+				downloadCount: 1,
+				createdAt: DateTimeOffset.Parse("2023-11-26T02:04:03Z"),
+				updatedAt: DateTimeOffset.Parse("2023-11-26T02:04:04Z"),
+				browserDownloadUrl: "https://github.com/dalyIsaac/Whim/releases/download/v0.1.242-alpha%2B823a398d/WhimInstaller-x64-0.1.242-alpha%2B823a398d.823a398db7a01e1c50dc296c9dd62782007025dd.exe",
+				uploader: CreateAuthor()
+			),
+		];
 		return new Release(
 			url: "https://api.github.com/repos/dalyIsaac/Whim/releases/131450677",
 			assetsUrl: "https://api.github.com/repos/dalyIsaac/Whim/releases/131450677/assets",
@@ -108,40 +107,39 @@ internal static class Data
 
 	public static Release CreateRelease243()
 	{
-		ReleaseAsset[] assets = new ReleaseAsset[2];
-
-		assets[0] = new ReleaseAsset(
-			url: "https://api.github.com/repos/dalyIsaac/Whim/releases/assets/137468755",
-			id: 137468755,
-			nodeId: "RA_kwDOGWZ1Ts4IMZtT",
-			name: "WhimInstaller-arm64-0.1.243-alpha+2ae89a20.2ae89a204825f950e0be5b712b56cd5929e94adb.exe",
-			label: "",
-			contentType: "application/x-msdownload",
-			state: "uploaded",
-			size: 24362101,
-			downloadCount: 1,
-			createdAt: DateTimeOffset.Parse("2023-11-26T05:03:23Z"),
-			updatedAt: DateTimeOffset.Parse("2023-11-26T05:03:25Z"),
-			browserDownloadUrl: "https://github.com/dalyIsaac/Whim/releases/download/v0.1.243-alpha%2B2ae89a20/WhimInstaller-arm64-0.1.243-alpha%2B2ae89a20.2ae89a204825f950e0be5b712b56cd5929e94adb.exe",
-			uploader: CreateAuthor()
-		);
-
-		assets[1] = new ReleaseAsset(
-			url: "https://api.github.com/repos/dalyIsaac/Whim/releases/assets/137468478",
-			id: 137468478,
-			nodeId: "RA_kwDOGWZ1Ts4IMZo-",
-			name: "WhimInstaller-x64-0.1.243-alpha+2ae89a20.2ae89a204825f950e0be5b712b56cd5929e94adb.exe",
-			label: "",
-			contentType: "application/x-msdownload",
-			state: "uploaded",
-			size: 25945113,
-			downloadCount: 8,
-			createdAt: DateTimeOffset.Parse("2023-11-26T05:00:29Z"),
-			updatedAt: DateTimeOffset.Parse("2023-11-26T05:00:30Z"),
-			browserDownloadUrl: "https://github.com/dalyIsaac/Whim/releases/download/v0.1.243-alpha%2B2ae89a20/WhimInstaller-x64-0.1.243-alpha%2B2ae89a20.2ae89a204825f950e0be5b712b56cd5929e94adb.exe",
-			uploader: CreateAuthor()
-		);
-
+		ReleaseAsset[] assets =
+		[
+			new ReleaseAsset(
+				url: "https://api.github.com/repos/dalyIsaac/Whim/releases/assets/137468755",
+				id: 137468755,
+				nodeId: "RA_kwDOGWZ1Ts4IMZtT",
+				name: "WhimInstaller-arm64-0.1.243-alpha+2ae89a20.2ae89a204825f950e0be5b712b56cd5929e94adb.exe",
+				label: "",
+				contentType: "application/x-msdownload",
+				state: "uploaded",
+				size: 24362101,
+				downloadCount: 1,
+				createdAt: DateTimeOffset.Parse("2023-11-26T05:03:23Z"),
+				updatedAt: DateTimeOffset.Parse("2023-11-26T05:03:25Z"),
+				browserDownloadUrl: "https://github.com/dalyIsaac/Whim/releases/download/v0.1.243-alpha%2B2ae89a20/WhimInstaller-arm64-0.1.243-alpha%2B2ae89a20.2ae89a204825f950e0be5b712b56cd5929e94adb.exe",
+				uploader: CreateAuthor()
+			),
+			new ReleaseAsset(
+				url: "https://api.github.com/repos/dalyIsaac/Whim/releases/assets/137468478",
+				id: 137468478,
+				nodeId: "RA_kwDOGWZ1Ts4IMZo-",
+				name: "WhimInstaller-x64-0.1.243-alpha+2ae89a20.2ae89a204825f950e0be5b712b56cd5929e94adb.exe",
+				label: "",
+				contentType: "application/x-msdownload",
+				state: "uploaded",
+				size: 25945113,
+				downloadCount: 8,
+				createdAt: DateTimeOffset.Parse("2023-11-26T05:00:29Z"),
+				updatedAt: DateTimeOffset.Parse("2023-11-26T05:00:30Z"),
+				browserDownloadUrl: "https://github.com/dalyIsaac/Whim/releases/download/v0.1.243-alpha%2B2ae89a20/WhimInstaller-x64-0.1.243-alpha%2B2ae89a20.2ae89a204825f950e0be5b712b56cd5929e94adb.exe",
+				uploader: CreateAuthor()
+			),
+		];
 		return new Release(
 			url: "https://api.github.com/repos/dalyIsaac/Whim/releases/131453811",
 			assetsUrl: "https://api.github.com/repos/dalyIsaac/Whim/releases/131453811/assets",

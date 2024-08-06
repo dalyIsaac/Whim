@@ -11,8 +11,7 @@ public class SetCreateLayoutEnginesTransformTests
 	)
 	{
 		// Given
-		Func<CreateLeafLayoutEngine[]> createLayoutEnginesFn = () =>
-			new CreateLeafLayoutEngine[] { (id) => engine1, (id) => engine2 };
+		Func<CreateLeafLayoutEngine[]> createLayoutEnginesFn = () => [(id) => engine1, (id) => engine2];
 
 		// When
 		var result = ctx.Store.Dispatch(new SetCreateLayoutEnginesTransform(createLayoutEnginesFn));

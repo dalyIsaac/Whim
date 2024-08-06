@@ -45,9 +45,7 @@ public abstract class BaseMemberAutoSubstituteDataAttribute : MemberDataAttribut
 			fixture.Customize(CreateCustomization());
 		}
 
-		return values
-			.Concat(testMethod.GetParameters().Skip(values.Length).Select(p => GetSpecimen(fixture, p)))
-			.ToArray();
+		return [.. values, .. testMethod.GetParameters().Skip(values.Length).Select(p => GetSpecimen(fixture, p))];
 	}
 
 	private static object GetSpecimen(IFixture fixture, ParameterInfo parameter)
@@ -70,16 +68,13 @@ public abstract class BaseMemberAutoSubstituteDataAttribute : MemberDataAttribut
 /// Creates an AutoFixture fixture with NSubstitute support and injects the given arguments, to be
 /// used like <c>MemberData</c> for an xunit <c>Theory</c>.
 /// </summary>
-public class MemberAutoSubstituteDataAttribute : BaseMemberAutoSubstituteDataAttribute
-{
-	/// <summary>
-	/// Creates a new instance of <see cref="MemberAutoSubstituteDataAttribute"/>.
-	/// </summary>
-	/// <param name="memberName"></param>
-	/// <param name="parameters"></param>
-	public MemberAutoSubstituteDataAttribute(string memberName, params object[] parameters)
-		: base(memberName, parameters) { }
-}
+/// <remarks>
+/// Creates a new instance of <see cref="MemberAutoSubstituteDataAttribute"/>.
+/// </remarks>
+/// <param name="memberName"></param>
+/// <param name="parameters"></param>
+public class MemberAutoSubstituteDataAttribute(string memberName, params object[] parameters)
+	: BaseMemberAutoSubstituteDataAttribute(memberName, parameters) { }
 
 /// <summary>
 /// Creates an AutoFixture fixture with NSubstitute support and injects the given arguments, to be

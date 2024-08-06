@@ -34,8 +34,8 @@ public class DoLayoutTests
 
 		IWindow[] minimizedWindows = Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>()).ToArray();
 
-		IWindowState[] expectedWindowStates = new IWindowState[]
-		{
+		IWindowState[] expectedWindowStates =
+		[
 			new WindowState()
 			{
 				Rectangle = new Rectangle<int>(),
@@ -48,7 +48,7 @@ public class DoLayoutTests
 				Window = minimizedWindows[1],
 				WindowSize = WindowSize.Minimized
 			}
-		};
+		];
 
 		// When the windows are added, and DoLayout is called
 		for (int idx = 0; idx < minimizedWindows.Length; idx++)
@@ -76,8 +76,8 @@ public class DoLayoutTests
 		IWindow[] windows = Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>()).ToArray();
 		IWindow[] minimizedWindows = Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>()).ToArray();
 
-		IWindowState[] expectedWindowStates = new IWindowState[]
-		{
+		IWindowState[] expectedWindowStates =
+		[
 			new WindowState()
 			{
 				Rectangle = new Rectangle<int>()
@@ -114,7 +114,7 @@ public class DoLayoutTests
 				Window = minimizedWindows[1],
 				WindowSize = WindowSize.Minimized
 			}
-		};
+		];
 
 		// When the windows are added, and DoLayout is called
 		for (int idx = 0; idx < windows.Length; idx++)

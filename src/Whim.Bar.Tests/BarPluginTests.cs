@@ -11,7 +11,7 @@ public class BarPluginTests
 	public void MonitorManager_MonitorsChanged_RemovedMonitors(IContext context, IMonitor monitor)
 	{
 		// Given
-		BarConfig barConfig = new(new List<BarComponent>(), new List<BarComponent>(), new List<BarComponent>());
+		BarConfig barConfig = new([], [], []);
 		BarPlugin barPlugin = new(context, barConfig);
 		NativeManagerUtils.SetupTryEnqueue(context);
 
@@ -20,9 +20,9 @@ public class BarPluginTests
 		context.MonitorManager.MonitorsChanged += Raise.EventWith(
 			new MonitorsChangedEventArgs()
 			{
-				AddedMonitors = Array.Empty<IMonitor>(),
-				UnchangedMonitors = Array.Empty<IMonitor>(),
-				RemovedMonitors = new[] { monitor }
+				AddedMonitors = [],
+				UnchangedMonitors = [],
+				RemovedMonitors = [monitor]
 			}
 		);
 

@@ -5,20 +5,19 @@ namespace Whim.CommandPalette;
 /// <summary>
 /// Command to save the changes made in the palette.
 /// </summary>
-internal class ConfirmCommand : System.Windows.Input.ICommand
+/// <remarks>
+/// Creates a new instance of <see cref="ConfirmCommand"/>.
+/// </remarks>
+/// <param name="viewModel"></param>
+internal class ConfirmCommand(ICommandPaletteWindowViewModel viewModel) : System.Windows.Input.ICommand
 {
-	private readonly ICommandPaletteWindowViewModel _viewModel;
+	private readonly ICommandPaletteWindowViewModel _viewModel = viewModel;
 
 	/// <inheritdoc/>
-	public event EventHandler? CanExecuteChanged;
-
-	/// <summary>
-	/// Creates a new instance of <see cref="ConfirmCommand"/>.
-	/// </summary>
-	/// <param name="viewModel"></param>
-	public ConfirmCommand(ICommandPaletteWindowViewModel viewModel)
+	public event EventHandler? CanExecuteChanged
 	{
-		_viewModel = viewModel;
+		add { }
+		remove { }
 	}
 
 	public bool CanExecute(object? parameter) => _viewModel.ActiveVariant != null;

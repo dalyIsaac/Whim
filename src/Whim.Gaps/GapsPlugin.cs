@@ -3,30 +3,24 @@ using System.Text.Json;
 namespace Whim.Gaps;
 
 /// <inheritdoc />
-public class GapsPlugin : IGapsPlugin
+/// <summary>
+/// Creates a new instance of the gaps plugin.
+/// </summary>
+/// <param name="context"></param>
+/// <param name="gapsConfig"></param>
+public class GapsPlugin(IContext context, GapsConfig gapsConfig) : IGapsPlugin
 {
-	private readonly IContext _context;
+	private readonly IContext _context = context;
 
 	/// <summary>
 	/// The configuration for the gaps plugin.
 	/// </summary>
-	public GapsConfig GapsConfig { get; }
+	public GapsConfig GapsConfig { get; } = gapsConfig;
 
 	/// <summary>
 	/// <c>whim.gaps</c>
 	/// </summary>
 	public string Name => "whim.gaps";
-
-	/// <summary>
-	/// Creates a new instance of the gaps plugin.
-	/// </summary>
-	/// <param name="context"></param>
-	/// <param name="gapsConfig"></param>
-	public GapsPlugin(IContext context, GapsConfig gapsConfig)
-	{
-		_context = context;
-		GapsConfig = gapsConfig;
-	}
 
 	/// <inheritdoc />
 	public void PreInitialize()

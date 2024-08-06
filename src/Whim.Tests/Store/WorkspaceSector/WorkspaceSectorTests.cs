@@ -50,14 +50,14 @@ public class WorkspaceSectorTests
 				}
 			});
 
-		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = ImmutableList.Create(engine) };
+		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [engine] };
 		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), workspace);
 
 		ctx.NativeManager.DeferWindowPos().Returns(new DeferWindowPosHandle(ctx, internalCtx));
 
 		// When
 		root.WorkspaceSector.WorkspacesToLayout = root.WorkspaceSector.WorkspacesToLayout.Add(workspace.Id);
-		CustomAssert.Layout(root, root.WorkspaceSector.DoLayout, new[] { workspace.Id });
+		CustomAssert.Layout(root, root.WorkspaceSector.DoLayout, [workspace.Id]);
 
 		// Then
 		ctx.NativeManager.Received(2).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
@@ -93,7 +93,7 @@ public class WorkspaceSectorTests
 		sut.WorkspacesToLayout = sut.WorkspacesToLayout.Add(workspace.Id);
 
 		// When we do the layout
-		CustomAssert.Layout(root, root.WorkspaceSector.DoLayout, new[] { workspace.Id });
+		CustomAssert.Layout(root, root.WorkspaceSector.DoLayout, [workspace.Id]);
 
 		// Then the invalid window should be removed from the workspace.
 		Assert.DoesNotContain(invalidWindow.Handle, sut.Workspaces[workspace.Id].WindowPositions.Keys);
@@ -115,7 +115,7 @@ public class WorkspaceSectorTests
 		sut.WindowHandleToFocus = window.Handle;
 
 		// When we do the layout
-		CustomAssert.Layout(root, root.WorkspaceSector.DoLayout, new[] { workspace.Id });
+		CustomAssert.Layout(root, root.WorkspaceSector.DoLayout, [workspace.Id]);
 
 		// Then the window should be focused
 		window.Received().Focus();

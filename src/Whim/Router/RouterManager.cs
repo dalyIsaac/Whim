@@ -2,17 +2,12 @@ using System.Text.RegularExpressions;
 
 namespace Whim;
 
-internal class RouterManager : IRouterManager
+internal class RouterManager(IContext context) : IRouterManager
 {
-	private readonly IContext _context;
-	private readonly List<Router> _routers = new();
+	private readonly IContext _context = context;
+	private readonly List<Router> _routers = [];
 
 	public RouterOptions RouterOptions { get; set; } = RouterOptions.RouteToLaunchedWorkspace;
-
-	public RouterManager(IContext context)
-	{
-		_context = context;
-	}
 
 	public void Add(Router router)
 	{
@@ -62,7 +57,7 @@ internal class RouterManager : IRouterManager
 		Logger.Debug($"Routing title: {title} to workspace {workspaceName}");
 		Add(window =>
 		{
-			if (window.Title.ToLower() == title)
+			if (window.Title.Equals(title, StringComparison.CurrentCultureIgnoreCase))
 			{
 				return _context.WorkspaceManager.TryGet(workspaceName);
 			}
@@ -77,7 +72,7 @@ internal class RouterManager : IRouterManager
 		Logger.Debug($"Routing title: {title} to workspace {workspace}");
 		Add(window =>
 		{
-			if (window.Title.ToLower() == title)
+			if (window.Title.Equals(title, StringComparison.CurrentCultureIgnoreCase))
 			{
 				return workspace;
 			}
@@ -139,7 +134,7 @@ internal class RouterManager : IRouterManager
 		Logger.Debug($"Routing window class: {windowClass} to workspace {workspaceName}");
 		Add(window =>
 		{
-			if (window.WindowClass.ToLower() == windowClass)
+			if (window.WindowClass.Equals(windowClass, StringComparison.CurrentCultureIgnoreCase))
 			{
 				return _context.WorkspaceManager.TryGet(workspaceName);
 			}
@@ -154,7 +149,7 @@ internal class RouterManager : IRouterManager
 		Logger.Debug($"Routing window class: {windowClass} to workspace {workspace}");
 		Add(window =>
 		{
-			if (window.WindowClass.ToLower() == windowClass)
+			if (window.WindowClass.Equals(windowClass, StringComparison.CurrentCultureIgnoreCase))
 			{
 				return workspace;
 			}

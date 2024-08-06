@@ -23,7 +23,7 @@ public class MouseLeftButtonUpTransformTests
 		SetMonitorAtPoint(internalCtx, (HMONITOR)2);
 
 		monitor.Handle.Returns((HMONITOR)1);
-		mutableRootSector.MonitorSector.Monitors = ImmutableArray.Create(monitor);
+		mutableRootSector.MonitorSector.Monitors = [monitor];
 
 		Point<int> point = new(10, 10);
 		MouseLeftButtonUpTransform sut = new(point);
@@ -47,7 +47,7 @@ public class MouseLeftButtonUpTransformTests
 		SetMonitorAtPoint(internalCtx, (HMONITOR)2);
 
 		monitor.Handle.Returns((HMONITOR)2);
-		mutableRootSector.MonitorSector.Monitors = ImmutableArray.Create(monitor);
+		mutableRootSector.MonitorSector.Monitors = [monitor];
 
 		Point<int> point = new(10, 10);
 		MouseLeftButtonUpTransform sut = new(point);

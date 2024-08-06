@@ -8,7 +8,7 @@ internal abstract class SectorBase
 	/// <summary>
 	/// Queue of events to dispatch.
 	/// </summary>
-	protected readonly List<EventArgs> _events = new();
+	protected readonly List<EventArgs> _events = [];
 
 	/// <summary>
 	/// Whether there are events queued.

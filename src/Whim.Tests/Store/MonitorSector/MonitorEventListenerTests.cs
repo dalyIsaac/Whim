@@ -95,7 +95,7 @@ public class MonitorEventListenerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal async void WindowMessageMonitor_SessionChanged(IContext ctx, IInternalContext internalCtx)
+	internal async Task WindowMessageMonitor_SessionChanged(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given the listener is initialized
 		MonitorEventListener listener = new(ctx, internalCtx);

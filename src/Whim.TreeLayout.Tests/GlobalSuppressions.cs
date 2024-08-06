@@ -15,3 +15,6 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Style", "IDE0058:Expression value is never used")]
 [assembly: SuppressMessage("Style", "IDE0022:Use expression body for methods")]
 [assembly: SuppressMessage("Design", "CA1024:Use properties where appropriate")]
+[assembly: SuppressMessage("Performance", "CA1852:Seal internal types")]
+[assembly: SuppressMessage("Performance", "CA1861:Avoid constant arrays as arguments")]
+[assembly: SuppressMessage("Performance", "CA1859:Use concrete types when possible for improved performance")]

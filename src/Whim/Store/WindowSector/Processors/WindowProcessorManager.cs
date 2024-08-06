@@ -6,9 +6,9 @@ internal class WindowProcessorManager
 {
 	private readonly IContext _ctx;
 
-	private readonly List<Func<IContext, IWindow, IWindowProcessor?>> _processorCreators = new();
+	private readonly List<Func<IContext, IWindow, IWindowProcessor?>> _processorCreators = [];
 
-	private readonly Dictionary<HWND, IWindowProcessor> _processors = new();
+	private readonly Dictionary<HWND, IWindowProcessor> _processors = [];
 
 	public WindowProcessorManager(IContext ctx)
 	{

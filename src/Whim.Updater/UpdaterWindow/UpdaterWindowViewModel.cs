@@ -69,7 +69,7 @@ internal class UpdaterWindowViewModel : INotifyPropertyChanged
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
-	private IReadOnlyList<ReleaseInfo> _releases = new List<ReleaseInfo>();
+	private IReadOnlyList<ReleaseInfo> _releases = [];
 
 	public string LastCheckedForUpdates => _plugin.LastCheckedForUpdates?.ToString() ?? "Never";
 

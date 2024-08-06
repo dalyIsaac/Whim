@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using AutoFixture;
@@ -228,9 +227,7 @@ public class LayoutPreviewPluginTests
 		// Given
 		workspace = workspace with
 		{
-			LayoutEngines = ImmutableList<ILayoutEngine>.Empty.Add(
-				new FloatingLayoutEngine(ctx, new LayoutEngineIdentity())
-			),
+			LayoutEngines = [new FloatingLayoutEngine(ctx, new LayoutEngineIdentity())],
 			ActiveLayoutEngineIndex = 0
 		};
 		rootSector.WorkspaceSector.Workspaces = rootSector.WorkspaceSector.Workspaces.SetItem(workspace.Id, workspace);

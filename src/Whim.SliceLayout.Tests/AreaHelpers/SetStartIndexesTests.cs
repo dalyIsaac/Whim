@@ -22,7 +22,7 @@ public class SetStartIndexesTests
 			},
 			// Multi-column 2-1-0
 			{
-				SliceLayouts.CreateMultiColumnArea(new uint[] { 2, 1, 0 }),
+				SliceLayouts.CreateMultiColumnArea([2, 1, 0]),
 				new ParentArea(
 					isRow: true,
 					(1.0 / 3.0, new SliceArea(order: 0, maxChildren: 2) { StartIndex = 0 }),

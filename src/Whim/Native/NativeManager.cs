@@ -273,6 +273,7 @@ internal partial class NativeManager : INativeManager
 
 	[LibraryImport("UXTheme.dll", EntryPoint = "#138", SetLastError = true)]
 	[return: MarshalAs(UnmanagedType.Bool)]
+	[DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
 	private static partial bool _ShouldSystemUseDarkMode();
 
 	public bool ShouldSystemUseDarkMode() => _ShouldSystemUseDarkMode();

@@ -3,14 +3,18 @@ namespace Whim;
 /// <summary>
 /// The sector containing windows.
 /// </summary>
-internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSectorEvents
+internal class WindowSector(IContext ctx, IInternalContext internalCtx)
+	: SectorBase,
+		IWindowSector,
+		IDisposable,
+		IWindowSectorEvents
 {
-	private readonly WindowEventListener _listener;
+	private readonly WindowEventListener _listener = new(ctx, internalCtx);
 	private bool _disposedValue;
 
 	public ImmutableDictionary<HWND, IWindow> Windows { get; internal set; } = ImmutableDictionary<HWND, IWindow>.Empty;
 
-	public ImmutableHashSet<HWND> StartupWindows { get; internal set; } = ImmutableHashSet<HWND>.Empty;
+	public ImmutableHashSet<HWND> StartupWindows { get; internal set; } = [];
 
 	public bool IsMovingWindow { get; internal set; }
 
@@ -24,11 +28,6 @@ internal class WindowSector : SectorBase, IWindowSector, IDisposable, IWindowSec
 	public event EventHandler<WindowMovedEventArgs>? WindowMoved;
 	public event EventHandler<WindowMinimizeStartedEventArgs>? WindowMinimizeStarted;
 	public event EventHandler<WindowMinimizeEndedEventArgs>? WindowMinimizeEnded;
-
-	public WindowSector(IContext ctx, IInternalContext internalCtx)
-	{
-		_listener = new WindowEventListener(ctx, internalCtx);
-	}
 
 	public override void Initialize()
 	{

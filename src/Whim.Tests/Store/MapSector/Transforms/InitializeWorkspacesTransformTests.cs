@@ -39,7 +39,7 @@ public class InitializeWorkspacesTransformTests
 
 	private static void AddWorkspacesToSavedState(IInternalContext internalCtx, params SavedWorkspace[] workspaces)
 	{
-		internalCtx.CoreSavedStateManager.SavedState.Returns(new CoreSavedState(workspaces.ToList()));
+		internalCtx.CoreSavedStateManager.SavedState.Returns(new CoreSavedState([.. workspaces]));
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -110,7 +110,8 @@ public class InitializeWorkspacesTransformTests
 
 	private static void Setup_UserCreatedWorkspaces(MutableRootSector root)
 	{
-		root.WorkspaceSector.WorkspacesToCreate = ImmutableList.Create(
+		root.WorkspaceSector.WorkspacesToCreate =
+		[
 			new WorkspaceToCreate(BrowserWorkspaceName, null),
 			new WorkspaceToCreate(
 				CodeWorkspaceName,
@@ -119,8 +120,8 @@ public class InitializeWorkspacesTransformTests
 					(id) => new ImmutableTestLayoutEngine(),
 					(id) => new ImmutableTestLayoutEngine(),
 				}
-			)
-		);
+			),
+		];
 	}
 
 	private static void Setup_SavedState(IInternalContext internalCtx)
@@ -200,8 +201,7 @@ public class InitializeWorkspacesTransformTests
 		internalCtx.CoreNativeManager.IsStandardWindow(Arg.Any<HWND>()).Returns(true);
 		internalCtx.CoreNativeManager.HasNoVisibleOwner(Arg.Any<HWND>()).Returns(true);
 
-		rootSector.WorkspaceSector.CreateLayoutEngines = () =>
-			new CreateLeafLayoutEngine[] { id => new ImmutableTestLayoutEngine() };
+		rootSector.WorkspaceSector.CreateLayoutEngines = () => [id => new ImmutableTestLayoutEngine()];
 
 		InitializeWorkspacesTransform sut = new();
 

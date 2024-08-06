@@ -44,11 +44,9 @@ public class MonitorsChangedEventArgs : EventArgs
 		}
 	}
 
-	private static IEnumerable<IMonitor> Concat(IEnumerable<IMonitor> first, IEnumerable<IMonitor> second)
+	private static List<IMonitor> Concat(IEnumerable<IMonitor> first, IEnumerable<IMonitor> second)
 	{
-		List<IMonitor> result = new(first.Count() + second.Count());
-		result.AddRange(first);
-		result.AddRange(second);
+		List<IMonitor> result = [.. first, .. second];
 		return result;
 	}
 

@@ -72,7 +72,7 @@ public partial record SliceLayoutEngine
 		return null;
 	}
 
-	private ILayoutEngine MoveWindowToIndex(int currentIndex, int targetIndex)
+	private SliceLayoutEngine MoveWindowToIndex(int currentIndex, int targetIndex)
 	{
 		if (_plugin.WindowInsertionType == WindowInsertionType.Swap)
 		{
@@ -82,7 +82,7 @@ public partial record SliceLayoutEngine
 		return RotateWindowIndices(currentIndex, targetIndex);
 	}
 
-	private ILayoutEngine SwapWindowIndices(int currentIndex, int targetIndex)
+	private SliceLayoutEngine SwapWindowIndices(int currentIndex, int targetIndex)
 	{
 		Logger.Debug($"Swapping {currentIndex} and {targetIndex}");
 
@@ -101,7 +101,7 @@ public partial record SliceLayoutEngine
 		return new SliceLayoutEngine(this, newWindows, _minimizedWindows);
 	}
 
-	private ILayoutEngine RotateWindowIndices(int currentIndex, int targetIndex)
+	private SliceLayoutEngine RotateWindowIndices(int currentIndex, int targetIndex)
 	{
 		Logger.Debug($"Rotating {currentIndex} and {targetIndex}");
 
@@ -143,7 +143,7 @@ public partial record SliceLayoutEngine
 		return null;
 	}
 
-	private ILayoutEngine PromoteWindowInStack(IWindow window, bool promote)
+	private SliceLayoutEngine PromoteWindowInStack(IWindow window, bool promote)
 	{
 		Logger.Debug($"Promoting {window} in stack");
 		if (GetPromoteTargetIndex(window, promote) is not (int windowIndex, int targetIndex))
@@ -154,7 +154,7 @@ public partial record SliceLayoutEngine
 		return MoveWindowToIndex(windowIndex, targetIndex);
 	}
 
-	private ILayoutEngine PromoteFocusInStack(IWindow window, bool promote)
+	private SliceLayoutEngine PromoteFocusInStack(IWindow window, bool promote)
 	{
 		Logger.Debug($"Promoting focus in stack");
 		if (GetPromoteTargetIndex(window, promote) is not (int, int targetIndex))

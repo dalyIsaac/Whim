@@ -2,17 +2,16 @@ using System;
 
 namespace Whim.Updater;
 
-internal class SkipReleaseCommand : System.Windows.Input.ICommand
+internal class SkipReleaseCommand(IUpdaterPlugin plugin, UpdaterWindowViewModel viewModel)
+	: System.Windows.Input.ICommand
 {
-	private readonly IUpdaterPlugin _plugin;
-	private readonly UpdaterWindowViewModel _viewModel;
+	private readonly IUpdaterPlugin _plugin = plugin;
+	private readonly UpdaterWindowViewModel _viewModel = viewModel;
 
-	public event EventHandler? CanExecuteChanged;
-
-	public SkipReleaseCommand(IUpdaterPlugin plugin, UpdaterWindowViewModel viewModel)
+	public event EventHandler? CanExecuteChanged
 	{
-		_plugin = plugin;
-		_viewModel = viewModel;
+		add { }
+		remove { }
 	}
 
 	public bool CanExecute(object? parameter) => true;
@@ -27,17 +26,16 @@ internal class SkipReleaseCommand : System.Windows.Input.ICommand
 	}
 }
 
-internal class InstallReleaseCommand : System.Windows.Input.ICommand
+internal class InstallReleaseCommand(IUpdaterPlugin plugin, UpdaterWindowViewModel viewModel)
+	: System.Windows.Input.ICommand
 {
-	private readonly IUpdaterPlugin _plugin;
-	private readonly UpdaterWindowViewModel _viewModel;
+	private readonly IUpdaterPlugin _plugin = plugin;
+	private readonly UpdaterWindowViewModel _viewModel = viewModel;
 
-	public event EventHandler? CanExecuteChanged;
-
-	public InstallReleaseCommand(IUpdaterPlugin plugin, UpdaterWindowViewModel viewModel)
+	public event EventHandler? CanExecuteChanged
 	{
-		_plugin = plugin;
-		_viewModel = viewModel;
+		add { }
+		remove { }
 	}
 
 	public bool CanExecute(object? parameter) => true;
@@ -53,15 +51,14 @@ internal class InstallReleaseCommand : System.Windows.Input.ICommand
 	}
 }
 
-internal class CloseUpdaterWindowCommand : System.Windows.Input.ICommand
+internal class CloseUpdaterWindowCommand(IUpdaterPlugin plugin) : System.Windows.Input.ICommand
 {
-	private readonly IUpdaterPlugin _plugin;
+	private readonly IUpdaterPlugin _plugin = plugin;
 
-	public event EventHandler? CanExecuteChanged;
-
-	public CloseUpdaterWindowCommand(IUpdaterPlugin plugin)
+	public event EventHandler? CanExecuteChanged
 	{
-		_plugin = plugin;
+		add { }
+		remove { }
 	}
 
 	public bool CanExecute(object? parameter) => true;

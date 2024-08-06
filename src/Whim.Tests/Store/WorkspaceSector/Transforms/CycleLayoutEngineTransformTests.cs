@@ -26,7 +26,7 @@ public class CycleLayoutEngineTransformTests
 		// Given
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
-			LayoutEngines = ImmutableList.Create(engine1, engine2, engine3),
+			LayoutEngines = [engine1, engine2, engine3],
 			ActiveLayoutEngineIndex = startIdx
 		};
 		AddWorkspaceToManager(ctx, rootSector, workspace);

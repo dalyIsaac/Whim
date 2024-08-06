@@ -18,12 +18,12 @@ internal class MenuVariantViewModel : IVariantViewModel
 	/// The rows which are currently unused and can be reused for new matches.
 	/// Keeping these around avoids the need to create new rows every time the palette is shown.
 	/// </summary>
-	private readonly List<IVariantRowView<MenuVariantRowModelData, MenuVariantRowViewModel>> _unusedRows = new();
+	private readonly List<IVariantRowView<MenuVariantRowModelData, MenuVariantRowViewModel>> _unusedRows = [];
 
 	/// <summary>
 	/// The current commands from which the matches shown in <see cref="MenuRows"/> are drawn.
 	/// </summary>
-	internal readonly List<MenuVariantRowModel> _allItems = new();
+	internal readonly List<MenuVariantRowModel> _allItems = [];
 
 	/// <summary>
 	/// Factory to create menu rows to make it possible to use xunit.
@@ -35,7 +35,7 @@ internal class MenuVariantViewModel : IVariantViewModel
 	> _menuRowFactory;
 
 	public readonly ObservableCollection<IVariantRowView<MenuVariantRowModelData, MenuVariantRowViewModel>> MenuRows =
-		new();
+	[];
 
 	public string? ConfirmButtonText => _activationConfig?.ConfirmButtonText;
 

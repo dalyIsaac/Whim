@@ -74,12 +74,12 @@ public class SwapWorkspaceWithAdjacentMonitorTransformTests
 		Workspace workspace1 = CreateWorkspace(ctx);
 		Workspace workspace2 = CreateWorkspace(ctx);
 		Workspace workspace3 = CreateWorkspace(ctx);
-		Workspace[] workspaces = { workspace1, workspace2, workspace3 };
+		Workspace[] workspaces = [workspace1, workspace2, workspace3];
 
 		IMonitor monitor1 = CreateMonitor((HMONITOR)1);
 		IMonitor monitor2 = CreateMonitor((HMONITOR)2);
 		IMonitor monitor3 = CreateMonitor((HMONITOR)3);
-		IMonitor[] monitors = { monitor1, monitor2, monitor3 };
+		IMonitor[] monitors = [monitor1, monitor2, monitor3];
 
 		ctx.MonitorManager.GetPreviousMonitor(monitor1).Returns(monitor3);
 		ctx.MonitorManager.GetNextMonitor(monitor1).Returns(monitor2);

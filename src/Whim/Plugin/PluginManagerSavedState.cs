@@ -7,5 +7,5 @@ internal class PluginManagerSavedState
 	/// <summary>
 	/// The saved state of all plugins.
 	/// </summary>
-	public Dictionary<string, JsonElement> Plugins { get; set; } = new();
+	public Dictionary<string, JsonElement> Plugins { get; set; } = [];
 }

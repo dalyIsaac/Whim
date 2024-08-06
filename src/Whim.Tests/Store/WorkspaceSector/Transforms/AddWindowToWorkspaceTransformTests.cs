@@ -10,7 +10,7 @@ public class AddWindowToWorkspaceTransformTests
 	{
 		// Given
 		Workspace workspace = CreateWorkspace(ctx);
-		workspace = workspace with { LayoutEngines = ImmutableList.Create(engine) };
+		workspace = workspace with { LayoutEngines = [engine] };
 
 		AddWorkspaceToManager(ctx, root, workspace);
 

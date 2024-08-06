@@ -1,18 +1,10 @@
-using System.Linq;
-
 namespace Whim;
 
-internal class KeybindManager : IKeybindManager
+internal class KeybindManager(IContext context) : IKeybindManager
 {
-	private readonly IContext _context;
-	private readonly Dictionary<IKeybind, List<string>> _keybindsCommandsMap = new();
-	private readonly Dictionary<string, IKeybind> _commandsKeybindsMap = new();
-
-	public KeybindManager(IContext context)
-	{
-		_context = context;
-	}
-
+	private readonly IContext _context = context;
+	private readonly Dictionary<IKeybind, List<string>> _keybindsCommandsMap = [];
+	private readonly Dictionary<string, IKeybind> _commandsKeybindsMap = [];
 	private bool _uniqueKeyModifiers = true;
 	public bool UnifyKeyModifiers
 	{
@@ -31,7 +23,7 @@ internal class KeybindManager : IKeybindManager
 
 	private void UnifyKeybinds()
 	{
-		KeyValuePair<string, IKeybind>[] keybinds = _commandsKeybindsMap.ToArray();
+		KeyValuePair<string, IKeybind>[] keybinds = [.. _commandsKeybindsMap];
 		_commandsKeybindsMap.Clear();
 		_keybindsCommandsMap.Clear();
 
@@ -53,7 +45,7 @@ internal class KeybindManager : IKeybindManager
 
 		if (!_keybindsCommandsMap.TryGetValue(keybind, out List<string>? value))
 		{
-			value = new List<string>();
+			value = [];
 			_keybindsCommandsMap.Add(keybind, value);
 		}
 
@@ -68,7 +60,7 @@ internal class KeybindManager : IKeybindManager
 
 		if (_keybindsCommandsMap.TryGetValue(keybind, out List<string>? commandIds))
 		{
-			List<ICommand> commands = new();
+			List<ICommand> commands = [];
 
 			foreach (string commandId in commandIds)
 			{
@@ -84,10 +76,10 @@ internal class KeybindManager : IKeybindManager
 				}
 			}
 
-			return commands.ToArray();
+			return [.. commands];
 		}
 
-		return Array.Empty<ICommand>();
+		return [];
 	}
 
 	public IKeybind? TryGetKeybind(string commandId)
