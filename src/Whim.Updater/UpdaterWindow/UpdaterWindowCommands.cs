@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 
 namespace Whim.Updater;
 
@@ -45,7 +46,14 @@ internal class InstallReleaseCommand(IUpdaterPlugin plugin, UpdaterWindowViewMod
 		Logger.Debug("Installing release");
 		if (_viewModel.LastRelease != null)
 		{
-			_plugin.InstallRelease(_viewModel.LastRelease.Release);
+			Task.Run(async () =>
+			{
+				await _plugin
+					.DownloadRelease(_viewModel.LastRelease.Release)
+					.ConfigureAwait(false);
+				await _plugin.InstallDownloadedRelease().ConfigureAwait(true);
+
+			});
 			_plugin.CloseUpdaterWindow();
 		}
 	}

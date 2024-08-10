@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.Windows.AppNotifications;
 
 namespace Whim;
@@ -64,6 +65,11 @@ internal class NotificationManager(IContext context) : INotificationManager
 		AppNotificationManager.Default.Show(appNotification);
 
 		return appNotification.Id != 0;
+	}
+
+	public async Task ClearToastNotification(uint notificationId)
+	{
+		await AppNotificationManager.Default.RemoveByIdAsync(notificationId);
 	}
 
 	protected virtual void Dispose(bool disposing)

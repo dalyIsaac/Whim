@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
+using Microsoft.Windows.AppNotifications;
 using Windows.UI.Composition;
 using Windows.Win32;
 using Windows.Win32.Graphics.Dwm;
@@ -197,8 +198,8 @@ public interface INativeManager
 	Task DownloadFileAsync(
 		Uri uri,
 		string destinationPath,
-		IProgress<float>? progress,
-		CancellationToken cancellationToken
+		AppNotificationProgressData? progress = default,
+		CancellationToken cancellationToken = default
 	);
 
 	/// <summary>

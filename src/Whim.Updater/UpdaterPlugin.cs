@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Timers;
 using DotNext;
 using Microsoft.Windows.AppNotifications;
-using Microsoft.Windows.AppNotifications.Builder;
 using Octokit;
 
 namespace Whim.Updater;
@@ -15,25 +12,35 @@ namespace Whim.Updater;
 /// <inheritdoc />
 public class UpdaterPlugin : IUpdaterPlugin
 {
-	private const string Owner = "dalyIsaac";
-	private const string Repository = "Whim";
-
-	/// <summary>
-	/// Notification ID for showing the updater window.
-	/// </summary>
-	private string SHOW_WINDOW_NOTIFICATION_ID => $"{Name}.show_window";
-
-	/// <summary>
-	/// Notification ID for not performing an update.
-	/// </summary>
-	private string CANCEL_NOTIFICATION_ID => $"{Name}.cancel";
-
-	private readonly IContext _context;
-	private readonly Version? _currentVersion;
-	private readonly UpdaterConfig _config;
+	private readonly IContext _ctx;
+	private readonly ReleaseManager _releaseManager;
 
 	private UpdaterWindow? _updaterWindow;
-	private readonly string _architecture = RuntimeInformation.ProcessArchitecture.ToString().ToLower();
+
+	/// <summary>
+	/// Notification ID for showing the changelog window.
+	/// </summary>
+	internal string OPEN_CHANGELOG_NOTIFICATION_ID => $"{Name}.show_window";
+
+	/// <summary>
+	/// Notification ID for not performing an update right now.
+	/// </summary>
+	internal string DEFER_UPDATE_NOTIFICATION_ID => $"{Name}.defer";
+
+	/// <summary>
+	/// Notification ID for skipping an update.
+	/// </summary>
+	internal string SKIP_UPDATE_NOTIFICATION_ID => $"{Name}.cancel";
+
+	/// <summary>
+	/// Notification ID for installing an update.
+	/// </summary>
+	internal string INSTALL_NOTIFICATION_ID => $"{Name}.install";
+
+	/// <summary>
+	/// Notification ID for cancelling an update installation.
+	/// </summary>
+	internal string CANCEL_INSTALL_NOTIFICATION_ID => $"{Name}.cancel_install";
 
 	/// <summary>
 	/// The release that the user has chosen to skip.
@@ -42,11 +49,13 @@ public class UpdaterPlugin : IUpdaterPlugin
 
 	private readonly Timer _timer = new();
 
-	private List<ReleaseInfo> _notInstalledReleases = [];
 	private bool _disposedValue;
 
 	/// <inheritdoc />
-	public DateTime? LastCheckedForUpdates { get; private set; }
+	public UpdaterConfig Config { get; }
+
+	/// <inheritdoc />
+	public DateTime? LastCheckedForUpdates { get; internal set; }
 
 	/// <summary>
 	/// <c>whim.updater</c>
@@ -63,10 +72,9 @@ public class UpdaterPlugin : IUpdaterPlugin
 	/// <param name="config"></param>
 	public UpdaterPlugin(IContext context, UpdaterConfig config)
 	{
-		_context = context;
-		_config = config;
-
-		_currentVersion = Version.Parse(_context.NativeManager.GetWhimVersion())!;
+		_ctx = context;
+		Config = config;
+		_releaseManager = new ReleaseManager(context, this);
 
 		if (config.UpdateFrequency.GetInterval() is double interval)
 		{
@@ -78,30 +86,32 @@ public class UpdaterPlugin : IUpdaterPlugin
 		}
 	}
 
-	private GitHubClient CreateGitHubClient() => new(new ProductHeaderValue(Name));
-
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
-		_context.NotificationManager.Register(SHOW_WINDOW_NOTIFICATION_ID, HandleOnShowWindowNotification);
-		_context.NotificationManager.Register(CANCEL_NOTIFICATION_ID, HandleOnCancelNotification);
+		_ctx.NotificationManager.Register(OPEN_CHANGELOG_NOTIFICATION_ID, OnOpenChangelogNotificationReceived);
+		_ctx.NotificationManager.Register(DEFER_UPDATE_NOTIFICATION_ID, OnDeferUpdateNotificationReceived);
+		_ctx.NotificationManager.Register(SKIP_UPDATE_NOTIFICATION_ID, OnSkipUpdateNotificationReceived);
+		_ctx.NotificationManager.Register(INSTALL_NOTIFICATION_ID, OnInstallNotificationReceived);
 	}
 
-	private void HandleOnShowWindowNotification(AppNotificationActivatedEventArgs args)
+	private void OnOpenChangelogNotificationReceived(AppNotificationActivatedEventArgs args)
 	{
 		Logger.Debug("Showing update window");
 
-		_context.NativeManager.TryEnqueue(async () =>
+		_ctx.NativeManager.TryEnqueue(async () =>
 		{
-			_updaterWindow = new UpdaterWindow(_context, this);
-			await _updaterWindow.Activate(_notInstalledReleases).ConfigureAwait(true);
+			_updaterWindow = new UpdaterWindow(_ctx, this);
+			await _updaterWindow.Activate(_releaseManager.NotInstalledReleases).ConfigureAwait(true);
 		});
 	}
 
-	private void HandleOnCancelNotification(AppNotificationActivatedEventArgs args)
-	{
-		Logger.Debug("User cancelled update");
-	}
+	private void OnDeferUpdateNotificationReceived(AppNotificationActivatedEventArgs args) =>
+		Logger.Debug("Deferring update");
+
+	private void OnSkipUpdateNotificationReceived(AppNotificationActivatedEventArgs args) => SkipRelease();
+
+	private void OnInstallNotificationReceived(AppNotificationActivatedEventArgs args) => InstallDownloadedRelease();
 
 	/// <inheritdoc />
 	public void PostInitialize()
@@ -118,62 +128,21 @@ public class UpdaterPlugin : IUpdaterPlugin
 		await CheckForUpdates().ConfigureAwait(true);
 
 	/// <inheritdoc />
-	public void SkipRelease(Release release)
+	public void SkipRelease(Release? release = null)
 	{
-		SkippedReleaseTagName = release.TagName;
-		_context.Store.Dispatch(new SaveStateTransform());
+		SkippedReleaseTagName = _releaseManager.NextRelease?.TagName;
+		_ctx.Store.Dispatch(new SaveStateTransform());
 	}
 
 	/// <inheritdoc />
-	public async Task CheckForUpdates(IGitHubClient? gitHubClient = null)
-	{
-		Logger.Debug("Checking for updates...");
-
-		gitHubClient ??= CreateGitHubClient();
-
-		_notInstalledReleases = await GetNotInstalledReleases(gitHubClient).ConfigureAwait(true);
-		if (_notInstalledReleases.Count == 0)
-		{
-			Logger.Debug("No updates found");
-			return;
-		}
-
-		ReleaseInfo lastRelease = _notInstalledReleases[0];
-		if (SkippedReleaseTagName == lastRelease.Release.TagName)
-		{
-			Logger.Debug($"Skipping release {lastRelease.Release.TagName}");
-			return;
-		}
-
-		Logger.Debug($"Found {lastRelease.Release.TagName}");
-
-		AppNotification notification = new AppNotificationBuilder()
-			.AddArgument(INotificationManager.NotificationIdKey, SHOW_WINDOW_NOTIFICATION_ID)
-			.AddText("Update available!")
-			.AddText(lastRelease.Release.TagName)
-			.AddButton(
-				new AppNotificationButton("Not now").AddArgument(
-					INotificationManager.NotificationIdKey,
-					CANCEL_NOTIFICATION_ID
-				)
-			)
-			.AddButton(
-				new AppNotificationButton("Open changelog").AddArgument(
-					INotificationManager.NotificationIdKey,
-					SHOW_WINDOW_NOTIFICATION_ID
-				)
-			)
-			.BuildNotification();
-
-		_context.NotificationManager.SendToastNotification(notification);
-	}
+	public Task CheckForUpdates() => _releaseManager.CheckForUpdates();
 
 	/// <inheritdoc />
 	public void CloseUpdaterWindow()
 	{
 		_updaterWindow?.Close();
 		_updaterWindow = null;
-		_context.Store.Dispatch(new SaveStateTransform());
+		_ctx.Store.Dispatch(new SaveStateTransform());
 	}
 
 	/// <inheritdoc />
@@ -198,105 +167,13 @@ public class UpdaterPlugin : IUpdaterPlugin
 		JsonSerializer.SerializeToElement(new SavedUpdaterPluginState(SkippedReleaseTagName, LastCheckedForUpdates));
 
 	/// <inheritdoc />
-	public async Task<List<ReleaseInfo>> GetNotInstalledReleases(IGitHubClient? gitHubClient = null)
-	{
-		Logger.Debug("Getting not installed releases");
-		LastCheckedForUpdates = DateTime.Now;
-
-		gitHubClient ??= CreateGitHubClient();
-
-		IReadOnlyList<Release> releases = await gitHubClient
-			.Repository.Release.GetAll(Owner, Repository, new ApiOptions() { PageSize = 100 })
-			.ConfigureAwait(false);
-
-		// Sort the releases by semver
-		List<ReleaseInfo> sortedReleases = [];
-		foreach (Release r in releases)
-		{
-			Version? version = Version.Parse(r.TagName);
-			if (version == null)
-			{
-				Logger.Debug($"Invalid release tag: {r.TagName}");
-				continue;
-			}
-
-			ReleaseInfo info = new(r, version);
-			if (info.Version.ReleaseChannel != _config.ReleaseChannel)
-			{
-				Logger.Debug($"Ignoring release for channel {info.Version.ReleaseChannel}");
-				continue;
-			}
-
-			if (_currentVersion == null || info.Version.IsNewerVersion(_currentVersion))
-			{
-				sortedReleases.Add(info);
-			}
-		}
-
-		// Sort the releases by semver in descending order.
-		sortedReleases.Sort((a, b) => a.Version.IsNewerVersion(b.Version) ? -1 : 1);
-
-		Logger.Debug($"Found {sortedReleases.Count} releases");
-
-		return sortedReleases;
-	}
+	public Task<List<ReleaseInfo>> GetNotInstalledReleases() => _releaseManager.GetNotInstalledReleases();
 
 	/// <inheritdoc />
-	public async Task<Result<string>> DownloadRelease(Release release)
-	{
-		Logger.Debug($"Downloading release {release.TagName}");
-
-		// Get the release asset to download.
-		string assetNameStart = $"WhimInstaller-{_architecture}";
-
-		ReleaseAsset? asset = null;
-		foreach (ReleaseAsset a in release.Assets)
-		{
-			if (a.Name.StartsWith(assetNameStart) && a.Name.EndsWith(".exe"))
-			{
-				asset = a;
-				break;
-			}
-		}
-
-		if (asset == null)
-		{
-			return Result.FromException<string>(new WhimException($"No asset found for release {release}"));
-		}
-
-		string tempPath = Path.Combine(Path.GetTempPath(), asset.Name);
-		Uri requestUri = new(asset.BrowserDownloadUrl);
-
-		// Download the asset.
-		try
-		{
-			await _context.NativeManager.DownloadFileAsync(requestUri, tempPath).ConfigureAwait(false);
-		}
-		catch (Exception ex)
-		{
-			Logger.Error($"Failed to download release: {ex}");
-			return Result.FromException<string>(ex);
-		}
-
-		return Result.FromValue(tempPath);
-	}
+	public Task<Result<string>> DownloadRelease(Release release) => _releaseManager.DownloadRelease(release);
 
 	/// <inheritdoc />
-	public async Task InstallRelease(string path)
-	{
-		Logger.Debug($"Installing release from path {path}");
-
-		try
-		{
-			await _context.NativeManager.RunFileAsync(path).ConfigureAwait(false);
-			_context.NativeManager.TryEnqueue(() => _context.Exit(new ExitEventArgs() { Reason = ExitReason.Update }));
-		}
-		catch (Exception ex)
-		{
-			Logger.Error($"Failed to run installer: {ex}");
-			return;
-		}
-	}
+	public Task InstallDownloadedRelease() => _releaseManager.InstallDownloadedRelease();
 
 	/// <inheritdoc />
 	protected virtual void Dispose(bool disposing)
@@ -310,8 +187,10 @@ public class UpdaterPlugin : IUpdaterPlugin
 				_timer.Dispose();
 				_updaterWindow?.Close();
 				_updaterWindow = null;
-				_context.NotificationManager.Unregister(SHOW_WINDOW_NOTIFICATION_ID);
-				_context.NotificationManager.Unregister(CANCEL_NOTIFICATION_ID);
+				_ctx.NotificationManager.Unregister(OPEN_CHANGELOG_NOTIFICATION_ID);
+				_ctx.NotificationManager.Unregister(DEFER_UPDATE_NOTIFICATION_ID);
+				_ctx.NotificationManager.Unregister(SKIP_UPDATE_NOTIFICATION_ID);
+				_ctx.NotificationManager.Unregister(INSTALL_NOTIFICATION_ID);
 			}
 
 			_disposedValue = true;

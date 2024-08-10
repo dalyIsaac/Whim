@@ -14,7 +14,7 @@ internal sealed partial class UpdaterWindow : Window
 
 	public UpdaterWindowViewModel ViewModel { get; }
 
-	public UpdaterWindow(IContext ctx, IUpdaterPlugin plugin, DateTime? lastCheckedForUpdates)
+	public UpdaterWindow(IContext ctx, IUpdaterPlugin plugin)
 	{
 		_ctx = ctx;
 		_plugin = plugin;

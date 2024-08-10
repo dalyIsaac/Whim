@@ -14,6 +14,11 @@ internal record SavedUpdaterPluginState(string? SkippedReleaseTagName, DateTime?
 public interface IUpdaterPlugin : IPlugin, IDisposable
 {
 	/// <summary>
+	/// The configuration for the updater.
+	/// </summary>
+	UpdaterConfig Config { get; }
+
+	/// <summary>
 	/// The latest release that the user has chosen to skip.
 	/// </summary>
 	string? SkippedReleaseTagName { get; }
@@ -26,11 +31,10 @@ public interface IUpdaterPlugin : IPlugin, IDisposable
 	/// <summary>
 	/// Gets the releases in the current <see cref="ReleaseChannel"/> that have not been installed.
 	/// </summary>
-	/// <param name="gitHubClient"></param>
 	/// <returns>
 	/// The releases, sorted by semver in descending order.
 	/// </returns>
-	Task<List<ReleaseInfo>> GetNotInstalledReleases(IGitHubClient? gitHubClient = null);
+	Task<List<ReleaseInfo>> GetNotInstalledReleases();
 
 	/// <summary>
 	/// Downloads the given release.
@@ -42,13 +46,10 @@ public interface IUpdaterPlugin : IPlugin, IDisposable
 	Task<Result<string>> DownloadRelease(Release release);
 
 	/// <summary>
-	/// Installs the release at the given path.
+	/// Installs the downloaded release, if one is downloaded - see <see cref="DownloadRelease"/>.
 	/// </summary>
-	/// <param name="path">
-	/// The release executable path.
-	/// </param>
 	/// <returns></returns>
-	Task InstallRelease(string path);
+	Task InstallDownloadedRelease();
 
 	/// <summary>
 	/// Skips the given release.
@@ -59,8 +60,7 @@ public interface IUpdaterPlugin : IPlugin, IDisposable
 	/// <summary>
 	/// Checks for updates. If there are updates, shows the updater window.
 	/// </summary>
-	/// <param name="gitHubClient"></param>
-	Task CheckForUpdates(IGitHubClient? gitHubClient = null);
+	Task CheckForUpdates();
 
 	/// <summary>
 	/// Close the updater window.
