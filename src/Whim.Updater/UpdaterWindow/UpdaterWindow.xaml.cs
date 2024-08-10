@@ -9,12 +9,14 @@ namespace Whim.Updater;
 
 internal sealed partial class UpdaterWindow : Window
 {
+	private readonly IContext _ctx;
 	private readonly IUpdaterPlugin _plugin;
 
 	public UpdaterWindowViewModel ViewModel { get; }
 
-	public UpdaterWindow(IUpdaterPlugin plugin, DateTime? lastCheckedForUpdates)
+	public UpdaterWindow(IContext ctx, IUpdaterPlugin plugin, DateTime? lastCheckedForUpdates)
 	{
+		_ctx = ctx;
 		_plugin = plugin;
 		ViewModel = new UpdaterWindowViewModel(_plugin);
 		UIElementExtensions.InitializeComponent(this, "Whim.Updater", "UpdaterWindow/UpdaterWindow");
@@ -58,5 +60,7 @@ internal sealed partial class UpdaterWindow : Window
 	{
 		UpdaterWebView.CoreWebView2.NavigationStarting -= CoreWebView2_NavigationStarting;
 		UpdaterWebView.Close();
+
+		_ctx.Store.Dispatch(new SaveStateTransform());
 	}
 }
