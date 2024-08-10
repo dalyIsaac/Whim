@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Timers;
+using DotNext;
 using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
 using Octokit;
@@ -92,7 +93,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 
 		_context.NativeManager.TryEnqueue(async () =>
 		{
-			_updaterWindow = new UpdaterWindow(plugin: this, null);
+			_updaterWindow = new UpdaterWindow(_context, this);
 			await _updaterWindow.Activate(_notInstalledReleases).ConfigureAwait(true);
 		});
 	}
@@ -120,6 +121,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 	public void SkipRelease(Release release)
 	{
 		SkippedReleaseTagName = release.TagName;
+		_context.Store.Dispatch(new SaveStateTransform());
 	}
 
 	/// <inheritdoc />
@@ -171,6 +173,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 	{
 		_updaterWindow?.Close();
 		_updaterWindow = null;
+		_context.Store.Dispatch(new SaveStateTransform());
 	}
 
 	/// <inheritdoc />
@@ -239,11 +242,11 @@ public class UpdaterPlugin : IUpdaterPlugin
 	}
 
 	/// <inheritdoc />
-	public async Task InstallRelease(Release release)
+	public async Task<Result<string>> DownloadRelease(Release release)
 	{
-		Logger.Debug($"Installing release {release.TagName}");
+		Logger.Debug($"Downloading release {release.TagName}");
 
-		// Get the release asset to install.
+		// Get the release asset to download.
 		string assetNameStart = $"WhimInstaller-{_architecture}";
 
 		ReleaseAsset? asset = null;
@@ -258,8 +261,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 
 		if (asset == null)
 		{
-			Logger.Debug($"No asset found for release {release}");
-			return;
+			return Result.FromException<string>(new WhimException($"No asset found for release {release}"));
 		}
 
 		string tempPath = Path.Combine(Path.GetTempPath(), asset.Name);
@@ -273,27 +275,27 @@ public class UpdaterPlugin : IUpdaterPlugin
 		catch (Exception ex)
 		{
 			Logger.Error($"Failed to download release: {ex}");
-			return;
+			return Result.FromException<string>(ex);
 		}
 
-		// Run the installer.
+		return Result.FromValue(tempPath);
+	}
+
+	/// <inheritdoc />
+	public async Task InstallRelease(string path)
+	{
+		Logger.Debug($"Installing release from path {path}");
+
 		try
 		{
-			int exitCode = await _context.NativeManager.RunFileAsync(tempPath).ConfigureAwait(false);
-			if (exitCode != 0)
-			{
-				Logger.Error($"Installer exited with code {exitCode}");
-				return;
-			}
+			await _context.NativeManager.RunFileAsync(path).ConfigureAwait(false);
+			_context.NativeManager.TryEnqueue(() => _context.Exit(new ExitEventArgs() { Reason = ExitReason.Update }));
 		}
 		catch (Exception ex)
 		{
 			Logger.Error($"Failed to run installer: {ex}");
 			return;
 		}
-
-		// Exit Whim.
-		_context.NativeManager.TryEnqueue(() => _context.Exit(new ExitEventArgs() { Reason = ExitReason.Update }));
 	}
 
 	/// <inheritdoc />

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using DotNext;
 using Octokit;
 
 namespace Whim.Updater;
@@ -26,15 +27,28 @@ public interface IUpdaterPlugin : IPlugin, IDisposable
 	/// Gets the releases in the current <see cref="ReleaseChannel"/> that have not been installed.
 	/// </summary>
 	/// <param name="gitHubClient"></param>
-	/// <returns></returns>
+	/// <returns>
+	/// The releases, sorted by semver in descending order.
+	/// </returns>
 	Task<List<ReleaseInfo>> GetNotInstalledReleases(IGitHubClient? gitHubClient = null);
 
 	/// <summary>
-	/// Downloads and installs the given release.
+	/// Downloads the given release.
 	/// </summary>
 	/// <param name="release"></param>
+	/// <returns>
+	/// The path to the downloaded release.
+	/// </returns>
+	Task<Result<string>> DownloadRelease(Release release);
+
+	/// <summary>
+	/// Installs the release at the given path.
+	/// </summary>
+	/// <param name="path">
+	/// The release executable path.
+	/// </param>
 	/// <returns></returns>
-	Task InstallRelease(Release release);
+	Task InstallRelease(string path);
 
 	/// <summary>
 	/// Skips the given release.
