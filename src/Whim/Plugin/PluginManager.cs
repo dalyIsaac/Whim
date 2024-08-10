@@ -147,7 +147,7 @@ internal partial class PluginManager : IPluginManager
 		}
 	}
 
-	private void SaveState()
+	public void SaveState()
 	{
 		PluginManagerSavedState pluginManagerSavedState = new();
 
