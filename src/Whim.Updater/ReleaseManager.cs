@@ -222,7 +222,9 @@ internal class ReleaseManager
 	public async Task<List<ReleaseInfo>> GetNotInstalledReleases()
 	{
 		Logger.Debug("Getting not installed releases");
+
 		_plugin.LastCheckedForUpdates = DateTime.Now;
+		_ctx.Store.Dispatch(new SaveStateTransform());
 
 		IReadOnlyList<Release> releases = await GitHubClient
 			.Repository.Release.GetAll(Owner, Repository, new ApiOptions() { PageSize = 100 })
