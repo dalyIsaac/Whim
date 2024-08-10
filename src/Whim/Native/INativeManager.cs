@@ -1,5 +1,6 @@
 using System.IO;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
 using Windows.UI.Composition;
@@ -175,6 +176,8 @@ public interface INativeManager
 	/// </summary>
 	/// <param name="uri"></param>
 	/// <param name="destinationPath"></param>
+	/// <param name="progress"></param>
+	/// <param name="cancellationToken"></param>
 	/// <returns></returns>
 	/// <exception cref="InvalidOperationException"></exception>
 	/// <exception cref="HttpRequestException"></exception>
@@ -191,7 +194,12 @@ public interface INativeManager
 	/// <exception cref="ArgumentNullException"></exception>
 	/// <exception cref="ObjectDisposedException"></exception>
 	/// <exception cref="NotSupportedException"></exception>
-	Task DownloadFileAsync(Uri uri, string destinationPath);
+	Task DownloadFileAsync(
+		Uri uri,
+		string destinationPath,
+		IProgress<float>? progress,
+		CancellationToken cancellationToken
+	);
 
 	/// <summary>
 	/// Runs the file at the given <paramref name="path"/>.

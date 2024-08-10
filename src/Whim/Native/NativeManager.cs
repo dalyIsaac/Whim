@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Reflection;
 #pragma warning restore IDE0005 // Using directive is unnecessary.
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.System;
 using Windows.UI.Composition;
@@ -314,15 +315,47 @@ internal partial class NativeManager : INativeManager
 #endif
 	}
 
-	public async Task DownloadFileAsync(Uri uri, string destinationPath)
+	public async Task DownloadFileAsync(
+		Uri uri,
+		string destinationPath,
+		IProgress<float>? progress = null,
+		CancellationToken cancellationToken = default
+	)
 	{
 		using HttpClient httpClient = new();
-		using HttpResponseMessage response = await httpClient.GetAsync(uri).ConfigureAwait(false);
+		using HttpResponseMessage response = await httpClient
+			.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+			.ConfigureAwait(false);
 
 		// Save the asset to a temporary file.
-		using Stream streamToReadFrom = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+		using Stream streamToReadFrom = await response
+			.Content.ReadAsStreamAsync(cancellationToken)
+			.ConfigureAwait(false);
 		using Stream streamToWriteTo = File.Open(destinationPath, System.IO.FileMode.Create);
-		await streamToReadFrom.CopyToAsync(streamToWriteTo).ConfigureAwait(false);
+
+		long? contentLength = response.Content.Headers.ContentLength;
+		if (contentLength.HasValue)
+		{
+			byte[] buffer = new byte[8192];
+			int bytesRead;
+			long totalBytesRead = 0;
+
+			while ((bytesRead = await streamToReadFrom.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
+			{
+				await streamToWriteTo
+					.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken)
+					.ConfigureAwait(false);
+				totalBytesRead += bytesRead;
+
+				progress?.Report((float)totalBytesRead / contentLength.Value);
+			}
+		}
+		else
+		{
+			await streamToReadFrom.CopyToAsync(streamToWriteTo, cancellationToken).ConfigureAwait(false);
+		}
+
+		progress?.Report(1);
 	}
 
 	public async Task<int> RunFileAsync(string path)
