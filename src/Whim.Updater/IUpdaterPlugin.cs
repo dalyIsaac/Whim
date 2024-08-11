@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotNext;
-using Octokit;
 
 namespace Whim.Updater;
 
@@ -29,41 +26,15 @@ public interface IUpdaterPlugin : IPlugin, IDisposable
 	DateTime? LastCheckedForUpdates { get; }
 
 	/// <summary>
-	/// Gets the releases in the current <see cref="ReleaseChannel"/> that have not been installed.
+	/// Skips the release with the given tag name.
 	/// </summary>
-	/// <returns>
-	/// The releases, sorted by semver in descending order.
-	/// </returns>
-	Task<List<ReleaseInfo>> GetNotInstalledReleases();
-
-	/// <summary>
-	/// Downloads the given release.
-	/// </summary>
-	/// <param name="release"></param>
-	/// <returns>
-	/// The path to the downloaded release.
-	/// </returns>
-	Task<Result<string>> DownloadRelease(Release release);
-
-	/// <summary>
-	/// Installs the downloaded release, if one is downloaded - see <see cref="DownloadRelease"/>.
-	/// </summary>
-	/// <returns></returns>
-	Task InstallDownloadedRelease();
-
-	/// <summary>
-	/// Skips the given release.
-	/// </summary>
-	/// <param name="release"></param>
-	void SkipRelease(Release release);
+	/// <param name="tagName">
+	/// The tag name of the release to skip. If null, skips the latest release.
+	/// </param>
+	void SkipRelease(string? tagName = null);
 
 	/// <summary>
 	/// Checks for updates. If there are updates, shows the updater window.
 	/// </summary>
 	Task CheckForUpdates();
-
-	/// <summary>
-	/// Close the updater window.
-	/// </summary>
-	void CloseUpdaterWindow();
 }

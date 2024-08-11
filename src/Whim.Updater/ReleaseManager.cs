@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using DotNext;
 using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
 using Octokit;
@@ -21,15 +18,10 @@ internal class ReleaseManager
 	private const string Owner = "dalyIsaac";
 	private const string Repository = "Whim";
 
+	public const string ChangelogUrl = $"https://github.com/{Owner}/{Repository}/releases/";
+
 	private readonly IContext _ctx;
 	private readonly UpdaterPlugin _plugin;
-
-	private readonly string _architecture = RuntimeInformation.ProcessArchitecture.ToString().ToLower();
-
-	/// <summary>
-	/// The downloaded release, if one is downloaded.
-	/// </summary>
-	private DownloadedRelease? _downloadedRelease;
 
 	/// <summary>
 	/// The next release to install.
@@ -119,107 +111,13 @@ internal class ReleaseManager
 		_ctx.NotificationManager.SendToastNotification(notification);
 	}
 
-	public async Task<Result<string>> DownloadRelease(Release release)
-	{
-		Logger.Debug($"Downloading release {release.TagName}");
-
-		// Get the release asset to download.
-		string assetNameStart = $"WhimInstaller-{_architecture}";
-
-		ReleaseAsset? asset = null;
-		foreach (ReleaseAsset a in release.Assets)
-		{
-			if (a.Name.StartsWith(assetNameStart) && a.Name.EndsWith(".exe"))
-			{
-				asset = a;
-				break;
-			}
-		}
-
-		if (asset == null)
-		{
-			return Result.FromException<string>(new WhimException($"No asset found for release {release}"));
-		}
-
-		string tempPath = Path.Combine(Path.GetTempPath(), asset.Name);
-		Uri requestUri = new(asset.BrowserDownloadUrl);
-
-		// Create the progress notification.
-		AppNotificationProgressData progress =
-			new(0) { Title = $"Downloading {release.TagName}", Status = "Downloading..." };
-
-		AppNotification downloadNotification = new AppNotificationBuilder()
-			.AddText("Downloading update...")
-			.AddProgressBar(
-				new AppNotificationProgressBar().BindTitle().BindStatus().BindValue().BindValueStringOverride()
-			)
-			.AddArgument(INotificationManager.NotificationIdKey, _plugin.SKIP_UPDATE_NOTIFICATION_ID)
-			.BuildNotification();
-
-		downloadNotification.Progress = progress;
-		_ctx.NotificationManager.SendToastNotification(downloadNotification);
-
-		// Download the asset.
-		try
-		{
-			await _ctx.NativeManager.DownloadFileAsync(requestUri, tempPath).ConfigureAwait(false);
-			_downloadedRelease = new DownloadedRelease(tempPath, release);
-			progress.Status = "Download complete";
-		}
-		catch (Exception ex)
-		{
-			Logger.Error($"Failed to download release: {ex}");
-			return Result.FromException<string>(ex);
-		}
-
-		await _ctx.NotificationManager.ClearToastNotification(downloadNotification.Id).ConfigureAwait(false);
-
-		// Create the installation notification.
-		AppNotification installNotification = new AppNotificationBuilder()
-			.AddText("Install update now?")
-			.AddText(release.TagName)
-			.AddButton(
-				new AppNotificationButton("Install").AddArgument(
-					INotificationManager.NotificationIdKey,
-					_plugin.INSTALL_NOTIFICATION_ID
-				)
-			)
-			.AddButton(
-				new AppNotificationButton("Not now").AddArgument(
-					INotificationManager.NotificationIdKey,
-					_plugin.CANCEL_INSTALL_NOTIFICATION_ID
-				)
-			)
-			.BuildNotification();
-
-		_ctx.NotificationManager.SendToastNotification(installNotification);
-
-		return Result.FromValue(tempPath);
-	}
-
-	public async Task InstallDownloadedRelease()
-	{
-		if (_downloadedRelease == null)
-		{
-			Logger.Error("No downloaded release to install");
-			return;
-		}
-
-		Logger.Debug($"Installing release {_downloadedRelease.Release.TagName} from path {_downloadedRelease.Path}");
-
-		try
-		{
-			await _ctx.NativeManager.RunFileAsync(_downloadedRelease.Path).ConfigureAwait(false);
-			_ctx.NativeManager.TryEnqueue(() => _ctx.Exit(new ExitEventArgs() { Reason = ExitReason.Update }));
-		}
-		catch (Exception ex)
-		{
-			Logger.Error($"Failed to run installer: {ex}");
-			return;
-		}
-	}
-
-	public async Task<List<ReleaseInfo>> GetNotInstalledReleases()
+	/// <summary>
+	/// Gets the releases in the current <see cref="ReleaseChannel"/> that have not been installed.
+	/// </summary>
+	/// <returns>
+	/// The releases, sorted by semver in descending order.
+	/// </returns>
+	private async Task<List<ReleaseInfo>> GetNotInstalledReleases()
 	{
 		Logger.Debug("Getting not installed releases");
 

@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
@@ -7,9 +6,7 @@ using System.Net.Http;
 using System.Reflection;
 #pragma warning restore IDE0005 // Using directive is unnecessary.
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Windows.AppNotifications;
 using Windows.System;
 using Windows.UI.Composition;
 using Windows.Win32;
@@ -311,72 +308,9 @@ internal partial class NativeManager : INativeManager
 	{
 #if DEBUG
 		// An arbitrary version number for debugging.
-		return "v0.7.4-alpha+ea8719b7";
+		return "v0.1.263-alpha+bc5c56c4";
 #else
 		return Assembly.GetExecutingAssembly().GetName().Version!.ToString();
 #endif
-	}
-
-	public async Task DownloadFileAsync(
-		Uri uri,
-		string destinationPath,
-		AppNotificationProgressData? progress = null,
-		CancellationToken cancellationToken = default
-	)
-	{
-		using HttpClient httpClient = new();
-		using HttpResponseMessage response = await httpClient
-			.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
-			.ConfigureAwait(false);
-
-		// Save the asset to a temporary file.
-		using Stream streamToReadFrom = await response
-			.Content.ReadAsStreamAsync(cancellationToken)
-			.ConfigureAwait(false);
-		using Stream streamToWriteTo = File.Open(destinationPath, System.IO.FileMode.Create);
-
-		long? contentLength = response.Content.Headers.ContentLength;
-		if (contentLength.HasValue)
-		{
-			byte[] buffer = new byte[8192];
-			int bytesRead;
-			long totalBytesRead = 0;
-
-			while ((bytesRead = await streamToReadFrom.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
-			{
-				await streamToWriteTo
-					.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken)
-					.ConfigureAwait(false);
-				totalBytesRead += bytesRead;
-
-				// progress?.Report((float)totalBytesRead / contentLength.Value);
-				if (progress is not null)
-				{
-					progress.Value = (float)totalBytesRead / contentLength.Value;
-					progress.ValueStringOverride =
-						$"{totalBytesRead / 1024 / 1024} / {contentLength.Value / 1024 / 1024} MB";
-				}
-			}
-		}
-		else
-		{
-			await streamToReadFrom.CopyToAsync(streamToWriteTo, cancellationToken).ConfigureAwait(false);
-		}
-
-		await streamToWriteTo.FlushAsync(cancellationToken).ConfigureAwait(false);
-		if (progress is not null)
-		{
-			progress.Value = 1;
-			progress.ValueStringOverride = "Download complete";
-		}
-	}
-
-	public async Task<int> RunFileAsync(string path)
-	{
-		using Process process = new();
-		process.StartInfo.FileName = path;
-		process.Start();
-		await process.WaitForExitAsync().ConfigureAwait(false);
-		return process.ExitCode;
 	}
 }

@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Timers;
-using DotNext;
 using Microsoft.Windows.AppNotifications;
-using Octokit;
 
 namespace Whim.Updater;
 
@@ -14,8 +12,6 @@ public class UpdaterPlugin : IUpdaterPlugin
 {
 	private readonly IContext _ctx;
 	private readonly ReleaseManager _releaseManager;
-
-	private UpdaterWindow? _updaterWindow;
 
 	/// <summary>
 	/// Notification ID for showing the changelog window.
@@ -31,16 +27,6 @@ public class UpdaterPlugin : IUpdaterPlugin
 	/// Notification ID for skipping an update.
 	/// </summary>
 	internal string SKIP_UPDATE_NOTIFICATION_ID => $"{Name}.cancel";
-
-	/// <summary>
-	/// Notification ID for installing an update.
-	/// </summary>
-	internal string INSTALL_NOTIFICATION_ID => $"{Name}.install";
-
-	/// <summary>
-	/// Notification ID for cancelling an update installation.
-	/// </summary>
-	internal string CANCEL_INSTALL_NOTIFICATION_ID => $"{Name}.cancel_install";
 
 	/// <summary>
 	/// The release that the user has chosen to skip.
@@ -92,26 +78,18 @@ public class UpdaterPlugin : IUpdaterPlugin
 		_ctx.NotificationManager.Register(OPEN_CHANGELOG_NOTIFICATION_ID, OnOpenChangelogNotificationReceived);
 		_ctx.NotificationManager.Register(DEFER_UPDATE_NOTIFICATION_ID, OnDeferUpdateNotificationReceived);
 		_ctx.NotificationManager.Register(SKIP_UPDATE_NOTIFICATION_ID, OnSkipUpdateNotificationReceived);
-		_ctx.NotificationManager.Register(INSTALL_NOTIFICATION_ID, OnInstallNotificationReceived);
 	}
 
 	private void OnOpenChangelogNotificationReceived(AppNotificationActivatedEventArgs args)
 	{
-		Logger.Debug("Showing update window");
-
-		_ctx.NativeManager.TryEnqueue(async () =>
-		{
-			_updaterWindow = new UpdaterWindow(_ctx, this);
-			await _updaterWindow.Activate(_releaseManager.NotInstalledReleases).ConfigureAwait(true);
-		});
+		Logger.Debug("Opening GitHub");
+		Process.Start(new ProcessStartInfo(ReleaseManager.ChangelogUrl) { UseShellExecute = true });
 	}
 
 	private void OnDeferUpdateNotificationReceived(AppNotificationActivatedEventArgs args) =>
 		Logger.Debug("Deferring update");
 
 	private void OnSkipUpdateNotificationReceived(AppNotificationActivatedEventArgs args) => SkipRelease();
-
-	private void OnInstallNotificationReceived(AppNotificationActivatedEventArgs args) => InstallDownloadedRelease();
 
 	/// <inheritdoc />
 	public void PostInitialize()
@@ -128,22 +106,14 @@ public class UpdaterPlugin : IUpdaterPlugin
 		await CheckForUpdates().ConfigureAwait(true);
 
 	/// <inheritdoc />
-	public void SkipRelease(Release? release = null)
+	public void SkipRelease(string? tagName = null)
 	{
-		SkippedReleaseTagName = _releaseManager.NextRelease?.TagName;
+		SkippedReleaseTagName = tagName ?? _releaseManager.NextRelease?.TagName;
 		_ctx.Store.Dispatch(new SaveStateTransform());
 	}
 
 	/// <inheritdoc />
 	public Task CheckForUpdates() => _releaseManager.CheckForUpdates();
-
-	/// <inheritdoc />
-	public void CloseUpdaterWindow()
-	{
-		_updaterWindow?.Close();
-		_updaterWindow = null;
-		_ctx.Store.Dispatch(new SaveStateTransform());
-	}
 
 	/// <inheritdoc />
 	public void LoadState(JsonElement state)
@@ -167,15 +137,6 @@ public class UpdaterPlugin : IUpdaterPlugin
 		JsonSerializer.SerializeToElement(new SavedUpdaterPluginState(SkippedReleaseTagName, LastCheckedForUpdates));
 
 	/// <inheritdoc />
-	public Task<List<ReleaseInfo>> GetNotInstalledReleases() => _releaseManager.GetNotInstalledReleases();
-
-	/// <inheritdoc />
-	public Task<Result<string>> DownloadRelease(Release release) => _releaseManager.DownloadRelease(release);
-
-	/// <inheritdoc />
-	public Task InstallDownloadedRelease() => _releaseManager.InstallDownloadedRelease();
-
-	/// <inheritdoc />
 	protected virtual void Dispose(bool disposing)
 	{
 		if (!_disposedValue)
@@ -185,12 +146,9 @@ public class UpdaterPlugin : IUpdaterPlugin
 				// dispose managed state (managed objects)
 				_timer.Elapsed -= Timer_Elapsed;
 				_timer.Dispose();
-				_updaterWindow?.Close();
-				_updaterWindow = null;
 				_ctx.NotificationManager.Unregister(OPEN_CHANGELOG_NOTIFICATION_ID);
 				_ctx.NotificationManager.Unregister(DEFER_UPDATE_NOTIFICATION_ID);
 				_ctx.NotificationManager.Unregister(SKIP_UPDATE_NOTIFICATION_ID);
-				_ctx.NotificationManager.Unregister(INSTALL_NOTIFICATION_ID);
 			}
 
 			_disposedValue = true;
