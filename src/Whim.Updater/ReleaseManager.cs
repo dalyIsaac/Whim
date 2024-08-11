@@ -121,7 +121,7 @@ internal class ReleaseManager
 	/// <returns>
 	/// The releases, sorted by semver in descending order.
 	/// </returns>
-	private async Task<List<ReleaseInfo>> GetNotInstalledReleases()
+	public async Task<List<ReleaseInfo>> GetNotInstalledReleases()
 	{
 		Logger.Debug("Getting not installed releases");
 

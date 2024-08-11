@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using FluentAssertions;
 using Microsoft.UI.Dispatching;
 using Microsoft.Windows.AppNotifications;
 using NSubstitute;
@@ -12,7 +13,6 @@ namespace Whim.Updater.Tests;
 public class ReleaseManagerTests
 {
 	#region CheckForUpdates
-
 	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
 	public async Task CheckForUpdates_WhenNoReleases(IContext ctx, IGitHubClient client)
 	{
@@ -46,6 +46,102 @@ public class ReleaseManagerTests
 		// Then
 		ctx.NotificationManager.DidNotReceive().SendToastNotification(Arg.Any<AppNotification>());
 		ctx.NativeManager.Received(1).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
+	}
+	#endregion
+
+	#region GetNotInstalledReleases
+	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
+	public async Task GetNotInstalledReleases_WhenNoReleases(IContext ctx, IGitHubClient client)
+	{
+		// Given
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
+		ReleaseManager sut = new(ctx, plugin) { GitHubClient = client };
+
+		// When
+		IEnumerable<ReleaseInfo> releases = await sut.GetNotInstalledReleases();
+
+		// Then
+		Assert.Empty(releases);
+	}
+
+	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
+	public async Task GetNotInstalledReleases_InvalidVersion(IContext ctx, IGitHubClient client)
+	{
+		// Given
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
+		ReleaseManager sut = new(ctx, plugin) { GitHubClient = client };
+		client
+			.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
+			.Returns([Data.CreateRelease242(tagName: "welp")]);
+
+		// When
+		IEnumerable<ReleaseInfo> releases = await sut.GetNotInstalledReleases();
+
+		// Then
+		Assert.Empty(releases);
+	}
+
+	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
+	public async Task GetNotInstalledReleases_DifferentChannel(IContext ctx, IGitHubClient client)
+	{
+		// Given
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
+		ReleaseManager sut = new(ctx, plugin) { GitHubClient = client };
+		client
+			.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
+			.Returns([Data.CreateRelease242(tagName: "v0.1.263-beta+bc5c56c4")]);
+
+		// When
+		IEnumerable<ReleaseInfo> releases = await sut.GetNotInstalledReleases();
+
+		// Then
+		Assert.Empty(releases);
+	}
+
+	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
+	public async Task GetNotInstalledReleases_OlderVersion(IContext ctx, IGitHubClient client)
+	{
+		// Given
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig());
+		ReleaseManager sut = new(ctx, plugin) { GitHubClient = client };
+		client
+			.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
+			.Returns([Data.CreateRelease242(tagName: "v0.1.261-alpha+bc5c56c4")]);
+
+		// When
+		IEnumerable<ReleaseInfo> releases = await sut.GetNotInstalledReleases();
+
+		// Then
+		Assert.Empty(releases);
+	}
+
+	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
+	public async Task GetNotInstalledReleases_Ordered(IContext ctx, IGitHubClient client)
+	{
+		// Given
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig() { ReleaseChannel = ReleaseChannel.Alpha });
+		ReleaseManager sut = new(ctx, plugin) { GitHubClient = client };
+
+		string[] orderedReleases =
+		[
+			"v0.1.261-alpha+bc5c56c4",
+			"v0.1.262-beta+bc5c56c4",
+			"v0.1.263-stable+bc5c56c4",
+			"v0.1.264-alpha+bc5c56c4",
+			"v0.2.265-alpha+bc5c56c4",
+			"v1.1.266-alpha+bc5c56c4"
+		];
+		string[] expectedReleases = ["v0.1.264-alpha+bc5c56c4", "v0.2.265-alpha+bc5c56c4", "v1.1.266-alpha+bc5c56c4"];
+
+		client
+			.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
+			.Returns(orderedReleases.Select(t => Data.CreateRelease242(tagName: t)).ToArray());
+
+		// When
+		IEnumerable<ReleaseInfo> releases = await sut.GetNotInstalledReleases();
+
+		// Then
+		releases.Select(r => r.Release.TagName).Should().BeEquivalentTo(expectedReleases);
 	}
 	#endregion
 }
