@@ -10,7 +10,7 @@ Whim is a hackable, pluggable and scriptable dynamic window manager for Windows 
 
 ## Installation
 
-Alpha builds are available on the [releases page](https://github.com/dalyIsaac/Whim/releases) on GitHub. Whim has an [updater plugin](docs/plugins/updater.md) to keep you up to date.
+Alpha builds are available on the [releases page](https://github.com/dalyIsaac/Whim/releases) on GitHub. Whim has an [updater plugin](docs/plugins/updater.md) to notify you of new releases.
 
 Installation via package managers is coming in [dalyIsaac/Whim#792](https://github.com/dalyIsaac/Whim/issues/792).
 
