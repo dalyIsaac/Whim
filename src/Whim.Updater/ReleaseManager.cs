@@ -33,18 +33,19 @@ internal class ReleaseManager
 	/// </summary>
 	public Version CurrentVersion { get; }
 
-	private GitHubClient? _gitHubClient;
+	private IGitHubClient? _gitHubClient;
 
 	/// <summary>
 	/// Lazy-loaded GitHub client.
 	/// </summary>
-	private GitHubClient GitHubClient
+	internal IGitHubClient GitHubClient
 	{
 		get
 		{
 			_gitHubClient ??= new GitHubClient(new ProductHeaderValue(_plugin.Name));
 			return _gitHubClient;
 		}
+		init => _gitHubClient = value;
 	}
 
 	public ReleaseManager(IContext context, UpdaterPlugin plugin)
@@ -84,31 +85,34 @@ internal class ReleaseManager
 
 		Logger.Debug($"Found {lastRelease.Release.TagName}");
 
-		AppNotification notification = new AppNotificationBuilder()
-			.AddArgument(INotificationManager.NotificationIdKey, _plugin.OPEN_CHANGELOG_NOTIFICATION_ID)
-			.AddText("Update available!")
-			.AddText(lastRelease.Release.TagName)
-			.AddButton(
-				new AppNotificationButton("Not now").AddArgument(
-					INotificationManager.NotificationIdKey,
-					_plugin.DEFER_UPDATE_NOTIFICATION_ID
+		_ctx.NativeManager.TryEnqueue(() =>
+		{
+			AppNotification notification = new AppNotificationBuilder()
+				.AddArgument(INotificationManager.NotificationIdKey, _plugin.OPEN_CHANGELOG_NOTIFICATION_ID)
+				.AddText("Update available!")
+				.AddText(lastRelease.Release.TagName)
+				.AddButton(
+					new AppNotificationButton("Not now").AddArgument(
+						INotificationManager.NotificationIdKey,
+						_plugin.DEFER_UPDATE_NOTIFICATION_ID
+					)
 				)
-			)
-			.AddButton(
-				new AppNotificationButton("Skip").AddArgument(
-					INotificationManager.NotificationIdKey,
-					_plugin.SKIP_UPDATE_NOTIFICATION_ID
+				.AddButton(
+					new AppNotificationButton("Skip").AddArgument(
+						INotificationManager.NotificationIdKey,
+						_plugin.SKIP_UPDATE_NOTIFICATION_ID
+					)
 				)
-			)
-			.AddButton(
-				new AppNotificationButton("Open changelog").AddArgument(
-					INotificationManager.NotificationIdKey,
-					_plugin.OPEN_CHANGELOG_NOTIFICATION_ID
+				.AddButton(
+					new AppNotificationButton("Open changelog").AddArgument(
+						INotificationManager.NotificationIdKey,
+						_plugin.OPEN_CHANGELOG_NOTIFICATION_ID
+					)
 				)
-			)
-			.BuildNotification();
+				.BuildNotification();
 
-		_ctx.NotificationManager.SendToastNotification(notification);
+			_ctx.NotificationManager.SendToastNotification(notification);
+		});
 	}
 
 	/// <summary>
