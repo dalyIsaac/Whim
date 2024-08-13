@@ -13,25 +13,20 @@ internal record DownloadedRelease(string Path, Release Release);
 /// <summary>
 /// Searches for, downloads, and installs updates for Whim.
 /// </summary>
-internal class ReleaseManager
+internal class ReleaseManager(IContext context, UpdaterPlugin plugin)
 {
 	private const string Owner = "dalyIsaac";
 	private const string Repository = "Whim";
 
 	public const string ChangelogUrl = $"https://github.com/{Owner}/{Repository}/releases/";
 
-	private readonly IContext _ctx;
-	private readonly UpdaterPlugin _plugin;
+	private readonly IContext _ctx = context;
+	private readonly UpdaterPlugin _plugin = plugin;
 
 	/// <summary>
 	/// The next release to install.
 	/// </summary>
 	public Release? NextRelease => NotInstalledReleases.FirstOrDefault()?.Release;
-
-	/// <summary>
-	/// The current version of Whim.
-	/// </summary>
-	public Version CurrentVersion { get; }
 
 	private IGitHubClient? _gitHubClient;
 
@@ -46,13 +41,6 @@ internal class ReleaseManager
 			return _gitHubClient;
 		}
 		init => _gitHubClient = value;
-	}
-
-	public ReleaseManager(IContext context, UpdaterPlugin plugin)
-	{
-		_ctx = context;
-		_plugin = plugin;
-		CurrentVersion = Version.ParseProductVersion(_ctx.NativeManager.GetWhimVersion())!;
 	}
 
 	/// <summary>
@@ -128,6 +116,8 @@ internal class ReleaseManager
 		_plugin.LastCheckedForUpdates = DateTime.Now;
 		_ctx.Store.Dispatch(new SaveStateTransform());
 
+		Version currentVersion = Version.ParseProductVersion(_ctx.NativeManager.GetWhimVersion())!;
+
 		IReadOnlyList<Release> releases = await GitHubClient
 			.Repository.Release.GetAll(Owner, Repository, new ApiOptions() { PageSize = 100 })
 			.ConfigureAwait(false);
@@ -150,7 +140,7 @@ internal class ReleaseManager
 				continue;
 			}
 
-			if (CurrentVersion == null || info.Version.IsNewerVersion(CurrentVersion))
+			if (currentVersion == null || info.Version.IsNewerVersion(currentVersion))
 			{
 				sortedReleases.Add(info);
 			}
