@@ -11,7 +11,7 @@ public class VersionTests
 	public void Parse(string tagName, int major, int minor, int patch, ReleaseChannel releaseChannel, string commit)
 	{
 		// Given
-		Version? version = Version.Parse(tagName);
+		Version? version = Version.ParseSemver(tagName);
 
 		// Then
 		Assert.NotNull(version);
@@ -31,7 +31,7 @@ public class VersionTests
 	public void Parse_Invalid(string tagName)
 	{
 		// Given
-		Version? version = Version.Parse(tagName);
+		Version? version = Version.ParseSemver(tagName);
 
 		// Then
 		Assert.Null(version);
@@ -47,8 +47,8 @@ public class VersionTests
 	public void IsNewerVersion(string tagName, string otherTagName, bool expected)
 	{
 		// Arrange
-		Version version = Version.Parse(tagName)!;
-		Version otherVersion = Version.Parse(otherTagName)!;
+		Version version = Version.ParseSemver(tagName)!;
+		Version otherVersion = Version.ParseSemver(otherTagName)!;
 
 		// Given
 		bool isNewer = version.IsNewerVersion(otherVersion);

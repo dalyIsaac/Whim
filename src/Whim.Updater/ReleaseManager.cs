@@ -52,7 +52,7 @@ internal class ReleaseManager
 	{
 		_ctx = context;
 		_plugin = plugin;
-		CurrentVersion = Version.Parse(_ctx.NativeManager.GetWhimVersion())!;
+		CurrentVersion = Version.ParseProductVersion(_ctx.NativeManager.GetWhimVersion())!;
 	}
 
 	/// <summary>
@@ -136,7 +136,7 @@ internal class ReleaseManager
 		List<ReleaseInfo> sortedReleases = [];
 		foreach (Release r in releases)
 		{
-			Version? version = Version.Parse(r.TagName);
+			Version? version = Version.ParseSemver(r.TagName);
 			if (version == null)
 			{
 				Logger.Debug($"Invalid release tag: {r.TagName}");

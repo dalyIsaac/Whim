@@ -308,9 +308,11 @@ internal partial class NativeManager : INativeManager
 	{
 #if DEBUG
 		// An arbitrary version number for debugging.
-		return "v0.1.263-alpha+bc5c56c4";
+		return "0.1.263.0";
 #else
-		return Assembly.GetExecutingAssembly().GetName().Version!.ToString();
+		Assembly assembly = Assembly.GetExecutingAssembly();
+		FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
+		return fileVersionInfo.ProductVersion!;
 #endif
 	}
 }

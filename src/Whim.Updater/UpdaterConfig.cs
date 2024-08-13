@@ -22,6 +22,12 @@ public enum ReleaseChannel
 	/// Stable releases are specific releases in a release branch <c>release/v*</c>.
 	/// </summary>
 	Stable = 2,
+
+	/// <summary>
+	/// Unknown release channel. This is typically used when we parse the version from
+	/// <see cref="INativeManager.GetWhimVersion"/>.
+	/// </summary>
+	Unknown = 999,
 }
 
 /// <summary>
