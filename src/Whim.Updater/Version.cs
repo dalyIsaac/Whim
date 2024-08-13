@@ -79,7 +79,7 @@ public partial record Version
 		return GetVersionFromMatch(match);
 	}
 
-	[GeneratedRegex(@"^v(\d+).(\d+).(\d+)-(alpha|beta|stable)\+([a-z\d]{8}).[a-z\d]*$")]
+	[GeneratedRegex(@"^(\d+).(\d+).(\d+)-(alpha|beta|stable)\+([a-z\d]{8}).[a-z\d]*$")]
 	private static partial Regex ProductVersionRegex();
 
 	private static Version GetVersionFromMatch(Match match)
