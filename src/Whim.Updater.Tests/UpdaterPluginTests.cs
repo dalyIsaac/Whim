@@ -14,7 +14,7 @@ public class UpdaterPluginCustomization : ICustomization
 	public void Customize(IFixture fixture)
 	{
 		IContext ctx = fixture.Freeze<IContext>();
-		ctx.NativeManager.GetWhimVersion().Returns("v0.1.263-alpha+bc5c56c4");
+		ctx.NativeManager.GetWhimVersion().Returns("0.1.263-alpha+bc5c56c4.12315123");
 	}
 }
 

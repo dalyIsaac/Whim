@@ -48,7 +48,7 @@ public partial record Version
 	/// <returns>
 	/// A new <see cref="Version"/> if the tag name is valid, otherwise null.
 	/// </returns>
-	public static Version? ParseSemver(string tagName)
+	public static Version? ParseTag(string tagName)
 	{
 		Match match = SemverRegex().Match(tagName);
 		if (!match.Success || match.Groups.Count != 6)
@@ -129,11 +129,6 @@ public partial record Version
 			return true;
 		}
 		else if (Patch < other.Patch)
-		{
-			return false;
-		}
-
-		if (ReleaseChannel == ReleaseChannel.Unknown || other.ReleaseChannel == ReleaseChannel.Unknown)
 		{
 			return false;
 		}

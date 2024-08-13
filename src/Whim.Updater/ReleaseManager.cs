@@ -132,13 +132,11 @@ internal class ReleaseManager
 			.Repository.Release.GetAll(Owner, Repository, new ApiOptions() { PageSize = 100 })
 			.ConfigureAwait(false);
 
-		var productVersion = Version.ParseProductVersion(_ctx.NativeManager.GetWhimVersion());
-
 		// Sort the releases by semver
 		List<ReleaseInfo> sortedReleases = [];
 		foreach (Release r in releases)
 		{
-			Version? version = Version.ParseSemver(r.TagName);
+			Version? version = Version.ParseTag(r.TagName);
 			if (version == null)
 			{
 				Logger.Debug($"Invalid release tag: {r.TagName}");
@@ -159,7 +157,7 @@ internal class ReleaseManager
 		}
 
 		// Sort the releases by semver in descending order.
-		sortedReleases.Sort((a, b) => a.Version.IsNewerVersion(b.Version) ? -1 : 1);
+		sortedReleases.Sort(static (a, b) => a.Version.IsNewerVersion(b.Version) ? -1 : 1);
 
 		Logger.Debug($"Found {sortedReleases.Count} releases");
 

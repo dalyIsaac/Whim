@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
 using Microsoft.UI.Dispatching;
-using Microsoft.Windows.AppNotifications;
 using NSubstitute;
 using Octokit;
 using Whim.TestUtils;
@@ -24,7 +23,8 @@ public class ReleaseManagerTests
 		await sut.CheckForUpdates();
 
 		// Then
-		ctx.NotificationManager.DidNotReceive().SendToastNotification(Arg.Any<AppNotification>());
+		ctx.NativeManager.DidNotReceive().TryEnqueue(Arg.Any<DispatcherQueueHandler>());
+		ctx.Store.Received(1).Dispatch(Arg.Any<SaveStateTransform>());
 		Assert.NotNull(plugin.LastCheckedForUpdates);
 	}
 
@@ -37,15 +37,36 @@ public class ReleaseManagerTests
 
 		UpdaterPlugin plugin = new(ctx, new UpdaterConfig() { ReleaseChannel = ReleaseChannel.Alpha });
 		plugin.SkipRelease(release.TagName);
+		ctx.Store.ClearReceivedCalls();
 
-		ReleaseManager sut = new(ctx, plugin);
+		ReleaseManager sut = new(ctx, plugin) { GitHubClient = client };
 
 		// When
 		await sut.CheckForUpdates();
 
 		// Then
-		ctx.NotificationManager.DidNotReceive().SendToastNotification(Arg.Any<AppNotification>());
+		ctx.NativeManager.DidNotReceive().TryEnqueue(Arg.Any<DispatcherQueueHandler>());
+		ctx.Store.Received(1).Dispatch(Arg.Any<SaveStateTransform>());
+		Assert.NotNull(plugin.LastCheckedForUpdates);
+	}
+
+	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]
+	public async Task CheckForUpdates_NewRelease(IContext ctx, IGitHubClient client)
+	{
+		// Given
+		Release release = Data.CreateRelease242(tagName: "v0.1.265-alpha+bc5c56c4");
+		client.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>()).Returns([release]);
+
+		UpdaterPlugin plugin = new(ctx, new UpdaterConfig() { ReleaseChannel = ReleaseChannel.Alpha });
+		ReleaseManager sut = new(ctx, plugin) { GitHubClient = client };
+
+		// When
+		await sut.CheckForUpdates();
+
+		// Then
 		ctx.NativeManager.Received(1).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
+		ctx.Store.Received(1).Dispatch(Arg.Any<SaveStateTransform>());
+		Assert.NotNull(plugin.LastCheckedForUpdates);
 	}
 	#endregion
 
