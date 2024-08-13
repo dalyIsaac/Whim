@@ -71,7 +71,7 @@ public partial record Version
 	public static Version? ParseProductVersion(string version)
 	{
 		Match match = ProductVersionRegex().Match(version);
-		if (!match.Success || match.Groups.Count != 2)
+		if (!match.Success || match.Groups.Count != 6)
 		{
 			return null;
 		}
