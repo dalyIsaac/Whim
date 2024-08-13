@@ -132,6 +132,8 @@ internal class ReleaseManager
 			.Repository.Release.GetAll(Owner, Repository, new ApiOptions() { PageSize = 100 })
 			.ConfigureAwait(false);
 
+		var productVersion = Version.ParseProductVersion(_ctx.NativeManager.GetWhimVersion());
+
 		// Sort the releases by semver
 		List<ReleaseInfo> sortedReleases = [];
 		foreach (Release r in releases)
