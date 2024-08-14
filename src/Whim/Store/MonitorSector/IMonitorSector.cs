@@ -6,7 +6,12 @@ namespace Whim;
 public interface IMonitorSector
 {
 	/// <summary>
-	/// All the monitors currently tracked by Whim.
+	/// All the monitors currently tracked by Whim. The monitors are ordered by their x-coordinate
+	/// and then by their y-coordinate.
+	///
+	/// Your primary monitor will have the top-left coordinate be (0, 0).
+	/// Accordingly, monitors to the left of the primary monitor will have negative x-coordinates,
+	/// and monitors above the primary monitor will have negative y-coordinates.
 	/// </summary>
 	ImmutableArray<IMonitor> Monitors { get; }
 

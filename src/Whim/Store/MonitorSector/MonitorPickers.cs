@@ -95,6 +95,25 @@ public static partial class Pickers
 		};
 
 	/// <summary>
+	/// Get the monitor at the given index.
+	/// </summary>
+	/// <param name="index">
+	/// The 0-based index of the monitor to get.
+	/// </param>
+	/// <returns></returns>
+	public static PurePicker<Result<IMonitor>> PickMonitorByIndex(int index) =>
+		(rootSector) =>
+		{
+			ImmutableArray<IMonitor> monitors = rootSector.MonitorSector.Monitors;
+			if (index < 0 || index >= monitors.Length)
+			{
+				return Result.FromException<IMonitor>(StoreExceptions.InvalidMonitorIndex(index));
+			}
+
+			return Result.FromValue(monitors[index]);
+		};
+
+	/// <summary>
 	/// Get the monitor at the point <paramref name="point"/>
 	/// </summary>
 	/// <param name="point">
