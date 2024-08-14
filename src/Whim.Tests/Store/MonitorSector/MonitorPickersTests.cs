@@ -92,6 +92,7 @@ public class MonitorPickersTests
 		Assert.Equal((HMONITOR)2, result.Handle);
 	}
 
+	#region PickAdjacentMonitor
 	[InlineAutoSubstituteData<StoreCustomization>(true)]
 	[InlineAutoSubstituteData<StoreCustomization>(false)]
 	[Theory]
@@ -132,6 +133,40 @@ public class MonitorPickersTests
 		// Then
 		Assert.Equal(root.MonitorSector.Monitors[endIdx].Handle, result.Value.Handle);
 	}
+	#endregion
+
+	#region PickMonitorByIndex
+	[Theory]
+	[InlineAutoSubstituteData<StoreCustomization>(-1)]
+	[InlineAutoSubstituteData<StoreCustomization>(4)]
+	internal void PickMonitorByIndex_MonitorIndexOutOfRange(int index, IContext ctx, MutableRootSector root)
+	{
+		// Given
+		PopulateMonitors(root);
+
+		// When
+		Result<IMonitor> result = ctx.Store.Pick(Pickers.PickMonitorByIndex(index));
+
+		// Then
+		Assert.False(result.IsSuccessful);
+	}
+
+	[Theory]
+	[InlineAutoSubstituteData<StoreCustomization>(0)]
+	[InlineAutoSubstituteData<StoreCustomization>(3)]
+	internal void PickMonitorByIndex_Success(int index, IContext ctx, MutableRootSector root)
+	{
+		// Given
+		PopulateMonitors(root);
+
+		// When
+		Result<IMonitor> result = ctx.Store.Pick(Pickers.PickMonitorByIndex(index));
+
+		// Then
+		Assert.True(result.IsSuccessful);
+		Assert.Equal(root.MonitorSector.Monitors[index].Handle, result.Value.Handle);
+	}
+	#endregion
 }
 
 public class GetMonitorAtPointPickerTests

@@ -34,25 +34,6 @@ public static partial class Pickers
 		static (rootSector) => PickMonitorByHandle(rootSector.MonitorSector.PrimaryMonitorHandle)(rootSector).Value;
 
 	/// <summary>
-	/// Get the monitor at the given index.
-	/// </summary>
-	/// <param name="index">
-	/// The 0-based index of the monitor to get.
-	/// </param>
-	/// <returns></returns>
-	public static PurePicker<Result<IMonitor>> PickMonitorByIndex(int index) =>
-		(rootSector) =>
-		{
-			ImmutableArray<IMonitor> monitors = rootSector.MonitorSector.Monitors;
-			if (index < 0 || index >= monitors.Length)
-			{
-				return Result.FromException<IMonitor>(StoreExceptions.InvalidMonitorIndex(index));
-			}
-
-			return Result.FromValue(monitors[index]);
-		};
-
-	/// <summary>
 	/// Get the last <see cref="IMonitor"/> which received an event sent by Windows which Whim did not ignore.
 	/// </summary>
 	public static PurePicker<IMonitor> PickLastWhimActiveMonitor() =>
@@ -111,6 +92,25 @@ public static partial class Pickers
 
 			int delta = reverse ? -1 : 1;
 			return Result.FromValue(monitors[(monitorIdx + delta).Mod(monitors.Length)]);
+		};
+
+	/// <summary>
+	/// Get the monitor at the given index.
+	/// </summary>
+	/// <param name="index">
+	/// The 0-based index of the monitor to get.
+	/// </param>
+	/// <returns></returns>
+	public static PurePicker<Result<IMonitor>> PickMonitorByIndex(int index) =>
+		(rootSector) =>
+		{
+			ImmutableArray<IMonitor> monitors = rootSector.MonitorSector.Monitors;
+			if (index < 0 || index >= monitors.Length)
+			{
+				return Result.FromException<IMonitor>(StoreExceptions.InvalidMonitorIndex(index));
+			}
+
+			return Result.FromValue(monitors[index]);
 		};
 
 	/// <summary>
