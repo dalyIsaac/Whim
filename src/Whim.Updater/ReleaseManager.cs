@@ -52,8 +52,11 @@ internal class ReleaseManager(IContext context, UpdaterPlugin plugin)
 	/// Checks for updates. If updates are found, a notification is shown, and the notifications are stored in
 	/// <see cref="NotInstalledReleases"/>.
 	/// </summary>
+	/// <param name="notifyIfNoUpdates">
+	/// Whether to show a notification if there are no updates.
+	/// </param>
 	/// <returns></returns>
-	public async Task CheckForUpdates()
+	public async Task CheckForUpdates(bool notifyIfNoUpdates)
 	{
 		Logger.Debug("Checking for updates...");
 
@@ -61,6 +64,19 @@ internal class ReleaseManager(IContext context, UpdaterPlugin plugin)
 		if (NotInstalledReleases.Count == 0)
 		{
 			Logger.Debug("No updates found");
+
+			if (notifyIfNoUpdates)
+			{
+				_ctx.NativeManager.TryEnqueue(() =>
+				{
+					AppNotification notification = new AppNotificationBuilder()
+						.AddText("No updates found.")
+						.AddText("Current version: " + _ctx.NativeManager.GetWhimVersion())
+						.BuildNotification();
+
+					_ctx.NotificationManager.SendToastNotification(notification);
+				});
+			}
 			return;
 		}
 

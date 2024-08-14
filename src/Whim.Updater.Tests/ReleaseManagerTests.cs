@@ -20,7 +20,7 @@ public class ReleaseManagerTests
 		ReleaseManager sut = new(ctx, plugin) { GitHubClient = client };
 
 		// When
-		await sut.CheckForUpdates();
+		await sut.CheckForUpdates(false);
 
 		// Then
 		ctx.NativeManager.DidNotReceive().TryEnqueue(Arg.Any<DispatcherQueueHandler>());
@@ -42,7 +42,7 @@ public class ReleaseManagerTests
 		ReleaseManager sut = new(ctx, plugin) { GitHubClient = client };
 
 		// When
-		await sut.CheckForUpdates();
+		await sut.CheckForUpdates(false);
 
 		// Then
 		ctx.NativeManager.DidNotReceive().TryEnqueue(Arg.Any<DispatcherQueueHandler>());
@@ -61,7 +61,7 @@ public class ReleaseManagerTests
 		ReleaseManager sut = new(ctx, plugin) { GitHubClient = client };
 
 		// When
-		await sut.CheckForUpdates();
+		await sut.CheckForUpdates(false);
 
 		// Then
 		ctx.NativeManager.Received(1).TryEnqueue(Arg.Any<DispatcherQueueHandler>());

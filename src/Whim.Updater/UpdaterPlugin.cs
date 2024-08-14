@@ -95,7 +95,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 	public void PostInitialize()
 	{
 #if !DEBUG
-		CheckForUpdates().ConfigureAwait(true);
+		CheckForUpdates(false).ConfigureAwait(true);
 #endif
 
 		_timer.Elapsed += Timer_Elapsed;
@@ -113,7 +113,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 	}
 
 	/// <inheritdoc />
-	public Task CheckForUpdates() => _releaseManager.CheckForUpdates();
+	public Task CheckForUpdates(bool notifyIfNoUpdates = true) => _releaseManager.CheckForUpdates(notifyIfNoUpdates);
 
 	/// <inheritdoc />
 	public void LoadState(JsonElement state)

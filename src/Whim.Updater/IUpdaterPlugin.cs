@@ -36,5 +36,8 @@ public interface IUpdaterPlugin : IPlugin, IDisposable
 	/// <summary>
 	/// Checks for updates. If there are updates, shows the updater window.
 	/// </summary>
-	Task CheckForUpdates();
+	/// <param name="notifyIfNoUpdates">
+	/// Whether to show a notification if there are no updates. Default is <c>true</c>.
+	/// </param>
+	Task CheckForUpdates(bool notifyIfNoUpdates = true);
 }
