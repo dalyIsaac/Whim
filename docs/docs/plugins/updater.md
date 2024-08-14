@@ -1,6 +1,11 @@
 # Updater Plugin
 
 The updater will show a notification when a new version is available. Clicking on the notification will show the changelog for the delta between the current version and the latest version.
+When an update is available, the notification will provide options to:
+
+- Open the `Releases` page on GitHub in the default browser.
+- Skip the version (i.e., do not show the notification for this version again).
+- Defer the update (i.e., show the notification again when the check is run next).
 
 The <xref:Whim.Updater.UpdaterConfig> supports specifying the <xref:Whim.Updater.ReleaseChannel> and <xref:Whim.Updater.UpdateFrequency>.
 

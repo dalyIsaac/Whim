@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Microsoft.Windows.AppNotifications;
 
 namespace Whim;
@@ -45,13 +44,6 @@ public interface INotificationManager : IDisposable
 	/// </param>
 	/// <returns></returns>
 	bool SendToastNotification(AppNotification appNotification);
-
-	/// <summary>
-	/// Clear a toast notification with the given id.
-	/// </summary>
-	/// <param name="notificationId"></param>
-	/// <returns></returns>
-	Task ClearToastNotification(uint notificationId);
 
 	/// <summary>
 	/// Handles a toast notification activation on app launch.
