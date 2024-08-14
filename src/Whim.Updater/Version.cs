@@ -48,14 +48,42 @@ public partial record Version
 	/// <returns>
 	/// A new <see cref="Version"/> if the tag name is valid, otherwise null.
 	/// </returns>
-	public static Version? Parse(string tagName)
+	public static Version? ParseTag(string tagName)
 	{
-		Match match = ReleaseTagRegex().Match(tagName);
+		Match match = SemverRegex().Match(tagName);
 		if (!match.Success || match.Groups.Count != 6)
 		{
 			return null;
 		}
 
+		return GetVersionFromMatch(match);
+	}
+
+	[GeneratedRegex(@"^v(\d+).(\d+).(\d+)-(alpha|beta|stable)\+([a-z0-9]{8})$")]
+	private static partial Regex SemverRegex();
+
+	/// <summary>
+	/// Parses a version string in the form of "v{major}.{minor}.{patch}.{build}".
+	/// This is the format returned by <see cref="INativeManager.GetWhimVersion"/>
+	/// </summary>
+	/// <param name="version"></param>
+	/// <returns></returns>
+	public static Version? ParseProductVersion(string version)
+	{
+		Match match = ProductVersionRegex().Match(version);
+		if (!match.Success || match.Groups.Count != 6)
+		{
+			return null;
+		}
+
+		return GetVersionFromMatch(match);
+	}
+
+	[GeneratedRegex(@"^(\d+).(\d+).(\d+)-(alpha|beta|stable)\+([a-z\d]{8}).[a-z\d]*$")]
+	private static partial Regex ProductVersionRegex();
+
+	private static Version GetVersionFromMatch(Match match)
+	{
 		int major = int.Parse(match.Groups[1].Value);
 		int minor = int.Parse(match.Groups[2].Value);
 		int patch = int.Parse(match.Groups[3].Value);
@@ -70,9 +98,6 @@ public partial record Version
 
 		return new Version(major, minor, patch, releaseChannel, commit);
 	}
-
-	[GeneratedRegex(@"^v(\d+).(\d+).(\d+)-(alpha|beta|stable)\+([a-z0-9]{8})$")]
-	private static partial Regex ReleaseTagRegex();
 
 	/// <summary>
 	/// Returns true if this is a newer release than the <paramref name="other"/> release.

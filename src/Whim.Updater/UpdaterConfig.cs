@@ -21,7 +21,7 @@ public enum ReleaseChannel
 	/// <summary>
 	/// Stable releases are specific releases in a release branch <c>release/v*</c>.
 	/// </summary>
-	Stable = 2,
+	Stable = 2
 }
 
 /// <summary>

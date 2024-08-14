@@ -31,7 +31,6 @@
     <None Remove="UpdaterWindow.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Markdig" />
     <PackageReference Include="Microsoft.WindowsAppSDK" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
     <PackageReference Include="Octokit" />

@@ -1,12 +1,9 @@
 using System.Diagnostics;
-using System.IO;
-using System.Net.Http;
 // We do use this in non-DEBUG.
 #pragma warning disable IDE0005 // Using directive is unnecessary.
 using System.Reflection;
 #pragma warning restore IDE0005 // Using directive is unnecessary.
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using Windows.System;
 using Windows.UI.Composition;
 using Windows.Win32;
@@ -308,29 +305,11 @@ internal partial class NativeManager : INativeManager
 	{
 #if DEBUG
 		// An arbitrary version number for debugging.
-		return "v0.1.263-alpha+bc5c56c4";
+		return "0.1.263-alpha+bc5c56c4.012371231235123621";
 #else
-		return Assembly.GetExecutingAssembly().GetName().Version!.ToString();
+		Assembly assembly = Assembly.GetExecutingAssembly();
+		FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
+		return fileVersionInfo.ProductVersion!;
 #endif
-	}
-
-	public async Task DownloadFileAsync(Uri uri, string destinationPath)
-	{
-		using HttpClient httpClient = new();
-		using HttpResponseMessage response = await httpClient.GetAsync(uri).ConfigureAwait(false);
-
-		// Save the asset to a temporary file.
-		using Stream streamToReadFrom = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-		using Stream streamToWriteTo = File.Open(destinationPath, System.IO.FileMode.Create);
-		await streamToReadFrom.CopyToAsync(streamToWriteTo).ConfigureAwait(false);
-	}
-
-	public async Task<int> RunFileAsync(string path)
-	{
-		using Process process = new();
-		process.StartInfo.FileName = path;
-		process.Start();
-		await process.WaitForExitAsync().ConfigureAwait(false);
-		return process.ExitCode;
 	}
 }

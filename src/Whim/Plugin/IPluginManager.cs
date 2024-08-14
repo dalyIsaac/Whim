@@ -58,4 +58,9 @@ public interface IPluginManager : IDisposable
 	/// <param name="pluginName">The name of the plugin.</param>
 	/// <returns>Whether the plugin manager includes a plugin with the given name.</returns>
 	bool Contains(string pluginName);
+
+	/// <summary>
+	/// Saves the state of all plugins to a JSON file.
+	/// </summary>
+	void SaveState();
 }
