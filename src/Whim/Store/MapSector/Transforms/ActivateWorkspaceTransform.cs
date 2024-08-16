@@ -10,7 +10,15 @@ namespace Whim;
 /// The handle of the monitor to activate the workspace in. If <see langword="null"/>, this will
 /// default to the active monitor.
 /// </param>
-public record ActivateWorkspaceTransform(WorkspaceId WorkspaceId, HMONITOR MonitorHandle = default) : Transform
+/// <param name="FocusWorkspace">
+/// If <see langword="true"/>, the last focused window of the <see cref="WorkspaceId"/> will be focused.
+/// If <see langword="false"/>, the last focused window of the active workspace will be focused.
+/// </param>
+public record ActivateWorkspaceTransform(
+	WorkspaceId WorkspaceId,
+	HMONITOR MonitorHandle = default,
+	bool FocusWorkspace = true
+) : Transform
 {
 	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
@@ -75,8 +83,24 @@ public record ActivateWorkspaceTransform(WorkspaceId WorkspaceId, HMONITOR Monit
 		}
 
 		// Layout the new workspace.
-		workspace.DoLayout();
-		workspace.FocusLastFocusedWindow();
+		ctx.Store.Dispatch(new DoWorkspaceLayoutTransform(workspace.Id));
+
+		if (FocusWorkspace)
+		{
+			ctx.Store.Dispatch(new FocusWindowTransform(workspace.Id));
+		}
+		else
+		{
+			IWorkspace activeWorkspace = ctx.Store.Pick(PickActiveWorkspace());
+			if (
+				activeWorkspace.Id != oldWorkspace?.Id
+				&& ctx.Store.Pick(PickLastFocusedWindow()).TryGet(out IWindow lastFocusedWindow)
+			)
+			{
+				// Queue the focus event for the last focused window.
+				ctx.Store.Dispatch(new FocusWindowTransform(activeWorkspace.Id, lastFocusedWindow));
+			}
+		}
 
 		mapSector.QueueEvent(
 			new MonitorWorkspaceChangedEventArgs()
