@@ -58,7 +58,7 @@ context.CommandManager.Add("move_window_to_monitor_2", "Move window to monitor 2
 
 ## Move a window to a specific workspace
 
-The following command can be used to move the active window to a specific workspace. The index of the workspace is zero-based.
+The following command can be used to move the active window to a specific workspace, using the workspace ID. The best way to get the workspace ID is to use the return value from the `Add` method on the `WorkspaceManager`.
 
 ```csharp
 Guid? browserWorkspaceId = context.WorkspaceManager.Add("Browser workspace");
