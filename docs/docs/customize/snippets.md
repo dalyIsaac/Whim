@@ -44,3 +44,31 @@ context.CommandManager.Add(
     callback: () => context.WorkspaceManager.ActivateAdjacent(skipActive: true)
 );
 ```
+
+## Move a window to a specific monitor
+
+The following command can be used to move the active window to a specific monitor. The index of the monitor is zero-based, so the primary monitor is index 0, the second monitor is index 1, and so on.
+
+```csharp
+context.CommandManager.Add("move_window_to_monitor_2", "Move window to monitor 2", () =>
+{
+    context.Store.Dispatch(new MoveWindowToMonitorIndexTransform(1));
+});
+```
+
+## Move a window to a specific workspace
+
+The following command can be used to move the active window to a specific workspace. The index of the workspace is zero-based.
+
+```csharp
+Guid? browserWorkspaceId = context.WorkspaceManager.Add("Browser workspace");
+context.CommandManager.Add("move_window_to_browser_workspace", "Move window to browser workspace", () =>
+{
+    // This `if` statement protects against workspaces being created with no layout engines.
+    if (browserWorkspaceId is Guid workspaceId)
+    {
+        // This defaults to the active window, but you can also pass in a specific window as the second argument to the transform.
+        context.Store.Dispatch(new MoveWindowToWorkspaceTransform(workspaceId));
+    }
+});
+```
