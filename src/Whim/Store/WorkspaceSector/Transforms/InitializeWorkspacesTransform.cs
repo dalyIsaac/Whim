@@ -27,7 +27,7 @@ internal record InitializeWorkspacesTransform : Transform
 		workspaceSector.HasInitialized = true;
 		foreach (WorkspaceToCreate w in workspaceSector.WorkspacesToCreate)
 		{
-			ctx.Store.Dispatch(new AddWorkspaceTransform(w.Name, w.CreateLeafLayoutEngines));
+			ctx.Store.Dispatch(new AddWorkspaceTransform(w.Name, w.CreateLeafLayoutEngines, w.WorkspaceId));
 		}
 
 		workspaceSector.WorkspacesToCreate = workspaceSector.WorkspacesToCreate.Clear();

@@ -82,11 +82,11 @@ public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 	/// </description>
 	/// </item>
 	/// <item>
-	/// <description>Otherwise, returns the created workspace.</description>
+	/// <description>Otherwise, returns the ID of the created workspace.</description>
 	/// </item>
 	/// </list>
 	/// </returns>
-	IWorkspace? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null);
+	WorkspaceId? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null);
 
 	/// <summary>
 	/// Whether the manager contains the given workspace.
