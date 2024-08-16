@@ -149,11 +149,11 @@ internal record MonitorsChangedTransform : Transform
 			// If there's no workspace, create one.
 			if (workspaceId == default)
 			{
-				if (ctx.WorkspaceManager.Add() is IWorkspace newWorkspace)
+				if (ctx.WorkspaceManager.Add() is WorkspaceId newWorkspaceId)
 				{
 					mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(
 						monitor.Handle,
-						newWorkspace.Id
+						newWorkspaceId
 					);
 				}
 				else

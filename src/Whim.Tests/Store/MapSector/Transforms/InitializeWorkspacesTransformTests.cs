@@ -112,8 +112,9 @@ public class InitializeWorkspacesTransformTests
 	{
 		root.WorkspaceSector.WorkspacesToCreate =
 		[
-			new WorkspaceToCreate(BrowserWorkspaceName, null),
+			new WorkspaceToCreate(Guid.NewGuid(), BrowserWorkspaceName, null),
 			new WorkspaceToCreate(
+				Guid.NewGuid(),
 				CodeWorkspaceName,
 				new List<CreateLeafLayoutEngine>()
 				{

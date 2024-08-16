@@ -93,17 +93,17 @@ public class MonitorsChangedTransformTests
 				_ =>
 				{
 					AddWorkspaceToManager(ctx, rootSector, workspace1);
-					return workspace1;
+					return workspace1.Id;
 				},
 				_ =>
 				{
 					AddWorkspaceToManager(ctx, rootSector, workspace2);
-					return workspace2;
+					return workspace2.Id;
 				},
 				_ =>
 				{
 					AddWorkspaceToManager(ctx, rootSector, workspace3);
-					return workspace3;
+					return workspace3.Id;
 				}
 			);
 		rootSector.WorkspaceSector.HasInitialized = true;

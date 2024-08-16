@@ -15,30 +15,35 @@ namespace Whim;
 /// The layout engines to add to the workspace. Defaults to <see langword="null"/>, which will
 /// use the <see cref="WorkspaceSector.CreateLayoutEngines"/> function.
 /// </param>
+/// <param name="WorkspaceId">
+/// The ID of the workspace. Defaults to <see cref="WorkspaceId.NewGuid"/>.
+/// </param>
 public record AddWorkspaceTransform(
 	string? Name = null,
-	IEnumerable<CreateLeafLayoutEngine>? CreateLeafLayoutEngines = null
-) : Transform<IWorkspace?>
+	IEnumerable<CreateLeafLayoutEngine>? CreateLeafLayoutEngines = null,
+	WorkspaceId WorkspaceId = default
+) : Transform<WorkspaceId>
 {
-	internal override Result<IWorkspace?> Execute(
+	internal override Result<WorkspaceId> Execute(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector
 	)
 	{
 		WorkspaceSector sector = mutableRootSector.WorkspaceSector;
+		WorkspaceId id = WorkspaceId == default ? WorkspaceId.NewGuid() : WorkspaceId;
 
 		if (!sector.HasInitialized)
 		{
-			sector.WorkspacesToCreate = sector.WorkspacesToCreate.Add(new(Name, CreateLeafLayoutEngines));
-			return null;
+			sector.WorkspacesToCreate = sector.WorkspacesToCreate.Add(new(id, Name, CreateLeafLayoutEngines));
+			return id;
 		}
 
 		CreateLeafLayoutEngine[] engineCreators = CreateLeafLayoutEngines?.ToArray() ?? sector.CreateLayoutEngines();
 
 		if (engineCreators.Length == 0)
 		{
-			return Result.FromException<IWorkspace?>(new WhimException("No engine creators were provided"));
+			return Result.FromException<WorkspaceId>(new WhimException("No engine creators were provided"));
 		}
 
 		// Create the layout engines.
@@ -58,7 +63,7 @@ public record AddWorkspaceTransform(
 		}
 
 		Workspace workspace =
-			new(ctx, WorkspaceId.NewGuid())
+			new(ctx, id)
 			{
 				BackingName = Name ?? $"Workspace {sector.Workspaces.Count + 1}",
 				LayoutEngines = layoutEnginesBuilder.ToImmutable()
@@ -67,6 +72,6 @@ public record AddWorkspaceTransform(
 		sector.WorkspaceOrder = sector.WorkspaceOrder.Add(workspace.Id);
 		sector.QueueEvent(new WorkspaceAddedEventArgs() { Workspace = workspace });
 
-		return workspace;
+		return id;
 	}
 }

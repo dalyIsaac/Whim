@@ -3,9 +3,14 @@ namespace Whim;
 /// <summary>
 /// A workspace's name and layout engines.
 /// </summary>
+/// <param name="WorkspaceId"></param>
 /// <param name="Name"></param>
 /// <param name="CreateLeafLayoutEngines"></param>
-internal record WorkspaceToCreate(string? Name, IEnumerable<CreateLeafLayoutEngine>? CreateLeafLayoutEngines);
+internal record WorkspaceToCreate(
+	WorkspaceId WorkspaceId,
+	string? Name,
+	IEnumerable<CreateLeafLayoutEngine>? CreateLeafLayoutEngines
+);
 
 internal class WorkspaceSector(IContext ctx, IInternalContext internalCtx)
 	: SectorBase,
