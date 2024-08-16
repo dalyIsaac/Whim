@@ -61,14 +61,22 @@ context.CommandManager.Add("move_window_to_monitor_2", "Move window to monitor 2
 The following command can be used to move the active window to a specific workspace, using the workspace ID. The best way to get the workspace ID is to use the return value from the `Add` method on the `WorkspaceManager`.
 
 ```csharp
+// Once the workspace has been created, it will have this ID.
 Guid? browserWorkspaceId = context.WorkspaceManager.Add("Browser workspace");
+
 context.CommandManager.Add("move_window_to_browser_workspace", "Move window to browser workspace", () =>
 {
     // This `if` statement protects against workspaces being created with no layout engines.
     if (browserWorkspaceId is Guid workspaceId)
     {
-        // This defaults to the active window, but you can also pass in a specific window as the second argument to the transform.
+        // This defaults to the active window, but you can also pass in a specific window as the
+        // second argument to the transform.
         context.Store.Dispatch(new MoveWindowToWorkspaceTransform(workspaceId));
+
+        // The following call will activate the workspace after moving the window.
+        // If the following line is not present, the window will be moved to the target workspace,
+        // but the target workspace will not be activated.
+        context.Store.Dispatch(new ActivateWorkspaceTransform(workspaceId));
     }
 });
 ```
