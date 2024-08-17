@@ -42,6 +42,7 @@ public class StoreCustomization : ICustomization
 
 		fixture.Inject(_store._root);
 		fixture.Inject(_store._root.MutableRootSector);
+		fixture.Inject(_store.Transforms);
 
 		_store._root.MutableRootSector.MonitorSector.MonitorsChangedDelay = 0;
 
