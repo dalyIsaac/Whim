@@ -25,7 +25,7 @@ context.CommandManager.Add(
 );
 ```
 
-## Skip over active workspaces
+## Activate adjacent workspace, skipping over active workspaces
 
 The following commands can be useful on multi-monitor setups. When bound to keybinds, these can be used to cycle through the list of workspaces, skipping over those that are active on other monitors to avoid accidental swapping.
 
@@ -79,4 +79,30 @@ context.CommandManager.Add("move_window_to_browser_workspace", "Move window to b
         context.Store.Dispatch(new ActivateWorkspaceTransform(workspaceId));
     }
 });
+```
+
+## Activate a workspace on a specific monitor without changing focus
+
+The following command can be used to activate a workspace on a specific monitor without focusing the workspace you are activating. In this example, I am activating a specific workspace on the 3rd monitor.
+
+```csharp
+Guid? browserWorkspaceId = context.WorkspaceManager.Add("Browser workspace");
+
+context.CommandManager.Add(
+    identifier: "activate_browser_workspace_on_monitor_3_no_focus",
+    title: "Activate browser workspace on monitor 3 no focus",
+    callback: () =>
+    {
+        if (browserWorkspaceId is Guid workspaceId)
+        {
+            IMonitor? monitor = context.Store.Pick(Pickers.PickMonitorByIndex(2)).ValueOrDefault;
+            if (monitor is null)
+            {
+                return;
+            }
+
+            context.Store.Dispatch(new ActivateWorkspaceTransform(workspaceId, monitor.Handle, FocusWorkspaceWindow: false));
+        }
+    }
+);
 ```
