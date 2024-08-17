@@ -42,9 +42,6 @@ public record ActivateWorkspaceTransform(
 			return Result.FromException<Unit>(targetMonitorResult.Error!);
 		}
 
-		// Get the active workspace for later.
-		IWorkspace activeWorkspace = ctx.Store.Pick(PickActiveWorkspace());
-
 		// Get the old workspace for the event.
 		IWorkspace? oldWorkspace = ctx.Store.Pick(PickWorkspaceByMonitor(targetMonitorHandle)).ValueOrDefault;
 
@@ -88,14 +85,14 @@ public record ActivateWorkspaceTransform(
 		// Layout the new workspace.
 		ctx.Store.Dispatch(new DoWorkspaceLayoutTransform(workspace.Id));
 
-		// Focus the new workspace if told to, or if the active workspace is the old workspace.
-		if (FocusWorkspaceWindow || activeWorkspace.Id == oldWorkspace?.Id)
+		if (FocusWorkspaceWindow)
 		{
 			ctx.Store.Dispatch(new FocusWindowTransform(workspace.Id));
 		}
 		else
 		{
-			ctx.Store.Dispatch(new FocusWindowTransform(activeWorkspace.Id));
+			WorkspaceId activeWorkspaceId = ctx.Store.Pick(PickActiveWorkspaceId());
+			ctx.Store.Dispatch(new FocusWindowTransform(activeWorkspaceId));
 		}
 
 		mapSector.QueueEvent(
