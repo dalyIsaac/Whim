@@ -10,14 +10,14 @@ namespace Whim;
 /// The handle of the monitor to activate the workspace in. If <see langword="null"/>, this will
 /// default to the active monitor.
 /// </param>
-/// <param name="FocusWorkspace">
+/// <param name="FocusWorkspaceWindow">
 /// If <see langword="true"/>, the last focused window of the <see cref="WorkspaceId"/> will be focused.
 /// If <see langword="false"/>, the last focused window of the active workspace will be focused.
 /// </param>
 public record ActivateWorkspaceTransform(
 	WorkspaceId WorkspaceId,
 	HMONITOR MonitorHandle = default,
-	bool FocusWorkspace = true
+	bool FocusWorkspaceWindow = true
 ) : Transform
 {
 	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
@@ -41,6 +41,9 @@ public record ActivateWorkspaceTransform(
 		{
 			return Result.FromException<Unit>(targetMonitorResult.Error!);
 		}
+
+		// Get the active workspace for later.
+		IWorkspace activeWorkspace = ctx.Store.Pick(PickActiveWorkspace());
 
 		// Get the old workspace for the event.
 		IWorkspace? oldWorkspace = ctx.Store.Pick(PickWorkspaceByMonitor(targetMonitorHandle)).ValueOrDefault;
@@ -85,21 +88,14 @@ public record ActivateWorkspaceTransform(
 		// Layout the new workspace.
 		ctx.Store.Dispatch(new DoWorkspaceLayoutTransform(workspace.Id));
 
-		if (FocusWorkspace)
+		// Focus the new workspace if told to, or if the active workspace is the old workspace.
+		if (FocusWorkspaceWindow || activeWorkspace.Id == oldWorkspace?.Id)
 		{
 			ctx.Store.Dispatch(new FocusWindowTransform(workspace.Id));
 		}
 		else
 		{
-			IWorkspace activeWorkspace = ctx.Store.Pick(PickActiveWorkspace());
-			if (
-				activeWorkspace.Id != oldWorkspace?.Id
-				&& ctx.Store.Pick(PickLastFocusedWindow()).TryGet(out IWindow lastFocusedWindow)
-			)
-			{
-				// Queue the focus event for the last focused window.
-				ctx.Store.Dispatch(new FocusWindowTransform(activeWorkspace.Id, lastFocusedWindow));
-			}
+			ctx.Store.Dispatch(new FocusWindowTransform(activeWorkspace.Id));
 		}
 
 		mapSector.QueueEvent(

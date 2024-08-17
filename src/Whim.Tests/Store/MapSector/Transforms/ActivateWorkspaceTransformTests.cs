@@ -67,7 +67,11 @@ public class ActivateWorkspaceTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WorkspaceAlreadyActivatedOnMonitor(IContext ctx, MutableRootSector rootSector)
+	internal void WorkspaceAlreadyActivatedOnMonitor(
+		IContext ctx,
+		MutableRootSector rootSector,
+		List<object> executedTransforms
+	)
 	{
 		// Given the workspace is already activated on the monitor
 		Workspace workspace = CreateWorkspace(ctx);
@@ -81,10 +85,12 @@ public class ActivateWorkspaceTransformTests
 
 		// Then nothing happens
 		Assert.True(result.IsSuccessful);
+		Assert.DoesNotContain(executedTransforms, t => t.Equals(new DoWorkspaceLayoutTransform(workspace.Id)));
+		Assert.DoesNotContain(executedTransforms, t => t is FocusWindowTransform);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void LayoutOldWorkspace(IContext ctx, MutableRootSector rootSector)
+	internal void LayoutOldWorkspace(IContext ctx, MutableRootSector rootSector, List<object> executedTransforms)
 	{
 		// Given the target monitor has an old workspace
 		Workspace workspace1 = CreateWorkspace(ctx);
@@ -104,25 +110,31 @@ public class ActivateWorkspaceTransformTests
 		// When we activate the workspace on the target monitor
 		var (result, evs) = AssertRaises(ctx, rootSector, sut);
 
-		// Then the old workspace is deactivated
+		// Then the old workspace is deactivated on monitor 1 and the new workspace is activated
 		Assert.True(result.IsSuccessful);
 
 		Assert.Equal(2, evs.Count);
 
+		// The event for the first monitor.
 		Assert.Same(workspace3, evs[0].PreviousWorkspace);
 		Assert.Same(workspace1, evs[0].CurrentWorkspace);
 		Assert.Same(monitor3, evs[0].Monitor);
 
+		// The event for the second monitor.
 		Assert.Same(workspace1, evs[1].PreviousWorkspace);
 		Assert.Same(workspace3, evs[1].CurrentWorkspace);
 		Assert.Same(monitor1, evs[1].Monitor);
 
 		Assert.Equal(workspace3.Id, rootSector.MapSector.MonitorWorkspaceMap[monitor1.Handle]);
 		Assert.Equal(workspace1.Id, rootSector.MapSector.MonitorWorkspaceMap[monitor3.Handle]);
+
+		Assert.Contains(executedTransforms, t => t.Equals(new DoWorkspaceLayoutTransform(workspace1.Id)));
+		Assert.Contains(executedTransforms, t => t.Equals(new DoWorkspaceLayoutTransform(workspace3.Id)));
+		Assert.Contains(executedTransforms, t => t.Equals(new FocusWindowTransform(workspace3.Id)));
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void DeactivateOldWorkspace(IContext ctx, MutableRootSector rootSector)
+	internal void DeactivateOldWorkspace(IContext ctx, MutableRootSector rootSector, List<object> executedTransforms)
 	{
 		// Given the target monitor has an old workspace, and the new workspace wasn't previously activated
 		Workspace workspace1 = CreateWorkspace(ctx);
@@ -149,5 +161,66 @@ public class ActivateWorkspaceTransformTests
 		Assert.Same(workspace1, evs[0].PreviousWorkspace);
 		Assert.Same(workspace3, evs[0].CurrentWorkspace);
 		Assert.Same(monitor1, evs[0].Monitor);
+
+		Assert.DoesNotContain(executedTransforms, t => t.Equals(new DoWorkspaceLayoutTransform(workspace1.Id)));
+		Assert.Contains(executedTransforms, t => t.Equals(new DoWorkspaceLayoutTransform(workspace3.Id)));
+		Assert.Contains(executedTransforms, t => t.Equals(new FocusWindowTransform(workspace3.Id)));
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void FocusWorkspaceWindow_ActiveIsOldWorkspace(
+		IContext ctx,
+		MutableRootSector rootSector,
+		List<object> executedTransforms
+	)
+	{
+		// Given the FocusWorkspaceWindow flag is false and the active workspace is the old workspace...
+		Workspace workspace1 = CreateWorkspace(ctx);
+		Workspace workspace2 = CreateWorkspace(ctx);
+
+		IMonitor monitor1 = CreateMonitor((HMONITOR)1);
+
+		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor1, workspace1);
+		AddWorkspacesToManager(ctx, rootSector, workspace2);
+
+		ActivateWorkspaceTransform sut = new(workspace2.Id, monitor1.Handle, FocusWorkspaceWindow: false);
+
+		// When we activate the workspace
+		var (result, evs) = AssertRaises(ctx, rootSector, sut);
+
+		// Then the window on the new workspace is focused
+		Assert.True(result.IsSuccessful);
+		Assert.Contains(executedTransforms, t => t.Equals(new FocusWindowTransform(workspace2.Id)));
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void FocusWorkspaceWindow_ActiveIsStillVisible(
+		IContext ctx,
+		MutableRootSector rootSector,
+		List<object> executedTransforms
+	)
+	{
+		// Given the FocusWorkspaceWindow flag is false and the active workspace is still visible...
+		Workspace workspace1 = CreateWorkspace(ctx);
+		Workspace workspace2 = CreateWorkspace(ctx);
+		Workspace workspace3 = CreateWorkspace(ctx);
+
+		IMonitor monitor1 = CreateMonitor((HMONITOR)1);
+		IMonitor monitor2 = CreateMonitor((HMONITOR)2);
+
+		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor1, workspace1);
+		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor2, workspace2);
+		AddWorkspacesToManager(ctx, rootSector, workspace3);
+
+		ActivateWorkspaceTransform sut = new(workspace3.Id, monitor2.Handle, FocusWorkspaceWindow: false);
+
+		// When we activate the workspace
+		var (result, evs) = AssertRaises(ctx, rootSector, sut);
+
+		// Then the window on the previously active workspace is focused
+		Assert.True(result.IsSuccessful);
+
+		Assert.Contains(executedTransforms, t => t.Equals(new FocusWindowTransform(workspace1.Id)));
+		Assert.DoesNotContain(executedTransforms, t => t.Equals(new FocusWindowTransform(workspace3.Id)));
 	}
 }
