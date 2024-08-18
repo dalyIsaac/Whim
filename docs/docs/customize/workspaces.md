@@ -2,7 +2,7 @@
 
 A "workspace" or <xref:Whim.IWorkspace> in Whim is a collection of windows displayed on a single monitor. The layouts of workspaces are determined by their [layout engines](layout-engines.md). Each workspace has a single active layout engine, and can cycle through different layout engines.
 
-The <xref:Whim.SetCreateLayoutEnginesTransform>lets you specify the default layout engines for workspaces. For example, the following config sets up three workspaces, and two layout engines:
+The <xref:Whim.SetCreateLayoutEnginesTransform> lets you specify the default layout engines for workspaces. For example, the following config sets up three workspaces, and two layout engines:
 
 ```csharp
 // Set up workspaces.

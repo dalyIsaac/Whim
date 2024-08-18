@@ -9,7 +9,7 @@ The idea of its usage throughout Whim is to avoid throwing exceptions, which can
 When a method returns a `Result<T>`, the caller can check if the operation was successful by calling the `TryGet` method.
 
 ```csharp
-Result<IWindow> windowResult = GetWindow(ctx, internalCtx);
+Result<IWindow> windowResult = context.Store.Pick(Pickers.PickWindowByHandle(windowHandle));
 if (!windowResult.TryGet(out IWindow window))
 {
     return windowResult;
@@ -25,7 +25,7 @@ return Result.FromValue(window);
 Sometimes an operation does not return a value, but the caller still needs to know if the operation was successful. In this case, the `Unit` type is used as the `T` type parameter of the `Result<T>`.
 
 ```csharp
-Result<IMonitor> oldMonitorResult = ctx.Store.Pick(PickMonitorByWindow(windowHandle));
+Result<IMonitor> oldMonitorResult = context.Store.Pick(PickMonitorByWindow(windowHandle));
 if (!oldMonitorResult.TryGet(out IMonitor oldMonitor))
 {
     // Forward the exception to the caller.
@@ -38,7 +38,7 @@ if (oldMonitor.Handle == MonitorHandle)
     return Unit.Result;
 }
 
-return ctx.Store.Dispatch(new MoveWindowToWorkspaceTransform(workspace.Id, windowHandle));
+return context.Store.Dispatch(new MoveWindowToWorkspaceTransform(workspace.Id, windowHandle));
 ```
 
 ## Future

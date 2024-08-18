@@ -36,14 +36,14 @@ The following commands can be useful on multi-monitor setups. When bound to keyb
 context.CommandManager.Add(
     identifier: "activate_previous_workspace",
     title: "Activate the previous inactive workspace",
-    callback: () => _ctx.Store.Dispatch(new ActivateAdjacentWorkspaceTransform(Reverse: true, SkipActive: true));
+    callback: () => context.Store.Dispatch(new ActivateAdjacentWorkspaceTransform(Reverse: true, SkipActive: true))
 );
 
 // Activate previous workspace, skipping over those that are active on other monitors
 context.CommandManager.Add(
     identifier: "activate_next_workspace",
     title: "Activate the next inactive workspace",
-    callback: () => _ctx.Store.Dispatch(new ActivateAdjacentWorkspaceTransform(SkipActive: true));
+    callback: () => context.Store.Dispatch(new ActivateAdjacentWorkspaceTransform(SkipActive: true))
 );
 ```
 

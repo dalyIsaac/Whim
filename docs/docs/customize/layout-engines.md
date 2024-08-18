@@ -71,18 +71,18 @@ Arbitrary layouts can be created by nesting areas:
 context.Store.Dispatch(
     new SetCreateLayoutEnginesTransform(
         () => new CreateLeafLayoutEngine[]
-            {
-                (id) => new SliceLayoutEngine(
-                    context,
-                    sliceLayoutPlugin,
-                    id,
-                    new ParentArea(
-                        isRow: true,
-                        (0.5, new OverflowArea()),
-                        (0.5, new SliceArea(order: 0, maxChildren: 2))
-                    )
-                ) { Name = "Overflow on left" }
-            }
+        {
+            (id) => new SliceLayoutEngine(
+                context,
+                sliceLayoutPlugin,
+                id,
+                new ParentArea(
+                    isRow: true,
+                    (0.5, new OverflowArea()),
+                    (0.5, new SliceArea(order: 0, maxChildren: 2))
+                )
+            ) { Name = "Overflow on left" }
+        }
     )
 );
 ```
