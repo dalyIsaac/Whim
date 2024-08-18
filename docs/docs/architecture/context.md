@@ -4,16 +4,12 @@ The <xref:Whim.IContext> is the core of Whim. It consists of managers which cont
 
 The <xref:Whim.IContext> consists of:
 
-- the <xref:Whim.IButler>
+- the <xref:Whim.IStore> - see the [Store](./store.md) page for more
 - managers which contain and control Whim's state and functionality
 - events related to the `IContext`
 - the <xref:Whim.IContext.UncaughtExceptionHandling> setting
 - the <xref:Whim.Logger>
 - the <xref:Whim.INativeManager> with some [CsWin32](./native-apis.md) APIs available for use in plugins
-
-The <xref:Whim.IButler> uses the various managers to handle events from Windows and the user to update the mapping of <xref:Whim.IWindow>s to <xref:Whim.IWorkspace>s to <xref:Whim.IMonitor>s.
-
-The <xref:Whim.IButler.Pantry> property can be set up until initialization to customize the behavior of the mappings.
 
 ## `IInternalContext`
 
@@ -22,8 +18,6 @@ Similarly to `IContext`, there is an internal-only interface `Whim.IInternalCont
 - the `ICoreSavedStateManager` to save core state
 - the `ICoreNativeManager` wrapper for internal-only [CsWin32](./native-apis.md) APIs.
 - hooks for Windows event providers, like `IKeybindHook`, `IMouseHook`, and `IWindowMessageMonitor`
-- internal interface implementations of public managers - e.g., `MonitorManager` is an implementation of `IInternalMonitorManager` and `IMonitorManager`
-- `IDeferWindowPosManager` to [handle STA re-entrancy](./threading.md)
 
 Plugins should subscribe to Whim's various `public` events.
 

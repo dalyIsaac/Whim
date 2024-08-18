@@ -18,7 +18,7 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 		UpdateWindowSector(mutableRootSector, window);
 		UpdateMapSector(ctx, internalCtx, mutableRootSector, window);
 
-		return Result.FromValue(window);
+		return windowResult;
 	}
 
 	private Result<IWindow> GetWindow(IContext ctx, IInternalContext internalCtx)

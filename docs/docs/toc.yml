@@ -34,9 +34,10 @@ items:
 
   - name: Architecture
   - href: architecture/context.md
+  - href: architecture/store.md
+  - href: architecture/result.md
   - href: architecture/events.md
   - href: architecture/native-apis.md
-  - href: architecture/threading.md
   - href: architecture/deprecated.md
 
   - name: Contributing
