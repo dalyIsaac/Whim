@@ -100,22 +100,26 @@ void DoConfig(IContext context)
 	context.PluginManager.AddPlugin(updaterPlugin);
 
 	// Set up workspaces.
-	context.WorkspaceManager.Add("1");
-	context.WorkspaceManager.Add("2");
-	context.WorkspaceManager.Add("3");
-	context.WorkspaceManager.Add("4");
+	Guid? firstWorkspace = context.Store.Dispatch(new AddWorkspaceTransform("1")).ValueOrDefault;
+	Guid? secondWorkspace = context.Store.Dispatch(new AddWorkspaceTransform("2")).ValueOrDefault;
+	Guid? thirdWorkspace = context.Store.Dispatch(new AddWorkspaceTransform("3")).ValueOrDefault;
+	Guid? fourthWorkspace = context.Store.Dispatch(new AddWorkspaceTransform("4")).ValueOrDefault;
 
 	// Set up layout engines.
-	context.WorkspaceManager.CreateLayoutEngines = () =>
-		new CreateLeafLayoutEngine[]
-		{
-			(id) => SliceLayouts.CreateMultiColumnLayout(context, sliceLayoutPlugin, id, 1, 2, 0),
-			(id) => SliceLayouts.CreatePrimaryStackLayout(context, sliceLayoutPlugin, id),
-			(id) => SliceLayouts.CreateSecondaryPrimaryLayout(context, sliceLayoutPlugin, id),
-			(id) => new FocusLayoutEngine(id),
-			(id) => new TreeLayoutEngine(context, treeLayoutPlugin, id),
-			(id) => new FloatingLayoutEngine(context, id)
-		};
+	context.Store.Dispatch(
+		new SetCreateLayoutEnginesTransform(
+			() =>
+				new CreateLeafLayoutEngine[]
+				{
+					(id) => SliceLayouts.CreateMultiColumnLayout(context, sliceLayoutPlugin, id, 1, 2, 0),
+					(id) => SliceLayouts.CreatePrimaryStackLayout(context, sliceLayoutPlugin, id),
+					(id) => SliceLayouts.CreateSecondaryPrimaryLayout(context, sliceLayoutPlugin, id),
+					(id) => new FocusLayoutEngine(id),
+					(id) => new TreeLayoutEngine(context, treeLayoutPlugin, id),
+					(id) => new FloatingLayoutEngine(context, id)
+				}
+		)
+	);
 }
 
 // We return doConfig here so that Whim can call it when it loads.
