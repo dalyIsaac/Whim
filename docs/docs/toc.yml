@@ -37,6 +37,7 @@ items:
   - href: architecture/events.md
   - href: architecture/native-apis.md
   - href: architecture/threading.md
+  - href: architecture/deprecated.md
 
   - name: Contributing
   - href: contribute/issues.md

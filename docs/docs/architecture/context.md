@@ -29,7 +29,7 @@ Plugins should subscribe to Whim's various `public` events.
 
 ## Initialization
 
-Managers will generally implement a subset of the following methods:
+Managers and the store will generally implement a subset of the following methods:
 
 - `PreInitialize` - used for things like subscribing to event listeners
 - `Initialize` - used for loading state, (usually user-defined or saved state)
@@ -39,37 +39,3 @@ Items should make the objects which expose events have been initialized prior to
 
 > [!NOTE]
 > The user should not initialize items, and should leave this to Whim.
-
-## Butler
-
-The "butler" or <xref:Whim.IButler> in Whim is responsible for using the <xref:Whim.IWorkspaceManager> and <xref:Whim.IMonitorManager> to handle events from the [window manager](#window-manager) to its "butler pantry". The butler also provides access to methods via inheritance from its "butler chores" to manage the movement of windows between workspaces and monitors.
-
-The "butler pantry" or <xref:Whim.IButlerPantry> stores the assignment of windows to workspaces, and the assignment of workspaces to monitors.
-
-When [scripting](../customize/scripting.md), use `IButler` methods to move windows between workspaces and monitors.
-
-## Workspaces
-
-Some <xref:Whim.IWorkspace> methods refer to `Workspace`-specific state:
-
-- the currently active layout engine
-- moving/focusing windows in a workspace
-
-These methods will generally call <xref:Whim.IWorkspace.DoLayout>.
-
-Methods which are typically used for internal Whim functionality will not call `DoLayout()`. These methods will include comments in the documentation warning against using them in scripts or plugins. Misuse of these methods can lead to unexpected behavior, as workspaces become out of sync with the [butler pantry](#butler).
-
-## Monitors
-
-Whim supports multiple monitors via the <xref:Whim.IMonitorManager>, which stores the current monitor configuration. `IMonitorManager` provides various methods including the ability get adjacent monitors, and the monitor which contains a given point.
-
-Each <xref:Whim.IMonitor> contains properties like its scale factor.
-
-> [!NOTE]
-> Whim does not support Windows' native "virtual" desktops, as they lack the ability to activate "desktops" independently of monitors.
-
-## Window Manager
-
-The "window manager" or <xref:Whim.IWindowManager> is used by Whim to manage <xref:Whim.IWindow>s. It listens to window events from Windows and notifies listeners (Whim core, plugins, etc.).
-
-For example, the `WindowFocused` event is used by the `Whim.FocusIndicator` and `Whim.Bar` plugins to update their indications of the currently focused window.
