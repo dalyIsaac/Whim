@@ -14,7 +14,7 @@ To counteract this, the <xref:Whim.IRouterManager> has a <xref:Whim.IRouterManag
 
 ## Adding/removing monitors
 
-When adding and removing monitors, Windows will very helpfully move windows between monitors. However, this conflicts with Whim. To work around Windows' helpfulness, Whim (in the `WindowManager` and `ButlerEventHandlers`) will ignore [`WinEvents`](../architecture/events.md) for 3 seconds for tracked windows. After the 3 seconds have elapsed, Whim will lay out all the active workspaces.
+When adding and removing monitors, Windows will very helpfully move windows between monitors. However, this conflicts with Whim. To work around Windows' helpfulness, Whim (in the `WindowEventListener` and `MonitorsChangedTransform`) will ignore [`WinEvents`](../architecture/events.md) for 3 seconds for tracked windows. After the 3 seconds have elapsed, Whim will lay out all the active workspaces.
 
 ## Window overflows given area
 

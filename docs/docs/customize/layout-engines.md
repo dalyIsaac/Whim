@@ -53,30 +53,38 @@ The `SliceLayouts` contains methods to create a few common layouts:
 - three-column layout, with the middle column being the primary
 
 ```csharp
-context.WorkspaceManager.CreateLayoutEngines = () => new CreateLeafLayoutEngine[]
-{
-    (id) => SliceLayouts.CreatePrimaryStackLayout(context, sliceLayoutPlugin, id),
-    (id) => SliceLayouts.CreateMultiColumnLayout(context, sliceLayoutPlugin, id, 1, 2, 0),
-    (id) => CustomLayouts.CreateSecondaryPrimaryLayout(context, sliceLayoutPlugin, id)
-}
+context.Store.Dispatch(
+    new SetCreateLayoutEnginesTransform(
+        () => new CreateLeafLayoutEngine[]
+        {
+            (id) => SliceLayouts.CreatePrimaryStackLayout(context, sliceLayoutPlugin, id),
+            (id) => SliceLayouts.CreateMultiColumnLayout(context, sliceLayoutPlugin, id, 1, 2, 0),
+            (id) => CustomLayouts.CreateSecondaryPrimaryLayout(context, sliceLayoutPlugin, id)
+        }
+    )
+);
 ```
 
 Arbitrary layouts can be created by nesting areas:
 
 ```csharp
-context.WorkspaceManager.CreateLayoutEngines = () => new CreateLeafLayoutEngine[]
-{
-    (id) => new SliceLayoutEngine(
-        context,
-        sliceLayoutPlugin,
-        id,
-        new ParentArea(
-            isRow: true,
-            (0.5, new OverflowArea()),
-            (0.5, new SliceArea(order: 0, maxChildren: 2))
-        )
-    ) { Name = "Overflow on left" }
-};
+context.Store.Dispatch(
+    new SetCreateLayoutEnginesTransform(
+        () => new CreateLeafLayoutEngine[]
+            {
+                (id) => new SliceLayoutEngine(
+                    context,
+                    sliceLayoutPlugin,
+                    id,
+                    new ParentArea(
+                        isRow: true,
+                        (0.5, new OverflowArea()),
+                        (0.5, new SliceArea(order: 0, maxChildren: 2))
+                    )
+                ) { Name = "Overflow on left" }
+            }
+    )
+);
 ```
 
 `SliceLayoutEngine` requires the <xref:Whim.SliceLayout.SliceLayoutPlugin> to be added to the <xref:Whim.IPluginManager> instance:
