@@ -13,6 +13,8 @@ A <xref:Whim.Transform`1> is an operation describing how to update the state of 
 
 A "picker" is an operation describing how to retrieve a value from the store. Pickers are usually a function implementing the delegate <xref:Whim.PurePicker`1>, but can be stateful subclasses of <xref:Whim.Picker`1>.
 
+All pickers can be seen at <xref:Whim.Pickers>.
+
 Pickers take in an immutable reference to the store and return a value. If the picking operation may fail, the picker should return a [`Result<T>`](./result.md).
 
 ## Sectors and Immutability
