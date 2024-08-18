@@ -9,6 +9,3 @@ For example, the ordering (with 0-based indexing) of the monitor configuration b
 ![Example monitor layout](../../images/example-monitor-layout.png)
 
 To interact with the monitors, use the monitor pickers from the <xref:Whim.Pickers> to retrieve them from the store. For more on how to use the store, see the [Store](./store.md) page.
-
-> [!NOTE]
-> Whim does not support Windows' native "virtual" desktops, as they lack the ability to activate "desktops" independently of monitors.

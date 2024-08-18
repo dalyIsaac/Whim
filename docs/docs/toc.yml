@@ -14,6 +14,7 @@ items:
   - href: customize/workspaces.md
   - href: customize/layout-engines.md
   - href: customize/monitors.md
+  - href: customize/store.md
   - href: customize/routing.md
   - href: customize/filtering.md
   - href: customize/logging.md
