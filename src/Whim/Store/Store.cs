@@ -1,12 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Whim;
 
-/// <inheritdoc />
-public class Store : IStore
+internal class Store : IStore
 {
 	private readonly IContext _ctx;
 	private readonly IInternalContext _internalCtx;
@@ -20,21 +20,16 @@ public class Store : IStore
 
 	private bool _disposedValue;
 
-	/// <inheritdoc />
 	public bool IsDisposing { get; private set; }
 
 	internal readonly RootSector _root;
 
-	/// <inheritdoc />
 	public IMonitorSectorEvents MonitorEvents => _root.MutableRootSector.MonitorSector;
 
-	/// <inheritdoc />
 	public IWindowSectorEvents WindowEvents => _root.MutableRootSector.WindowSector;
 
-	/// <inheritdoc />
 	public IMapSectorEvents MapEvents => _root.MutableRootSector.MapSector;
 
-	/// <inheritdoc />
 	public IWorkspaceSectorEvents WorkspaceEvents => _root.MutableRootSector.WorkspaceSector;
 
 	internal Store(IContext ctx, IInternalContext internalCtx)
@@ -45,7 +40,6 @@ public class Store : IStore
 		_root = new RootSector(ctx, internalCtx);
 	}
 
-	/// <inheritdoc />
 	public void Initialize()
 	{
 		_root.Initialize();
@@ -60,7 +54,6 @@ public class Store : IStore
 	protected virtual Result<TResult> DispatchFn<TResult>(Transform<TResult> transform) =>
 		transform.Execute(_ctx, _internalCtx, _root.MutableRootSector);
 
-	/// <inheritdoc />
 	public Result<TResult> Dispatch<TResult>(Transform<TResult> transform)
 	{
 		if (_internalCtx.CoreNativeManager.IsStaThread())
@@ -99,7 +92,6 @@ public class Store : IStore
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private TResult PickFn<TResult>(Picker<TResult> picker) => picker.Execute(_ctx, _internalCtx, _root);
 
-	/// <inheritdoc />
 	public TResult Pick<TResult>(Picker<TResult> picker)
 	{
 		if (Thread.CurrentThread.GetApartmentState() == ApartmentState.STA)
@@ -126,7 +118,6 @@ public class Store : IStore
 
 	private TResult PurePickFn<TResult>(PurePicker<TResult> picker) => picker(_root);
 
-	/// <inheritdoc />
 	public TResult Pick<TResult>(PurePicker<TResult> picker)
 	{
 		if (Thread.CurrentThread.GetApartmentState() == ApartmentState.STA)

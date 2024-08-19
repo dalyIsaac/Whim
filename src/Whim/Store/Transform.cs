@@ -1,7 +1,7 @@
 namespace Whim;
 
 /// <summary>
-/// Operation describing how to update the state of the <see cref="Store"/>.
+/// Operation describing how to update the state of the <see cref="IStore"/>.
 /// The implementing record should be populated with the payload.
 /// </summary>
 /// <typeparam name="TResult"></typeparam>

@@ -2,7 +2,7 @@
 
 <xref:Whim.TreeLayout.TreeLayoutPlugin> provides commands and functionality for the <xref:Whim.TreeLayout.TreeLayoutEngine>.
 
-<xref:Whim.TreeLayout.TreeLayoutPlugin> does not load the <xref:Whim.TreeLayout.TreeLayoutEngine> - that is done when creating a workspace via <xref:Whim.IWorkspaceManager.Add(System.String,System.Collections.Generic.IEnumerable{Whim.CreateLeafLayoutEngine})>.
+<xref:Whim.TreeLayout.TreeLayoutPlugin> does not load the <xref:Whim.TreeLayout.TreeLayoutEngine> - that is done when creating a workspace via the <xref:Whim.AddWorkspaceTransform>.
 
 For more about the `TreeLayoutEngine`, see the [Layout Engines](../customize/layout-engines.md#treelayoutengine) page.
 

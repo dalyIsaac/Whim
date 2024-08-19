@@ -13,6 +13,8 @@ items:
   - href: customize/keybinds.md
   - href: customize/workspaces.md
   - href: customize/layout-engines.md
+  - href: customize/monitors.md
+  - href: customize/store.md
   - href: customize/routing.md
   - href: customize/filtering.md
   - href: customize/logging.md
@@ -34,9 +36,11 @@ items:
 
   - name: Architecture
   - href: architecture/context.md
+  - href: architecture/store.md
+  - href: architecture/result.md
   - href: architecture/events.md
   - href: architecture/native-apis.md
-  - href: architecture/threading.md
+  - href: architecture/deprecated.md
 
   - name: Contributing
   - href: contribute/issues.md

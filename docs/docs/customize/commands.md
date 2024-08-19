@@ -13,7 +13,7 @@ Whim differentiates three types of commands.
 Core commands have identifiers under the `whim.core` namespace.
 
 | Identifier                                  | Title                                                              | Default Keybind                                      |
-|---------------------------------------------| ------------------------------------------------------------------ |------------------------------------------------------|
+| ------------------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------- |
 | `whim.core.activate_previous_workspace`     | Activate the previous workspace                                    | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>LEFT</kbd>   |
 | `whim.core.activate_next_workspace`         | Activate the next workspace                                        | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>RIGHT</kbd>  |
 | `whim.core.focus_window_in_direction.left`  | Focus the window in the left direction                             | <kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>LEFT</kbd>    |
@@ -60,7 +60,13 @@ context.CommandManager.Add(
     // Automatically namespaced to `whim.custom`.
     identifier: "close_window",
     title: "Close focused window",
-    callback: () => context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow.Close()
+    callback: () =>
+    {
+        if (context.Store.Pick(Pickers.PickLastFocusedWindow).TryGet(out IWindow window))
+        {
+            window.Close();
+        }
+    }
 );
 
 // Create an associated keybind.

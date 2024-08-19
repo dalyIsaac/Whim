@@ -15,11 +15,13 @@ context.CommandManager.Add(
     callback: () =>
     {
         // Get the first window with the process name "Discord.exe".
-        IWindow window = context.WindowManager.FirstOrDefault(w => w.ProcessFileName == "Discord.exe");
-        if (window != null)
+        IWindow? result = context
+            .Store.Pick(Pickers.PickAllWindows())
+            .FirstOrDefault(w => w.ProcessFileName == "Discord.exe");
+        if (result is IWindow discord)
         {
-            window.ShowMinimized();
-            context.WorkspaceManager.ActiveWorkspace.FocusFirstWindow();
+            result.ShowMinimized();
+            discord.Focus();
         }
     }
 );
@@ -34,14 +36,14 @@ The following commands can be useful on multi-monitor setups. When bound to keyb
 context.CommandManager.Add(
     identifier: "activate_previous_workspace",
     title: "Activate the previous inactive workspace",
-    callback: () => context.WorkspaceManager.ActivateAdjacent(reverse: true, skipActive: true)
+    callback: () => context.Store.Dispatch(new ActivateAdjacentWorkspaceTransform(Reverse: true, SkipActive: true))
 );
 
 // Activate previous workspace, skipping over those that are active on other monitors
 context.CommandManager.Add(
     identifier: "activate_next_workspace",
     title: "Activate the next inactive workspace",
-    callback: () => context.WorkspaceManager.ActivateAdjacent(skipActive: true)
+    callback: () => context.Store.Dispatch(new ActivateAdjacentWorkspaceTransform(SkipActive: true))
 );
 ```
 
@@ -58,11 +60,11 @@ context.CommandManager.Add("move_window_to_monitor_2", "Move window to monitor 2
 
 ## Move a window to a specific workspace
 
-The following command can be used to move the active window to a specific workspace, using the workspace ID. The best way to get the workspace ID is to use the return value from the `Add` method on the `WorkspaceManager`.
+The following command can be used to move the active window to a specific workspace, using the workspace ID. The best way to get the workspace ID is to use the return value from the <xref:Whim.AddWorkspaceTransform>.
 
 ```csharp
 // Once the workspace has been created, it will have this ID.
-Guid? browserWorkspaceId = context.WorkspaceManager.Add("Browser workspace");
+Guid? browserWorkspaceId = context.Store.Dispatch(new AddWorkspaceTransform("Browser")).ValueOrDefault;
 
 context.CommandManager.Add("move_window_to_browser_workspace", "Move window to browser workspace", () =>
 {
@@ -86,7 +88,7 @@ context.CommandManager.Add("move_window_to_browser_workspace", "Move window to b
 The following command can be used to activate a workspace on a specific monitor without focusing the workspace you are activating. In this example, I am activating a specific workspace on the 3rd monitor.
 
 ```csharp
-Guid? browserWorkspaceId = context.WorkspaceManager.Add("Browser workspace");
+Guid? browserWorkspaceId = context.Store.Dispatch(new AddWorkspaceTransform("Browser")).ValueOrDefault;
 
 context.CommandManager.Add(
     identifier: "activate_browser_workspace_on_monitor_3_no_focus",
