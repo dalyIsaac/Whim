@@ -1,8 +1,7 @@
 namespace Whim;
 
 /// <summary>
-/// Whim's store.
-/// WARNING: Currently non-functional - use managers instead.
+/// Contains the state of Whim's monitors, windows, and workspaces.
 /// </summary>
 public interface IStore : IDisposable
 {
@@ -69,13 +68,13 @@ public interface IStore : IDisposable
 	/// <example>
 	/// If you want to get the full result and handle it appropriately:
 	/// <code>
-	/// Result&lt;IWorkspace> workspace = context.Store.Pick(PickWorkspaceByWindow(window.Handle));
+	/// Result&lt;IMonitor&gt; monitor = context.Store.Pick(PickMonitorAtPoint(new Point&lt;int&gt;(100, 200)));
 	/// </code>
 	///
 	/// If you want to assume the result is successful and get the value (this will throw an exception
 	/// if it fails):
 	/// <code>
-	/// IWorkspace workspace = context.Store.Pick(PickWorkspaceByWindow(window.Handle)).Value;
+	/// IMonitor monitor = context.Store.Pick(PickMonitorAtPoint(new Point&lt;int&gt;(100, 200))).Value;
 	/// </code>
 	/// </example>
 	public TResult Pick<TResult>(Picker<TResult> picker);
@@ -93,7 +92,16 @@ public interface IStore : IDisposable
 	/// The result of the picker applied to Whim's state.
 	/// </returns>
 	/// <example>
-	/// This is used exactly the same as <see cref="Pick{TResult}(Picker{TResult})"/>.
+	/// If you want to get the full result and handle it appropriately:
+	/// <code>
+	/// Result&lt;IWorkspace> workspace = context.Store.Pick(PickWorkspaceByWindow(window.Handle));
+	/// </code>
+	///
+	/// If you want to assume the result is successful and get the value (this will throw an exception
+	/// if it fails):
+	/// <code>
+	/// IWorkspace workspace = context.Store.Pick(PickWorkspaceByWindow(window.Handle)).Value;
+	/// </code>
 	/// </example>
 	public TResult Pick<TResult>(PurePicker<TResult> picker);
 }
