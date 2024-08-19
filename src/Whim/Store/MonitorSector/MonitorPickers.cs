@@ -6,7 +6,10 @@ public static partial class Pickers
 	/// Get a monitor by its <see cref="HMONITOR"/> handle.
 	/// </summary>
 	/// <param name="handle"></param>
-	/// <returns></returns>
+	/// <returns>
+	/// The monitor with the given handle, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// If the monitor is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// </returns>
 	public static PurePicker<Result<IMonitor>> PickMonitorByHandle(HMONITOR handle) =>
 		(rootSector) =>
 		{
@@ -24,18 +27,27 @@ public static partial class Pickers
 	/// <summary>
 	/// Get the currently active monitor.
 	/// </summary>
+	/// <returns>
+	/// The active monitor, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// </returns>
 	public static PurePicker<IMonitor> PickActiveMonitor() =>
 		static (rootSector) => PickMonitorByHandle(rootSector.MonitorSector.ActiveMonitorHandle)(rootSector).Value;
 
 	/// <summary>
 	/// Get the primary monitor.
 	/// </summary>
+	/// <returns>
+	/// The primary monitor, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// </returns>
 	public static PurePicker<IMonitor> PickPrimaryMonitor() =>
 		static (rootSector) => PickMonitorByHandle(rootSector.MonitorSector.PrimaryMonitorHandle)(rootSector).Value;
 
 	/// <summary>
 	/// Get the last <see cref="IMonitor"/> which received an event sent by Windows which Whim did not ignore.
 	/// </summary>
+	/// <returns>
+	/// The last monitor which received an event, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// </returns>
 	public static PurePicker<IMonitor> PickLastWhimActiveMonitor() =>
 		static (rootSector) =>
 			PickMonitorByHandle(rootSector.MonitorSector.LastWhimActiveMonitorHandle)(rootSector).Value;
@@ -43,6 +55,9 @@ public static partial class Pickers
 	/// <summary>
 	/// Get all the <see cref="IMonitor"/>s tracked by Whim.
 	/// </summary>
+	/// <returns>
+	/// Tll the monitors, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// </returns>
 	public static PurePicker<IReadOnlyList<IMonitor>> PickAllMonitors() =>
 		static (rootSector) => rootSector.MonitorSector.Monitors;
 
@@ -59,7 +74,10 @@ public static partial class Pickers
 	/// When <see langword="true"/>, then returns the first monitor. Otherwise returns an exception in the
 	/// result.
 	/// </param>
-	/// <returns></returns>
+	/// <returns>
+	/// The monitor adjacent to the given monitor, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// If the monitor is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// </returns>
 	public static PurePicker<Result<IMonitor>> PickAdjacentMonitor(
 		HMONITOR handle = default,
 		bool reverse = false,
@@ -100,7 +118,10 @@ public static partial class Pickers
 	/// <param name="index">
 	/// The 0-based index of the monitor to get.
 	/// </param>
-	/// <returns></returns>
+	/// <returns>
+	/// The monitor at the given index, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// If the monitor is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// </returns>
 	public static PurePicker<Result<IMonitor>> PickMonitorByIndex(int index) =>
 		(rootSector) =>
 		{
@@ -123,7 +144,10 @@ public static partial class Pickers
 	/// When <see langword="true"/>, then returns the first monitor. Otherwise returns an exception in the
 	/// result.
 	/// </param>
-	/// <returns></returns>
+	/// <returns>
+	/// The monitor at the given point, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// If the monitor is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// </returns>
 	public static Picker<Result<IMonitor>> PickMonitorAtPoint(IPoint<int> point, bool getFirst = false) =>
 		new GetMonitorAtPointPicker(point, getFirst);
 }
