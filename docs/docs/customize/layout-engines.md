@@ -44,9 +44,9 @@ Each `SliceLayoutEngine` is divided into a number of <xref:Whim.SliceLayout.IAre
 `OverflowArea`s are implicitly the last ordered area in the layout engine, in comparison to all `SliceArea`s.
 Internally, `SliceLayoutEngine` stores a list of <xref:Whim.IWindow>s. Each `IArea` corresponds to a "slice" of the `IWindow` list.
 
-#### Defining `SliceLayoutEngine`s
+#### Defining different `SliceLayouts`
 
-The `SliceLayouts` contains methods to create a few common layouts:
+The <xref:Whim.SliceLayout.SliceLayouts> static class contains methods to create a few common layouts:
 
 - primary/stack (master/stack)
 - multi-column layout
