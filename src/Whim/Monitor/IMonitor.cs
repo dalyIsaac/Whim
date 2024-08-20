@@ -106,8 +106,8 @@ public static class MonitorHelpers
 		int translatedX = rectangle.X - monitor.X;
 		int translatedY = rectangle.Y - monitor.Y;
 
-		double x = Math.Abs((double)translatedX / monitor.Width);
-		double y = Math.Abs((double)translatedY / monitor.Height);
+		double x = Math.Max((double)translatedX / monitor.Width, 0);
+		double y = Math.Max((double)translatedY / monitor.Height, 0);
 		double width = Math.Abs((double)rectangle.Width / monitor.Width);
 		double height = Math.Abs((double)rectangle.Height / monitor.Height);
 		return new Rectangle<double>()
