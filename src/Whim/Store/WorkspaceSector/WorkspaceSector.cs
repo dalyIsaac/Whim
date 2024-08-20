@@ -150,7 +150,7 @@ internal class WorkspaceSector(IContext ctx, IInternalContext internalCtx)
 			WindowHandleToFocus.Focus(_internalCtx);
 		}
 
-		_internalCtx.WindowManager.OnWindowFocused(window);
+		_ctx.Store.Dispatch(new WindowFocusedTransform(window));
 		WindowHandleToFocus = default;
 	}
 
