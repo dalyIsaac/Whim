@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using DotNext;
 
 namespace Whim.FloatingWindow;
 
@@ -33,7 +34,13 @@ internal static class FloatingUtils
 			return null;
 		}
 
-		IMonitor newMonitor = context.MonitorManager.GetMonitorAtPoint(newActualRectangle);
+		Result<IMonitor> newMonitorResult = context.Store.Pick(Pickers.PickMonitorByWindow(window.Handle));
+		if (!newMonitorResult.TryGet(out IMonitor newMonitor))
+		{
+			Logger.Error($"Could not obtain monitor for floating window {window}");
+			return null;
+		}
+
 		IRectangle<double> newUnitSquareRectangle = newMonitor.WorkingArea.NormalizeRectangle(newActualRectangle);
 		if (newUnitSquareRectangle.Equals(oldRectangle))
 		{
