@@ -1,5 +1,3 @@
-using System;
-
 namespace Whim.SliceLayout;
 
 /// <summary>
