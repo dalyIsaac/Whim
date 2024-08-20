@@ -3,11 +3,19 @@ namespace Whim.Tests;
 public class MutableRootSectorTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Initialize_Dispose(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal void Initialize_Dispose(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector rootSector,
+		ILayoutEngine engine1,
+		ILayoutEngine engine2
+	)
 	{
-		// Given
+		// Given there is a populated layout engine creator
 		MutableRootSector sut = new(ctx, internalCtx);
 		var capture = CaptureWinEventProc.Create(internalCtx);
+
+		rootSector.WorkspaceSector.CreateLayoutEngines = () => [(id) => engine1, (id) => engine2];
 
 		ctx.Store.Dispatch(new AddWorkspaceTransform());
 

@@ -5,6 +5,7 @@ namespace Whim;
 /// <summary>
 /// Layout engine that lays out windows in columns.
 /// </summary>
+[Obsolete("Use SliceLayoutEngine instead - see SliceLayouts")]
 public record ColumnLayoutEngine : ILayoutEngine
 {
 	/// <summary>

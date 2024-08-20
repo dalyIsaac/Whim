@@ -34,8 +34,7 @@ internal class WorkspaceSector(IContext ctx, IInternalContext internalCtx)
 	public ImmutableDictionary<WorkspaceId, Workspace> Workspaces { get; set; } =
 		ImmutableDictionary<WorkspaceId, Workspace>.Empty;
 
-	public Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; } =
-		() => [(id) => new ColumnLayoutEngine(id)];
+	public Func<CreateLeafLayoutEngine[]> CreateLayoutEngines { get; set; } = () => [];
 
 	public ImmutableList<ProxyLayoutEngineCreator> ProxyLayoutEngineCreators { get; set; } = [];
 

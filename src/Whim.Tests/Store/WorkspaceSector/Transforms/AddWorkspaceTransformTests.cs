@@ -51,7 +51,7 @@ public class AddWorkspaceTransformTests
 
 		root.WorkspaceSector.ProxyLayoutEngineCreators =
 		[
-			(engine) => Substitute.For<TestProxyLayoutEngine>(engine),
+			(ILayoutEngine engine) => Substitute.For<TestProxyLayoutEngine>(engine),
 			(engine) => Substitute.For<TestProxyLayoutEngine>(engine)
 		];
 
@@ -89,34 +89,20 @@ public class AddWorkspaceTransformTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Success_UseDefaults(IContext ctx, MutableRootSector root)
+	internal void Fails_Defaults(IContext ctx, MutableRootSector root)
 	{
-		// Given the workspace sector is initialized
+		// Given the workspace sector is initialized and there are no layout engines in the creator
 		root.WorkspaceSector.HasInitialized = true;
 
 		AddWorkspaceTransform sut = new();
 
 		// When we execute the transform
+		// Then we don't get a workspace created
 		Result<Guid>? result = null;
-		var raisedEvent = Assert.Raises<WorkspaceAddedEventArgs>(
+		CustomAssert.DoesNotRaise<WorkspaceAddedEventArgs>(
 			h => ctx.Store.WorkspaceEvents.WorkspaceAdded += h,
 			h => ctx.Store.WorkspaceEvents.WorkspaceAdded -= h,
 			() => result = ctx.Store.Dispatch(sut)
 		);
-
-		// Then we get the created workspace
-		Assert.True(result!.Value.IsSuccessful);
-
-		IWorkspace workspace = root.WorkspaceSector.Workspaces[result!.Value.Value];
-		Assert.NotNull(workspace);
-		Assert.Single(root.WorkspaceSector.Workspaces);
-		Assert.Single(root.WorkspaceSector.WorkspaceOrder);
-
-		Assert.Empty(root.WorkspaceSector.WorkspacesToCreate);
-
-		Assert.Equal("Workspace 1", raisedEvent.Arguments.Workspace.Name);
-		Assert.Same(raisedEvent.Arguments.Workspace, workspace);
-
-		Assert.Single(workspace.LayoutEngines);
 	}
 }

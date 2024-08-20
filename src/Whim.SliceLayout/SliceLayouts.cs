@@ -1,5 +1,3 @@
-using System;
-
 namespace Whim.SliceLayout;
 
 /// <summary>
@@ -8,10 +6,123 @@ namespace Whim.SliceLayout;
 public static class SliceLayouts
 {
 	/// <summary>
+	/// Creates a column layout, where windows are stacked vertically.
+	/// </summary>
+	/// <example>
+	/// Usage:
+	/// <code>
+	/// context.Store.Dispatch(
+	/// 	new SetCreateLayoutEnginesTransform(
+	/// 		() => new CreateLeafLayoutEngine[]
+	/// 		{
+	/// 			(id) => SliceLayouts.CreateColumnLayout(context, sliceLayoutPlugin, id)
+	/// 		}
+	/// 	)
+	/// );
+	/// </code>
+	///
+	/// Layout:
+	/// <code>
+	/// ---------------------------------------------------------
+	/// |                                                       |
+	/// |                                                       |
+	/// |                                                       |
+	/// |                                                       |
+	/// |                                |                      |
+	/// |                                |                      |
+	/// |                       Overflow |                      |
+	/// |                                |                      |
+	/// |                                ↓                      |
+	/// |                                                       |
+	/// |                                                       |
+	/// |                                                       |
+	/// |                                                       |
+	/// |                                                       |
+	/// |                                                       |
+	/// ---------------------------------------------------------
+	/// </code>
+	/// </example>
+	/// <param name="context"></param>
+	/// <param name="plugin"></param>
+	/// <param name="identity"></param>
+	/// <param name="leftToRight"></param>
+	/// <returns></returns>
+	public static ILayoutEngine CreateColumnLayout(
+		IContext context,
+		ISliceLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		bool leftToRight = true
+	) =>
+		new SliceLayoutEngine(context, plugin, identity, new(isRow: false, (1, new OverflowArea())))
+		{
+			Name = "Column"
+		};
+
+	/// <summary>
+	/// Creates a row layout, where windows are stacked horizontally.
+	/// </summary>
+	/// <example>
+	/// Usage:
+	/// <code>
+	/// context.Store.Dispatch(
+	/// 	new SetCreateLayoutEnginesTransform(
+	/// 		() => new CreateLeafLayoutEngine[]
+	/// 		{
+	/// 			(id) => SliceLayouts.CreateRowLayout(context, sliceLayoutPlugin, id)
+	/// 		}
+	/// 	)
+	/// );
+	/// </code>
+	///
+	/// Layout:
+	/// <code>
+	/// ---------------------------------------------------------
+	/// |                                                       |
+	/// |                                                       |
+	/// |                                                       |
+	/// |                                                       |
+	/// |                                                       |
+	/// |                                                       |
+	/// |                       Overflow                        |
+	/// |                       -------→                        |
+	/// |                                                       |
+	/// |                                                       |
+	/// |                                                       |
+	/// |                                                       |
+	/// |                                                       |
+	/// |                                                       |
+	/// |                                                       |
+	/// ---------------------------------------------------------
+	/// </code>
+	/// </example>
+	/// <param name="context"></param>
+	/// <param name="plugin"></param>
+	/// <param name="identity"></param>
+	/// <returns></returns>
+	public static ILayoutEngine CreateRowLayout(
+		IContext context,
+		ISliceLayoutPlugin plugin,
+		LayoutEngineIdentity identity
+	) => new SliceLayoutEngine(context, plugin, identity, new(isRow: true, (1, new OverflowArea()))) { Name = "Row" };
+
+	/// <summary>
 	/// Creates a primary stack layout, where the first window takes up half the screen, and the
 	/// remaining windows are stacked vertically on the other half.
-	///
+	/// </summary>
 	/// <example>
+	/// Usage:
+	/// <code>
+	/// context.Store.Dispatch(
+	/// 	new SetCreateLayoutEnginesTransform(
+	/// 		() => new CreateLeafLayoutEngine[]
+	/// 		{
+	/// 			(id) => SliceLayouts.CreatePrimaryStackLayout(context, sliceLayoutPlugin, id)
+	/// 		}
+	/// 	)
+	/// );
+	/// </code>
+	///
+	/// Layout:
 	/// <code>
 	/// ----------------------------------------------------------------
 	/// |                              |                               |
@@ -22,11 +133,11 @@ public static class SliceLayouts
 	/// |                              |                               |
 	/// |                              |                               |
 	/// |                              |                               |
-	/// |                              |                               |
-	/// |                              |                               |
-	/// |           Primary            |           Overflow            |
-	/// |          1 window            |                               |
-	/// |                              |                               |
+	/// |                              |                     |         |
+	/// |                              |                     |         |
+	/// |           Primary            |           Overflow  |         |
+	/// |          1 window            |                     |         |
+	/// |                              |                     ↓         |
 	/// |                              |                               |
 	/// |                              |                               |
 	/// |                              |                               |
@@ -40,7 +151,6 @@ public static class SliceLayouts
 	/// ----------------------------------------------------------------
 	/// </code>
 	/// </example>
-	/// </summary>
 	/// <param name="context"></param>
 	/// <param name="plugin"></param>
 	/// <param name="identity"></param>
@@ -59,10 +169,21 @@ public static class SliceLayouts
 	/// <br />
 	/// For example, new <c>uint[] { 2, 1, 0 }</c> will create a layout with 3 columns, where the
 	/// first column has 2 rows, the second column has 1 row, and the third column has infinite rows.
-	///
-	/// For example:
-	///
+	/// </summary>
 	/// <example>
+	/// Usage:
+	/// <code>
+	/// context.Store.Dispatch(
+	/// 	new SetCreateLayoutEnginesTransform(
+	/// 		() => new CreateLeafLayoutEngine[]
+	/// 		{
+	/// 			(id) => SliceLayouts.CreateMultiColumnLayout(context, sliceLayoutPlugin, id)
+	/// 		}
+	/// 	)
+	/// );
+	/// </code>
+	///
+	/// Layout:
 	/// <code>
 	/// -------------------------------------------------------------------------------------------------
 	/// |                               |                               |                               |
@@ -73,11 +194,11 @@ public static class SliceLayouts
 	/// |                               |                               |                               |
 	/// |                               |                               |                               |
 	/// |                               |                               |                               |
-	/// |                               |                               |                               |
-	/// |                               |                               |                               |
-	/// |           Slice 1             |           Slice 2             |           Overflow            |
-	/// |          2 windows            |          1 window             |                               |
-	/// |                               |                               |                               |
+	/// |                    |          |                               |                    |          |
+	/// |                    |          |                               |                    |          |
+	/// |           Slice 1  |          |           Slice 2             |           Overflow |          |
+	/// |          2 windows |          |          1 window             |                    |          |
+	/// |                    ↓          |                               |                    ↓          |
 	/// |                               |                               |                               |
 	/// |                               |                               |                               |
 	/// |                               |                               |                               |
@@ -91,13 +212,11 @@ public static class SliceLayouts
 	/// -------------------------------------------------------------------------------------------------
 	/// </code>
 	/// </example>
-	/// </summary>
 	/// <param name="context">The <see cref="IContext"/> to use</param>
 	/// <param name="plugin">The <see cref="ISliceLayoutPlugin"/> to use</param>
 	/// <param name="identity">The identity of the layout engine</param>
 	/// <param name="capacities">The number of rows in each column</param>
 	/// <returns></returns>
-	/// <exception cref="ArgumentException"></exception>
 	public static ILayoutEngine CreateMultiColumnLayout(
 		IContext context,
 		ISliceLayoutPlugin plugin,
@@ -140,10 +259,21 @@ public static class SliceLayouts
 	/// column is on the left, and the overflow column is on the right.
 	///
 	/// The middle column takes up 50% of the screen, and the left and right columns take up 25%.
-	///
-	/// For example:
-	///
+	/// </summary>
 	/// <example>
+	/// Usage:
+	/// <code>
+	/// context.Store.Dispatch(
+	/// 	new SetCreateLayoutEnginesTransform(
+	/// 		() => new CreateLeafLayoutEngine[]
+	/// 		{
+	/// 			(id) => SliceLayouts.CreateSecondaryPrimaryLayout(context, sliceLayoutPlugin, id)
+	/// 		}
+	/// 	)
+	/// );
+	/// </code>
+	///
+	/// Layout:
 	/// <code>
 	/// ------------------------------------------------------------------------
 	/// |                 |                             |                      |
@@ -154,11 +284,11 @@ public static class SliceLayouts
 	/// |                 |                             |                      |
 	/// |                 |                             |                      |
 	/// |                 |                             |                      |
-	/// |                 |                             |                      |
-	/// |                 |                             |                      |
-	/// |     Slice 2     |           Slice 1           |       Overflow       |
-	/// |    2 windows    |          1 window           |                      |
-	/// |                 |                             |                      |
+	/// |              |  |                             |                |     |
+	/// |              |  |                             |                |     |
+	/// |     Slice 2  |  |           Slice 1           |       Overflow |     |
+	/// |    2 windows |  |          1 window           |                |     |
+	/// |              ↓  |                             |                ↓     |
 	/// |                 |                             |                      |
 	/// |                 |                             |                      |
 	/// |                 |                             |                      |
@@ -172,7 +302,6 @@ public static class SliceLayouts
 	/// ------------------------------------------------------------------------
 	/// </code>
 	/// </example>
-	/// </summary>
 	/// <param name="context"></param>
 	/// <param name="plugin"></param>
 	/// <param name="identity"></param>
