@@ -1,4 +1,3 @@
-using System.Diagnostics;
 // We do use this in non-DEBUG.
 #pragma warning disable IDE0005 // Using directive is unnecessary.
 using System.Reflection;
