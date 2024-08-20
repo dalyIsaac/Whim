@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.UI.Dispatching;
-using Microsoft.UI.Xaml;
 
 namespace Whim.Tests;
 
