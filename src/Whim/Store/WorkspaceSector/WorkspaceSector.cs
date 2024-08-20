@@ -87,6 +87,18 @@ internal class WorkspaceSector(IContext ctx, IInternalContext internalCtx)
 	{
 		Logger.Debug("Doing layout");
 
+		// Force the window to focus to not be minimized.
+		if (WindowHandleToFocus != default)
+		{
+			if (_ctx.Store.Pick(PickWorkspaceByWindow(WindowHandleToFocus)).TryGet(out IWorkspace workspace))
+			{
+				WorkspacesToLayout = WorkspacesToLayout.Add(workspace.Id);
+
+				// Force the window to not be minimized.
+				_ctx.Store.Dispatch(new MinimizeWindowEndTransform(workspace.Id, WindowHandleToFocus));
+			}
+		}
+
 		GarbageCollect();
 		LayoutAllWorkspaces();
 		FocusHandle();
@@ -139,7 +151,7 @@ internal class WorkspaceSector(IContext ctx, IInternalContext internalCtx)
 			WindowHandleToFocus.Focus(_internalCtx);
 		}
 
-		_internalCtx.WindowManager.OnWindowFocused(window);
+		_ctx.Store.Dispatch(new WindowFocusedTransform(window));
 		WindowHandleToFocus = default;
 	}
 

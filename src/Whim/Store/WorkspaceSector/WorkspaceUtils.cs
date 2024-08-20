@@ -31,6 +31,8 @@ internal static class WorkspaceUtils
 			}
 		);
 
+		sector.WindowHandleToFocus = workspace.LastFocusedWindowHandle;
+
 		return workspace;
 	}
 

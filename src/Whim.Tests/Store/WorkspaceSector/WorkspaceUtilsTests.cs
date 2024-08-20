@@ -45,10 +45,12 @@ public class WorkspaceUtilsTests
 	)
 	{
 		// Given
+		HWND lastFocusedWindowHandle = new(1);
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
 			LayoutEngines = [engine1, engine2, engine3],
-			ActiveLayoutEngineIndex = 1
+			ActiveLayoutEngineIndex = 1,
+			LastFocusedWindowHandle = lastFocusedWindowHandle
 		};
 		int newActiveLayoutEngineIndex = 2;
 
@@ -69,6 +71,7 @@ public class WorkspaceUtilsTests
 		Assert.NotSame(workspace, result);
 		Assert.Equal(2, result.ActiveLayoutEngineIndex);
 		Assert.Equal(workspace.Id, result.Id);
+		Assert.Equal(lastFocusedWindowHandle, root.WorkspaceSector.WindowHandleToFocus);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -103,6 +106,7 @@ public class WorkspaceUtilsTests
 		Assert.Same(workspace, result);
 		Assert.Equal(0, result.ActiveLayoutEngineIndex);
 		Assert.Equal(workspace.Id, result.Id);
+		Assert.Equal(default, root.WorkspaceSector.WindowHandleToFocus);
 	}
 
 	[Theory, AutoSubstituteData]

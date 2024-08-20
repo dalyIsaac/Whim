@@ -100,7 +100,7 @@ public class WorkspaceSectorTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void DoLayout_FocusWindow(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
+	internal void DoLayout_FocusWindow(IContext ctx, MutableRootSector root, List<object> transforms)
 	{
 		// Given
 		IWindow window = CreateWindow((HWND)1);
@@ -119,13 +119,14 @@ public class WorkspaceSectorTests
 
 		// Then the window should be focused
 		window.Received().Focus();
-		internalCtx.WindowManager.Received().OnWindowFocused(window);
+		Assert.Contains(transforms, t => t.Equals(new WindowFocusedTransform(window)));
+		Assert.Contains(transforms, t => t.Equals(new MinimizeWindowEndTransform(workspace.Id, window.Handle)));
 
 		Assert.Equal(default, sut.WindowHandleToFocus);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void DoLayout_FocusHandle(IInternalContext internalCtx, MutableRootSector root)
+	internal void DoLayout_FocusHandle(IInternalContext internalCtx, MutableRootSector root, List<object> transforms)
 	{
 		// Given
 		HWND handle = (HWND)1;
@@ -140,5 +141,7 @@ public class WorkspaceSectorTests
 		internalCtx.CoreNativeManager.Received().SetForegroundWindow(handle);
 
 		Assert.Equal(default, sut.WindowHandleToFocus);
+		Assert.Contains(transforms, t => t.Equals(new WindowFocusedTransform(null)));
+		Assert.DoesNotContain(transforms, t => t is MinimizeWindowEndTransform);
 	}
 }
