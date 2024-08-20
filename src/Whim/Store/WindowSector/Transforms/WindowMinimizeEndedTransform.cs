@@ -14,8 +14,8 @@ internal record WindowMinimizeEndedTransform(IWindow Window) : Transform
 			return Result.FromException<Unit>(workspaceResult.Error!);
 		}
 
-		workspace.MinimizeWindowEnd(Window);
-		workspace.DoLayout();
+		ctx.Store.Dispatch(new MinimizeWindowEndTransform(workspace.Id, Window.Handle));
+		ctx.Store.Dispatch(new DoWorkspaceLayoutTransform(workspace.Id));
 
 		mutableRootSector.WindowSector.QueueEvent(new WindowMinimizeEndedEventArgs() { Window = Window });
 
