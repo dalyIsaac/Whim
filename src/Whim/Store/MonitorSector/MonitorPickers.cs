@@ -56,7 +56,7 @@ public static partial class Pickers
 	/// Get all the <see cref="IMonitor"/>s tracked by Whim.
 	/// </summary>
 	/// <returns>
-	/// Tll the monitors, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// The monitors, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
 	/// </returns>
 	public static PurePicker<IReadOnlyList<IMonitor>> PickAllMonitors() =>
 		static (rootSector) => rootSector.MonitorSector.Monitors;
