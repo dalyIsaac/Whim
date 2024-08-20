@@ -2,33 +2,44 @@
 
 The <xref:Whim.IStore> contains the state of windows, workspaces, and monitors in Whim. For a more in-depth look at the store, see the [Store](../architecture/store.md) page in the architecture section.
 
-## Core Concepts
+## Pickers and Transforms
 
-- Use <xref:Whim.Pickers> to retrieve values from the store - see [Reading from the Store](#reading-from-the-store)
-- Use <xref:Whim.Transform>s to update the store - see [Writing to the Store](#writing-to-the-store)
-- Use handles and IDs to reference windows, workspaces, and monitors - see [Handles and IDs](#handles-and-ids)
-- Use `Result<T>` to handle errors - see [Result<T>](#resultt)
+To **retrieve values from the store**, pass a "picker" from the <xref:Whim.Pickers> static class to the <xref href="Whim.IStore.Pick``1(Whim.Picker{``0})" /> method. Pickers will typically take in [handles or IDs as arguments](#handles-and-ids).
 
-## Reading from the Store
-
-To retrieve values from the store, use the <xref href="Whim.IStore.Pick``1(Whim.Picker{``0})" /> method. For example:
+For example:
 
 ```csharp
 IMonitor primaryMonitor = context.Store.Pick(Pickers.PickPrimaryMonitor());
-IMonitor? thirdMonitor = context.Store.Pick(Pickers.PickMonitorByIndex(2)).ValueOrDefault;
+IMonitor thirdMonitor = context.Store.Pick(Pickers.PickMonitorByIndex(2)).Value;
 ```
 
-Pickers can be found in the <xref:Whim.Pickers> static class.
+To **update Whim's state**, pass a "transform" to the <xref href="Whim.IStore.Dispatch``1(Whim.Transform{``0})" /> method. Transforms can be found in the API documentation for the <xref:Whim> namespace.
 
-## Writing to the Store
-
-To update Whim's state, use the <xref href="Whim.IStore.Dispatch``1(Whim.Transform{``0})" /> method. For example:
+For example:
 
 ```csharp
 context.Store.Dispatch(new ActivateWorkspaceTransform(workspaceId, monitor.Handle));
 ```
 
-Transforms can be found in the API documentation for the <xref:Whim> namespace.
+As an example of using pickers and transforms together:
+
+```csharp
+Guid browserWorkspaceId = context.Store.Dispatch(new AddWorkspaceTransform("Browser")).Value;
+
+context.CommandManager.Add(
+    identifier: "last_focused_to_browser",
+    title: "Move the last focused window to the browser workspace",
+    callback: () =>
+    {
+        if (context.Store.Pick(Pickers.PickLastFocusedWindow()).TryGet(out IWindow window))
+        {
+            context.Store.Dispatch(new MoveWindowToWorkspaceTransform(browserWorkspaceId, window.Handle));
+        }
+    }
+);
+```
+
+For examples on how to interact with the store, see the [Snippets](snippets.md) page.
 
 ## Handles and IDs
 
@@ -44,23 +55,7 @@ A handle is a token that represents a resource that is managed by the Windows ke
 
 ## `Result<T>`
 
-All transforms and some pickers return a `Result<T>`. This is a type that can either contain a value or an error. For example:
-
-```csharp
-Result<IMonitor> monitorResult = context.Store.Pick(Pickers.PickMonitorByIndex(2));
-if (monitorResult.TryGet(out IMonitor monitor))
-{
-    // Do something with the monitor
-}
-else
-{
-    // Handle the error
-}
-```
-
-If you're sure the operation will succeed, you can use the `ValueOrDefault` property. However, it is recommended to use the `TryGet` method to handle errors.
-
-## `Unit`
+All transforms and some pickers return a `Result<T>`. This is a type that can either contain a value or an error.
 
 Some transforms will return a `Result<Unit>` This represents an operation that does not return a value. For example:
 
@@ -72,25 +67,53 @@ if (!result.IsSuccessful)
 }
 ```
 
-### `ValueOrDefault` Examples
+### Error Handling
 
-The return type of `PickMonitorByIndex` is `Result<IMonitor>`. As the value returned is a complex
-type, when you use `ValueOrDefault`, the return type will be nullable.
-
-```csharp
-IMonitor? monitor = context.Store.Pick(Pickers.PickMonitorByIndex(2)).ValueOrDefault;
-```
-
-The `AddWorkspaceTransform` implements `Transform<Guid>`, so the return type of dispatching it will be
-`Result<Guid>`. As the value returned is a value type, when you use `ValueOrDefault`, the return type will be the value type itself.
-However, if it fails, the return type will be the default value of the value type, which in this
-case is `Guid.Empty`.
+To handle errors for reference types (classes, interfaces):
 
 ```csharp
-Guid workspaceId = context.Store.Dispatch(new AddWorkspaceTransform("Workspace name")).ValueOrDefault;
+// The return type of PickMonitorByIndex is Result<IMonitor>.
+
+// If this fails, monitor1 will be null.
+IMonitor? monitor1 = context.Store.Pick(Pickers.PickMonitorByIndex(0)).ValueOrDefault;
+
+// If this fails, an exception will throw.
+IMonitor monitor2 = context.Store.Pick(Pickers.PickMonitorByIndex(0)).Value;
+
+// If this fails, the else block will execute.
+if (context.Store.Pick(Pickers.PickMonitorByIndex(0)).TryGet(out IMonitor monitor3))
+{
+    // Do something with the monitor
+}
+else
+{
+    // Handle the error
+}
 ```
 
-The return type of `PickPrimaryMonitor` is `PurePicker<IMonitor>`, so there will always be a value.
+To handle errors for value types (handles, IDs, etc.):
+
+```csharp
+// The return type of AddWorkspaceTransform is Result<Guid>.
+
+// If this fails, workspaceId will be the default value, equivalent to all bits being 0.
+Guid workspace1 = context.Store.Dispatch(new AddWorkspaceTransform("Workspace 1")).ValueOrDefault;
+
+// If this fails, an exception will throw.
+Guid workspace2 = context.Store.Dispatch(new AddWorkspaceTransform("Workspace 2")).Value;
+
+// If this fails, the else block will execute.
+if (context.Store.Dispatch(new AddWorkspaceTransform("Workspace 3")).TryGet(out Guid workspace3))
+{
+    // Do something with the workspace
+}
+else
+{
+    // Handle the error
+}
+```
+
+Items which don't return a `Result` do not need to be handled in this way - they can be used directly.
 
 ```csharp
 IMonitor primaryMonitor = context.Store.Pick(Pickers.PickPrimaryMonitor());

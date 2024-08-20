@@ -9,3 +9,30 @@ For example, the ordering (with 0-based indexing) of the monitor configuration b
 ![Example monitor layout](../../images/example-monitor-layout.png)
 
 To interact with the monitors, use the monitor pickers from the <xref:Whim.Pickers> to retrieve them from the store. For more on how to use the store, see the [Store](./store.md) page.
+
+## Example Command
+
+```csharp
+Guid browserWorkspaceId = context.Store.Dispatch(new AddWorkspaceTransform("Browser")).Value;
+Guid ideWorkspaceId = context.Store.Dispatch(new AddWorkspaceTransform("IDE")).Value;
+
+context.CommandManager.Add(
+    "move_last_focused_browser_window_to_first_monitor",
+    "Move last focused browser window to the first monitor",
+    () => {
+        if (!context.Store.Pick(Pickers.PickMonitorsByIndex(0)).TryGet(out IMonitor firstMonitor))
+        {
+            return;
+        }
+
+        if (!context.Store.Pick(Pickers.PickLastFocusedWindowHandle(browserWorkspaceId)).TryGet(out HWND lastFocusedWindowHandle))
+        {
+            return;
+        }
+
+        context.Store.Dispatch(new MoveWindowToMonitorTransform(lastFocusedWindowHandle, firstMonitor.Handle));
+    }
+);
+```
+
+For more, see the [Store](./store.md) and [Commands](./commands.md) pages.

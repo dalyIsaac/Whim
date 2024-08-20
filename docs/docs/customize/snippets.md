@@ -64,7 +64,7 @@ The following command can be used to move the active window to a specific worksp
 
 ```csharp
 // Once the workspace has been created, it will have this ID.
-Guid? browserWorkspaceId = context.Store.Dispatch(new AddWorkspaceTransform("Browser")).ValueOrDefault;
+Guid browserWorkspaceId = context.Store.Dispatch(new AddWorkspaceTransform("Browser")).Value;
 
 context.CommandManager.Add("move_window_to_browser_workspace", "Move window to browser workspace", () =>
 {
@@ -88,7 +88,7 @@ context.CommandManager.Add("move_window_to_browser_workspace", "Move window to b
 The following command can be used to activate a workspace on a specific monitor without focusing the workspace you are activating. In this example, I am activating a specific workspace on the 3rd monitor.
 
 ```csharp
-Guid? browserWorkspaceId = context.Store.Dispatch(new AddWorkspaceTransform("Browser")).ValueOrDefault;
+Guid browserWorkspaceId = context.Store.Dispatch(new AddWorkspaceTransform("Browser")).Value;
 
 context.CommandManager.Add(
     identifier: "activate_browser_workspace_on_monitor_3_no_focus",
@@ -97,7 +97,7 @@ context.CommandManager.Add(
     {
         if (browserWorkspaceId is Guid workspaceId)
         {
-            IMonitor? monitor = context.Store.Pick(Pickers.PickMonitorByIndex(2)).ValueOrDefault;
+            IMonitor monitor = context.Store.Pick(Pickers.PickMonitorByIndex(2)).Value;
             if (monitor is null)
             {
                 return;

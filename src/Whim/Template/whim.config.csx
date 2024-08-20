@@ -100,10 +100,10 @@ void DoConfig(IContext context)
 	context.PluginManager.AddPlugin(updaterPlugin);
 
 	// Set up workspaces.
-	Guid? firstWorkspace = context.Store.Dispatch(new AddWorkspaceTransform("1")).ValueOrDefault;
-	Guid? secondWorkspace = context.Store.Dispatch(new AddWorkspaceTransform("2")).ValueOrDefault;
-	Guid? thirdWorkspace = context.Store.Dispatch(new AddWorkspaceTransform("3")).ValueOrDefault;
-	Guid? fourthWorkspace = context.Store.Dispatch(new AddWorkspaceTransform("4")).ValueOrDefault;
+	Guid firstWorkspace = context.Store.Dispatch(new AddWorkspaceTransform("1")).Value;
+	Guid secondWorkspace = context.Store.Dispatch(new AddWorkspaceTransform("2")).Value;
+	Guid thirdWorkspace = context.Store.Dispatch(new AddWorkspaceTransform("3")).Value;
+	Guid fourthWorkspace = context.Store.Dispatch(new AddWorkspaceTransform("4")).Value;
 
 	// Set up layout engines.
 	context.Store.Dispatch(

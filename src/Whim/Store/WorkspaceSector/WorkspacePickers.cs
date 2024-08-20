@@ -6,13 +6,19 @@ public static partial class Pickers
 	/// Get the workspace with the provided <paramref name="workspaceId"/>.
 	/// </summary>
 	/// <param name="workspaceId"></param>
+	/// <returns>
+	/// The workspace with the provided <paramref name="workspaceId"/>, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// If the workspace is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// </returns>
 	public static PurePicker<Result<IWorkspace>> PickWorkspaceById(WorkspaceId workspaceId) =>
 		(IRootSector rootSector) => BaseWorkspacePicker(workspaceId, rootSector, workspace => workspace);
 
 	/// <summary>
 	/// Get all workspaces.
 	/// </summary>
-	/// <returns></returns>
+	/// <returns>
+	/// All workspaces, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// </returns>
 	public static PurePicker<IEnumerable<IWorkspace>> PickAllWorkspaces() =>
 		static (IRootSector rootSector) => GetAllActiveWorkspaces(rootSector.WorkspaceSector);
 
@@ -28,6 +34,10 @@ public static partial class Pickers
 	/// Get the workspace with the provided <paramref name="name"/>.
 	/// </summary>
 	/// <param name="name"></param>
+	/// <returns>
+	/// The workspace with the provided <paramref name="name"/>, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// If the workspace is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// </returns>
 	public static PurePicker<Result<IWorkspace>> PickWorkspaceByName(string name) =>
 		(IRootSector rootSector) =>
 		{
@@ -49,7 +59,6 @@ public static partial class Pickers
 	/// <param name="rootSector">The root sector.</param>
 	/// <param name="operation">The operation to determine what to get.</param>
 	/// <typeparam name="TResult">The result.</typeparam>
-	/// <returns></returns>
 	private static Result<TResult> BaseWorkspacePicker<TResult>(
 		WorkspaceId workspaceId,
 		IRootSector rootSector,
@@ -96,7 +105,9 @@ public static partial class Pickers
 	/// <summary>
 	/// Get the active workspace.
 	/// </summary>
-	/// <returns></returns>
+	/// <returns>
+	/// The active workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// </returns>
 	public static PurePicker<IWorkspace> PickActiveWorkspace() =>
 		static (IRootSector rootSector) =>
 			rootSector.WorkspaceSector.Workspaces[
@@ -111,7 +122,9 @@ public static partial class Pickers
 	/// <summary>
 	/// Get the id of the active workspace.
 	/// </summary>
-	/// <returns></returns>
+	/// <returns>
+	/// The id of the active workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// </returns>
 	public static PurePicker<WorkspaceId> PickActiveWorkspaceId() =>
 		static (IRootSector rootSector) =>
 			rootSector.MapSector.MonitorWorkspaceMap[rootSector.MonitorSector.ActiveMonitorHandle];
@@ -120,6 +133,10 @@ public static partial class Pickers
 	/// Get the active layout engine in the provided workspace.
 	/// </summary>
 	/// <param name="workspaceId"></param>
+	/// <returns>
+	/// The active layout engine in the provided workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// If the workspace is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// </returns>
 	public static PurePicker<Result<ILayoutEngine>> PickActiveLayoutEngine(WorkspaceId workspaceId) =>
 		(IRootSector rootSector) =>
 			BaseWorkspacePicker(
@@ -132,6 +149,10 @@ public static partial class Pickers
 	/// Get all the windows in the provided workspace.
 	/// </summary>
 	/// <param name="workspaceId"></param>
+	/// <returns>
+	/// All the windows in the provided workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// If the workspace is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// </returns>
 	public static PurePicker<Result<IEnumerable<IWindow>>> PickAllWindowsInWorkspace(WorkspaceId workspaceId) =>
 		(IRootSector rootSector) =>
 			BaseWorkspacePicker(workspaceId, rootSector, workspace => GetWorkspaceWindows(rootSector, workspace));
@@ -151,6 +172,10 @@ public static partial class Pickers
 	/// Get the last focused window in the provided workspace.
 	/// </summary>
 	/// <param name="workspaceId">The workspace to get the last focused window for. Defaults to the active workspace</param>
+	/// <returns>
+	/// The last focused window in the provided workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// If the workspace is not found or there is no last focused window, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// </returns>
 	public static PurePicker<Result<IWindow>> PickLastFocusedWindow(WorkspaceId workspaceId = default) =>
 		(IRootSector rootSector) =>
 			BaseWorkspacePicker(
@@ -171,7 +196,9 @@ public static partial class Pickers
 	/// Get the last focused window handle in the provided workspace.
 	/// </summary>
 	/// <param name="workspaceId">The workspace to get the last focused window handle for. Defaults to the active workspace</param>
-	/// <returns></returns>
+	/// <returns>
+	/// If the workspace is not found or there is no last focused window, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// </returns>
 	public static PurePicker<Result<HWND>> PickLastFocusedWindowHandle(WorkspaceId workspaceId = default) =>
 		(IRootSector rootSector) =>
 			BaseWorkspacePicker(
@@ -193,6 +220,10 @@ public static partial class Pickers
 	/// </summary>
 	/// <param name="workspaceId">The workspace to get the window position for.</param>
 	/// <param name="windowHandle">The window handle to get the position for.</param>
+	/// <returns>
+	/// The window position in the provided workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// If the workspace is not found or the window is not found in the workspace, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// </returns>
 	public static PurePicker<Result<WindowPosition>> PickWindowPosition(WorkspaceId workspaceId, HWND windowHandle) =>
 		(IRootSector rootSector) =>
 			BaseWorkspacePicker(
@@ -212,7 +243,9 @@ public static partial class Pickers
 	/// <summary>
 	/// Picks the function used to create the default layout engines to add to a workspace.
 	/// </summary>
-	/// <returns></returns>
+	/// <returns>
+	/// The function used to create the default layout engines to add to a workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// </returns>
 	public static PurePicker<Func<CreateLeafLayoutEngine[]>> PickCreateLeafLayoutEngines() =>
 		static (IRootSector rootSector) => rootSector.WorkspaceSector.CreateLayoutEngines;
 }

@@ -6,9 +6,9 @@ The <xref:Whim.SetCreateLayoutEnginesTransform> lets you specify the default lay
 
 ```csharp
 // Set up workspaces.
-context.Store.Dispatch(new AddWorkspaceTransform("Browser"));
-context.Store.Dispatch(new AddWorkspaceTransform("IDE"));
-context.Store.Dispatch(new AddWorkspaceTransform("Alt"));
+Guid browserWorkspaceId = context.Store.Dispatch(new AddWorkspaceTransform("Browser")).Value;
+Guid ideWorkspaceId = context.Store.Dispatch(new AddWorkspaceTransform("IDE")).Value;
+Guid altWorkspaceId = context.Store.Dispatch(new AddWorkspaceTransform("Alt")).Value;
 
 // Set up layout engines.
 context.Store.Dispatch(
@@ -42,5 +42,20 @@ If no name is provided, the name will default to `Workspace {workspaces.Count + 
 
 When Whim exits, it will save the current workspaces and the current positions of each window within them. When Whim is started again, it will attempt to merge the saved workspaces with the workspaces defined in the config.
 
-> [!NOTE]
-> Whim does not support Windows' native "virtual" desktops, as they lack the ability to activate "desktops" independently of monitors.
+## Example Command
+
+```csharp
+Guid browserWorkspaceId = context.Store.Dispatch(new AddWorkspaceTransform("Browser")).Value;
+Guid ideWorkspaceId = context.Store.Dispatch(new AddWorkspaceTransform("IDE")).Value;
+
+context.CommandManager.Add(
+    "merge_workspace_with_browser",
+    "Merge current workspace with Browser workspace",
+    () => {
+        Guid activeWorkspaceId = context.Store.Pick(Pickers.PickActiveWorkspaceId());
+        context.Store.Dispatch(new MergeWorkspaceTransform(activeWorkspaceId, browserWorkspaceId));
+    }
+);
+```
+
+For more, see the [Store](./store.md) and [Commands](./commands.md) pages.
