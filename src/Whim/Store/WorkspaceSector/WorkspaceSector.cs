@@ -87,6 +87,7 @@ internal class WorkspaceSector(IContext ctx, IInternalContext internalCtx)
 	{
 		Logger.Debug("Doing layout");
 
+		// Force the window to focus to not be minimized.
 		if (WindowHandleToFocus != default)
 		{
 			if (_ctx.Store.Pick(PickWorkspaceByWindow(WindowHandleToFocus)).TryGet(out IWorkspace workspace))
