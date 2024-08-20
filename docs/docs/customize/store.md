@@ -4,22 +4,22 @@ The <xref:Whim.IStore> contains the state of windows, workspaces, and monitors i
 
 ## Pickers and Transforms
 
-To **retrieve values from the store**, use the <xref href="Whim.IStore.Pick``1(Whim.Picker{``0})" /> method. For example:
+To **retrieve values from the store**, pass a "picker" from the <xref:Whim.Pickers> static class to the <xref href="Whim.IStore.Pick``1(Whim.Picker{``0})" /> method. Pickers will typically take in [handles or IDs as arguments](#handles-and-ids).
+
+For example:
 
 ```csharp
 IMonitor primaryMonitor = context.Store.Pick(Pickers.PickPrimaryMonitor());
 IMonitor thirdMonitor = context.Store.Pick(Pickers.PickMonitorByIndex(2)).Value;
 ```
 
-Pickers will typically take in [handles or IDs as arguments](#handles-and-ids). Pickers can be found in the <xref:Whim.Pickers> static class.
+To **update Whim's state**, pass a "transform" to the <xref href="Whim.IStore.Dispatch``1(Whim.Transform{``0})" /> method. Transforms can be found in the API documentation for the <xref:Whim> namespace.
 
-To **update Whim's state**, use the <xref href="Whim.IStore.Dispatch``1(Whim.Transform{``0})" /> method. For example:
+For example:
 
 ```csharp
 context.Store.Dispatch(new ActivateWorkspaceTransform(workspaceId, monitor.Handle));
 ```
-
-Transforms can be found in the API documentation for the <xref:Whim> namespace.
 
 As an example of using pickers and transforms together:
 
