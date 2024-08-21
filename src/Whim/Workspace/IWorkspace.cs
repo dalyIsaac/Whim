@@ -93,6 +93,7 @@ public interface IWorkspace : IDisposable
 	/// <summary>
 	/// Trigger a layout.
 	/// </summary>
+	[Obsolete("Use DoWorkspaceLayoutTransform instead.")]
 	void DoLayout();
 	#endregion
 
@@ -109,6 +110,7 @@ public interface IWorkspace : IDisposable
 	///
 	/// To focus the last focused window, use <see cref="FocusLastFocusedWindow"/>.
 	/// </summary>
+	[Obsolete("Use the picker PickLastFocusedWindow instead.")]
 	IWindow? LastFocusedWindow { get; }
 
 	/// <summary>
@@ -122,6 +124,7 @@ public interface IWorkspace : IDisposable
 	/// </remarks>
 	/// <param name="window"></param>
 	/// <returns>Whether the <paramref name="window"/> was added.</returns>
+	[Obsolete("Use AddWindowToWorkspaceTransform instead.")]
 	bool AddWindow(IWindow window);
 
 	/// <summary>
@@ -135,6 +138,7 @@ public interface IWorkspace : IDisposable
 	/// </remarks>
 	/// <param name="window"></param>
 	/// <returns>True when the window was removed.</returns>
+	[Obsolete("Use RemoveWindowFromWorkspaceTransform instead.")]
 	bool RemoveWindow(IWindow window);
 
 	/// <summary>
@@ -147,6 +151,7 @@ public interface IWorkspace : IDisposable
 	/// <summary>
 	/// Deactivates the workspace.
 	/// </summary>
+	[Obsolete("This method will be removed in the future, and there is no planned replacement.")]
 	void Deactivate();
 
 	/// <summary>
@@ -163,6 +168,7 @@ public interface IWorkspace : IDisposable
 	/// If <see cref="LastFocusedWindow"/> is not <see langword="null"/> or not minimized, then we focus the
 	/// last window in the workspace.
 	/// </summary>
+	[Obsolete("Use FocusWindowTransform instead.")]
 	void FocusLastFocusedWindow();
 
 	/// <summary>
@@ -178,6 +184,7 @@ public interface IWorkspace : IDisposable
 	/// <returns>
 	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
 	/// </returns>
+	[Obsolete("Use FocusWindowInDirectionTransform instead.")]
 	bool FocusWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false);
 
 	/// <summary>
@@ -193,6 +200,7 @@ public interface IWorkspace : IDisposable
 	/// <returns>
 	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
 	/// </returns>
+	[Obsolete("Use SwapWindowInDirectionTransform instead.")]
 	bool SwapWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false);
 
 	/// <summary>
@@ -216,6 +224,9 @@ public interface IWorkspace : IDisposable
 	/// <returns>
 	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
 	/// </returns>
+	[Obsolete(
+		"Use MoveWindowEdgesInDirectionTransform instead - note that the coordinate space for deltas is different."
+	)]
 	bool MoveWindowEdgesInDirection(
 		Direction edges,
 		IPoint<double> deltas,
@@ -235,6 +246,7 @@ public interface IWorkspace : IDisposable
 	/// <returns>
 	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
 	/// </returns>
+	[Obsolete("Use MoveWindowToPointTransform instead - note that the coordinate space for the point is different.")]
 	bool MoveWindowToPoint(IWindow window, IPoint<double> point, bool deferLayout = false);
 	#endregion
 
@@ -251,6 +263,7 @@ public interface IWorkspace : IDisposable
 	/// <see cref="DoLayout"/> is not called in this method.
 	/// </remarks>
 	/// <param name="window"></param>
+	[Obsolete("Use window.ShowMinimized() instead.")]
 	void MinimizeWindowStart(IWindow window);
 
 	/// <summary>
@@ -267,6 +280,7 @@ public interface IWorkspace : IDisposable
 	/// </remarks>
 	/// <param name="window"></param>
 	/// <returns></returns>
+	[Obsolete("Use window.ShowNormal() instead.")]
 	void MinimizeWindowEnd(IWindow window);
 
 	#region PerformCustomLayoutEngineAction
@@ -283,6 +297,7 @@ public interface IWorkspace : IDisposable
 	/// <returns>
 	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
 	/// </returns>
+	[Obsolete("Use LayoutEngineCustomActionTransform instead.")]
 	bool PerformCustomLayoutEngineAction(LayoutEngineCustomAction action);
 
 	/// <summary>
@@ -301,6 +316,7 @@ public interface IWorkspace : IDisposable
 	/// <returns>
 	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
 	/// </returns>
+	[Obsolete("Use LayoutEngineCustomActionWithPayloadTransform instead.")]
 	bool PerformCustomLayoutEngineAction<T>(LayoutEngineCustomAction<T> action);
 	#endregion
 }
