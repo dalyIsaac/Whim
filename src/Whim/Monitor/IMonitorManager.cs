@@ -3,6 +3,7 @@ namespace Whim;
 /// <summary>
 /// The manager for <see cref="IMonitor"/>s.
 /// </summary>
+[Obsolete("Use transforms and pickers to interact with the store instead.")]
 public interface IMonitorManager : IEnumerable<IMonitor>, IDisposable
 {
 	/// <summary>

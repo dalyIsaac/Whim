@@ -7,6 +7,7 @@ namespace Whim;
 /// To activate a workspace, or change the mapping between workspaces and monitors, use the
 /// <see cref="IButler"/>.
 /// </summary>
+[Obsolete("Use transforms and pickers to interact with the store instead.")]
 public interface IWorkspaceManager : IEnumerable<IWorkspace>, IDisposable
 {
 	/// <summary>

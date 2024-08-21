@@ -3,6 +3,7 @@ namespace Whim;
 /// <summary>
 /// The manager for <see cref="IWindow"/>s.
 /// </summary>
+[Obsolete("Use transforms and pickers to interact with the store instead.")]
 public interface IWindowManager : IEnumerable<IWindow>, IDisposable
 {
 	/// <summary>

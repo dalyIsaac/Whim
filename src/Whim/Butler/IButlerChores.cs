@@ -3,6 +3,7 @@ namespace Whim;
 /// <summary>
 /// Manage the movement of <see cref="IWindow"/>s between <see cref="IWorkspace"/>s and <see cref="IMonitor"/>s.
 /// </summary>
+[Obsolete("Use transforms and pickers to interact with the store instead.")]
 public interface IButlerChores
 {
 	/// <summary>

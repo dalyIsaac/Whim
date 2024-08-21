@@ -5,6 +5,7 @@ namespace Whim;
 /// to handle events from the <see cref="IWindowManager"/> to update the assignment of <see cref="IWindow"/>s
 /// to <see cref="IWorkspace"/>s, and <see cref="IWorkspace"/>s to <see cref="IMonitor"/>s.
 /// </summary>
+[Obsolete("Use transforms and pickers to interact with the store instead.")]
 public interface IButler : IButlerChores, IDisposable
 {
 	/// <summary>
