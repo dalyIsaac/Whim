@@ -53,12 +53,14 @@ public interface IWorkspace : IDisposable
 	/// The name of the workspace. When the <c>Name</c> is set, the
 	/// <see cref="IWorkspaceManager.WorkspaceRenamed"/> event is triggered.
 	/// </summary>
+	[Obsolete("Use the picker PickWorkspaceName or SetWorkspaceNameTransform instead.")]
 	string Name { get; set; }
 
 	#region Layout engine
 	/// <summary>
 	/// The active layout engine.
 	/// </summary>
+	[Obsolete("Use the picker PickActiveLayoutEngine instead.")]
 	ILayoutEngine ActiveLayoutEngine { get; }
 
 	/// <summary>
@@ -68,6 +70,7 @@ public interface IWorkspace : IDisposable
 	/// <returns>
 	/// <see langword="true"/> if the layout engine is the one specified by <paramref name="nextIdx"/>.
 	/// </returns>
+	[Obsolete("Use SetLayoutEngineFromIndexTransform instead.")]
 	bool TrySetLayoutEngineFromIndex(int nextIdx);
 
 	/// <summary>
@@ -76,11 +79,13 @@ public interface IWorkspace : IDisposable
 	/// <param name="reverse">
 	/// When <see langword="true"/>, activate the previous layout, otherwise activate the next layout. Defaults to <see langword="false" />.
 	/// </param>
+	[Obsolete("Use CycleLayoutEngineTransform instead.")]
 	void CycleLayoutEngine(bool reverse = false);
 
 	/// <summary>
 	/// Activates previously active layout engine.
 	/// </summary>
+	[Obsolete("Use ActivatePreviouslyActiveLayoutEngineTransform instead.")]
 	void ActivatePreviouslyActiveLayoutEngine();
 
 	/// <summary>
@@ -88,6 +93,7 @@ public interface IWorkspace : IDisposable
 	/// </summary>
 	/// <param name="name">The name of the layout engine to make active.</param>
 	/// <returns></returns>
+	[Obsolete("Use SetLayoutEngineFromNameTransform instead.")]
 	bool TrySetLayoutEngineFromName(string name);
 
 	/// <summary>
@@ -101,6 +107,7 @@ public interface IWorkspace : IDisposable
 	/// <summary>
 	/// The windows in the workspace.
 	/// </summary>
+	[Obsolete("Use the picker PickWorkspaceWindows instead.")]
 	IEnumerable<IWindow> Windows { get; }
 
 	/// <summary>
@@ -146,6 +153,7 @@ public interface IWorkspace : IDisposable
 	/// </summary>
 	/// <param name="window">The window to check for.</param>
 	/// <returns>True when the workspace contains the provided <paramref name="window"/>.</returns>
+	[Obsolete("Use the picker PickWorkspaceWindows instead, and do a membership check instead.")]
 	bool ContainsWindow(IWindow window);
 
 	/// <summary>
@@ -162,6 +170,7 @@ public interface IWorkspace : IDisposable
 	/// If the window is not in the workspace, or the workspace is not active,
 	/// <c>null</c> is returned.
 	/// </returns>
+	[Obsolete("Use the picker PickWindowPosition instead.")]
 	IWindowState? TryGetWindowState(IWindow window);
 
 	/// <summary>

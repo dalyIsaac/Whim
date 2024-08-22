@@ -19,7 +19,7 @@ public static partial class Pickers
 	/// <returns>
 	/// All workspaces, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
 	/// </returns>
-	public static PurePicker<IEnumerable<IWorkspace>> PickAllWorkspaces() =>
+	public static PurePicker<IEnumerable<IWorkspace>> PickWorkspaces() =>
 		static (IRootSector rootSector) => GetAllActiveWorkspaces(rootSector.WorkspaceSector);
 
 	private static IEnumerable<IWorkspace> GetAllActiveWorkspaces(IWorkspaceSector workspaceSector)
@@ -153,7 +153,7 @@ public static partial class Pickers
 	/// All the windows in the provided workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
 	/// If the workspace is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
 	/// </returns>
-	public static PurePicker<Result<IEnumerable<IWindow>>> PickAllWindowsInWorkspace(WorkspaceId workspaceId) =>
+	public static PurePicker<Result<IEnumerable<IWindow>>> PickWorkspaceWindows(WorkspaceId workspaceId) =>
 		(IRootSector rootSector) =>
 			BaseWorkspacePicker(workspaceId, rootSector, workspace => GetWorkspaceWindows(rootSector, workspace));
 

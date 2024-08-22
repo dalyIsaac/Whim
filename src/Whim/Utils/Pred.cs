@@ -12,10 +12,13 @@ namespace Whim;
 /// <param name="idx">
 /// The index of the object.
 /// </param>
+/// <param name="ctx">
+/// The context.
+/// </param>
 /// <returns>
 /// Whether the object should be considered.
 /// </returns>
-public delegate bool Pred<in T>(T obj, int idx);
+public delegate bool Pred<in T>(T obj, int idx, IContext ctx);
 
 /// <summary>
 /// Extensions for <see cref="Pred{T}"/>
@@ -28,14 +31,15 @@ public static class PredExtensions
 	/// <typeparam name="T"></typeparam>
 	/// <param name="enumerable"></param>
 	/// <param name="pred"></param>
+	/// <param name="ctx"></param>
 	/// <returns></returns>
-	public static int GetMatchingIndex<T>(this IEnumerable<T> enumerable, Pred<T> pred)
+	public static int GetMatchingIndex<T>(this IEnumerable<T> enumerable, Pred<T> pred, IContext ctx)
 	{
 		int idx = 0;
 
 		foreach (T obj in enumerable)
 		{
-			if (pred(obj, idx))
+			if (pred(obj, idx, ctx))
 			{
 				return idx;
 			}

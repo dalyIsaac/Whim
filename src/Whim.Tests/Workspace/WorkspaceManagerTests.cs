@@ -109,7 +109,7 @@ public class WorkspaceManagerTests
 		var _ = sut.Contains(Substitute.For<IWorkspace>());
 
 		// Then
-		ctx.Store.Received(1).Pick(Pickers.PickAllWorkspaces());
+		ctx.Store.Received(1).Pick(Pickers.PickWorkspaces());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -123,7 +123,7 @@ public class WorkspaceManagerTests
 		((IEnumerable)sut).GetEnumerator();
 
 		// Then
-		ctx.Store.Received(2).Pick(Pickers.PickAllWorkspaces());
+		ctx.Store.Received(2).Pick(Pickers.PickWorkspaces());
 	}
 
 	[Theory, AutoSubstituteData]

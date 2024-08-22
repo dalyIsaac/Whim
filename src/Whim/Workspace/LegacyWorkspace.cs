@@ -28,7 +28,7 @@ public partial record Workspace : IInternalWorkspace
 	public ILayoutEngine ActiveLayoutEngine => _context.Store.Pick(PickActiveLayoutEngine(Id)).Value!;
 
 	/// <inheritdoc/>
-	public IEnumerable<IWindow> Windows => _context.Store.Pick(PickAllWindowsInWorkspace(Id)).Value!;
+	public IEnumerable<IWindow> Windows => _context.Store.Pick(PickWorkspaceWindows(Id)).Value!;
 
 	internal Workspace(IContext context, WorkspaceId id)
 	{
@@ -58,7 +58,7 @@ public partial record Workspace : IInternalWorkspace
 
 	/// <inheritdoc/>
 	public bool TrySetLayoutEngineFromIndex(int nextIdx) =>
-		_context.Store.Dispatch(new ActivateLayoutEngineTransform(Id, (_, idx) => idx == nextIdx)).IsSuccessful;
+		_context.Store.Dispatch(new SetLayoutEngineFromIndexTransform(Id, nextIdx)).IsSuccessful;
 
 	/// <inheritdoc/>
 	public void CycleLayoutEngine(bool reverse = false) =>
@@ -66,13 +66,11 @@ public partial record Workspace : IInternalWorkspace
 
 	/// <inheritdoc/>
 	public void ActivatePreviouslyActiveLayoutEngine() =>
-		_context.Store.Dispatch(
-			new ActivateLayoutEngineTransform(Id, (_, idx) => idx == LatestWorkspace.PreviousLayoutEngineIndex)
-		);
+		_context.Store.Dispatch(new ActivatePreviouslyActiveLayoutEngineTransform(Id));
 
 	/// <inheritdoc/>
 	public bool TrySetLayoutEngineFromName(string name) =>
-		_context.Store.Dispatch(new ActivateLayoutEngineTransform(Id, (l, _) => l.Name == name)).IsSuccessful;
+		_context.Store.Dispatch(new SetLayoutEngineFromNameTransform(Id, name)).IsSuccessful;
 
 	/// <inheritdoc/>
 	public bool AddWindow(IWindow window) =>
@@ -120,7 +118,7 @@ public partial record Workspace : IInternalWorkspace
 	/// <inheritdoc/>
 	public IWindowState? TryGetWindowState(IWindow window)
 	{
-		if (WindowPositions.TryGetValue(window.Handle, out WindowPosition? pos))
+		if (_context.Store.Pick(PickWindowPosition(Id, window.Handle)).TryGet(out WindowPosition pos))
 		{
 			return new WindowState
 			{
@@ -137,7 +135,7 @@ public partial record Workspace : IInternalWorkspace
 	public void DoLayout() => _context.Store.Dispatch(new DoWorkspaceLayoutTransform(Id));
 
 	/// <inheritdoc/>
-	public bool ContainsWindow(IWindow window) => LatestWorkspace.WindowPositions.ContainsKey(window.Handle);
+	public bool ContainsWindow(IWindow window) => _context.Store.Pick(PickWorkspaceWindows(Id)).Value.Contains(window);
 
 	/// <inheritdoc/>
 	public bool PerformCustomLayoutEngineAction(LayoutEngineCustomAction action) =>

@@ -5,7 +5,7 @@ namespace Whim;
 /// </summary>
 /// <param name="WorkspaceId"></param>
 /// <param name="Window"></param>
-internal record AddWindowToWorkspaceTransform(WorkspaceId WorkspaceId, IWindow Window)
+public record AddWindowToWorkspaceTransform(WorkspaceId WorkspaceId, IWindow Window)
 	: BaseWorkspaceTransform(WorkspaceId)
 {
 	private protected override Result<Workspace> WorkspaceOperation(
