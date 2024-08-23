@@ -14,6 +14,7 @@ public interface IButler : IButlerChores, IDisposable
 	///
 	/// Defaults to <see cref="ButlerPantry"/>.
 	/// </summary>
+	[Obsolete("Use transforms and pickers to interact with the store instead.")]
 	IButlerPantry Pantry { get; }
 
 	/// <summary>
@@ -24,10 +25,12 @@ public interface IButler : IButlerChores, IDisposable
 	/// <summary>
 	/// Description of how an <see cref="IWindow"/> has been routed between workspaces.
 	/// </summary>
+	[Obsolete("Use the IStore.MapEvents.WindowRouted event instead.")]
 	event EventHandler<RouteEventArgs>? WindowRouted;
 
 	/// <summary>
 	/// Event for when a monitor's workspace has changed.
 	/// </summary>
+	[Obsolete("Use the IStore.MapEvents.MonitorWorkspaceChanged event instead.")]
 	event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
 }
