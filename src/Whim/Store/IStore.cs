@@ -42,7 +42,7 @@ public interface IStore : IDisposable
 	/// <example>
 	/// If you want to get the full result and handle it appropriately:
 	/// <code>
-	/// Result&lt;Guid:gt; firstWorkspace = context.Store.Dispatch(new AddWorkspaceTransform("First Workspace"));
+	/// Result&lt;Guid&gt; firstWorkspace = context.Store.Dispatch(new AddWorkspaceTransform("First Workspace"));
 	/// </code>
 	///
 	/// If you want to assume the result is successful and get the value (this will throw an exception
