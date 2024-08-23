@@ -54,7 +54,7 @@ public partial record Workspace : IInternalWorkspace
 		_context.Store.Dispatch(new MinimizeWindowEndTransform(Id, window.Handle));
 
 	/// <inheritdoc/>
-	public void FocusLastFocusedWindow() => _context.Store.Dispatch(new FocusWindowTransform(LastFocusedWindowHandle));
+	public void FocusLastFocusedWindow() => _context.Store.Dispatch(new FocusWorkspaceTransform(Id));
 
 	/// <inheritdoc/>
 	public bool TrySetLayoutEngineFromIndex(int nextIdx) =>
@@ -82,12 +82,12 @@ public partial record Workspace : IInternalWorkspace
 
 	/// <inheritdoc/>
 	public bool FocusWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false) =>
-		_context.Store.Dispatch(new FocusWindowInDirectionTransform(Id, direction)).TryGet(out bool isChanged)
+		_context.Store.Dispatch(new FocusWindowInDirectionTransform(Id, direction, window?.Handle ?? default)).TryGet(out bool isChanged)
 		&& isChanged;
 
 	/// <inheritdoc/>
 	public bool SwapWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false) =>
-		_context.Store.Dispatch(new SwapWindowInDirectionTransform(Id, direction)).TryGet(out bool isChanged)
+		_context.Store.Dispatch(new SwapWindowInDirectionTransform(Id, direction, window?.Handle ?? default)).TryGet(out bool isChanged)
 		&& isChanged;
 
 	/// <inheritdoc/>

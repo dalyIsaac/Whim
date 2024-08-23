@@ -143,7 +143,7 @@ public class LegacyWorkspaceTests
 		workspace.FocusLastFocusedWindow();
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new FocusWindowTransform(workspace.Id));
+		ctx.Store.Received(1).Dispatch(new FocusWorkspaceTransform(workspace.Id));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -238,7 +238,7 @@ public class LegacyWorkspaceTests
 
 		// Then
 		ctx.Store.Received(1)
-			.Dispatch(new FocusWindowInDirectionTransform(workspace.Id, window.Handle, Direction.Left));
+			.Dispatch(new FocusWindowInDirectionTransform(workspace.Id, Direction.Left, window.Handle));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -253,7 +253,7 @@ public class LegacyWorkspaceTests
 
 		// Then
 		ctx.Store.Received(1)
-			.Dispatch(new SwapWindowInDirectionTransform(workspace.Id, window.Handle, Direction.Left));
+			.Dispatch(new SwapWindowInDirectionTransform(workspace.Id, Direction.Left, window.Handle));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -329,6 +329,7 @@ public class LegacyWorkspaceTests
 		// Given
 		Workspace workspace = CreateWorkspace(ctx);
 		IWindow window = CreateWindow((HWND)1);
+		ctx.Store.Pick(Arg.Any<PurePicker<Result<WindowPosition>>>()).Returns(Result.FromException<WindowPosition>(StoreExceptions.WindowNotFoundInWorkspace(window.Handle, workspace.Id)));
 
 		// When
 		IWindowState? result = workspace.TryGetWindowState(window);

@@ -236,7 +236,7 @@ public static partial class Pickers
 						return position;
 					}
 
-					return Result.FromException<WindowPosition>(new WhimException("Window not found in workspace"));
+					return Result.FromException<WindowPosition>(StoreExceptions.WindowNotFoundInWorkspace(windowHandle, workspaceId));
 				}
 			);
 
