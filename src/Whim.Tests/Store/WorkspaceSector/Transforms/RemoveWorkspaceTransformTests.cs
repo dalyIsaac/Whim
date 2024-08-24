@@ -37,7 +37,7 @@ public class RemoveWorkspaceTransformTests
 			CreateMonitor((HMONITOR)1),
 			CreateWorkspace(ctx) with
 			{
-				BackingName = "Test"
+				BackingName = "Test",
 			}
 		);
 		AddWorkspacesToManager(ctx, root, providedWorkspace);
@@ -63,7 +63,7 @@ public class RemoveWorkspaceTransformTests
 			CreateMonitor((HMONITOR)1),
 			CreateWorkspace(ctx) with
 			{
-				BackingName = "Test"
+				BackingName = "Test",
 			}
 		);
 		AddWorkspacesToManager(ctx, root, providedWorkspace);

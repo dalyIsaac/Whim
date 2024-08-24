@@ -38,7 +38,7 @@ public class CommandPaletteCommands : PluginCommands
 							Callback = (text) => _context.WorkspaceManager.ActiveWorkspace.Name = text,
 							Hint = "Enter new workspace name",
 							InitialText = _context.WorkspaceManager.ActiveWorkspace.Name,
-							Prompt = "Rename workspace"
+							Prompt = "Rename workspace",
 						}
 					)
 			)
@@ -51,7 +51,7 @@ public class CommandPaletteCommands : PluginCommands
 						{
 							Callback = (name) => _context.WorkspaceManager.Add(name),
 							Hint = "Enter new workspace name",
-							Prompt = "Create workspace"
+							Prompt = "Create workspace",
 						}
 					)
 			)
@@ -84,7 +84,7 @@ public class CommandPaletteCommands : PluginCommands
 						{
 							Hint = "Select windows",
 							Options = CreateMoveWindowsToWorkspaceOptions(),
-							Callback = MoveMultipleWindowsToWorkspaceCallback
+							Callback = MoveMultipleWindowsToWorkspaceCallback,
 						}
 					)
 			)
@@ -99,7 +99,7 @@ public class CommandPaletteCommands : PluginCommands
 							Commands = _context.WorkspaceManager.ActiveWorkspace.Windows.Select(w =>
 								RemoveWindowCommandCreator(w)
 							),
-							ConfirmButtonText = "Remove"
+							ConfirmButtonText = "Remove",
 						}
 					)
 			)
@@ -114,7 +114,7 @@ public class CommandPaletteCommands : PluginCommands
 							ConfirmButtonText = "Focus",
 							Commands = _context
 								.WorkspaceManager.SelectMany(w => w.Windows)
-								.Select(w => FocusWindowCommandCreator(w))
+								.Select(w => FocusWindowCommandCreator(w)),
 						}
 					)
 			);
@@ -143,7 +143,7 @@ public class CommandPaletteCommands : PluginCommands
 			{
 				Hint = "Select workspace",
 				Commands = items,
-				ConfirmButtonText = "Activate"
+				ConfirmButtonText = "Activate",
 			}
 		);
 	}
@@ -165,7 +165,7 @@ public class CommandPaletteCommands : PluginCommands
 				Id = $"{PluginName}.move_multiple_windows_to_workspace.{w.Title}",
 				Title = w.Title,
 				IsEnabled = true,
-				IsSelected = false
+				IsSelected = false,
 			})
 			.ToArray();
 	}

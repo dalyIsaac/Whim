@@ -46,7 +46,7 @@ void DoConfig(IContext context)
 		{
 			BatteryWidget.CreateComponent(),
 			ActiveLayoutWidget.CreateComponent(),
-			DateTimeWidget.CreateComponent()
+			DateTimeWidget.CreateComponent(),
 		};
 
 	BarConfig barConfig = new(leftComponents, centerComponents, rightComponents);
@@ -116,7 +116,7 @@ void DoConfig(IContext context)
 					(id) => SliceLayouts.CreateSecondaryPrimaryLayout(context, sliceLayoutPlugin, id),
 					(id) => new FocusLayoutEngine(id),
 					(id) => new TreeLayoutEngine(context, treeLayoutPlugin, id),
-					(id) => new FloatingLayoutEngine(context, id)
+					(id) => new FloatingLayoutEngine(context, id),
 				}
 		)
 	);

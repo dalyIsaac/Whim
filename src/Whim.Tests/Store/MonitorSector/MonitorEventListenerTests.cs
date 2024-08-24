@@ -14,8 +14,8 @@ public class MonitorEventListenerTests
 				HWnd = (HWND)1,
 				LParam = (LPARAM)1,
 				UMsg = 1,
-				WParam = (WPARAM)1
-			}
+				WParam = (WPARAM)1,
+			},
 		};
 
 	[Theory, AutoSubstituteData]

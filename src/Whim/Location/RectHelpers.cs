@@ -16,6 +16,6 @@ internal static class RectHelpers
 			X = rect.left,
 			Y = rect.top,
 			Width = rect.right - rect.left,
-			Height = rect.bottom - rect.top
+			Height = rect.bottom - rect.top,
 		};
 }

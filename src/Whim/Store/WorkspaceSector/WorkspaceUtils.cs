@@ -27,7 +27,7 @@ internal static class WorkspaceUtils
 			{
 				Workspace = workspace,
 				PreviousLayoutEngine = workspace.LayoutEngines[previousLayoutEngineIdx],
-				CurrentLayoutEngine = workspace.LayoutEngines[layoutEngineIdx]
+				CurrentLayoutEngine = workspace.LayoutEngines[layoutEngineIdx],
 			}
 		);
 

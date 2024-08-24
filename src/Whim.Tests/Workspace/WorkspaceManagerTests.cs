@@ -180,7 +180,7 @@ public class WorkspaceManagerTests
 			() =>
 				ctx.Store.WorkspaceEvents.WorkspaceAdded += Raise.Event<EventHandler<WorkspaceAddedEventArgs>>(
 					ctx.Store,
-					new WorkspaceAddedEventArgs() { Workspace = Substitute.For<IWorkspace>(), }
+					new WorkspaceAddedEventArgs() { Workspace = Substitute.For<IWorkspace>() }
 				)
 		);
 	}
@@ -199,7 +199,7 @@ public class WorkspaceManagerTests
 			() =>
 				ctx.Store.WorkspaceEvents.WorkspaceRemoved += Raise.Event<EventHandler<WorkspaceRemovedEventArgs>>(
 					ctx.Store,
-					new WorkspaceRemovedEventArgs() { Workspace = Substitute.For<IWorkspace>(), }
+					new WorkspaceRemovedEventArgs() { Workspace = Substitute.For<IWorkspace>() }
 				)
 		);
 	}
@@ -263,7 +263,7 @@ public class WorkspaceManagerTests
 			() =>
 				ctx.Store.WorkspaceEvents.WorkspaceLayoutStarted += Raise.Event<
 					EventHandler<WorkspaceLayoutStartedEventArgs>
-				>(ctx.Store, new WorkspaceLayoutStartedEventArgs() { Workspace = Substitute.For<IWorkspace>(), })
+				>(ctx.Store, new WorkspaceLayoutStartedEventArgs() { Workspace = Substitute.For<IWorkspace>() })
 		);
 	}
 
@@ -281,7 +281,7 @@ public class WorkspaceManagerTests
 			() =>
 				ctx.Store.WorkspaceEvents.WorkspaceLayoutCompleted += Raise.Event<
 					EventHandler<WorkspaceLayoutCompletedEventArgs>
-				>(ctx.Store, new WorkspaceLayoutCompletedEventArgs() { Workspace = Substitute.For<IWorkspace>(), })
+				>(ctx.Store, new WorkspaceLayoutCompletedEventArgs() { Workspace = Substitute.For<IWorkspace>() })
 		);
 	}
 

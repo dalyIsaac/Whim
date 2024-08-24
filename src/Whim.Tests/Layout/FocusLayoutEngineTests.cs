@@ -174,20 +174,20 @@ public class FocusLayoutEngineTests
 			{
 				Window = window1,
 				Rectangle = rectangle,
-				WindowSize = WindowSize.Minimized
+				WindowSize = WindowSize.Minimized,
 			},
 			new WindowState()
 			{
 				Window = window2,
 				Rectangle = rectangle,
-				WindowSize = WindowSize.Minimized
+				WindowSize = WindowSize.Minimized,
 			},
 			new WindowState()
 			{
 				Window = window3,
 				Rectangle = rectangle,
-				WindowSize = WindowSize.Normal
-			}
+				WindowSize = WindowSize.Normal,
+			},
 		];
 
 		expected.Should().BeEquivalentTo(result);
@@ -301,7 +301,7 @@ public class FocusLayoutEngineTests
 			{
 				Name = actionName,
 				Window = null,
-				Payload = null
+				Payload = null,
 			}
 		);
 		IWindowState[] windowStates = result.DoLayout(new Rectangle<int>(), Substitute.For<IMonitor>()).ToArray();
@@ -316,14 +316,14 @@ public class FocusLayoutEngineTests
 			{
 				Window = window1,
 				Rectangle = new Rectangle<int>(),
-				WindowSize = expectedWindowSize
+				WindowSize = expectedWindowSize,
 			},
 			new WindowState()
 			{
 				Window = window2,
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Minimized
-			}
+				WindowSize = WindowSize.Minimized,
+			},
 		];
 
 		expected.Should().BeEquivalentTo(windowStates);
@@ -343,7 +343,7 @@ public class FocusLayoutEngineTests
 			{
 				Name = "Focus.unknown",
 				Window = null,
-				Payload = null
+				Payload = null,
 			}
 		);
 
@@ -427,14 +427,14 @@ public class FocusLayoutEngineTests
 			{
 				Window = windows[0],
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Minimized
+				WindowSize = WindowSize.Minimized,
 			},
 			new WindowState()
 			{
 				Window = windows[1],
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Minimized
-			}
+				WindowSize = WindowSize.Minimized,
+			},
 		}
 			.Should()
 			.BeEquivalentTo(windowStates);
@@ -459,8 +459,8 @@ public class FocusLayoutEngineTests
 			{
 				Window = newWindow,
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Minimized
-			}
+				WindowSize = WindowSize.Minimized,
+			},
 		}
 			.Should()
 			.BeEquivalentTo(windowStates);
@@ -488,20 +488,20 @@ public class FocusLayoutEngineTests
 			{
 				Window = windows[0],
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Minimized
+				WindowSize = WindowSize.Minimized,
 			},
 			new WindowState()
 			{
 				Window = windows[1],
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
 				Window = newWindow,
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Minimized
-			}
+				WindowSize = WindowSize.Minimized,
+			},
 		}
 			.Should()
 			.BeEquivalentTo(windowStates);
@@ -529,14 +529,14 @@ public class FocusLayoutEngineTests
 			{
 				Window = windows[0],
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Minimized
+				WindowSize = WindowSize.Minimized,
 			},
 			new WindowState()
 			{
 				Window = windows[1],
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Normal
-			}
+				WindowSize = WindowSize.Normal,
+			},
 		}
 			.Should()
 			.BeEquivalentTo(windowStates);
@@ -566,20 +566,20 @@ public class FocusLayoutEngineTests
 			{
 				Window = windows[0],
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
 				Window = windows[1],
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Minimized
+				WindowSize = WindowSize.Minimized,
 			},
 			new WindowState()
 			{
 				Window = newWindow,
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Minimized
-			}
+				WindowSize = WindowSize.Minimized,
+			},
 		}
 			.Should()
 			.BeEquivalentTo(windowStates);
@@ -607,14 +607,14 @@ public class FocusLayoutEngineTests
 			{
 				Window = windows[0],
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
 				Window = windows[1],
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Minimized
-			}
+				WindowSize = WindowSize.Minimized,
+			},
 		}
 			.Should()
 			.BeEquivalentTo(windowStates);

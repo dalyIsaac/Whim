@@ -26,7 +26,7 @@ public class MonitorUtilsTests
 				left = 1920,
 				top = 0,
 				right = 3840,
-				bottom = 1080
+				bottom = 1080,
 			},
 			(HMONITOR)1
 		),
@@ -37,7 +37,7 @@ public class MonitorUtilsTests
 				left = 0,
 				top = 0,
 				right = 1920,
-				bottom = 1080
+				bottom = 1080,
 			},
 			(HMONITOR)2
 		),
@@ -48,7 +48,7 @@ public class MonitorUtilsTests
 				left = 0,
 				top = 1080,
 				right = 1920,
-				bottom = 2160
+				bottom = 2160,
 			},
 			(HMONITOR)3
 		),

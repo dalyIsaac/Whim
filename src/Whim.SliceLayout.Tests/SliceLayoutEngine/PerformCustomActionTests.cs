@@ -31,7 +31,7 @@ public class PerformCustomActionTests
 			{
 				Name = "whim.slice_layout.window.promote",
 				Window = untrackedWindow,
-				Payload = untrackedWindow
+				Payload = untrackedWindow,
 			}
 		);
 
@@ -51,7 +51,7 @@ public class PerformCustomActionTests
 			// Promote to higher area, overflow to slice
 			{ 5, 3 },
 			// Promote to higher area, slice to slice
-			{ 3, 1 }
+			{ 3, 1 },
 		};
 
 	[Theory]
@@ -78,7 +78,7 @@ public class PerformCustomActionTests
 			{
 				Name = "whim.slice_layout.window.promote",
 				Window = windows[focusedWindowIdx],
-				Payload = windows[focusedWindowIdx]
+				Payload = windows[focusedWindowIdx],
 			}
 		);
 
@@ -103,7 +103,7 @@ public class PerformCustomActionTests
 			{
 				Name = "whim.slice_layout.window.promote",
 				Window = window,
-				Payload = window
+				Payload = window,
 			}
 		);
 
@@ -135,7 +135,7 @@ public class PerformCustomActionTests
 			{
 				Name = "whim.slice_layout.window.demote",
 				Window = untrackedWindow,
-				Payload = untrackedWindow
+				Payload = untrackedWindow,
 			}
 		);
 
@@ -177,7 +177,7 @@ public class PerformCustomActionTests
 			{
 				Name = "whim.slice_layout.window.demote",
 				Window = windows[focusedWindowIdx],
-				Payload = windows[focusedWindowIdx]
+				Payload = windows[focusedWindowIdx],
 			}
 		);
 
@@ -202,7 +202,7 @@ public class PerformCustomActionTests
 			{
 				Name = "whim.slice_layout.window.demote",
 				Window = window,
-				Payload = window
+				Payload = window,
 			}
 		);
 
@@ -246,7 +246,7 @@ public class PerformCustomActionTests
 			{
 				Name = promote ? plugin.PromoteFocusActionName : plugin.DemoteFocusActionName,
 				Window = windows[focusedWindowIdx],
-				Payload = windows[focusedWindowIdx]
+				Payload = windows[focusedWindowIdx],
 			}
 		);
 
@@ -277,7 +277,7 @@ public class PerformCustomActionTests
 			{
 				Name = "whim.slice_layout.window.unknown",
 				Window = windows[0],
-				Payload = windows[0]
+				Payload = windows[0],
 			}
 		);
 

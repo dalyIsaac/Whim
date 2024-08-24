@@ -13,7 +13,7 @@ public enum WindowInsertionType
 	/// <summary>
 	/// Insert the window into the slice, pushing the existing window down the stack.
 	/// </summary>
-	Rotate
+	Rotate,
 }
 
 /// <summary>

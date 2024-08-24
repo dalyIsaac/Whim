@@ -29,7 +29,7 @@ internal record MoveWindowEdgesInDirectionWorkspaceTransform(
 			? workspace
 			: workspace with
 			{
-				LayoutEngines = workspace.LayoutEngines.SetItem(workspace.ActiveLayoutEngineIndex, newEngine)
+				LayoutEngines = workspace.LayoutEngines.SetItem(workspace.ActiveLayoutEngineIndex, newEngine),
 			};
 	}
 }

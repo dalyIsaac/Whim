@@ -21,7 +21,7 @@ public enum ReleaseChannel
 	/// <summary>
 	/// Stable releases are specific releases in a release branch <c>release/v*</c>.
 	/// </summary>
-	Stable = 2
+	Stable = 2,
 }
 
 /// <summary>
@@ -68,7 +68,7 @@ public static class UpdateFrequencyExtensions
 			UpdateFrequency.Weekly => TimeSpan.FromDays(7).TotalMilliseconds,
 			UpdateFrequency.Monthly => TimeSpan.FromDays(30).TotalMilliseconds,
 			UpdateFrequency.Never => null,
-			_ => null
+			_ => null,
 		};
 }
 

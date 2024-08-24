@@ -111,7 +111,7 @@ internal static class StoreTestUtils
 		{
 			workspace = workspace with
 			{
-				WindowPositions = workspace.WindowPositions.SetItem(window.Handle, new WindowPosition())
+				WindowPositions = workspace.WindowPositions.SetItem(window.Handle, new WindowPosition()),
 			};
 		}
 

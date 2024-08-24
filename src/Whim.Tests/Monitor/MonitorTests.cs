@@ -67,7 +67,7 @@ public class MonitorTests
 				X = 10,
 				Y = 10,
 				Width = 1900,
-				Height = 1060
+				Height = 1060,
 			},
 			monitor.WorkingArea
 		);
@@ -94,7 +94,7 @@ public class MonitorTests
 				X = 10,
 				Y = 10,
 				Width = 1900,
-				Height = 1060
+				Height = 1060,
 			},
 			monitor.WorkingArea
 		);
@@ -140,7 +140,7 @@ public class MonitorTests
 				X = 10,
 				Y = 10,
 				Width = 1900,
-				Height = 1060
+				Height = 1060,
 			},
 			monitor.WorkingArea
 		);

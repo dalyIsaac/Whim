@@ -152,9 +152,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 0,
 							Y = 0,
 							Width = 23,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -164,9 +164,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 23,
 							Y = 0,
 							Width = 43,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -176,10 +176,10 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 67,
 							Y = 0,
 							Width = 33,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -198,9 +198,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 0,
 							Y = 0,
 							Width = 43,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -210,9 +210,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 43,
 							Y = 0,
 							Width = 23,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -222,10 +222,10 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 67,
 							Y = 0,
 							Width = 33,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -244,9 +244,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 0,
 							Y = 0,
 							Width = 33,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -256,9 +256,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 33,
 							Y = 0,
 							Width = 23,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -268,10 +268,10 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 57,
 							Y = 0,
 							Width = 43,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -290,9 +290,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 0,
 							Y = 0,
 							Width = 33,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -302,9 +302,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 33,
 							Y = 0,
 							Width = 43,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -314,10 +314,10 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 77,
 							Y = 0,
 							Width = 23,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -382,9 +382,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 0,
 							Y = 0,
 							Width = 100,
-							Height = 23
+							Height = 23,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -394,9 +394,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 0,
 							Y = 23,
 							Width = 100,
-							Height = 43
+							Height = 43,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -406,10 +406,10 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 0,
 							Y = 67,
 							Width = 100,
-							Height = 33
+							Height = 33,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -428,9 +428,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 0,
 							Y = 0,
 							Width = 100,
-							Height = 43
+							Height = 43,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -440,9 +440,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 0,
 							Y = 43,
 							Width = 100,
-							Height = 23
+							Height = 23,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -452,10 +452,10 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 0,
 							Y = 67,
 							Width = 100,
-							Height = 33
+							Height = 33,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -470,7 +470,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 					{
 						Window = bottomEdgeUpWindows[0],
 						Rectangle = new Rectangle<int>() { Width = 100, Height = 33 },
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -479,9 +479,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 						{
 							Y = 33,
 							Height = 23,
-							Width = 100
+							Width = 100,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -490,10 +490,10 @@ public class MoveSingleWindowEdgeInDirectionTests
 						{
 							Y = 57,
 							Height = 43,
-							Width = 100
+							Width = 100,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -508,7 +508,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 					{
 						Window = bottomEdgeDownWindows[0],
 						Rectangle = new Rectangle<int>() { Width = 100, Height = 33 },
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -517,9 +517,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 						{
 							Y = 33,
 							Height = 43,
-							Width = 100
+							Width = 100,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -528,10 +528,10 @@ public class MoveSingleWindowEdgeInDirectionTests
 						{
 							Y = 77,
 							Height = 23,
-							Width = 100
+							Width = 100,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -594,7 +594,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 					{
 						Window = windows1[0],
 						Rectangle = new Rectangle<int>() { Width = 40, Height = 40 },
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -603,9 +603,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 						{
 							Y = 40,
 							Width = 40,
-							Height = 60
+							Height = 60,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -614,9 +614,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 						{
 							X = 40,
 							Height = 50,
-							Width = 60
+							Width = 60,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -626,10 +626,10 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 40,
 							Y = 50,
 							Width = 60,
-							Height = 50
+							Height = 50,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -645,7 +645,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 					{
 						Window = windows2[0],
 						Rectangle = new Rectangle<int>() { Width = 60, Height = 60 },
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -654,9 +654,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 						{
 							Y = 60,
 							Height = 40,
-							Width = 60
+							Width = 60,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -665,9 +665,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 						{
 							X = 60,
 							Height = 50,
-							Width = 40
+							Width = 40,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -677,10 +677,10 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 60,
 							Y = 50,
 							Width = 40,
-							Height = 50
+							Height = 50,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -696,7 +696,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 					{
 						Window = windows3[0],
 						Rectangle = new Rectangle<int>() { Width = 60, Height = 50 },
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -705,9 +705,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 						{
 							Y = 50,
 							Width = 60,
-							Height = 50
+							Height = 50,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -716,9 +716,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 						{
 							X = 60,
 							Width = 40,
-							Height = 40
+							Height = 40,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -728,10 +728,10 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 60,
 							Y = 40,
 							Width = 40,
-							Height = 60
+							Height = 60,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -747,7 +747,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 					{
 						Window = windows4[0],
 						Rectangle = new Rectangle<int>() { Width = 40, Height = 50 },
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -756,9 +756,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 						{
 							Y = 50,
 							Width = 40,
-							Height = 50
+							Height = 50,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -767,9 +767,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 						{
 							X = 40,
 							Width = 60,
-							Height = 60
+							Height = 60,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -779,10 +779,10 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 40,
 							Y = 60,
 							Width = 60,
-							Height = 40
+							Height = 40,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -798,7 +798,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 					{
 						Window = windows5[0],
 						Rectangle = new Rectangle<int>() { Width = 40, Height = 40 },
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -807,9 +807,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 						{
 							Y = 40,
 							Width = 40,
-							Height = 60
+							Height = 60,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -818,9 +818,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 						{
 							X = 40,
 							Width = 60,
-							Height = 50
+							Height = 50,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -830,10 +830,10 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 40,
 							Y = 50,
 							Width = 60,
-							Height = 50
+							Height = 50,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -849,7 +849,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 					{
 						Window = windows6[0],
 						Rectangle = new Rectangle<int>() { Width = 60, Height = 60 },
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -858,9 +858,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 						{
 							Y = 60,
 							Width = 60,
-							Height = 40
+							Height = 40,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -869,9 +869,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 						{
 							X = 60,
 							Width = 40,
-							Height = 50
+							Height = 50,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -881,10 +881,10 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 60,
 							Y = 50,
 							Width = 40,
-							Height = 50
+							Height = 50,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -900,7 +900,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 					{
 						Window = windows7[0],
 						Rectangle = new Rectangle<int>() { Width = 60, Height = 50 },
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -909,9 +909,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 						{
 							Y = 50,
 							Width = 60,
-							Height = 50
+							Height = 50,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -920,9 +920,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 						{
 							X = 60,
 							Width = 40,
-							Height = 40
+							Height = 40,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -932,10 +932,10 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 60,
 							Y = 40,
 							Width = 40,
-							Height = 60
+							Height = 60,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -951,7 +951,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 					{
 						Window = windows8[0],
 						Rectangle = new Rectangle<int>() { Width = 40, Height = 50 },
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -960,9 +960,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 						{
 							Y = 50,
 							Width = 40,
-							Height = 50
+							Height = 50,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -971,9 +971,9 @@ public class MoveSingleWindowEdgeInDirectionTests
 						{
 							X = 40,
 							Width = 60,
-							Height = 60
+							Height = 60,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -983,10 +983,10 @@ public class MoveSingleWindowEdgeInDirectionTests
 							X = 40,
 							Y = 60,
 							Width = 60,
-							Height = 40
+							Height = 40,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -1014,7 +1014,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 				{ "topLeft", topLeft },
 				{ "topRight", topRight },
 				{ "bottomLeft", bottomLeft },
-				{ "bottomRight", bottomRight }
+				{ "bottomRight", bottomRight },
 			};
 
 		LayoutEngineWrapper wrapper = new();

@@ -75,7 +75,7 @@ public class WindowEventListenerTests
 			(PInvoke.EVENT_SYSTEM_MOVESIZESTART, PInvoke.EVENT_SYSTEM_MOVESIZEEND),
 			(PInvoke.EVENT_SYSTEM_FOREGROUND, PInvoke.EVENT_SYSTEM_FOREGROUND),
 			(PInvoke.EVENT_OBJECT_LOCATIONCHANGE, PInvoke.EVENT_OBJECT_LOCATIONCHANGE),
-			(PInvoke.EVENT_SYSTEM_MINIMIZESTART, PInvoke.EVENT_SYSTEM_MINIMIZEEND)
+			(PInvoke.EVENT_SYSTEM_MINIMIZESTART, PInvoke.EVENT_SYSTEM_MINIMIZEEND),
 		];
 
 		foreach (var (eventMin, eventMax) in events)
@@ -243,60 +243,60 @@ public class WindowEventListenerTests
 		yield return new object[]
 		{
 			PInvoke.EVENT_SYSTEM_FOREGROUND,
-			new Func<IWindow, Transform>(window => new WindowFocusedTransform(window))
+			new Func<IWindow, Transform>(window => new WindowFocusedTransform(window)),
 		};
 		yield return new object[]
 		{
 			PInvoke.EVENT_OBJECT_UNCLOAKED,
-			new Func<IWindow, Transform>(window => new WindowFocusedTransform(window))
+			new Func<IWindow, Transform>(window => new WindowFocusedTransform(window)),
 		};
 
 		yield return new object[]
 		{
 			PInvoke.EVENT_OBJECT_HIDE,
-			new Func<IWindow, Transform>(window => new WindowHiddenTransform(window))
+			new Func<IWindow, Transform>(window => new WindowHiddenTransform(window)),
 		};
 
 		yield return new object[]
 		{
 			PInvoke.EVENT_OBJECT_DESTROY,
-			new Func<IWindow, Transform>(window => new WindowRemovedTransform(window))
+			new Func<IWindow, Transform>(window => new WindowRemovedTransform(window)),
 		};
 
 		yield return new object[]
 		{
 			PInvoke.EVENT_OBJECT_CLOAKED,
-			new Func<IWindow, Transform>(window => new WindowRemovedTransform(window))
+			new Func<IWindow, Transform>(window => new WindowRemovedTransform(window)),
 		};
 
 		yield return new object[]
 		{
 			PInvoke.EVENT_SYSTEM_MOVESIZESTART,
-			new Func<IWindow, Transform>(window => new WindowMoveStartedTransform(window))
+			new Func<IWindow, Transform>(window => new WindowMoveStartedTransform(window)),
 		};
 
 		yield return new object[]
 		{
 			PInvoke.EVENT_SYSTEM_MOVESIZEEND,
-			new Func<IWindow, Transform>(window => new WindowMoveEndedTransform(window))
+			new Func<IWindow, Transform>(window => new WindowMoveEndedTransform(window)),
 		};
 
 		yield return new object[]
 		{
 			PInvoke.EVENT_OBJECT_LOCATIONCHANGE,
-			new Func<IWindow, Transform>(window => new WindowMovedTransform(window))
+			new Func<IWindow, Transform>(window => new WindowMovedTransform(window)),
 		};
 
 		yield return new object[]
 		{
 			PInvoke.EVENT_SYSTEM_MINIMIZESTART,
-			new Func<IWindow, Transform>(window => new WindowMinimizeStartedTransform(window))
+			new Func<IWindow, Transform>(window => new WindowMinimizeStartedTransform(window)),
 		};
 
 		yield return new object[]
 		{
 			PInvoke.EVENT_SYSTEM_MINIMIZEEND,
-			new Func<IWindow, Transform>(window => new WindowMinimizeEndedTransform(window))
+			new Func<IWindow, Transform>(window => new WindowMinimizeEndedTransform(window)),
 		};
 	}
 

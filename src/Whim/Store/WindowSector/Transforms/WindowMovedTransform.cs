@@ -26,7 +26,7 @@ internal record WindowMovedTransform(IWindow Window) : Transform
 			{
 				Window = Window,
 				CursorDraggedPoint = cursorPoint,
-				MovedEdges = WindowUtils.GetMovedEdges(ctx, Window)?.MovedEdges
+				MovedEdges = WindowUtils.GetMovedEdges(ctx, Window)?.MovedEdges,
 			}
 		);
 

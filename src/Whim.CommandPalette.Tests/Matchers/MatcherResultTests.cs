@@ -10,7 +10,7 @@ public class MatcherResultTests
 	{
 		// Given
 		string text = "normal highlighted normal";
-		FilterTextMatch[] matches = [new FilterTextMatch(7, 18),];
+		FilterTextMatch[] matches = [new FilterTextMatch(7, 18)];
 		IVariantRowModel<int> modelMock = Substitute.For<IVariantRowModel<int>>();
 		modelMock.Title.Returns(text);
 

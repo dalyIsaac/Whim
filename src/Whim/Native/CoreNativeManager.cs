@@ -188,7 +188,7 @@ internal class CoreNativeManager(IContext context) : ICoreNativeManager
 		"WorkerW",
 		"Shell_TrayWnd",
 		"Shell_SecondaryTrayWnd",
-		"Progman"
+		"Progman",
 	];
 
 	public bool IsSystemWindow(HWND hwnd, string className)
@@ -316,7 +316,7 @@ internal class CoreNativeManager(IContext context) : ICoreNativeManager
 				{
 					dwFlags = PInvoke.DWM_BB_ENABLE | PInvoke.DWM_BB_BLURREGION,
 					fEnable = true,
-					hRgnBlur = new HRGN(rgn.DangerousGetHandle())
+					hRgnBlur = new HRGN(rgn.DangerousGetHandle()),
 				}
 			)
 			.Succeeded;

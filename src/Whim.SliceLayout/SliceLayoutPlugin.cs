@@ -63,7 +63,7 @@ public class SliceLayoutPlugin(IContext context) : ISliceLayoutPlugin
 			new LayoutEngineCustomAction()
 			{
 				Name = promote ? PromoteWindowActionName : DemoteWindowActionName,
-				Window = definedWindow
+				Window = definedWindow,
 			}
 		);
 	}
@@ -105,7 +105,7 @@ public class SliceLayoutPlugin(IContext context) : ISliceLayoutPlugin
 			new LayoutEngineCustomAction()
 			{
 				Name = promote ? PromoteFocusActionName : DemoteFocusActionName,
-				Window = definedWindow
+				Window = definedWindow,
 			}
 		);
 	}

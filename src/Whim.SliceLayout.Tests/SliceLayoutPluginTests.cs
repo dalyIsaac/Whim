@@ -204,7 +204,7 @@ public class SliceLayoutPluginTests
 			new(Substitute.For<IContext>())
 			{
 				// When
-				WindowInsertionType = insertionType
+				WindowInsertionType = insertionType,
 			};
 
 		// Then

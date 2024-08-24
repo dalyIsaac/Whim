@@ -295,7 +295,7 @@ public class FloatingLayoutEngineTests
 			{
 				Name = "Action",
 				Payload = "payload",
-				Window = null
+				Window = null,
 			};
 
 		// When

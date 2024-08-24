@@ -79,7 +79,7 @@ public class InitializeWorkspacesTransformTests
 		// Given there are saved workspaces which don't exist in the workspace manager
 		IWindow window = CreateWindow((HWND)10);
 		SavedWorkspace workspace =
-			new("test", new List<SavedWindow>() { new(window.Handle, Rectangle.UnitSquare<double>()), });
+			new("test", new List<SavedWindow>() { new(window.Handle, Rectangle.UnitSquare<double>()) });
 		AddWorkspacesToSavedState(internalCtx, workspace);
 
 		ctx.WindowManager.CreateWindow(window.Handle).Returns(Result.FromException<IWindow>(new Exception("nope")));

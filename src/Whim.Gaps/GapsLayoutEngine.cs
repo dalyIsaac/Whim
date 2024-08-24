@@ -68,7 +68,7 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 				X = rectangle.X + outerGap,
 				Y = rectangle.Y + outerGap,
 				Width = rectangle.Width - doubleOuterGap,
-				Height = rectangle.Height - doubleOuterGap
+				Height = rectangle.Height - doubleOuterGap,
 			};
 
 		foreach (IWindowState windowState in InnerLayoutEngine.DoLayout(proxiedRect, monitor))
@@ -99,9 +99,9 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 					X = x,
 					Y = y,
 					Width = width,
-					Height = height
+					Height = height,
 				},
-				WindowSize = windowState.WindowSize
+				WindowSize = windowState.WindowSize,
 			};
 		}
 	}

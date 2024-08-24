@@ -78,7 +78,7 @@ public class TreeHelpersTests
 			{
 				X = 0.5,
 				Width = 0.5,
-				Height = 1
+				Height = 1,
 			},
 			result.Rectangle
 		);
@@ -103,7 +103,7 @@ public class TreeHelpersTests
 				X = 0.5,
 				Y = 0,
 				Width = 0.5,
-				Height = 0.5
+				Height = 0.5,
 			},
 			result.Rectangle
 		);
@@ -426,7 +426,7 @@ public class TreeHelpersTests
 				Rectangle.UnitSquare<double>(),
 				new Point<double>() { X = 0.75, Y = 0.5 },
 				Direction.Right
-			}
+			},
 		};
 
 	public static TheoryData<Rectangle<double>, Point<double>, Direction> GetDirectionToPoint_NonUnitSquareData =>
@@ -438,7 +438,7 @@ public class TreeHelpersTests
 					X = 1,
 					Y = 1,
 					Width = 2,
-					Height = 2
+					Height = 2,
 				},
 				new Point<double>() { X = 1.5, Y = 1.5 },
 				Direction.Up
@@ -449,7 +449,7 @@ public class TreeHelpersTests
 					X = 1,
 					Y = 1,
 					Width = 2,
-					Height = 2
+					Height = 2,
 				},
 				new Point<double>() { X = 1.5, Y = 2 },
 				Direction.Left
@@ -460,7 +460,7 @@ public class TreeHelpersTests
 					X = 1,
 					Y = 1,
 					Width = 2,
-					Height = 2
+					Height = 2,
 				},
 				new Point<double>() { X = 2.5, Y = 2.75 },
 				Direction.Down
@@ -471,7 +471,7 @@ public class TreeHelpersTests
 					X = 1,
 					Y = 1,
 					Width = 2,
-					Height = 2
+					Height = 2,
 				},
 				new Point<double>() { X = 2.5, Y = 2.5 },
 				Direction.Right
@@ -487,7 +487,7 @@ public class TreeHelpersTests
 					X = 1,
 					Y = 1,
 					Width = 2,
-					Height = 1
+					Height = 1,
 				},
 				new Point<double>() { X = 2.0, Y = 1.25 },
 				Direction.Up
@@ -498,7 +498,7 @@ public class TreeHelpersTests
 					X = 1,
 					Y = 1,
 					Width = 2,
-					Height = 1
+					Height = 1,
 				},
 				new Point<double>() { X = 1.5, Y = 1.5 },
 				Direction.Left
@@ -509,7 +509,7 @@ public class TreeHelpersTests
 					X = 1,
 					Y = 1,
 					Width = 2,
-					Height = 1
+					Height = 1,
 				},
 				new Point<double>() { X = 2.0, Y = 1.75 },
 				Direction.Down
@@ -520,7 +520,7 @@ public class TreeHelpersTests
 					X = 1,
 					Y = 1,
 					Width = 2,
-					Height = 1
+					Height = 1,
 				},
 				new Point<double>() { X = 2.5, Y = 1.5 },
 				Direction.Right
@@ -531,7 +531,7 @@ public class TreeHelpersTests
 					X = 1,
 					Y = 1,
 					Width = 1,
-					Height = 2
+					Height = 2,
 				},
 				new Point<double>() { X = 1.5, Y = 1.5 },
 				Direction.Up
@@ -542,7 +542,7 @@ public class TreeHelpersTests
 					X = 1,
 					Y = 1,
 					Width = 1,
-					Height = 2
+					Height = 2,
 				},
 				new Point<double>() { X = 1.25, Y = 2.5 },
 				Direction.Left
@@ -553,7 +553,7 @@ public class TreeHelpersTests
 					X = 1,
 					Y = 1,
 					Width = 1,
-					Height = 2
+					Height = 2,
 				},
 				new Point<double>() { X = 1.25, Y = 2.75 },
 				Direction.Down
@@ -564,11 +564,11 @@ public class TreeHelpersTests
 					X = 1,
 					Y = 1,
 					Width = 1,
-					Height = 2
+					Height = 2,
 				},
 				new Point<double>() { X = 1.75, Y = 2.5 },
 				Direction.Right
-			}
+			},
 		};
 
 	[Theory]
@@ -606,7 +606,7 @@ public class TreeHelpersTests
 				tree.RightTopRight2.Window,
 				tree.RightTopRight3.Window,
 				tree.RightBottom.Window
-			)
+			),
 		];
 
 		// When
@@ -618,7 +618,7 @@ public class TreeHelpersTests
 			{
 				Window = nodeState.WindowNode.Window,
 				Rectangle = nodeState.Rectangle,
-				WindowSize = nodeState.WindowSize
+				WindowSize = nodeState.WindowSize,
 			})
 			.Should()
 			.Equal(expectedStates, (a, b) => a.Equals(b));

@@ -49,14 +49,14 @@ public class MonitorWorkspaceChangedEventTests
 			{
 				Monitor = monitor,
 				CurrentWorkspace = workspace,
-				PreviousWorkspace = aWorkspace
+				PreviousWorkspace = aWorkspace,
 			};
 		MonitorWorkspaceChangedEventArgs b =
 			new()
 			{
 				Monitor = monitor,
 				CurrentWorkspace = workspace,
-				PreviousWorkspace = bWorkspace
+				PreviousWorkspace = bWorkspace,
 			};
 
 		// Then
@@ -75,14 +75,14 @@ public class MonitorWorkspaceChangedEventTests
 			{
 				Monitor = monitor,
 				CurrentWorkspace = aCurrentWorkspace,
-				PreviousWorkspace = bCurrentWorkspace
+				PreviousWorkspace = bCurrentWorkspace,
 			};
 		MonitorWorkspaceChangedEventArgs b =
 			new()
 			{
 				Monitor = monitor,
 				CurrentWorkspace = aCurrentWorkspace,
-				PreviousWorkspace = previousWorkspace
+				PreviousWorkspace = previousWorkspace,
 			};
 
 		// Then
@@ -98,14 +98,14 @@ public class MonitorWorkspaceChangedEventTests
 			{
 				Monitor = monitor,
 				CurrentWorkspace = currentWorkspace,
-				PreviousWorkspace = previousWorkspace
+				PreviousWorkspace = previousWorkspace,
 			};
 		MonitorWorkspaceChangedEventArgs b =
 			new()
 			{
 				Monitor = monitor,
 				CurrentWorkspace = currentWorkspace,
-				PreviousWorkspace = previousWorkspace
+				PreviousWorkspace = previousWorkspace,
 			};
 
 		// Then
@@ -121,7 +121,7 @@ public class MonitorWorkspaceChangedEventTests
 			{
 				Monitor = monitor,
 				CurrentWorkspace = currentWorkspace,
-				PreviousWorkspace = previousWorkspace
+				PreviousWorkspace = previousWorkspace,
 			};
 
 		// Then

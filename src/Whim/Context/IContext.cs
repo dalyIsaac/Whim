@@ -13,7 +13,7 @@ public enum UncaughtExceptionHandling
 	/// <summary>
 	/// Shutdown and show the user an error message.
 	/// </summary>
-	Shutdown
+	Shutdown,
 }
 
 /// <summary>

@@ -31,7 +31,7 @@ public record SwapWindowInDirectionTransform(Guid WorkspaceId, HWND WindowHandle
 			? workspace
 			: workspace with
 			{
-				LayoutEngines = workspace.LayoutEngines.SetItem(workspace.ActiveLayoutEngineIndex, newEngine)
+				LayoutEngines = workspace.LayoutEngines.SetItem(workspace.ActiveLayoutEngineIndex, newEngine),
 			};
 	}
 }

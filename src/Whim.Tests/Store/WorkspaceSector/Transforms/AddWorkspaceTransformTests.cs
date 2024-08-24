@@ -52,7 +52,7 @@ public class AddWorkspaceTransformTests
 		root.WorkspaceSector.ProxyLayoutEngineCreators =
 		[
 			(ILayoutEngine engine) => Substitute.For<TestProxyLayoutEngine>(engine),
-			(engine) => Substitute.For<TestProxyLayoutEngine>(engine)
+			(engine) => Substitute.For<TestProxyLayoutEngine>(engine),
 		];
 
 		AddWorkspaceTransform sut = new(name, createLeafLayoutEngines);

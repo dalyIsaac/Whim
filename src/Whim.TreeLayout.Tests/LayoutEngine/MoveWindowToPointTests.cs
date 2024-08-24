@@ -58,9 +58,9 @@ public class MoveWindowToPointTests
 							X = 0,
 							Y = 0,
 							Width = 50,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -70,10 +70,10 @@ public class MoveWindowToPointTests
 							X = 50,
 							Y = 0,
 							Width = 50,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 	}
@@ -112,9 +112,9 @@ public class MoveWindowToPointTests
 							X = 0,
 							Y = 0,
 							Width = 100,
-							Height = 50
+							Height = 50,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -124,10 +124,10 @@ public class MoveWindowToPointTests
 							X = 0,
 							Y = 50,
 							Width = 100,
-							Height = 50
+							Height = 50,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 	}
@@ -166,9 +166,9 @@ public class MoveWindowToPointTests
 							X = 0,
 							Y = 0,
 							Width = 50,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -178,10 +178,10 @@ public class MoveWindowToPointTests
 							X = 50,
 							Y = 0,
 							Width = 50,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 	}
@@ -220,9 +220,9 @@ public class MoveWindowToPointTests
 							X = 0,
 							Y = 0,
 							Width = 100,
-							Height = 50
+							Height = 50,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -232,10 +232,10 @@ public class MoveWindowToPointTests
 							X = 0,
 							Y = 50,
 							Width = 100,
-							Height = 50
+							Height = 50,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 	}
@@ -303,9 +303,9 @@ public class MoveWindowToPointTests
 							X = 0,
 							Y = 0,
 							Width = 33,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -315,9 +315,9 @@ public class MoveWindowToPointTests
 							X = 33,
 							Y = 0,
 							Width = 33,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -327,10 +327,10 @@ public class MoveWindowToPointTests
 							X = 67,
 							Y = 0,
 							Width = 33,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 	}
@@ -376,9 +376,9 @@ public class MoveWindowToPointTests
 							X = 0,
 							Y = 0,
 							Width = 50,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -388,9 +388,9 @@ public class MoveWindowToPointTests
 							X = 50,
 							Y = 0,
 							Width = 50,
-							Height = 50
+							Height = 50,
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -400,10 +400,10 @@ public class MoveWindowToPointTests
 							X = 50,
 							Y = 50,
 							Width = 50,
-							Height = 50
+							Height = 50,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 	}
@@ -446,10 +446,10 @@ public class MoveWindowToPointTests
 							X = 0,
 							Y = 0,
 							Width = 100,
-							Height = 100
+							Height = 100,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 	}

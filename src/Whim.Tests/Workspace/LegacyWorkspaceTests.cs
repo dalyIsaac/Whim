@@ -12,7 +12,7 @@ public class LegacyWorkspaceTests
 		// Given
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
-			BackingName = "Bob"
+			BackingName = "Bob",
 		};
 		AddWorkspaceToManager(ctx, root, workspace);
 
@@ -59,7 +59,7 @@ public class LegacyWorkspaceTests
 		// Given
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
-			LayoutEngines = [engine]
+			LayoutEngines = [engine],
 		};
 		AddWorkspaceToManager(ctx, root, workspace);
 
@@ -299,7 +299,7 @@ public class LegacyWorkspaceTests
 		// Given
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
-			BackingName = "Legacy"
+			BackingName = "Legacy",
 		};
 		AddWorkspacesToManager(ctx, root, workspace);
 
@@ -412,7 +412,7 @@ public class LegacyWorkspaceTests
 			{
 				Name = "Test",
 				Window = window,
-				Payload = window
+				Payload = window,
 			};
 
 		ctx.Store.Dispatch(new LayoutEngineCustomActionWithPayloadTransform<IWindow>(workspace.Id, action))

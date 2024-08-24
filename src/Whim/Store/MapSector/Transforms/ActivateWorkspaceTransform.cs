@@ -70,7 +70,7 @@ public record ActivateWorkspaceTransform(
 				{
 					Monitor = loserMonitor,
 					PreviousWorkspace = workspace,
-					CurrentWorkspace = oldWorkspace
+					CurrentWorkspace = oldWorkspace,
 				}
 			);
 		}
@@ -100,7 +100,7 @@ public record ActivateWorkspaceTransform(
 			{
 				Monitor = targetMonitor,
 				PreviousWorkspace = oldWorkspace,
-				CurrentWorkspace = workspace
+				CurrentWorkspace = workspace,
 			}
 		);
 

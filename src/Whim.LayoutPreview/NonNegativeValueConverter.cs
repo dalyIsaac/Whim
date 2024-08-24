@@ -11,7 +11,7 @@ internal class NonNegativeValueConverter : IValueConverter
 		{
 			int i => i < 0,
 			double d => d < 0,
-			_ => throw new ArgumentException($"Unexpected type {value.GetType().Name}", nameof(value))
+			_ => throw new ArgumentException($"Unexpected type {value.GetType().Name}", nameof(value)),
 		};
 		return System.Convert.ChangeType(isNegative ? 0 : value, targetType);
 	}

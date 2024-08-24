@@ -11,7 +11,7 @@ public class WindowStateTests
 			{
 				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = window
+				Window = window,
 			};
 
 		// When
@@ -30,14 +30,14 @@ public class WindowStateTests
 			{
 				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = window
+				Window = window,
 			};
 		WindowState windowState2 =
 			new()
 			{
 				Rectangle = new Rectangle<int>() { X = 1, Y = 1 },
 				WindowSize = WindowSize.Normal,
-				Window = window
+				Window = window,
 			};
 
 		// When
@@ -56,14 +56,14 @@ public class WindowStateTests
 			{
 				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = window
+				Window = window,
 			};
 		WindowState windowState2 =
 			new()
 			{
 				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Maximized,
-				Window = window
+				Window = window,
 			};
 
 		// When
@@ -82,14 +82,14 @@ public class WindowStateTests
 			{
 				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = window1
+				Window = window1,
 			};
 		WindowState windowState2 =
 			new()
 			{
 				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = window2
+				Window = window2,
 			};
 
 		// When
@@ -108,14 +108,14 @@ public class WindowStateTests
 			{
 				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = window
+				Window = window,
 			};
 		WindowState windowState2 =
 			new()
 			{
 				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = window
+				Window = window,
 			};
 
 		// When
@@ -134,14 +134,14 @@ public class WindowStateTests
 			{
 				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = window
+				Window = window,
 			};
 		WindowState windowState2 =
 			new()
 			{
 				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = window
+				Window = window,
 			};
 
 		// When
@@ -160,14 +160,14 @@ public class WindowStateTests
 			{
 				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = window1
+				Window = window1,
 			};
 		WindowState windowState2 =
 			new()
 			{
 				Rectangle = new Rectangle<int>(),
 				WindowSize = WindowSize.Normal,
-				Window = window2
+				Window = window2,
 			};
 
 		// When

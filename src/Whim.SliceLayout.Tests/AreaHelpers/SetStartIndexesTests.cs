@@ -144,7 +144,7 @@ public class SetStartIndexesTests
 					(0.25, new SliceArea(order: 2, maxChildren: 4))
 				),
 				6
-			}
+			},
 		};
 
 	[Theory]

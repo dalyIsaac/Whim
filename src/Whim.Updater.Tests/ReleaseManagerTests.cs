@@ -150,7 +150,7 @@ public class ReleaseManagerTests
 			"v0.1.263-stable+bc5c56c4",
 			"v0.1.264-alpha+bc5c56c4",
 			"v0.2.265-alpha+bc5c56c4",
-			"v1.1.266-alpha+bc5c56c4"
+			"v1.1.266-alpha+bc5c56c4",
 		];
 		string[] expectedReleases = ["v0.1.264-alpha+bc5c56c4", "v0.2.265-alpha+bc5c56c4", "v1.1.266-alpha+bc5c56c4"];
 

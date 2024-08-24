@@ -21,7 +21,7 @@ public class SliceLayoutsTests
 			new ParentArea(isRow: false, (1, new SliceArea(order: 0, maxChildren: 0)))
 		)
 		{
-			Name = "Column"
+			Name = "Column",
 		}
 			.Should()
 			.BeEquivalentTo(sut);
@@ -43,7 +43,7 @@ public class SliceLayoutsTests
 			new ParentArea(isRow: true, (1, new SliceArea(order: 0, maxChildren: 0)))
 		)
 		{
-			Name = "Row"
+			Name = "Row",
 		}
 			.Should()
 			.BeEquivalentTo(sut);
@@ -64,7 +64,7 @@ public class SliceLayoutsTests
 			new ParentArea(isRow: true, (0.5, new SliceArea(order: 0, maxChildren: 0)), (0.5, new OverflowArea()))
 		)
 		{
-			Name = "Primary stack"
+			Name = "Primary stack",
 		}
 			.Should()
 			.BeEquivalentTo(sut);

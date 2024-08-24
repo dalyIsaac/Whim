@@ -20,7 +20,7 @@ public enum FileSinkConfigRollingInterval
 	/// <summary>
 	/// Rolls over the file log each day.
 	/// </summary>
-	Day
+	Day,
 }
 
 internal static class FileSinkConfigRollingIntervalExtensions
@@ -35,6 +35,6 @@ internal static class FileSinkConfigRollingIntervalExtensions
 		{
 			FileSinkConfigRollingInterval.Infinite => RollingInterval.Infinite,
 			FileSinkConfigRollingInterval.Month => RollingInterval.Month,
-			_ => RollingInterval.Day
+			_ => RollingInterval.Day,
 		};
 }

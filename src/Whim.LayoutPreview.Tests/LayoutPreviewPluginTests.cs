@@ -126,7 +126,7 @@ public class LayoutPreviewPluginTests
 			{
 				Window = Substitute.For<IWindow>(),
 				CursorDraggedPoint = null,
-				MovedEdges = null
+				MovedEdges = null,
 			};
 
 		// When
@@ -149,7 +149,7 @@ public class LayoutPreviewPluginTests
 			{
 				Window = Substitute.For<IWindow>(),
 				CursorDraggedPoint = null,
-				MovedEdges = null
+				MovedEdges = null,
 			};
 
 		// When
@@ -172,7 +172,7 @@ public class LayoutPreviewPluginTests
 			{
 				Window = Substitute.For<IWindow>(),
 				CursorDraggedPoint = new Rectangle<int>(),
-				MovedEdges = Direction.LeftDown
+				MovedEdges = Direction.LeftDown,
 			};
 
 		// When
@@ -199,7 +199,7 @@ public class LayoutPreviewPluginTests
 			{
 				Window = Substitute.For<IWindow>(),
 				CursorDraggedPoint = new Rectangle<int>(),
-				MovedEdges = null
+				MovedEdges = null,
 			};
 		rootSector.MapSector.MonitorWorkspaceMap = rootSector.MapSector.MonitorWorkspaceMap.Clear();
 
@@ -228,7 +228,7 @@ public class LayoutPreviewPluginTests
 		workspace = workspace with
 		{
 			LayoutEngines = [new FloatingLayoutEngine(ctx, new LayoutEngineIdentity())],
-			ActiveLayoutEngineIndex = 0
+			ActiveLayoutEngineIndex = 0,
 		};
 		rootSector.WorkspaceSector.Workspaces = rootSector.WorkspaceSector.Workspaces.SetItem(workspace.Id, workspace);
 		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitor);
@@ -239,7 +239,7 @@ public class LayoutPreviewPluginTests
 			{
 				Window = window,
 				CursorDraggedPoint = new Rectangle<int>(),
-				MovedEdges = null
+				MovedEdges = null,
 			};
 
 		// When
@@ -266,7 +266,7 @@ public class LayoutPreviewPluginTests
 			{
 				Window = window,
 				CursorDraggedPoint = new Rectangle<int>(),
-				MovedEdges = null
+				MovedEdges = null,
 			};
 
 		workspace.ActiveLayoutEngine.ClearReceivedCalls();
@@ -293,7 +293,7 @@ public class LayoutPreviewPluginTests
 			{
 				Window = Substitute.For<IWindow>(),
 				CursorDraggedPoint = null,
-				MovedEdges = null
+				MovedEdges = null,
 			};
 
 		// When
@@ -320,7 +320,7 @@ public class LayoutPreviewPluginTests
 			{
 				Window = movedWindow,
 				CursorDraggedPoint = new Rectangle<int>(),
-				MovedEdges = null
+				MovedEdges = null,
 			}
 		);
 		rootSector.WindowSector.QueueEvent(new WindowRemovedEventArgs() { Window = removedWindow });
@@ -344,7 +344,7 @@ public class LayoutPreviewPluginTests
 			{
 				Window = movedWindow,
 				CursorDraggedPoint = new Rectangle<int>(),
-				MovedEdges = null
+				MovedEdges = null,
 			};
 		WindowEventArgs removeArgs = new WindowRemovedEventArgs() { Window = movedWindow };
 
@@ -369,7 +369,7 @@ public class LayoutPreviewPluginTests
 			{
 				Window = movedWindow,
 				CursorDraggedPoint = new Rectangle<int>(),
-				MovedEdges = null
+				MovedEdges = null,
 			};
 
 		WindowFocusedEventArgs focusArgs = new() { Window = movedWindow };

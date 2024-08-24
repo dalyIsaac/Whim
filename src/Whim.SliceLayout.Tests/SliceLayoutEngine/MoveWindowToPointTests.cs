@@ -14,7 +14,7 @@ public class MoveWindowToPointTests
 			{ SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(0.7, 0.7), 4 },
 			{ SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(0.3, 0.3), 0 },
 			{ SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(0.3, 0.7), 1 },
-			{ SampleSliceLayouts.CreateNestedLayout(), 6, 3, new Point<double>(0, 0), 0 }
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, 3, new Point<double>(0, 0), 0 },
 		};
 
 	[Theory]
@@ -53,7 +53,7 @@ public class MoveWindowToPointTests
 			{ SampleSliceLayouts.CreateNestedLayout(), 4, new Point<double>(0.7, 0.7) },
 			{ SampleSliceLayouts.CreateNestedLayout(), 0, new Point<double>(0.3, 0.3) },
 			{ SampleSliceLayouts.CreateNestedLayout(), 1, new Point<double>(0.3, 0.7) },
-			{ SampleSliceLayouts.CreateNestedLayout(), 0, new Point<double>(0, 0) }
+			{ SampleSliceLayouts.CreateNestedLayout(), 0, new Point<double>(0, 0) },
 		};
 
 	[Theory]
@@ -90,7 +90,7 @@ public class MoveWindowToPointTests
 			{ SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(-0.1, 0.7) },
 			{ SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(0.7, -0.1) },
 			{ SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(1.1, 0.7) },
-			{ SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(0.7, 1.1) }
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, 1, new Point<double>(0.7, 1.1) },
 		};
 
 	[Theory]

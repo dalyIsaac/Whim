@@ -50,9 +50,9 @@ public class SwapWindowInDirectionTests
 					X = 0,
 					Y = 0,
 					Width = 50,
-					Height = 100
+					Height = 100,
 				},
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
@@ -62,10 +62,10 @@ public class SwapWindowInDirectionTests
 					X = 50,
 					Y = 0,
 					Width = 50,
-					Height = 100
+					Height = 100,
 				},
-				WindowSize = WindowSize.Normal
-			}
+				WindowSize = WindowSize.Normal,
+			},
 		}
 			.Should()
 			.Equal(windowStates);
@@ -99,9 +99,9 @@ public class SwapWindowInDirectionTests
 					X = 0,
 					Y = 0,
 					Width = 50,
-					Height = 100
+					Height = 100,
 				},
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
@@ -111,10 +111,10 @@ public class SwapWindowInDirectionTests
 					X = 50,
 					Y = 0,
 					Width = 50,
-					Height = 100
+					Height = 100,
 				},
-				WindowSize = WindowSize.Normal
-			}
+				WindowSize = WindowSize.Normal,
+			},
 		}
 			.Should()
 			.Equal(windowStates);
@@ -150,7 +150,7 @@ public class SwapWindowInDirectionTests
 			{
 				Window = window2,
 				Rectangle = new Rectangle<int>() { Width = 50, Height = 100 },
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
@@ -160,9 +160,9 @@ public class SwapWindowInDirectionTests
 					X = 50,
 					Y = 0,
 					Width = 50,
-					Height = 50
+					Height = 50,
 				},
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
@@ -172,10 +172,10 @@ public class SwapWindowInDirectionTests
 					X = 50,
 					Y = 50,
 					Width = 50,
-					Height = 50
+					Height = 50,
 				},
-				WindowSize = WindowSize.Normal
-			}
+				WindowSize = WindowSize.Normal,
+			},
 		}
 			.Should()
 			.Equal(windowStates);
@@ -218,9 +218,9 @@ public class SwapWindowInDirectionTests
 					X = 0,
 					Y = 0,
 					Width = 50,
-					Height = 50
+					Height = 50,
 				},
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
@@ -230,9 +230,9 @@ public class SwapWindowInDirectionTests
 					X = 0,
 					Y = 50,
 					Width = 50,
-					Height = 50
+					Height = 50,
 				},
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
@@ -242,9 +242,9 @@ public class SwapWindowInDirectionTests
 					X = 50,
 					Y = 0,
 					Width = 50,
-					Height = 50
+					Height = 50,
 				},
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
@@ -254,10 +254,10 @@ public class SwapWindowInDirectionTests
 					X = 50,
 					Y = 50,
 					Width = 50,
-					Height = 50
+					Height = 50,
 				},
-				WindowSize = WindowSize.Normal
-			}
+				WindowSize = WindowSize.Normal,
+			},
 		}
 			.Should()
 			.Equal(windowStates);

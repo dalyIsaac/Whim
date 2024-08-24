@@ -23,7 +23,7 @@ public class MoveWindowToPointInWorkspaceTransformTests
 			window,
 			CreateWorkspace(ctx) with
 			{
-				LayoutEngines = [engine1, engine2]
+				LayoutEngines = [engine1, engine2],
 			}
 		);
 		Point<double> point = new(0.5, 0.5);

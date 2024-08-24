@@ -170,7 +170,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 			{
 				Rectangle = items[idx].Rectangle,
 				Window = _windows[items[idx].Index],
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			};
 		}
 
@@ -192,7 +192,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 			{
 				Rectangle = minimizedRectangle,
 				Window = _minimizedWindows[idx],
-				WindowSize = WindowSize.Minimized
+				WindowSize = WindowSize.Minimized,
 			};
 		}
 
@@ -301,16 +301,23 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	public ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action) =>
 		action switch
 		{
-			LayoutEngineCustomAction<IWindow> promoteAction when promoteAction.Name == _plugin.PromoteWindowActionName
-				=> PromoteWindowInStack(promoteAction.Payload, promote: true),
-			LayoutEngineCustomAction<IWindow> demoteAction when demoteAction.Name == _plugin.DemoteWindowActionName
-				=> PromoteWindowInStack(demoteAction.Payload, promote: false),
+			LayoutEngineCustomAction<IWindow> promoteAction
+				when promoteAction.Name == _plugin.PromoteWindowActionName => PromoteWindowInStack(
+				promoteAction.Payload,
+				promote: true
+			),
+			LayoutEngineCustomAction<IWindow> demoteAction when demoteAction.Name == _plugin.DemoteWindowActionName =>
+				PromoteWindowInStack(demoteAction.Payload, promote: false),
 			LayoutEngineCustomAction<IWindow> promoteFocusAction
-				when promoteFocusAction.Name == _plugin.PromoteFocusActionName
-				=> PromoteFocusInStack(promoteFocusAction.Payload, promote: true),
+				when promoteFocusAction.Name == _plugin.PromoteFocusActionName => PromoteFocusInStack(
+				promoteFocusAction.Payload,
+				promote: true
+			),
 			LayoutEngineCustomAction<IWindow> demoteFocusAction
-				when demoteFocusAction.Name == _plugin.DemoteFocusActionName
-				=> PromoteFocusInStack(demoteFocusAction.Payload, promote: false),
-			_ => this
+				when demoteFocusAction.Name == _plugin.DemoteFocusActionName => PromoteFocusInStack(
+				demoteFocusAction.Payload,
+				promote: false
+			),
+			_ => this,
 		};
 }

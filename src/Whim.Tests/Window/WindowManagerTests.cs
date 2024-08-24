@@ -102,7 +102,7 @@ public class WindowManagerTests
 					{
 						Window = window,
 						MovedEdges = Direction.None,
-						CursorDraggedPoint = new Point<int>()
+						CursorDraggedPoint = new Point<int>(),
 					}
 				)
 		);
@@ -133,7 +133,7 @@ public class WindowManagerTests
 					{
 						Window = window,
 						MovedEdges = Direction.None,
-						CursorDraggedPoint = new Point<int>()
+						CursorDraggedPoint = new Point<int>(),
 					}
 				)
 		);
@@ -164,7 +164,7 @@ public class WindowManagerTests
 					{
 						Window = window,
 						MovedEdges = Direction.None,
-						CursorDraggedPoint = new Point<int>()
+						CursorDraggedPoint = new Point<int>(),
 					}
 				)
 		);

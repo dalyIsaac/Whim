@@ -29,7 +29,7 @@ internal record AddWindowToWorkspaceTransform(WorkspaceId WorkspaceId, IWindow W
 		return workspace with
 		{
 			WindowPositions = updatedPositions,
-			LayoutEngines = newLayoutEngines.ToImmutableList()
+			LayoutEngines = newLayoutEngines.ToImmutableList(),
 		};
 	}
 }

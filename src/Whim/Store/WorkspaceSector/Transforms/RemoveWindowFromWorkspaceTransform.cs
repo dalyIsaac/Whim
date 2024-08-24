@@ -69,7 +69,7 @@ internal record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, IWin
 
 		return workspace with
 		{
-			LastFocusedWindowHandle = newLastFocusedWindowHandle
+			LastFocusedWindowHandle = newLastFocusedWindowHandle,
 		};
 	}
 

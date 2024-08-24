@@ -16,7 +16,7 @@ public class WindowMoveEndedTransformTests
 				{
 					Rectangle = originalRect,
 					Window = window,
-					WindowSize = WindowSize.Normal
+					WindowSize = WindowSize.Normal,
 				}
 			);
 		ctx.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns(newRect);

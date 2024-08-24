@@ -38,7 +38,7 @@ internal record MinimizeWindowEndTransform(WorkspaceId WorkspaceId, HWND WindowH
 
 				// Restore in just the active layout engine. MinimizeWindowEnd is not called as part of
 				// Whim starting up.
-				LayoutEngines = workspace.LayoutEngines.SetItem(workspace.ActiveLayoutEngineIndex, newLayoutEngine)
+				LayoutEngines = workspace.LayoutEngines.SetItem(workspace.ActiveLayoutEngineIndex, newLayoutEngine),
 			};
 	}
 }

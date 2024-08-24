@@ -21,7 +21,7 @@ public class PruneTests
 				SliceLayouts.CreatePrimaryStackArea(),
 				3,
 				new ParentArea(isRow: true, (0.5, new SliceArea(order: 0, maxChildren: 1)), (0.5, new OverflowArea()))
-			}
+			},
 		};
 
 	public static TheoryData<ParentArea, int, ParentArea> Prune_MultiColumn =>
@@ -61,7 +61,7 @@ public class PruneTests
 					(1.0 / 3.0, new SliceArea(order: 1, maxChildren: 1) { StartIndex = 2 }),
 					(1.0 / 3.0, new OverflowArea() { StartIndex = 3 })
 				)
-			}
+			},
 		};
 
 	public static TheoryData<ParentArea, int, ParentArea> Prune_SecondaryPrimary =>
@@ -95,7 +95,7 @@ public class PruneTests
 					(0.5, new SliceArea(order: 0, maxChildren: 1)),
 					(0.25, new OverflowArea() { StartIndex = 2 })
 				)
-			}
+			},
 		};
 
 	public static TheoryData<ParentArea, int, ParentArea> Prune_OverflowColumn =>
@@ -114,7 +114,7 @@ public class PruneTests
 				SampleSliceLayouts.CreateOverflowColumnLayout(),
 				2,
 				new ParentArea(isRow: false, (1.0, new OverflowArea()))
-			}
+			},
 		};
 
 	public static TheoryData<ParentArea, int, ParentArea> Prune_Nested =>
@@ -160,7 +160,7 @@ public class PruneTests
 						)
 					)
 				)
-			}
+			},
 		};
 
 	// Take the first overflow area
@@ -190,7 +190,7 @@ public class PruneTests
 					(0.5, new SliceArea(order: 0, maxChildren: 1)),
 					(0.5, new OverflowArea() { StartIndex = 1 })
 				)
-			}
+			},
 		};
 
 	[Theory]

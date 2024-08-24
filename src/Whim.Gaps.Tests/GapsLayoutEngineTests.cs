@@ -30,10 +30,10 @@ public class GapsLayoutEngineTests
 							X = 10 + 5,
 							Y = 10 + 5,
 							Width = 1920 - (10 * 2) - (5 * 2),
-							Height = 1080 - (10 * 2) - (5 * 2)
+							Height = 1080 - (10 * 2) - (5 * 2),
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -52,9 +52,9 @@ public class GapsLayoutEngineTests
 							X = 10 + 5,
 							Y = 10 + 5,
 							Width = 960 - 10 - (5 * 2),
-							Height = 1080 - (10 * 2) - (5 * 2)
+							Height = 1080 - (10 * 2) - (5 * 2),
 						},
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
@@ -64,10 +64,10 @@ public class GapsLayoutEngineTests
 							X = 960 + 5,
 							Y = 10 + 5,
 							Width = 960 - 10 - (5 * 2),
-							Height = 1080 - (10 * 2) - (5 * 2)
+							Height = 1080 - (10 * 2) - (5 * 2),
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -85,10 +85,10 @@ public class GapsLayoutEngineTests
 							X = 15 + 7,
 							Y = 15 + 7,
 							Width = 1920 - (15 * 2) - (7 * 2),
-							Height = 1080 - (15 * 2) - (7 * 2)
+							Height = 1080 - (15 * 2) - (7 * 2),
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -116,7 +116,7 @@ public class GapsLayoutEngineTests
 				X = 0,
 				Y = 0,
 				Width = 1920,
-				Height = 1080
+				Height = 1080,
 			};
 
 		IMonitor monitor = Substitute.For<IMonitor>();
@@ -146,7 +146,7 @@ public class GapsLayoutEngineTests
 					X = 5,
 					Y = 5,
 					Width = -100,
-					Height = 1080
+					Height = 1080,
 				},
 				[
 					new WindowState()
@@ -157,10 +157,10 @@ public class GapsLayoutEngineTests
 							X = 5,
 							Y = 5,
 							Width = 0,
-							Height = 1080
+							Height = 1080,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -175,7 +175,7 @@ public class GapsLayoutEngineTests
 					X = 5,
 					Y = 5,
 					Width = 0,
-					Height = 1080
+					Height = 1080,
 				},
 				[
 					new WindowState()
@@ -186,10 +186,10 @@ public class GapsLayoutEngineTests
 							X = 5,
 							Y = 5,
 							Width = 0,
-							Height = 1080
+							Height = 1080,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -203,7 +203,7 @@ public class GapsLayoutEngineTests
 					X = 5,
 					Y = 5,
 					Width = 5,
-					Height = 1080
+					Height = 1080,
 				},
 				[
 					new WindowState()
@@ -214,10 +214,10 @@ public class GapsLayoutEngineTests
 							X = 5,
 							Y = 5,
 							Width = 5,
-							Height = 1080
+							Height = 1080,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -232,7 +232,7 @@ public class GapsLayoutEngineTests
 					X = 5,
 					Y = 5,
 					Width = 1920,
-					Height = -100
+					Height = -100,
 				},
 				[
 					new WindowState()
@@ -243,10 +243,10 @@ public class GapsLayoutEngineTests
 							X = 5,
 							Y = 5,
 							Width = 1920,
-							Height = 0
+							Height = 0,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -261,7 +261,7 @@ public class GapsLayoutEngineTests
 					X = 5,
 					Y = 5,
 					Width = 1920,
-					Height = 0
+					Height = 0,
 				},
 				[
 					new WindowState()
@@ -272,10 +272,10 @@ public class GapsLayoutEngineTests
 							X = 5,
 							Y = 5,
 							Width = 1920,
-							Height = 0
+							Height = 0,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -289,7 +289,7 @@ public class GapsLayoutEngineTests
 					X = 5,
 					Y = 5,
 					Width = 1920,
-					Height = 5
+					Height = 5,
 				},
 				[
 					new WindowState()
@@ -300,10 +300,10 @@ public class GapsLayoutEngineTests
 							X = 5,
 							Y = 5,
 							Width = 1920,
-							Height = 5
+							Height = 5,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -318,7 +318,7 @@ public class GapsLayoutEngineTests
 					X = 5,
 					Y = 5,
 					Width = 5,
-					Height = 5
+					Height = 5,
 				},
 				[
 					new WindowState()
@@ -329,10 +329,10 @@ public class GapsLayoutEngineTests
 							X = 5,
 							Y = 5,
 							Width = 5,
-							Height = 5
+							Height = 5,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -346,7 +346,7 @@ public class GapsLayoutEngineTests
 					X = 5,
 					Y = 5,
 					Width = 0,
-					Height = 0
+					Height = 0,
 				},
 				[
 					new WindowState()
@@ -357,10 +357,10 @@ public class GapsLayoutEngineTests
 							X = 5,
 							Y = 5,
 							Width = 0,
-							Height = 0
+							Height = 0,
 						},
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -387,8 +387,8 @@ public class GapsLayoutEngineTests
 					{
 						Window = window,
 						Rectangle = rect,
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 
@@ -412,8 +412,8 @@ public class GapsLayoutEngineTests
 			{
 				Window = window,
 				Rectangle = rect,
-				WindowSize = WindowSize.Normal
-			}
+				WindowSize = WindowSize.Normal,
+			},
 		];
 
 		// Given
@@ -745,7 +745,7 @@ public class GapsLayoutEngineTests
 			{
 				Name = "Action",
 				Payload = "payload",
-				Window = Substitute.For<IWindow>()
+				Window = Substitute.For<IWindow>(),
 			};
 		innerLayoutEngine.PerformCustomAction(action).Returns(performCustomActionResult);
 
@@ -771,7 +771,7 @@ public class GapsLayoutEngineTests
 			{
 				Name = "Action",
 				Payload = "payload",
-				Window = Substitute.For<IWindow>()
+				Window = Substitute.For<IWindow>(),
 			};
 		innerLayoutEngine.PerformCustomAction(action).Returns(innerLayoutEngine);
 

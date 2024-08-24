@@ -57,7 +57,7 @@ internal record MonitorsChangedTransform : Transform
 			{
 				UnchangedMonitors = unchangedMonitors,
 				RemovedMonitors = removedMonitors,
-				AddedMonitors = addedMonitors
+				AddedMonitors = addedMonitors,
 			};
 
 		if (addedMonitors.Count != 0 || removedMonitors.Count != 0)

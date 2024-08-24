@@ -185,7 +185,7 @@ public class TreeLayoutEngineWidgetViewModelTests
 			{
 				Monitor = monitor,
 				CurrentWorkspace = Substitute.For<IWorkspace>(),
-				PreviousWorkspace = Substitute.For<IWorkspace>()
+				PreviousWorkspace = Substitute.For<IWorkspace>(),
 			}
 		);
 
@@ -209,7 +209,7 @@ public class TreeLayoutEngineWidgetViewModelTests
 					{
 						Monitor = Substitute.For<IMonitor>(),
 						CurrentWorkspace = Substitute.For<IWorkspace>(),
-						PreviousWorkspace = Substitute.For<IWorkspace>()
+						PreviousWorkspace = Substitute.For<IWorkspace>(),
 					}
 				)
 		);
@@ -236,7 +236,7 @@ public class TreeLayoutEngineWidgetViewModelTests
 			{
 				Workspace = workspace,
 				CurrentLayoutEngine = Substitute.For<ILayoutEngine>(),
-				PreviousLayoutEngine = Substitute.For<ILayoutEngine>()
+				PreviousLayoutEngine = Substitute.For<ILayoutEngine>(),
 			}
 		);
 
@@ -259,7 +259,7 @@ public class TreeLayoutEngineWidgetViewModelTests
 			{
 				TreeLayoutEngine = Substitute.For<ILayoutEngine>(),
 				CurrentDirection = Direction.Down,
-				PreviousDirection = Direction.Right
+				PreviousDirection = Direction.Right,
 			}
 		);
 

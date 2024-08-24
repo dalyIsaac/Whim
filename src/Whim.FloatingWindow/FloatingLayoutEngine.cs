@@ -89,11 +89,10 @@ public record FloatingLayoutEngine : ILayoutEngine
 			{
 				Window = window,
 				Rectangle = monitor.WorkingArea.ToMonitor(loc),
-				WindowSize = window.IsMaximized
-					? WindowSize.Maximized
-					: window.IsMinimized
-						? WindowSize.Minimized
-						: WindowSize.Normal
+				WindowSize =
+					window.IsMaximized ? WindowSize.Maximized
+					: window.IsMinimized ? WindowSize.Minimized
+					: WindowSize.Normal,
 			};
 		}
 	}

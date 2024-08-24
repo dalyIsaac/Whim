@@ -45,11 +45,11 @@ public class CoreSavedStateManagerTests
 			{
 				new(
 					"workspace1",
-					new() { new SavedWindow(1, new(0, 0, 100, 100)), new SavedWindow(2, new(100, 100, 100, 100)), }
+					new() { new SavedWindow(1, new(0, 0, 100, 100)), new SavedWindow(2, new(100, 100, 100, 100)) }
 				),
 				new(
 					"workspace2",
-					new() { new SavedWindow(3, new(200, 200, 100, 100)), new SavedWindow(4, new(300, 300, 100, 100)), }
+					new() { new SavedWindow(3, new(200, 200, 100, 100)), new SavedWindow(4, new(300, 300, 100, 100)) }
 				),
 			}
 		);
@@ -116,13 +116,13 @@ public class CoreSavedStateManagerTests
 					{
 						Window = windows[0],
 						Rectangle = new Rectangle<int>(0, 0, 100, 100),
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
 						Window = windows[1],
 						Rectangle = new Rectangle<int>(100, 100, 100, 100),
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 				}
 			);
@@ -138,13 +138,13 @@ public class CoreSavedStateManagerTests
 					{
 						Window = windows[2],
 						Rectangle = new Rectangle<int>(200, 200, 100, 100),
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
 						Window = windows[3],
 						Rectangle = new Rectangle<int>(300, 300, 100, 100),
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 				}
 			);
@@ -160,7 +160,7 @@ public class CoreSavedStateManagerTests
 				{
 					new(
 						"workspace1",
-						new() { new SavedWindow(1, new(0, 0, 0.1, 0.1)), new SavedWindow(2, new(0.1, 0.1, 0.1, 0.1)), }
+						new() { new SavedWindow(1, new(0, 0, 0.1, 0.1)), new SavedWindow(2, new(0.1, 0.1, 0.1, 0.1)) }
 					),
 					new(
 						"workspace2",
@@ -169,7 +169,7 @@ public class CoreSavedStateManagerTests
 							new SavedWindow(3, new(0.2, 0.2, 0.1, 0.1)),
 							new SavedWindow(4, new(0.3, 0.3, 0.1, 0.1)),
 						}
-					)
+					),
 				}
 			)
 		);

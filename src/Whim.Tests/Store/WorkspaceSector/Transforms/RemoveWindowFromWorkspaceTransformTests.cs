@@ -86,7 +86,7 @@ public class RemoveWindowFromWorkspaceTransformTests
 			WindowPositions = ImmutableDictionary<HWND, WindowPosition>.Empty.Add(
 				(HWND)3,
 				new WindowPosition { WindowSize = WindowSize.Normal }
-			)
+			),
 		};
 
 		workspace = PopulateWindowWorkspaceMap(ctx, root, CreateWindow(window.Handle), workspace);

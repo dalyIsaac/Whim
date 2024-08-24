@@ -15,7 +15,7 @@ public class PerformCustomActionTests
 			{
 				Name = "Action",
 				Payload = "payload",
-				Window = window
+				Window = window,
 			};
 		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity);
 

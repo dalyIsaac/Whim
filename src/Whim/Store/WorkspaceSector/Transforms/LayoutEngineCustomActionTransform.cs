@@ -67,6 +67,6 @@ public record LayoutEngineCustomActionTransform(WorkspaceId WorkspaceId, LayoutE
 		{
 			Name = Action.Name,
 			Payload = Action.Window,
-			Window = Action.Window
+			Window = Action.Window,
 		}
 	);

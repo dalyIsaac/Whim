@@ -66,9 +66,9 @@ internal static class MonitorTestUtils
 							cbSize = (uint)Marshal.SizeOf<MONITORINFO>(),
 							rcMonitor = rect,
 							rcWork = rect,
-							dwFlags = 0
+							dwFlags = 0,
 						},
-						szDevice = $"DISPLAY {(int)hMonitor}"
+						szDevice = $"DISPLAY {(int)hMonitor}",
 					}
 				);
 		}

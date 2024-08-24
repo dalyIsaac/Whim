@@ -294,7 +294,7 @@ internal static class TreeHelpers
 		IPoint<double> normPoint = new Point<double>
 		{
 			X = searchPoint.X - rectangle.X,
-			Y = searchPoint.Y - rectangle.Y
+			Y = searchPoint.Y - rectangle.Y,
 		};
 
 		// Equations for the diagonals.
@@ -355,7 +355,7 @@ internal static class TreeHelpers
 					X = rectangle.X,
 					Y = rectangle.Y,
 					Width = rectangle.Width,
-					Height = rectangle.Height
+					Height = rectangle.Height,
 				};
 
 			if (parent.IsHorizontal)

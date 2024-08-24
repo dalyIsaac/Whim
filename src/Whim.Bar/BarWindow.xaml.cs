@@ -40,7 +40,7 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window, System.IDispos
 		{
 			Window = window,
 			Rectangle = GetUpdatedRectangle(),
-			WindowSize = WindowSize.Normal
+			WindowSize = WindowSize.Normal,
 		};
 
 		// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/3689
@@ -70,7 +70,7 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window, System.IDispos
 			X = _monitor.WorkingArea.X,
 			Y = _monitor.WorkingArea.Y,
 			Width = _monitor.WorkingArea.Width,
-			Height = (int)(_barConfig.Height * scale)
+			Height = (int)(_barConfig.Height * scale),
 		};
 	}
 

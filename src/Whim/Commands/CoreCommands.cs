@@ -232,7 +232,7 @@ internal class CoreCommands : PluginCommands
 						new LayoutEngineCustomAction()
 						{
 							Name = $"{focusLayoutEngine.Name}.toggle_maximized",
-							Window = null
+							Window = null,
 						}
 					);
 				},

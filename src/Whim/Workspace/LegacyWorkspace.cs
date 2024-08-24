@@ -128,7 +128,7 @@ public partial record Workspace : IInternalWorkspace
 			{
 				Window = window,
 				Rectangle = pos.LastWindowRectangle,
-				WindowSize = pos.WindowSize
+				WindowSize = pos.WindowSize,
 			};
 		}
 

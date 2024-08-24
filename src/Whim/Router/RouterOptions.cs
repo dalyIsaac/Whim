@@ -27,5 +27,5 @@ public enum RouterOptions
 	/// Routes windows to the workspace which last received an event sent by Windows which Whim
 	/// did not ignore.
 	/// </summary>
-	RouteToLastTrackedActiveWorkspace
+	RouteToLastTrackedActiveWorkspace,
 }

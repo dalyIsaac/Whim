@@ -41,7 +41,7 @@ public class ProxyFloatingLayoutEngineTests
 			{
 				window,
 				new HashSet<LayoutEngineIdentity> { innerLayoutEngine.Identity }
-			}
+			},
 		};
 		plugin.FloatingWindows.Returns(floatingWindows);
 		return this;
@@ -601,14 +601,14 @@ public class ProxyFloatingLayoutEngineTests
 					{
 						Window = window1,
 						Rectangle = new Rectangle<int>(),
-						WindowSize = WindowSize.Normal
+						WindowSize = WindowSize.Normal,
 					},
 					new WindowState()
 					{
 						Window = window2,
 						Rectangle = new Rectangle<int>(),
-						WindowSize = WindowSize.Normal
-					}
+						WindowSize = WindowSize.Normal,
+					},
 				]
 			);
 		newInnerLayoutEngine.Count.Returns(2);
@@ -622,7 +622,7 @@ public class ProxyFloatingLayoutEngineTests
 					X = 0,
 					Y = 0,
 					Width = 1000,
-					Height = 1000
+					Height = 1000,
 				},
 				monitor
 			)
@@ -642,22 +642,22 @@ public class ProxyFloatingLayoutEngineTests
 					X = 0,
 					Y = 0,
 					Width = 100,
-					Height = 100
+					Height = 100,
 				},
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
 				Window = window1,
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
 				Window = window2,
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Normal
-			}
+				WindowSize = WindowSize.Normal,
+			},
 		];
 
 		windowStates.Should().Equal(expected);
@@ -1117,7 +1117,7 @@ public class ProxyFloatingLayoutEngineTests
 			{
 				Name = "Action",
 				Payload = "payload",
-				Window = null
+				Window = null,
 			};
 
 		// When
@@ -1142,7 +1142,7 @@ public class ProxyFloatingLayoutEngineTests
 			{
 				Name = "Action",
 				Payload = "payload",
-				Window = Substitute.For<IWindow>()
+				Window = Substitute.For<IWindow>(),
 			};
 		innerLayoutEngine.PerformCustomAction(action).Returns(innerLayoutEngine);
 
@@ -1170,7 +1170,7 @@ public class ProxyFloatingLayoutEngineTests
 			{
 				Name = "Action",
 				Payload = "payload",
-				Window = window
+				Window = window,
 			};
 		MarkWindowAsFloating(plugin, window, innerLayoutEngine);
 		ILayoutEngine newEngine = engine.AddWindow(window);
