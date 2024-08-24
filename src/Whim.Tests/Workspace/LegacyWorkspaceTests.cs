@@ -323,18 +323,12 @@ public class LegacyWorkspaceTests
 		ctx.Store.Received(1).Dispatch(new DeactivateWorkspaceTransform(workspace.Id));
 	}
 
-	[Theory, AutoSubstituteData]
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void TryGetWindowState_WindowNotFound(IContext ctx)
 	{
 		// Given
 		Workspace workspace = CreateWorkspace(ctx);
 		IWindow window = CreateWindow((HWND)1);
-		ctx.Store.Pick(Arg.Any<PurePicker<Result<WindowPosition>>>())
-			.Returns(
-				Result.FromException<WindowPosition>(
-					StoreExceptions.WindowNotFoundInWorkspace(window.Handle, workspace.Id)
-				)
-			);
 
 		// When
 		IWindowState? result = workspace.TryGetWindowState(window);
