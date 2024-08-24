@@ -4,7 +4,7 @@ The <xref:Whim.Gaps.GapsPlugin> adds the config and commands for the <xref:Whim.
 
 ![Gaps plugin demo](../../images/gaps-demo.png)
 
-This behavior can be customized with the <xref:Whim.Gaps.GapsConfig> provided to the <Whim.Gaps.GapsCommands.#ctor(Whim.Gaps.IGapsPlugin)>.
+This behavior can be customized with the <xref:Whim.Gaps.GapsConfig> provided to the <xref:Whim.Gaps.GapsPlugin> constructor.
 
 ## Example Config
 

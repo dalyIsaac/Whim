@@ -8,7 +8,7 @@ For more about the `TreeLayoutEngine`, see the [Layout Engines](../customize/lay
 
 The [Tree Layout Bar plugin](./tree-layout-bar.md) provides a widget for the bar to set the direction to add the next window.
 
-## Example Config`
+## Example Config
 
 ```csharp
 #r "WHIM_PATH\whim.dll"
