@@ -3,6 +3,7 @@ namespace Whim;
 /// <summary>
 /// Manage the movement of <see cref="IWindow"/>s between <see cref="IWorkspace"/>s and <see cref="IMonitor"/>s.
 /// </summary>
+[Obsolete("Use transforms and pickers to interact with the store instead.")]
 public interface IButlerChores
 {
 	/// <summary>
@@ -13,6 +14,7 @@ public interface IButlerChores
 	/// The monitor to activate the workspace in. If <see langword="null"/>, this will default to
 	/// the active monitor.
 	/// </param>
+	[Obsolete("Use the transform ActivateWorkspaceTransform instead.")]
 	void Activate(IWorkspace workspace, IMonitor? monitor = null);
 
 	/// <summary>
@@ -27,18 +29,21 @@ public interface IButlerChores
 	/// <param name="skipActive">
 	/// When <see langword="true"/>, skips all workspaces that are active on any other monitor. Defaults to <see langword="false"/>.
 	/// </param>
+	[Obsolete("Use the transform ActivateAdjacentWorkspaceTransform instead.")]
 	void ActivateAdjacent(IMonitor? monitor = null, bool reverse = false, bool skipActive = false);
 
 	/// <summary>
 	/// Triggers all active workspaces to update their layout.
 	/// Active workspaces are those that are visible on a monitor.
 	/// </summary>
+	[Obsolete("Use the transform LayoutAllActiveWorkspacesTransform instead.")]
 	void LayoutAllActiveWorkspaces();
 
 	/// <summary>
 	/// Focus the Windows desktop's window.
 	/// </summary>
 	/// <param name="monitor"></param>
+	[Obsolete("Use the transform FocusMonitorDesktopTransform instead.")]
 	void FocusMonitorDesktop(IMonitor monitor);
 
 	/// <summary>
@@ -53,6 +58,7 @@ public interface IButlerChores
 	/// </param>
 	/// <param name="window"></param>
 	/// <returns>Whether the window's edges were moved.</returns>
+	[Obsolete("Use the transform MoveWindowEdgesInDirectionTransform instead.")]
 	bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null);
 
 	/// <summary>
@@ -67,6 +73,7 @@ public interface IButlerChores
 	/// <param name="skipActive">
 	/// When <see langword="true"/>, skips all workspaces that are active on any other monitor. Defaults to <see langword="false"/>.
 	/// </param>
+	[Obsolete("Use the transform MoveWindowToAdjacentWorkspaceTransform instead.")]
 	void MoveWindowToAdjacentWorkspace(IWindow? window = null, bool reverse = false, bool skipActive = false);
 
 	/// <summary>
@@ -77,6 +84,7 @@ public interface IButlerChores
 	/// The window to move. If <see langword="null"/>, this will default to
 	/// the focused/active window.
 	/// </param>
+	[Obsolete("Use the transform MoveWindowToMonitorTransform instead.")]
 	void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null);
 
 	/// <summary>
@@ -86,6 +94,7 @@ public interface IButlerChores
 	/// The window to move. If <see langword="null"/>, this will default to
 	/// the focused/active window.
 	/// </param>
+	[Obsolete("Use the transform MoveWindowToAdjacentMonitorTransform instead.")]
 	void MoveWindowToNextMonitor(IWindow? window = null);
 
 	/// <summary>
@@ -95,6 +104,7 @@ public interface IButlerChores
 	/// The window to move. If <see langword="null"/>, this will default to
 	/// the focused/active window.
 	/// </param>
+	[Obsolete("Use the transform MoveWindowToAdjacentMonitorTransform instead.")]
 	void MoveWindowToPreviousMonitor(IWindow? window = null);
 
 	/// <summary>
@@ -105,6 +115,7 @@ public interface IButlerChores
 	/// The point to move the window to. The point is in the coordinate space of the monitors,
 	/// not the unit square.
 	/// </param>
+	[Obsolete("Use the transform MoveWindowToPointTransform instead.")]
 	void MoveWindowToPoint(IWindow window, IPoint<int> point);
 
 	/// <summary>
@@ -115,6 +126,7 @@ public interface IButlerChores
 	/// The window to move. If <see langword="null"/>, this will default to
 	/// the focused/active window.
 	/// </param>
+	[Obsolete("Use the transform MoveWindowToWorkspaceTransform instead.")]
 	void MoveWindowToWorkspace(IWorkspace workspace, IWindow? window = null);
 
 	/// <summary>
@@ -122,6 +134,7 @@ public interface IButlerChores
 	/// </summary>
 	/// <param name="source">The workspace to remove.</param>
 	/// <param name="target">The workspace to merge the windows into.</param>
+	[Obsolete("Use the transform MergeWorkspaceWindowsTransform instead.")]
 	void MergeWorkspaceWindows(IWorkspace source, IWorkspace target);
 
 	/// <summary>
@@ -131,5 +144,6 @@ public interface IButlerChores
 	/// <param name="reverse">
 	/// When <see langword="true"/>, swaps workspace with the previous monitor, otherwise with the next. Defaults to <see langword="false" />.
 	/// </param>
+	[Obsolete("Use the transform SwapWorkspaceWithAdjacentMonitorTransform instead.")]
 	void SwapWorkspaceWithAdjacentMonitor(IWorkspace? workspace = null, bool reverse = false);
 }

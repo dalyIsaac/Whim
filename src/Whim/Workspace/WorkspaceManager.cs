@@ -45,10 +45,9 @@ internal class WorkspaceManager(IContext context) : IWorkspaceManager
 	public void AddProxyLayoutEngine(ProxyLayoutEngineCreator proxyLayoutEngineCreator) =>
 		_context.Store.Dispatch(new AddProxyLayoutEngineTransform(proxyLayoutEngineCreator));
 
-	public bool Contains(IWorkspace workspace) =>
-		_context.Store.Pick(PickAllWorkspaces()).Any(w => w.Id == workspace.Id);
+	public bool Contains(IWorkspace workspace) => _context.Store.Pick(PickWorkspaces()).Any(w => w.Id == workspace.Id);
 
-	public IEnumerator<IWorkspace> GetEnumerator() => _context.Store.Pick(PickAllWorkspaces()).GetEnumerator();
+	public IEnumerator<IWorkspace> GetEnumerator() => _context.Store.Pick(PickWorkspaces()).GetEnumerator();
 
 	public void Initialize()
 	{

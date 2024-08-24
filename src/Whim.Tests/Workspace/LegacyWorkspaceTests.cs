@@ -143,7 +143,7 @@ public class LegacyWorkspaceTests
 		workspace.FocusLastFocusedWindow();
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new FocusWindowTransform(workspace.Id));
+		ctx.Store.Received(1).Dispatch(new FocusWorkspaceTransform(workspace.Id));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -238,7 +238,7 @@ public class LegacyWorkspaceTests
 
 		// Then
 		ctx.Store.Received(1)
-			.Dispatch(new FocusWindowInDirectionTransform(workspace.Id, window.Handle, Direction.Left));
+			.Dispatch(new FocusWindowInDirectionTransform(workspace.Id, Direction.Left, window.Handle));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -253,7 +253,7 @@ public class LegacyWorkspaceTests
 
 		// Then
 		ctx.Store.Received(1)
-			.Dispatch(new SwapWindowInDirectionTransform(workspace.Id, window.Handle, Direction.Left));
+			.Dispatch(new SwapWindowInDirectionTransform(workspace.Id, Direction.Left, window.Handle));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -323,7 +323,7 @@ public class LegacyWorkspaceTests
 		ctx.Store.Received(1).Dispatch(new DeactivateWorkspaceTransform(workspace.Id));
 	}
 
-	[Theory, AutoSubstituteData]
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void TryGetWindowState_WindowNotFound(IContext ctx)
 	{
 		// Given

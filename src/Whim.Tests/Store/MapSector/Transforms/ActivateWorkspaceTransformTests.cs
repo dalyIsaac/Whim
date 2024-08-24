@@ -130,7 +130,7 @@ public class ActivateWorkspaceTransformTests
 
 		Assert.Contains(executedTransforms, t => t.Equals(new DoWorkspaceLayoutTransform(workspace1.Id)));
 		Assert.Contains(executedTransforms, t => t.Equals(new DoWorkspaceLayoutTransform(workspace3.Id)));
-		Assert.Contains(executedTransforms, t => t.Equals(new FocusWindowTransform(workspace3.Id)));
+		Assert.Contains(executedTransforms, t => t.Equals(new FocusWorkspaceTransform(workspace3.Id)));
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -164,7 +164,7 @@ public class ActivateWorkspaceTransformTests
 
 		Assert.DoesNotContain(executedTransforms, t => t.Equals(new DoWorkspaceLayoutTransform(workspace1.Id)));
 		Assert.Contains(executedTransforms, t => t.Equals(new DoWorkspaceLayoutTransform(workspace3.Id)));
-		Assert.Contains(executedTransforms, t => t.Equals(new FocusWindowTransform(workspace3.Id)));
+		Assert.Contains(executedTransforms, t => t.Equals(new FocusWorkspaceTransform(workspace3.Id)));
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -190,7 +190,7 @@ public class ActivateWorkspaceTransformTests
 
 		// Then the window on the new workspace is focused
 		Assert.True(result.IsSuccessful);
-		Assert.Contains(executedTransforms, t => t.Equals(new FocusWindowTransform(workspace2.Id)));
+		Assert.Contains(executedTransforms, t => t.Equals(new FocusWorkspaceTransform(workspace2.Id)));
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -220,7 +220,7 @@ public class ActivateWorkspaceTransformTests
 		// Then the window on the previously active workspace is focused
 		Assert.True(result.IsSuccessful);
 
-		Assert.Contains(executedTransforms, t => t.Equals(new FocusWindowTransform(workspace1.Id)));
-		Assert.DoesNotContain(executedTransforms, t => t.Equals(new FocusWindowTransform(workspace3.Id)));
+		Assert.Contains(executedTransforms, t => t.Equals(new FocusWorkspaceTransform(workspace1.Id)));
+		Assert.DoesNotContain(executedTransforms, t => t.Equals(new FocusWorkspaceTransform(workspace3.Id)));
 	}
 }

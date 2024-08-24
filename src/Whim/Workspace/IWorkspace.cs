@@ -53,12 +53,14 @@ public interface IWorkspace : IDisposable
 	/// The name of the workspace. When the <c>Name</c> is set, the
 	/// <see cref="IWorkspaceManager.WorkspaceRenamed"/> event is triggered.
 	/// </summary>
+	[Obsolete("Use the picker PickWorkspaceName or SetWorkspaceNameTransform instead.")]
 	string Name { get; set; }
 
 	#region Layout engine
 	/// <summary>
 	/// The active layout engine.
 	/// </summary>
+	[Obsolete("Use the picker PickActiveLayoutEngine instead.")]
 	ILayoutEngine ActiveLayoutEngine { get; }
 
 	/// <summary>
@@ -68,6 +70,7 @@ public interface IWorkspace : IDisposable
 	/// <returns>
 	/// <see langword="true"/> if the layout engine is the one specified by <paramref name="nextIdx"/>.
 	/// </returns>
+	[Obsolete("Use SetLayoutEngineFromIndexTransform instead.")]
 	bool TrySetLayoutEngineFromIndex(int nextIdx);
 
 	/// <summary>
@@ -76,11 +79,13 @@ public interface IWorkspace : IDisposable
 	/// <param name="reverse">
 	/// When <see langword="true"/>, activate the previous layout, otherwise activate the next layout. Defaults to <see langword="false" />.
 	/// </param>
+	[Obsolete("Use CycleLayoutEngineTransform instead.")]
 	void CycleLayoutEngine(bool reverse = false);
 
 	/// <summary>
 	/// Activates previously active layout engine.
 	/// </summary>
+	[Obsolete("Use ActivatePreviouslyActiveLayoutEngineTransform instead.")]
 	void ActivatePreviouslyActiveLayoutEngine();
 
 	/// <summary>
@@ -88,11 +93,13 @@ public interface IWorkspace : IDisposable
 	/// </summary>
 	/// <param name="name">The name of the layout engine to make active.</param>
 	/// <returns></returns>
+	[Obsolete("Use SetLayoutEngineFromNameTransform instead.")]
 	bool TrySetLayoutEngineFromName(string name);
 
 	/// <summary>
 	/// Trigger a layout.
 	/// </summary>
+	[Obsolete("Use DoWorkspaceLayoutTransform instead.")]
 	void DoLayout();
 	#endregion
 
@@ -100,6 +107,7 @@ public interface IWorkspace : IDisposable
 	/// <summary>
 	/// The windows in the workspace.
 	/// </summary>
+	[Obsolete("Use the picker PickWorkspaceWindows instead.")]
 	IEnumerable<IWindow> Windows { get; }
 
 	/// <summary>
@@ -109,6 +117,7 @@ public interface IWorkspace : IDisposable
 	///
 	/// To focus the last focused window, use <see cref="FocusLastFocusedWindow"/>.
 	/// </summary>
+	[Obsolete("Use the picker PickLastFocusedWindow instead.")]
 	IWindow? LastFocusedWindow { get; }
 
 	/// <summary>
@@ -122,6 +131,7 @@ public interface IWorkspace : IDisposable
 	/// </remarks>
 	/// <param name="window"></param>
 	/// <returns>Whether the <paramref name="window"/> was added.</returns>
+	[Obsolete("Use AddWindowToWorkspaceTransform instead.")]
 	bool AddWindow(IWindow window);
 
 	/// <summary>
@@ -135,6 +145,7 @@ public interface IWorkspace : IDisposable
 	/// </remarks>
 	/// <param name="window"></param>
 	/// <returns>True when the window was removed.</returns>
+	[Obsolete("Use RemoveWindowFromWorkspaceTransform instead.")]
 	bool RemoveWindow(IWindow window);
 
 	/// <summary>
@@ -142,11 +153,13 @@ public interface IWorkspace : IDisposable
 	/// </summary>
 	/// <param name="window">The window to check for.</param>
 	/// <returns>True when the workspace contains the provided <paramref name="window"/>.</returns>
+	[Obsolete("Use the picker PickWorkspaceWindows instead, and do a membership check instead.")]
 	bool ContainsWindow(IWindow window);
 
 	/// <summary>
 	/// Deactivates the workspace.
 	/// </summary>
+	[Obsolete("This method will be removed in the future, and there is no planned replacement.")]
 	void Deactivate();
 
 	/// <summary>
@@ -157,12 +170,14 @@ public interface IWorkspace : IDisposable
 	/// If the window is not in the workspace, or the workspace is not active,
 	/// <c>null</c> is returned.
 	/// </returns>
+	[Obsolete("Use the picker PickWindowPosition instead.")]
 	IWindowState? TryGetWindowState(IWindow window);
 
 	/// <summary>
 	/// If <see cref="LastFocusedWindow"/> is not <see langword="null"/> or not minimized, then we focus the
 	/// last window in the workspace.
 	/// </summary>
+	[Obsolete("Use FocusWindowTransform instead.")]
 	void FocusLastFocusedWindow();
 
 	/// <summary>
@@ -178,6 +193,7 @@ public interface IWorkspace : IDisposable
 	/// <returns>
 	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
 	/// </returns>
+	[Obsolete("Use FocusWindowInDirectionTransform instead.")]
 	bool FocusWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false);
 
 	/// <summary>
@@ -193,6 +209,7 @@ public interface IWorkspace : IDisposable
 	/// <returns>
 	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
 	/// </returns>
+	[Obsolete("Use SwapWindowInDirectionTransform instead.")]
 	bool SwapWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false);
 
 	/// <summary>
@@ -216,6 +233,9 @@ public interface IWorkspace : IDisposable
 	/// <returns>
 	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
 	/// </returns>
+	[Obsolete(
+		"Use MoveWindowEdgesInDirectionTransform instead - note that the coordinate space for deltas is different."
+	)]
 	bool MoveWindowEdgesInDirection(
 		Direction edges,
 		IPoint<double> deltas,
@@ -235,6 +255,7 @@ public interface IWorkspace : IDisposable
 	/// <returns>
 	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
 	/// </returns>
+	[Obsolete("Use MoveWindowToPointTransform instead - note that the coordinate space for the point is different.")]
 	bool MoveWindowToPoint(IWindow window, IPoint<double> point, bool deferLayout = false);
 	#endregion
 
@@ -251,6 +272,7 @@ public interface IWorkspace : IDisposable
 	/// <see cref="DoLayout"/> is not called in this method.
 	/// </remarks>
 	/// <param name="window"></param>
+	[Obsolete("Use window.ShowMinimized() instead.")]
 	void MinimizeWindowStart(IWindow window);
 
 	/// <summary>
@@ -267,6 +289,7 @@ public interface IWorkspace : IDisposable
 	/// </remarks>
 	/// <param name="window"></param>
 	/// <returns></returns>
+	[Obsolete("Use window.ShowNormal() instead.")]
 	void MinimizeWindowEnd(IWindow window);
 
 	#region PerformCustomLayoutEngineAction
@@ -283,6 +306,7 @@ public interface IWorkspace : IDisposable
 	/// <returns>
 	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
 	/// </returns>
+	[Obsolete("Use LayoutEngineCustomActionTransform instead.")]
 	bool PerformCustomLayoutEngineAction(LayoutEngineCustomAction action);
 
 	/// <summary>
@@ -301,6 +325,7 @@ public interface IWorkspace : IDisposable
 	/// <returns>
 	/// Whether the <see cref="ActiveLayoutEngine"/> changed.
 	/// </returns>
+	[Obsolete("Use LayoutEngineCustomActionWithPayloadTransform instead.")]
 	bool PerformCustomLayoutEngineAction<T>(LayoutEngineCustomAction<T> action);
 	#endregion
 }

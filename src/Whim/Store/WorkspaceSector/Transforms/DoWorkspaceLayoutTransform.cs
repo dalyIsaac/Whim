@@ -1,10 +1,16 @@
 ﻿namespace Whim;
 
 /// <summary>
-/// Triggers a layout (sets all the window positions) for the workspace specified by <see cref="WorkspaceId"/>.
+/// Queues a layout (sets all the window positions) for the workspace specified by <see cref="WorkspaceId"/>.
+/// This requires that the workspace has a matching monitor in the <see cref="IMonitorSector"/>.
 /// </summary>
 /// <param name="WorkspaceId"></param>
-internal record DoWorkspaceLayoutTransform(WorkspaceId WorkspaceId) : Transform
+/// <example>
+/// <code>
+/// context.Store.Dispatch(new DoWorkspaceLayoutTransform(workspaceId));
+/// </code>
+/// </example>
+public record DoWorkspaceLayoutTransform(WorkspaceId WorkspaceId) : Transform
 {
 	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{

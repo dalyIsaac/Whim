@@ -9,7 +9,8 @@ namespace Whim;
 /// The handle of the window to operate on.
 /// </param>
 /// <param name="DefaultToLastFocusedWindow">
-/// If <paramref name="WindowHandle"/> is <c>null</c>, try to use the last focused window.
+/// When <see langword="true"/>, when the <paramref name="WindowHandle"/> is <c>null</c>, try to use
+/// the last focused window.
 /// </param>
 /// <param name="IsWindowRequiredInWorkspace">
 /// When <see langword="true"/>, the window must be in the workspace.
@@ -18,7 +19,7 @@ namespace Whim;
 /// If <c>true</c>, do not perform a workspace layout.
 /// </param>
 public abstract record BaseWorkspaceWindowTransform(
-	Guid WorkspaceId,
+	WorkspaceId WorkspaceId,
 	HWND WindowHandle,
 	bool DefaultToLastFocusedWindow,
 	bool IsWindowRequiredInWorkspace,

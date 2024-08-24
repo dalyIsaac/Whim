@@ -1,15 +1,34 @@
 namespace Whim;
 
 /// <summary>
-/// Focus the <paramref name="WindowHandle"/> in the workspace with the given <paramref name="WorkspaceId"/>
-/// in the provided <paramref name="Direction"/>.
+/// Focus the window adjacent to the given <paramref name="WindowHandle"/> in the workspace with
+/// the given <paramref name="WorkspaceId"/> in the provided <paramref name="Direction"/>.
 ///
 /// Returns whether the active layout engine changed.
 /// </summary>
-/// <param name="WorkspaceId"></param>
-/// <param name="WindowHandle"></param>
-/// <param name="Direction"></param>
-public record FocusWindowInDirectionTransform(Guid WorkspaceId, HWND WindowHandle, Direction Direction)
+/// <param name="WorkspaceId">
+/// The id of the workspace to focus the window in.
+/// </param>
+/// <param name="Direction">
+/// The direction to search for the adjacent window to focus.
+/// </param>
+/// <param name="WindowHandle">
+/// The handle of the window from which to focus the adjacent window. Default to the last focused
+/// window if not provided.
+/// If provided, this window must exist in the workspace.
+/// </param>
+/// <example>
+/// To focus the window to the left of the specified window:
+/// <code>
+/// context.Store.Dispatch(new FocusWindowInDirectionTransform(workspaceId, Direction.Left, windowHandle));
+/// </code>
+///
+/// To focus the last focused window in the workspace:
+/// <code>
+/// context.Store.Dispatch(new FocusWindowInDirectionTransform(workspaceId, Direction.Left));
+/// </code>
+/// </example>
+public record FocusWindowInDirectionTransform(WorkspaceId WorkspaceId, Direction Direction, HWND WindowHandle = default)
 	: BaseWorkspaceWindowTransform(
 		WorkspaceId,
 		WindowHandle,

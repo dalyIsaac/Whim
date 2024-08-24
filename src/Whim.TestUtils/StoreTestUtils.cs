@@ -81,7 +81,7 @@ internal static class StoreTestUtils
 
 	public static void AddMonitorsToManager(IContext ctx, MutableRootSector rootSector, params IMonitor[] newMonitors)
 	{
-		List<IMonitor> monitors = [.. ctx.MonitorManager];
+		List<IMonitor> monitors = [.. rootSector.MonitorSector.Monitors];
 		monitors.AddRange(newMonitors);
 
 		ctx.MonitorManager.GetEnumerator().Returns(_ => monitors.GetEnumerator());

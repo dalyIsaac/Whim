@@ -1,42 +1,41 @@
 namespace Whim;
 
 /// <summary>
-/// Focus the provided <paramref name="Window"/> in the workspace with given <paramref name="WorkspaceId"/>.
-/// If <paramref name="Window"/> is <c>null</c>, focus the last focused window.
+/// Queue focus for the provided <paramref name="WindowHandle"/>. If <paramref name="WindowHandle"/> is
+/// <c>default</c>, focus the last focused window. If there is no last focused window, focus the monitor's desktop.
 ///
-/// NOTE: This does not update the workspace's <see cref="Workspace.LastFocusedWindow"/>.
-/// Instead, it queues a call to <see cref="IWindow.Focus"/>. If there is no last focused window, the monitor's
-/// desktop will be focused.
+/// The focus operation will be performed after the transform sequence is executed.
 /// </summary>
-/// <param name="WorkspaceId"></param>
-/// <param name="Window"></param>
-public record FocusWindowTransform(WorkspaceId WorkspaceId, IWindow? Window = null)
-	: BaseWorkspaceTransform(WorkspaceId)
+/// <param name="WindowHandle"></param>
+/// <example>
+/// <code>
+/// context.Store.Dispatch(new FocusWindowTransform(windowHandle));
+/// </code>
+///
+/// To focus the last focused window:
+/// <code>
+/// context.Store.Dispatch(new FocusWindowTransform());
+/// </code>
+/// </example>
+public record FocusWindowTransform(HWND WindowHandle = default) : Transform<Unit>
 {
-	private protected override Result<Workspace> WorkspaceOperation(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector rootSector,
-		Workspace workspace
-	)
+	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
-		IWindow? lastFocusedWindow = Window ?? workspace.LastFocusedWindow;
-		if (lastFocusedWindow != null && !lastFocusedWindow.IsMinimized)
+		HWND windowHandle = WindowHandle;
+
+		if (windowHandle == default)
 		{
-			rootSector.WorkspaceSector.WindowHandleToFocus = lastFocusedWindow.Handle;
-			return workspace;
+			if (!ctx.Store.Pick(PickLastFocusedWindowHandle()).TryGet(out HWND lastFocusedWindowHandle))
+			{
+				Logger.Debug("No last focused window to focus, focusing desktop");
+				HMONITOR activeMonitor = ctx.Store.Pick(PickActiveMonitor()).Handle;
+				return ctx.Store.Dispatch(new FocusMonitorDesktopTransform(activeMonitor));
+			}
+
+			windowHandle = lastFocusedWindowHandle;
 		}
 
-		Logger.Debug($"No windows in workspace {workspace.Name} to focus, focusing desktop");
-
-		// Get the bounds of the monitor for this workspace.
-		Result<IMonitor> monitorResult = ctx.Store.Pick(PickMonitorByWorkspace(workspace.Id));
-		if (!monitorResult.TryGet(out IMonitor monitor))
-		{
-			return Result.FromException<Workspace>(monitorResult.Error!);
-		}
-
-		ctx.Store.Dispatch(new FocusMonitorDesktopTransform(monitor.Handle));
-		return workspace;
+		rootSector.WorkspaceSector.WindowHandleToFocus = windowHandle;
+		return Unit.Result;
 	}
 }

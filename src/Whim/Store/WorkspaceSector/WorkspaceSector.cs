@@ -174,7 +174,6 @@ internal class WorkspaceSector(IContext ctx, IInternalContext internalCtx)
 		// Execute the layout task, and update the window states before the completed event.
 		SetWindowPositions(workspace, monitor);
 
-		// triggers.WorkspaceLayoutCompleted(new WorkspaceEventArgs() { Workspace = workspace });
 		_ctx.NativeManager.TryEnqueue(
 			() =>
 				WorkspaceLayoutCompleted?.Invoke(this, new WorkspaceLayoutCompletedEventArgs { Workspace = workspace })

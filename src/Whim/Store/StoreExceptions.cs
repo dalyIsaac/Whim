@@ -7,6 +7,9 @@ internal static class StoreExceptions
 
 	public static Exception WindowNotFound(HWND handle) => new WhimException($"Window with handle {handle} not found.");
 
+	public static Exception WindowNotFoundInWorkspace(HWND handle, WorkspaceId workspaceId) =>
+		new WhimException($"Window with handle {handle} not found in workspace {workspaceId}.");
+
 	public static Exception WorkspaceNotFound(WorkspaceId workspaceId) =>
 		new WhimException($"Workspace {workspaceId} not found.");
 

@@ -58,13 +58,13 @@ public class WorkspacePickersTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void PickAllWorkspaces(IContext ctx, MutableRootSector root)
+	internal void PickWorkspaces(IContext ctx, MutableRootSector root)
 	{
 		// Given there are three workspaces
 		CreateNamedWorkspaces(ctx, root);
 
 		// When we get the workspaces
-		var result = ctx.Store.Pick(Pickers.PickAllWorkspaces()).ToArray();
+		var result = ctx.Store.Pick(Pickers.PickWorkspaces()).ToArray();
 
 		// Then we get the workspaces
 		Assert.Equal(3, result.Length);
@@ -156,7 +156,7 @@ public class WorkspacePickersTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void PickAllWindowsInWorkspace(IContext ctx, MutableRootSector root)
+	internal void PickWorkspaceWindows(IContext ctx, MutableRootSector root)
 	{
 		// Given the workspaces and windows
 		IMonitor monitor = CreateMonitor((HMONITOR)1);
@@ -173,7 +173,7 @@ public class WorkspacePickersTests
 		PopulateWindowWorkspaceMap(ctx, root, CreateWindow((HWND)3), workspace);
 
 		// When we get the windows
-		Result<IEnumerable<IWindow>> result = ctx.Store.Pick(Pickers.PickAllWindowsInWorkspace(workspace.Id));
+		Result<IEnumerable<IWindow>> result = ctx.Store.Pick(Pickers.PickWorkspaceWindows(workspace.Id));
 
 		// Then we get the windows
 		Assert.True(result.IsSuccessful);

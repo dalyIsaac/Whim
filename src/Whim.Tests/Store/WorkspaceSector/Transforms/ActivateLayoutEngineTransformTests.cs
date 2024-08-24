@@ -3,91 +3,161 @@ using System.Diagnostics.CodeAnalysis;
 namespace Whim.Tests;
 
 [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
-public class ActivateLayoutEngineTransformTests
+public class SetLayoutEngineFromIndexTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WorkspaceNotFound(IContext ctx)
+	internal void Predicate_IndexMatches_ReturnsTrue(
+		IContext ctx,
+		MutableRootSector rootSector,
+		ILayoutEngine engine,
+		ILayoutEngine engine2
+	)
 	{
-		// Given the workspace doesn't exist
-		ActivateLayoutEngineTransform sut = new(Guid.NewGuid(), (_, _) => true);
+		// Given there is a layout engine at index 1
+		Workspace workspace = CreateWorkspace(ctx) with
+		{
+			LayoutEngines = [engine, engine2],
+		};
+		AddWorkspaceToManager(ctx, rootSector, workspace);
 
-		// When we execute the transform
-		Result<bool> result = ctx.Store.Dispatch(sut);
+		SetLayoutEngineFromIndexTransform transform = new(workspace.Id, 1);
 
-		// Then we get an error
+		// When the transform is dispatched
+		Result<bool> result = ctx.Store.Dispatch(transform);
+
+		// Then the transform succeeded
+		Assert.True(result.IsSuccessful);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void Predicate_IndexDoesNotMatch_ReturnsFalse(
+		IContext ctx,
+		MutableRootSector rootSector,
+		ILayoutEngine engine,
+		ILayoutEngine engine2
+	)
+	{
+		// Given there is no layout engine at index 2
+		Workspace workspace = CreateWorkspace(ctx) with
+		{
+			LayoutEngines = [engine, engine2],
+		};
+		AddWorkspaceToManager(ctx, rootSector, workspace);
+
+		SetLayoutEngineFromIndexTransform transform = new(workspace.Id, 2);
+
+		// When the transform is dispatched
+		Result<bool> result = ctx.Store.Dispatch(transform);
+
+		// Then the transform failed
 		Assert.False(result.IsSuccessful);
 	}
+}
 
+[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
+public class ActivatePreviouslyActiveLayoutEngineTransformTests
+{
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void LayoutEngineNotFound(IContext ctx, MutableRootSector rootSector, ILayoutEngine engine)
-	{
-		// Given the layout engine doesn't exist
-		Workspace workspace = CreateWorkspace(ctx) with
-		{
-			LayoutEngines = [engine],
-		};
-		AddWorkspaceToManager(ctx, rootSector, workspace);
-
-		ActivateLayoutEngineTransform sut = new(workspace.Id, (_, _) => true);
-
-		// When we execute the transform
-		Result<bool> result = ctx.Store.Dispatch(sut);
-
-		// Then we succeed, but the workspace doesn't change
-		Assert.True(result.IsSuccessful);
-		Assert.False(result.Value);
-		Assert.Same(workspace, rootSector.WorkspaceSector.Workspaces[workspace.Id]);
-	}
-
-	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void LayoutEngineFoundByEngine(
+	internal void Predicate_ActiveEngineMatches_ReturnsTrue(
 		IContext ctx,
 		MutableRootSector rootSector,
 		ILayoutEngine engine,
 		ILayoutEngine engine2
 	)
 	{
-		// Given the layout engine exists
+		// Given there is a previously active layout engine
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
 			LayoutEngines = [engine, engine2],
+			PreviousLayoutEngineIndex = 1,
 		};
 		AddWorkspaceToManager(ctx, rootSector, workspace);
 
-		ActivateLayoutEngineTransform sut = new(workspace.Id, (e, _) => e == engine2);
+		ActivatePreviouslyActiveLayoutEngineTransform sut = new(workspace.Id);
 
-		// When we execute the transform
+		// When the transform is dispatched
 		Result<bool> result = ctx.Store.Dispatch(sut);
 
-		// Then we succeed
+		// Then the transform succeeded
 		Assert.True(result.IsSuccessful);
-		Assert.True(result.Value);
-		Assert.NotSame(workspace, rootSector.WorkspaceSector.Workspaces[workspace.Id]);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void LayoutEngineFoundByIndex(
+	internal void Predicate_ActiveEngineDoesNotMatch_ReturnsFalse(
 		IContext ctx,
 		MutableRootSector rootSector,
 		ILayoutEngine engine,
 		ILayoutEngine engine2
 	)
 	{
-		// Given the layout engine exists
+		// Given there is no previously active layout engine with a matching index
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
 			LayoutEngines = [engine, engine2],
+			PreviousLayoutEngineIndex = 10,
 		};
 		AddWorkspaceToManager(ctx, rootSector, workspace);
 
-		ActivateLayoutEngineTransform sut = new(workspace.Id, (_, i) => i == 1);
+		ActivatePreviouslyActiveLayoutEngineTransform transform = new(workspace.Id);
 
-		// When we execute the transform
-		Result<bool> result = ctx.Store.Dispatch(sut);
+		// When the transform is dispatched
+		Result<bool> result = ctx.Store.Dispatch(transform);
 
-		// Then we succeed
+		// Then the transform failed
+		Assert.False(result.IsSuccessful);
+	}
+}
+
+[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
+public class SetLayoutEngineFromNameTransformTests
+{
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void Predicate_NameMatches_ReturnsTrue(
+		IContext ctx,
+		MutableRootSector rootSector,
+		ILayoutEngine engine,
+		ILayoutEngine engine2
+	)
+	{
+		// Given there is a layout engine with the specified name
+		engine.Name.Returns("Engine 1");
+		engine2.Name.Returns("Engine 2");
+
+		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [engine, engine2] };
+
+		AddWorkspaceToManager(ctx, rootSector, workspace);
+
+		SetLayoutEngineFromNameTransform transform = new(workspace.Id, "Engine 1");
+
+		// When the transform is dispatched
+		Result<bool> result = ctx.Store.Dispatch(transform);
+
+		// Then the transform succeeded
 		Assert.True(result.IsSuccessful);
-		Assert.True(result.Value);
-		Assert.NotSame(workspace, rootSector.WorkspaceSector.Workspaces[workspace.Id]);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void Predicate_NameDoesNotMatch_ReturnsFalse(
+		IContext ctx,
+		MutableRootSector rootSector,
+		ILayoutEngine engine,
+		ILayoutEngine engine2
+	)
+	{
+		// Given there is no layout engine with the specified name
+		engine.Name.Returns("Engine 1");
+		engine2.Name.Returns("Engine 2");
+
+		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [engine, engine2] };
+
+		AddWorkspaceToManager(ctx, rootSector, workspace);
+
+		SetLayoutEngineFromNameTransform transform = new(workspace.Id, "Engine 3");
+
+		// When the transform is dispatched
+		Result<bool> result = ctx.Store.Dispatch(transform);
+
+		// Then the transform failed
+		Assert.False(result.IsSuccessful);
 	}
 }

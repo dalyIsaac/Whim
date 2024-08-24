@@ -6,7 +6,7 @@ namespace Whim;
 /// </summary>
 /// <param name="WorkspaceId"></param>
 /// <param name="Window"></param>
-internal record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, IWindow Window)
+public record RemoveWindowFromWorkspaceTransform(WorkspaceId WorkspaceId, IWindow Window)
 	: BaseWorkspaceTransform(WorkspaceId, SkipDoLayout: false)
 {
 	private protected override Result<Workspace> WorkspaceOperation(
