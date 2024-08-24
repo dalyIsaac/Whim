@@ -1,4 +1,4 @@
-# Development
+# Building Whim
 
 > [!NOTE]
 > Make sure to read the [environment setup](environment-setup.md) guide before continuing.

@@ -43,8 +43,8 @@ items:
   - href: architecture/deprecated.md
 
   - name: Contributing
-  - href: contribute/issues.md
+  - href: contribute/guide.md
   - href: contribute/environment-setup.md
-  - href: contribute/development.md
+  - href: contribute/building-whim.md
   - href: contribute/docs.md
   - href: contribute/releases.md
