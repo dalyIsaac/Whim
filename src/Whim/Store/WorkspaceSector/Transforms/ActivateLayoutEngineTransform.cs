@@ -11,17 +11,20 @@ public abstract record ActivateLayoutEngineTransform(WorkspaceId WorkspaceId) : 
 	/// <summary>
 	/// The predicate to determine which layout engine should be activated.
 	/// </summary>
+	/// <param name="ctx">
+	/// The context.
+	/// </param>
+	/// <param name="workspace">
+	/// The workspace to check.
+	/// </param>
 	/// <param name="engine">
 	/// The layout engine to check.
 	/// </param>
 	/// <param name="idx">
 	/// The index of the layout engine in the workspace.
 	/// </param>
-	/// <param name="ctx">
-	/// The context.
-	/// </param>
 	/// <returns></returns>
-	public abstract bool Predicate(ILayoutEngine engine, int idx, IContext ctx);
+	public abstract bool Predicate(IContext ctx, Workspace workspace, ILayoutEngine engine, int idx);
 
 	private protected override Result<Workspace> WorkspaceOperation(
 		IContext ctx,
@@ -30,13 +33,16 @@ public abstract record ActivateLayoutEngineTransform(WorkspaceId WorkspaceId) : 
 		Workspace workspace
 	)
 	{
-		int layoutEngineIdx = workspace.LayoutEngines.GetMatchingIndex(Predicate, ctx);
-		if (layoutEngineIdx == -1)
+		for (int idx = 0; idx < workspace.LayoutEngines.Count; idx++)
 		{
-			return Result.FromException<Workspace>(new WhimException("Provided layout engine not found"));
+			ILayoutEngine engine = workspace.LayoutEngines[idx];
+			if (Predicate(ctx, workspace, engine, idx))
+			{
+				return WorkspaceUtils.SetActiveLayoutEngine(rootSector.WorkspaceSector, workspace, idx);
+			}
 		}
 
-		return WorkspaceUtils.SetActiveLayoutEngine(rootSector.WorkspaceSector, workspace, layoutEngineIdx);
+		return Result.FromException<Workspace>(new WhimException("Provided layout engine not found"));
 	}
 }
 
@@ -53,7 +59,8 @@ public record SetLayoutEngineFromIndexTransform(WorkspaceId WorkspaceId, int Lay
 	: ActivateLayoutEngineTransform(WorkspaceId)
 {
 	/// <inheritdoc/>
-	public override bool Predicate(ILayoutEngine engine, int idx, IContext ctx) => idx == LayoutEngineIndex;
+	public override bool Predicate(IContext ctx, Workspace workspace, ILayoutEngine engine, int idx) =>
+		idx == LayoutEngineIndex;
 }
 
 /// <summary>
@@ -66,8 +73,8 @@ public record ActivatePreviouslyActiveLayoutEngineTransform(WorkspaceId Workspac
 	: ActivateLayoutEngineTransform(WorkspaceId)
 {
 	/// <inheritdoc/>
-	public override bool Predicate(ILayoutEngine engine, int idx, IContext ctx) =>
-		engine == ctx.Store.Pick(PickActiveLayoutEngine(WorkspaceId)).Value;
+	public override bool Predicate(IContext ctx, Workspace workspace, ILayoutEngine engine, int idx) =>
+		idx == workspace.PreviousLayoutEngineIndex;
 }
 
 /// <summary>
@@ -83,5 +90,6 @@ public record SetLayoutEngineFromNameTransform(WorkspaceId WorkspaceId, string L
 	: ActivateLayoutEngineTransform(WorkspaceId)
 {
 	/// <inheritdoc/>
-	public override bool Predicate(ILayoutEngine engine, int idx, IContext ctx) => engine.Name == LayoutEngineName;
+	public override bool Predicate(IContext ctx, Workspace workspace, ILayoutEngine engine, int idx) =>
+		engine.Name == LayoutEngineName;
 }
