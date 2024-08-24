@@ -72,8 +72,8 @@ public class ActivatePreviouslyActiveLayoutEngineTransformTests
 			PreviousLayoutEngineIndex = 1,
 		};
 		AddWorkspaceToManager(ctx, rootSector, workspace);
-		
-		ActivatePreviouslyActiveLayoutEngineTransform sut = new (workspace.Id);
+
+		ActivatePreviouslyActiveLayoutEngineTransform sut = new(workspace.Id);
 
 		// When the transform is dispatched
 		Result<bool> result = ctx.Store.Dispatch(sut);
@@ -94,7 +94,7 @@ public class ActivatePreviouslyActiveLayoutEngineTransformTests
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
 			LayoutEngines = [engine, engine2],
-			PreviousLayoutEngineIndex = 10
+			PreviousLayoutEngineIndex = 10,
 		};
 		AddWorkspaceToManager(ctx, rootSector, workspace);
 
