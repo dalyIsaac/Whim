@@ -329,7 +329,12 @@ public class LegacyWorkspaceTests
 		// Given
 		Workspace workspace = CreateWorkspace(ctx);
 		IWindow window = CreateWindow((HWND)1);
-		ctx.Store.Pick(Arg.Any<PurePicker<Result<WindowPosition>>>()).Returns(Result.FromException<WindowPosition>(StoreExceptions.WindowNotFoundInWorkspace(window.Handle, workspace.Id)));
+		ctx.Store.Pick(Arg.Any<PurePicker<Result<WindowPosition>>>())
+			.Returns(
+				Result.FromException<WindowPosition>(
+					StoreExceptions.WindowNotFoundInWorkspace(window.Handle, workspace.Id)
+				)
+			);
 
 		// When
 		IWindowState? result = workspace.TryGetWindowState(window);

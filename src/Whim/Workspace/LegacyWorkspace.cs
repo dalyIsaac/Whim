@@ -82,13 +82,15 @@ public partial record Workspace : IInternalWorkspace
 
 	/// <inheritdoc/>
 	public bool FocusWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false) =>
-		_context.Store.Dispatch(new FocusWindowInDirectionTransform(Id, direction, window?.Handle ?? default)).TryGet(out bool isChanged)
-		&& isChanged;
+		_context
+			.Store.Dispatch(new FocusWindowInDirectionTransform(Id, direction, window?.Handle ?? default))
+			.TryGet(out bool isChanged) && isChanged;
 
 	/// <inheritdoc/>
 	public bool SwapWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false) =>
-		_context.Store.Dispatch(new SwapWindowInDirectionTransform(Id, direction, window?.Handle ?? default)).TryGet(out bool isChanged)
-		&& isChanged;
+		_context
+			.Store.Dispatch(new SwapWindowInDirectionTransform(Id, direction, window?.Handle ?? default))
+			.TryGet(out bool isChanged) && isChanged;
 
 	/// <inheritdoc/>
 	public bool MoveWindowEdgesInDirection(
