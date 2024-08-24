@@ -36,7 +36,7 @@ public class WindowUtilsTests
 		window.Handle.Returns((HWND)12);
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
-			WindowPositions = ImmutableDictionary<HWND, WindowPosition>.Empty.Add(window.Handle, new())
+			WindowPositions = ImmutableDictionary<HWND, WindowPosition>.Empty.Add(window.Handle, new()),
 		};
 		PopulateWindowWorkspaceMap(ctx, rootSector, window, workspace);
 
@@ -67,7 +67,7 @@ public class WindowUtilsTests
 		window.Handle.Returns((HWND)12);
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
-			WindowPositions = ImmutableDictionary<HWND, WindowPosition>.Empty.Add(window.Handle, new())
+			WindowPositions = ImmutableDictionary<HWND, WindowPosition>.Empty.Add(window.Handle, new()),
 		};
 
 		PopulateWindowWorkspaceMap(ctx, rootSector, window, workspace);
@@ -140,7 +140,7 @@ public class WindowUtilsTests
 				new Rectangle<int>() { Y = 4, Height = 3 },
 				Direction.Down,
 				new Point<int>() { X = 0, Y = -1 }
-			}
+			},
 		};
 
 	[Theory]
@@ -162,7 +162,7 @@ public class WindowUtilsTests
 			WindowPositions = ImmutableDictionary<HWND, WindowPosition>.Empty.Add(
 				window.Handle,
 				new() { LastWindowRectangle = originalRect, WindowSize = WindowSize.Normal }
-			)
+			),
 		};
 
 		PopulateWindowWorkspaceMap(ctx, rootSector, window, workspace);

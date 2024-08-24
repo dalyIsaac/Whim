@@ -144,9 +144,9 @@ public record ColumnLayoutEngine : ILayoutEngine
 					X = x,
 					Y = y,
 					Width = width,
-					Height = height
+					Height = height,
 				},
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			};
 
 			if (LeftToRight)
@@ -173,7 +173,7 @@ public record ColumnLayoutEngine : ILayoutEngine
 			{
 				Window = window,
 				Rectangle = minimizedRectangle,
-				WindowSize = WindowSize.Minimized
+				WindowSize = WindowSize.Minimized,
 			};
 		}
 	}

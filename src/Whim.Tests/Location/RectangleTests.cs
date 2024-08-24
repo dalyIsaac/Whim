@@ -66,7 +66,7 @@ public class RectangleTests
 				X = 5,
 				Y = 5,
 				Width = 5,
-				Height = 5
+				Height = 5,
 			};
 		IRectangle<int> rect3 = rect1.Add(rect2);
 		Assert.StrictEqual(
@@ -75,7 +75,7 @@ public class RectangleTests
 				X = 5,
 				Y = 5,
 				Width = 15,
-				Height = 15
+				Height = 15,
 			},
 			rect3
 		);
@@ -92,7 +92,7 @@ public class RectangleTests
 				X = 5,
 				Y = 5,
 				Width = 5,
-				Height = 5
+				Height = 5,
 			};
 
 		// When
@@ -123,7 +123,7 @@ public class RectangleTests
 		yield return new object[]
 		{
 			new Rectangle<int>() { Width = 10, Height = 10 },
-			new Point<int>() { X = 5, Y = 5 }
+			new Point<int>() { X = 5, Y = 5 },
 		};
 		yield return new object[]
 		{
@@ -132,9 +132,9 @@ public class RectangleTests
 				X = 5,
 				Y = 5,
 				Width = 10,
-				Height = 10
+				Height = 10,
 			},
-			new Point<double>() { X = 10, Y = 10 }
+			new Point<double>() { X = 10, Y = 10 },
 		};
 		yield return new object[]
 		{
@@ -143,9 +143,9 @@ public class RectangleTests
 				X = -5,
 				Y = -5,
 				Width = 10,
-				Height = 10
+				Height = 10,
 			},
-			new Point<double>() { X = 0, Y = 0 }
+			new Point<double>() { X = 0, Y = 0 },
 		};
 	}
 

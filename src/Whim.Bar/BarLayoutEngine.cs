@@ -45,7 +45,7 @@ public record BarLayoutEngine : BaseProxyLayoutEngine
 				X = rectangle.X,
 				Y = rectangle.Y + height,
 				Width = rectangle.Width,
-				Height = Math.Max(0, rectangle.Height - height)
+				Height = Math.Max(0, rectangle.Height - height),
 			};
 		return InnerLayoutEngine.DoLayout(proxiedRect, monitor);
 	}

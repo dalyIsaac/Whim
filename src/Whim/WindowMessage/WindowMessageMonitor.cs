@@ -75,7 +75,7 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 					UMsg = uMsg,
 					WParam = wParam,
 					LParam = lParam,
-				}
+				},
 			};
 
 		switch (uMsg)

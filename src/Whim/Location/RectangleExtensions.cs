@@ -20,6 +20,6 @@ public static class RectangleExtensions
 			X = rectangle.X + other.X,
 			Y = rectangle.Y + other.Y,
 			Width = rectangle.Width + other.Width,
-			Height = rectangle.Height + other.Height
+			Height = rectangle.Height + other.Height,
 		};
 }

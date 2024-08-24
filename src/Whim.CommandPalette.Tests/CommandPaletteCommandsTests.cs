@@ -215,19 +215,19 @@ public class CommandPaletteCommandsTests
 			{
 				Id = "0",
 				Title = "Window 0",
-				IsSelected = true
+				IsSelected = true,
 			},
 			new SelectOption()
 			{
 				Id = "1",
 				Title = "Window 1",
-				IsSelected = false
+				IsSelected = false,
 			},
 			new SelectOption()
 			{
 				Id = "2",
 				Title = "Window 2",
-				IsSelected = true
+				IsSelected = true,
 			},
 		];
 

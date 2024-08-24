@@ -25,6 +25,6 @@ internal record SetLastFocusedWindowTransform(WorkspaceId WorkspaceId, HWND Wind
 			? workspace
 			: workspace with
 			{
-				LastFocusedWindowHandle = window.Handle
+				LastFocusedWindowHandle = window.Handle,
 			};
 }

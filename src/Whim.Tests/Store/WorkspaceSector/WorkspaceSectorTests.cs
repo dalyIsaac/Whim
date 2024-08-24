@@ -40,14 +40,14 @@ public class WorkspaceSectorTests
 				{
 					Window = window1,
 					Rectangle = new Rectangle<int>(0, 0, 100, 100),
-					WindowSize = WindowSize.Normal
+					WindowSize = WindowSize.Normal,
 				},
 				new WindowState()
 				{
 					Window = window2,
 					Rectangle = new Rectangle<int>(100, 100, 100, 100),
-					WindowSize = WindowSize.Minimized
-				}
+					WindowSize = WindowSize.Minimized,
+				},
 			});
 
 		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [engine] };

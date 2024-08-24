@@ -26,7 +26,7 @@ public class MoveWindowEdgesInDirectionWorkspaceTransformTests
 			CreateWorkspace(ctx) with
 			{
 				LayoutEngines = [engine1, engine2],
-				ActiveLayoutEngineIndex = 1
+				ActiveLayoutEngineIndex = 1,
 			}
 		);
 
@@ -74,7 +74,7 @@ public class MoveWindowEdgesInDirectionWorkspaceTransformTests
 			CreateWorkspace(ctx) with
 			{
 				LayoutEngines = [engine1, engine2],
-				ActiveLayoutEngineIndex = 1
+				ActiveLayoutEngineIndex = 1,
 			}
 		);
 

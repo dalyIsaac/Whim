@@ -135,7 +135,7 @@ internal partial class NativeManager : INativeManager
 			X = windowRect.left - extendedFrameRectangle.X,
 			Y = windowRect.top - extendedFrameRectangle.Y,
 			Width = windowRect.right - windowRect.left - extendedFrameRectangle.Width,
-			Height = windowRect.bottom - windowRect.top - extendedFrameRectangle.Height
+			Height = windowRect.bottom - windowRect.top - extendedFrameRectangle.Height,
 		};
 	}
 
@@ -163,7 +163,7 @@ internal partial class NativeManager : INativeManager
 				X = extendedFrameRect.left,
 				Y = extendedFrameRect.top,
 				Width = extendedFrameRect.right - extendedFrameRect.left,
-				Height = extendedFrameRect.bottom - extendedFrameRect.top
+				Height = extendedFrameRect.bottom - extendedFrameRect.top,
 			};
 		}
 	}
@@ -260,7 +260,7 @@ internal partial class NativeManager : INativeManager
 			{
 				apartmentType = DISPATCHERQUEUE_THREAD_APARTMENTTYPE.DQTAT_COM_STA,
 				threadType = DISPATCHERQUEUE_THREAD_TYPE.DQTYPE_THREAD_CURRENT,
-				dwSize = (uint)Marshal.SizeOf(typeof(DispatcherQueueOptions))
+				dwSize = (uint)Marshal.SizeOf(typeof(DispatcherQueueOptions)),
 			};
 
 		PInvoke.CreateDispatcherQueueController(options, out nint raw);

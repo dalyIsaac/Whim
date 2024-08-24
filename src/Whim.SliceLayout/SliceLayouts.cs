@@ -55,7 +55,7 @@ public static class SliceLayouts
 	) =>
 		new SliceLayoutEngine(context, plugin, identity, new(isRow: false, (1, new OverflowArea())))
 		{
-			Name = "Column"
+			Name = "Column",
 		};
 
 	/// <summary>
@@ -326,7 +326,7 @@ public static class SliceLayouts
 			CreateSecondaryPrimaryArea(primaryColumnCapacity, secondaryColumnCapacity)
 		)
 		{
-			Name = "Secondary primary"
+			Name = "Secondary primary",
 		};
 
 	internal static ParentArea CreateSecondaryPrimaryArea(uint primaryColumnCapacity, uint secondaryColumnCapacity)

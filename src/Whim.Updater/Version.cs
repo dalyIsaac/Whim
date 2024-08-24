@@ -92,7 +92,7 @@ public partial record Version
 			"alpha" => ReleaseChannel.Alpha,
 			"beta" => ReleaseChannel.Beta,
 			"stable" => ReleaseChannel.Stable,
-			_ => ReleaseChannel.Stable
+			_ => ReleaseChannel.Stable,
 		};
 		string commit = match.Groups[5].Value;
 

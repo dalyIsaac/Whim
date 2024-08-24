@@ -309,7 +309,7 @@ public record TreeLayoutEngine : ILayoutEngine
 				{
 					Window = item.WindowNode.Window,
 					Rectangle = item.Rectangle,
-					WindowSize = item.WindowSize
+					WindowSize = item.WindowSize,
 				};
 			}
 		}
@@ -320,7 +320,7 @@ public record TreeLayoutEngine : ILayoutEngine
 			{
 				Window = window,
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Minimized
+				WindowSize = WindowSize.Minimized,
 			};
 		}
 	}
@@ -362,7 +362,7 @@ public record TreeLayoutEngine : ILayoutEngine
 		{
 			WindowNode windowNode => windowNode.Window,
 			ISplitNode ISplitNode => ISplitNode.GetLeftMostWindow().WindowNode.Window,
-			_ => null
+			_ => null,
 		};
 	}
 

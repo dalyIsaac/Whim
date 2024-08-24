@@ -120,7 +120,7 @@ public class WorkspaceWidgetViewModelTests
 			{
 				Monitor = monitor,
 				PreviousWorkspace = previousWorkspace,
-				CurrentWorkspace = currentWorkspace
+				CurrentWorkspace = currentWorkspace,
 			}
 		);
 
@@ -162,7 +162,7 @@ public class WorkspaceWidgetViewModelTests
 			{
 				Monitor = monitor,
 				PreviousWorkspace = existingModel.Workspace,
-				CurrentWorkspace = addedWorkspaceModel.Workspace
+				CurrentWorkspace = addedWorkspaceModel.Workspace,
 			}
 		);
 
@@ -205,7 +205,7 @@ public class WorkspaceWidgetViewModelTests
 			{
 				Monitor = otherMonitor,
 				PreviousWorkspace = existingModel.Workspace,
-				CurrentWorkspace = addedWorkspaceModel.Workspace
+				CurrentWorkspace = addedWorkspaceModel.Workspace,
 			}
 		);
 
@@ -231,7 +231,7 @@ public class WorkspaceWidgetViewModelTests
 			{
 				context.WorkspaceManager.WorkspaceRenamed += Raise.Event<EventHandler<WorkspaceRenamedEventArgs>>(
 					context.WorkspaceManager,
-					new WorkspaceRenamedEventArgs() { Workspace = workspace, PreviousName = "Old Name", }
+					new WorkspaceRenamedEventArgs() { Workspace = workspace, PreviousName = "Old Name" }
 				);
 			}
 		);
@@ -257,7 +257,7 @@ public class WorkspaceWidgetViewModelTests
 
 		context.WorkspaceManager.WorkspaceRenamed += Raise.Event<EventHandler<WorkspaceRenamedEventArgs>>(
 			context.WorkspaceManager,
-			new WorkspaceRenamedEventArgs() { Workspace = renamedWorkspace, PreviousName = "Old Name", }
+			new WorkspaceRenamedEventArgs() { Workspace = renamedWorkspace, PreviousName = "Old Name" }
 		);
 
 		// Then

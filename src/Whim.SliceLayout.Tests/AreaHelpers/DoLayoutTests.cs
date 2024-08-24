@@ -22,7 +22,7 @@ public class DoLayoutTests
 			{
 				new Rectangle<int>(0, 0, 100, 100),
 				SliceLayouts.CreatePrimaryStackArea(),
-				new[] { new Rectangle<int>(0, 0, 100, 100), }
+				new[] { new Rectangle<int>(0, 0, 100, 100) }
 			},
 			// Fill overflow
 			{
@@ -52,13 +52,13 @@ public class DoLayoutTests
 			{
 				new Rectangle<int>(0, 0, 100, 100),
 				SliceLayouts.CreateMultiColumnArea([2, 1, 0]),
-				new[] { new Rectangle<int>(0, 0, 100, 100), }
+				new[] { new Rectangle<int>(0, 0, 100, 100) }
 			},
 			// Fill primary
 			{
 				new Rectangle<int>(0, 0, 100, 100),
 				SliceLayouts.CreateMultiColumnArea([2, 1, 0]),
-				new[] { new Rectangle<int>(0, 0, 100, 50), new Rectangle<int>(0, 50, 100, 50), }
+				new[] { new Rectangle<int>(0, 0, 100, 50), new Rectangle<int>(0, 50, 100, 50) }
 			},
 			// Fill secondary
 			{
@@ -101,7 +101,7 @@ public class DoLayoutTests
 			{
 				new Rectangle<int>(0, 0, 100, 100),
 				SliceLayouts.CreateSecondaryPrimaryArea(1, 2),
-				new[] { new Rectangle<int>(0, 0, 100, 100), }
+				new[] { new Rectangle<int>(0, 0, 100, 100) }
 			},
 			// Fill secondary
 			{
@@ -111,7 +111,7 @@ public class DoLayoutTests
 				{
 					new Rectangle<int>(38, 0, 62, 100),
 					new Rectangle<int>(0, 0, 38, 50),
-					new Rectangle<int>(0, 50, 38, 50)
+					new Rectangle<int>(0, 50, 38, 50),
 				}
 			},
 			// Fill overflow
@@ -125,7 +125,7 @@ public class DoLayoutTests
 					new Rectangle<int>(0, 50, 25, 50),
 					new Rectangle<int>(75, 0, 25, 33),
 					new Rectangle<int>(75, 33, 25, 33),
-					new Rectangle<int>(75, 66, 25, 33)
+					new Rectangle<int>(75, 66, 25, 33),
 				}
 			},
 		};
@@ -143,7 +143,7 @@ public class DoLayoutTests
 			{
 				new Rectangle<int>(0, 0, 100, 100),
 				SampleSliceLayouts.CreateOverflowColumnLayout(),
-				new[] { new Rectangle<int>(0, 0, 100, 100), }
+				new[] { new Rectangle<int>(0, 0, 100, 100) }
 			},
 			// Fill overflow
 			{
@@ -154,7 +154,7 @@ public class DoLayoutTests
 					new Rectangle<int>(0, 0, 100, 25),
 					new Rectangle<int>(0, 25, 100, 25),
 					new Rectangle<int>(0, 50, 100, 25),
-					new Rectangle<int>(0, 75, 100, 25)
+					new Rectangle<int>(0, 75, 100, 25),
 				}
 			},
 		};
@@ -172,7 +172,7 @@ public class DoLayoutTests
 			{
 				new Rectangle<int>(0, 0, 100, 100),
 				SampleSliceLayouts.CreateOverflowRowLayout(),
-				new[] { new Rectangle<int>(0, 0, 100, 100), }
+				new[] { new Rectangle<int>(0, 0, 100, 100) }
 			},
 			// Fill overflow
 			{
@@ -183,9 +183,9 @@ public class DoLayoutTests
 					new Rectangle<int>(0, 0, 25, 100),
 					new Rectangle<int>(25, 0, 25, 100),
 					new Rectangle<int>(50, 0, 25, 100),
-					new Rectangle<int>(75, 0, 25, 100)
+					new Rectangle<int>(75, 0, 25, 100),
 				}
-			}
+			},
 		};
 
 	public static TheoryData<IRectangle<int>, ParentArea, IRectangle<int>[]> DoLayout_Nested =>
@@ -201,13 +201,13 @@ public class DoLayoutTests
 			{
 				new Rectangle<int>(0, 0, 100, 100),
 				SampleSliceLayouts.CreateNestedLayout(),
-				new[] { new Rectangle<int>(0, 0, 100, 100), }
+				new[] { new Rectangle<int>(0, 0, 100, 100) }
 			},
 			// Fill primary
 			{
 				new Rectangle<int>(0, 0, 100, 100),
 				SampleSliceLayouts.CreateNestedLayout(),
-				new[] { new Rectangle<int>(0, 0, 100, 50), new Rectangle<int>(0, 50, 100, 50), }
+				new[] { new Rectangle<int>(0, 0, 100, 50), new Rectangle<int>(0, 50, 100, 50) }
 			},
 			//Fill secondary
 			{
@@ -235,7 +235,7 @@ public class DoLayoutTests
 					new Rectangle<int>(50, 66, 50, 16),
 					new Rectangle<int>(50, 82, 50, 16),
 				}
-			}
+			},
 		};
 
 	[Theory]
@@ -264,7 +264,7 @@ public class DoLayoutTests
 			{
 				Rectangle = expectedRectangles[i],
 				Window = Substitute.For<IWindow>(),
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			};
 		}
 		for (int i = 0; i < minimizedWindowCount; i++)
@@ -273,7 +273,7 @@ public class DoLayoutTests
 			{
 				Rectangle = new Rectangle<int>(),
 				Window = Substitute.For<IWindow>(),
-				WindowSize = WindowSize.Minimized
+				WindowSize = WindowSize.Minimized,
 			};
 		}
 

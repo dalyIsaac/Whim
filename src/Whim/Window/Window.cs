@@ -27,7 +27,7 @@ internal class Window : IWindow
 				X = rect.left,
 				Y = rect.top,
 				Width = rect.right - rect.left,
-				Height = rect.bottom - rect.top
+				Height = rect.bottom - rect.top,
 			};
 		}
 	}
@@ -149,7 +149,7 @@ internal class Window : IWindow
 			Handle = hwnd,
 			ProcessId = processId,
 			ProcessFileName = processFileName,
-			ProcessFilePath = processPath
+			ProcessFilePath = processPath,
 		};
 	}
 

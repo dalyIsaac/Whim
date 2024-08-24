@@ -203,7 +203,7 @@ public class MapPickersTests
 			{ 0, new[] { 0, 1 }, false, true, 2 },
 			{ 1, new[] { 0, 1 }, true, true, 3 },
 			{ 3, new[] { 0, 2 }, false, true, 1 },
-			{ 3, new[] { 2, 3 }, true, true, 1 }
+			{ 3, new[] { 2, 3 }, true, true, 1 },
 		};
 
 	[Theory]

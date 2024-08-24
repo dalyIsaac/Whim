@@ -13,15 +13,15 @@ public class WorkspacePickersTests
 			root,
 			CreateWorkspace(ctx) with
 			{
-				BackingName = "Test"
+				BackingName = "Test",
 			},
 			CreateWorkspace(ctx) with
 			{
-				BackingName = "Test2"
+				BackingName = "Test2",
 			},
 			CreateWorkspace(ctx) with
 			{
-				BackingName = "Test3"
+				BackingName = "Test3",
 			}
 		);
 	}
@@ -143,7 +143,7 @@ public class WorkspacePickersTests
 		Workspace activeWorkspace = CreateWorkspace(ctx) with
 		{
 			LayoutEngines = [layoutEngine1, layoutEngine2],
-			ActiveLayoutEngineIndex = 1
+			ActiveLayoutEngineIndex = 1,
 		};
 		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), activeWorkspace);
 
@@ -204,7 +204,7 @@ public class WorkspacePickersTests
 			workspace.Id,
 			workspace with
 			{
-				LastFocusedWindowHandle = lastFocusedWindow.Handle
+				LastFocusedWindowHandle = lastFocusedWindow.Handle,
 			}
 		);
 
@@ -227,7 +227,7 @@ public class WorkspacePickersTests
 			workspace.Id,
 			workspace with
 			{
-				LastFocusedWindowHandle = lastFocusedWindow.Handle
+				LastFocusedWindowHandle = lastFocusedWindow.Handle,
 			}
 		);
 
@@ -265,7 +265,7 @@ public class WorkspacePickersTests
 			workspace.Id,
 			workspace with
 			{
-				LastFocusedWindowHandle = lastFocusedWindow.Handle
+				LastFocusedWindowHandle = lastFocusedWindow.Handle,
 			}
 		);
 
@@ -288,7 +288,7 @@ public class WorkspacePickersTests
 			workspace.Id,
 			workspace with
 			{
-				LastFocusedWindowHandle = lastFocusedWindow.Handle
+				LastFocusedWindowHandle = lastFocusedWindow.Handle,
 			}
 		);
 
@@ -327,7 +327,7 @@ public class WorkspacePickersTests
 			WindowPositions = workspace.WindowPositions.SetItem(
 				window.Handle,
 				new WindowPosition(WindowSize.Minimized, new Rectangle<int>())
-			)
+			),
 		};
 
 		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
@@ -388,7 +388,7 @@ public class WorkspacePickersTests
 	{
 		// Given the workspaces and windows
 		Func<CreateLeafLayoutEngine[]> createLayoutEngines = () =>
-			[(id) => Substitute.For<ILayoutEngine>(), (id) => Substitute.For<ILayoutEngine>(),];
+			[(id) => Substitute.For<ILayoutEngine>(), (id) => Substitute.For<ILayoutEngine>()];
 
 		root.WorkspaceSector.CreateLayoutEngines = createLayoutEngines;
 

@@ -115,7 +115,7 @@ public static class MonitorHelpers
 			X = x,
 			Y = y,
 			Width = width,
-			Height = height
+			Height = height,
 		};
 	}
 
@@ -133,7 +133,7 @@ public static class MonitorHelpers
 			X = Convert.ToInt32(monitor.X + (rectangle.X * monitor.Width)),
 			Y = Convert.ToInt32(monitor.Y + (rectangle.Y * monitor.Height)),
 			Width = Math.Abs(Convert.ToInt32(rectangle.Width * monitor.Width)),
-			Height = Math.Abs(Convert.ToInt32(rectangle.Height * monitor.Height))
+			Height = Math.Abs(Convert.ToInt32(rectangle.Height * monitor.Height)),
 		};
 	}
 }

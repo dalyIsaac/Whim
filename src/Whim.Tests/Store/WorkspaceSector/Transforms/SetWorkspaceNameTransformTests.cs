@@ -11,7 +11,7 @@ public class SetWorkspaceNameTransformTests
 		// Given the new name is the same as the old name
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
-			BackingName = "test"
+			BackingName = "test",
 		};
 		AddWorkspaceToManager(ctx, root, workspace);
 
@@ -32,7 +32,7 @@ public class SetWorkspaceNameTransformTests
 		// Given the new name is different from the old name
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
-			BackingName = "test"
+			BackingName = "test",
 		};
 		AddWorkspaceToManager(ctx, root, workspace);
 

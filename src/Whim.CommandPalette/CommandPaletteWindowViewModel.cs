@@ -121,7 +121,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 			MenuVariantConfig => _menuVariant,
 			FreeTextVariantConfig => _freeTextVariant,
 			SelectVariantConfig => _selectVariant,
-			_ => null
+			_ => null,
 		};
 
 		if (ActiveVariant == null)

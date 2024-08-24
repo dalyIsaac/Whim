@@ -79,7 +79,7 @@ internal static class WindowUtils
 			return null;
 		}
 
-		return (movedEdges, new Point<int>() { X = movedEdgeDeltaX, Y = movedEdgeDeltaY, });
+		return (movedEdges, new Point<int>() { X = movedEdgeDeltaX, Y = movedEdgeDeltaY });
 	}
 
 	public static HWND OrLastFocusedWindow(this HWND handle, IContext ctx)

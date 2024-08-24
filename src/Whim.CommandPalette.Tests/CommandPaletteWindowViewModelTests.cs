@@ -126,7 +126,7 @@ public class CommandPaletteWindowViewModelTests
 				X = 0,
 				Y = 0,
 				Height = 100,
-				Width = 100
+				Width = 100,
 			}
 		);
 
@@ -135,7 +135,7 @@ public class CommandPaletteWindowViewModelTests
 			{
 				Commands = [],
 				InitialText = "Initial text",
-				Hint = "Hint"
+				Hint = "Hint",
 			};
 
 		IEnumerable<ICommand> ICommands = [new Command("id", "title", () => { })];
@@ -172,11 +172,11 @@ public class CommandPaletteWindowViewModelTests
 				{
 					Options = [],
 					Callback = (items) => { },
-					ConfirmButtonText = "Save"
+					ConfirmButtonText = "Save",
 				},
 				true,
 				"Save"
-			}
+			},
 		};
 
 	[Theory]

@@ -25,7 +25,7 @@ internal record DeactivateWorkspaceTransform(WorkspaceId WorkspaceId)
 
 		return workspace with
 		{
-			WindowPositions = updatedPositions
+			WindowPositions = updatedPositions,
 		};
 	}
 }

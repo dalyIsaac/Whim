@@ -33,7 +33,7 @@ public record FocusWindowInDirectionTransform(Guid WorkspaceId, HWND WindowHandl
 			? workspace
 			: workspace with
 			{
-				LayoutEngines = workspace.LayoutEngines.SetItem(workspace.ActiveLayoutEngineIndex, newLayoutEngine)
+				LayoutEngines = workspace.LayoutEngines.SetItem(workspace.ActiveLayoutEngineIndex, newLayoutEngine),
 			};
 	}
 }

@@ -40,7 +40,7 @@ internal sealed partial class FocusIndicatorWindow : Microsoft.UI.Xaml.Window, S
 			X = windowRectangle.X - borderSize,
 			Y = windowRectangle.Y - borderSize,
 			Height = windowRectangle.Height + (borderSize * 2),
-			Width = windowRectangle.Width + (borderSize * 2)
+			Width = windowRectangle.Width + (borderSize * 2),
 		};
 
 		// Prevent the window from being activated.

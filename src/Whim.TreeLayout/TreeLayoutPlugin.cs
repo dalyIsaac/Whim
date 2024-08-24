@@ -82,7 +82,7 @@ public class TreeLayoutPlugin(IContext context) : ITreeLayoutPlugin
 			{
 				CurrentDirection = direction,
 				PreviousDirection = previousDirection,
-				TreeLayoutEngine = engine
+				TreeLayoutEngine = engine,
 			}
 		);
 	}

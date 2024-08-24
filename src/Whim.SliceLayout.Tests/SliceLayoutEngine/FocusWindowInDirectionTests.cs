@@ -22,7 +22,7 @@ public class FocusWindowInDirectionTests
 			// Last overflow window, top left
 			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Up | Direction.Left, 5, 1 },
 			// Slice 1, down across slices
-			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Down, 3, 4 }
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Down, 3, 4 },
 		};
 
 	[Theory]
@@ -63,7 +63,7 @@ public class FocusWindowInDirectionTests
 			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Right, 2 },
 			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Up, 0 },
 			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Down, 1 },
-			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Down, 5 }
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Down, 5 },
 		};
 
 	[Theory]

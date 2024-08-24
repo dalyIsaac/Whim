@@ -22,7 +22,7 @@ public class BarPluginTests
 			{
 				AddedMonitors = [],
 				UnchangedMonitors = [],
-				RemovedMonitors = [monitor]
+				RemovedMonitors = [monitor],
 			}
 		);
 

@@ -20,7 +20,7 @@ public class FloatingWindowPluginCustomization : ICustomization
 				X = 0,
 				Y = 0,
 				Width = 3,
-				Height = 3
+				Height = 3,
 			}
 		);
 
@@ -125,7 +125,7 @@ public class FloatingWindowPluginTests
 			{
 				Window = window,
 				Rectangle = rect,
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			};
 
 		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(activeWorkspace);
@@ -219,7 +219,7 @@ public class FloatingWindowPluginTests
 				{
 					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
-					WindowSize = WindowSize.Normal
+					WindowSize = WindowSize.Normal,
 				}
 			);
 
@@ -263,7 +263,7 @@ public class FloatingWindowPluginTests
 				{
 					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
-					WindowSize = WindowSize.Normal
+					WindowSize = WindowSize.Normal,
 				}
 			);
 
@@ -305,7 +305,7 @@ public class FloatingWindowPluginTests
 				{
 					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
-					WindowSize = WindowSize.Normal
+					WindowSize = WindowSize.Normal,
 				}
 			);
 
@@ -331,7 +331,7 @@ public class FloatingWindowPluginTests
 				{
 					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
-					WindowSize = WindowSize.Normal
+					WindowSize = WindowSize.Normal,
 				}
 			);
 
@@ -411,7 +411,7 @@ public class FloatingWindowPluginTests
 				{
 					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
-					WindowSize = WindowSize.Normal
+					WindowSize = WindowSize.Normal,
 				}
 			);
 
@@ -424,7 +424,7 @@ public class FloatingWindowPluginTests
 				{
 					window,
 					new HashSet<LayoutEngineIdentity>() { layoutEngine.Identity }
-				}
+				},
 			},
 			plugin.FloatingWindows
 		);
@@ -456,7 +456,7 @@ public class FloatingWindowPluginTests
 				{
 					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
 					Window = window,
-					WindowSize = WindowSize.Normal
+					WindowSize = WindowSize.Normal,
 				}
 			);
 
@@ -476,7 +476,7 @@ public class FloatingWindowPluginTests
 				{
 					window,
 					new HashSet<LayoutEngineIdentity>() { layoutEngine2.Identity }
-				}
+				},
 			},
 			plugin.FloatingWindows
 		);

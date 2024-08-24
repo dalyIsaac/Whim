@@ -35,7 +35,7 @@ internal record WindowMoveEndedTransform(IWindow Window) : Transform
 			{
 				Window = Window,
 				CursorDraggedPoint = point,
-				MovedEdges = movedEdges
+				MovedEdges = movedEdges,
 			}
 		);
 

@@ -60,7 +60,7 @@ public class MenuVariantViewModelTests
 		[
 			new Command("id", "title", () => { }),
 			new Command("id2", "title2", () => { }),
-			new Command("id3", "title3", () => { })
+			new Command("id3", "title3", () => { }),
 		];
 		ctx.CommandManager.GetEnumerator().Returns(items.GetEnumerator());
 
@@ -89,7 +89,7 @@ public class MenuVariantViewModelTests
 		[
 			new Command("id", "title", () => { }),
 			new Command("id2", "title2", () => { }),
-			new Command("id3", "title3", () => { })
+			new Command("id3", "title3", () => { }),
 		];
 		ctx.CommandManager.GetEnumerator().Returns(items.GetEnumerator());
 
@@ -115,7 +115,7 @@ public class MenuVariantViewModelTests
 		[
 			new Command("id", "title", () => { }),
 			new Command("id2", "title2", () => { }),
-			new Command("id3", "title3", () => { })
+			new Command("id3", "title3", () => { }),
 		];
 		ctx.CommandManager.GetEnumerator().Returns(items.GetEnumerator());
 
@@ -143,7 +143,7 @@ public class MenuVariantViewModelTests
 				{
 					called = true;
 				}
-			)
+			),
 		];
 		ctx.CommandManager.GetEnumerator().Returns(items.GetEnumerator());
 
@@ -246,7 +246,7 @@ public class MenuVariantViewModelTests
 				{
 					called = true;
 				}
-			)
+			),
 		];
 		ctx.CommandManager.GetEnumerator().Returns(items.GetEnumerator());
 
@@ -329,7 +329,7 @@ public class MenuVariantViewModelTests
 				{
 					called = true;
 				}
-			)
+			),
 		];
 		ctx.CommandManager.GetEnumerator().Returns(items.GetEnumerator());
 

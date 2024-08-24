@@ -29,7 +29,7 @@ public class SliceLayoutEngineTests
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout())
 		{
-			Name = "Paradise Shelduck"
+			Name = "Paradise Shelduck",
 		};
 
 		// When
@@ -295,50 +295,50 @@ public class SliceLayoutEngineTests
 			{
 				Rectangle = new Rectangle<int>(0, 0, third, 50),
 				Window = windows[0],
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
 				Rectangle = new Rectangle<int>(0, 50, third, 50),
 				Window = windows[1],
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
 				Rectangle = new Rectangle<int>(third, 0, third, 100),
 				Window = windows[2],
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
 				Rectangle = new Rectangle<int>(2 * third, 0, third, third),
 				Window = windows[3],
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
 				Rectangle = new Rectangle<int>(2 * third, third, third, third),
 				Window = windows[4],
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
 				Rectangle = new Rectangle<int>(2 * third, 2 * third, third, third),
 				Window = windows[5],
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			// Minimized windows
 			new WindowState()
 			{
 				Rectangle = new Rectangle<int>(),
 				Window = minimizedWindows[0],
-				WindowSize = WindowSize.Minimized
+				WindowSize = WindowSize.Minimized,
 			},
 			new WindowState()
 			{
 				Rectangle = new Rectangle<int>(),
 				Window = minimizedWindows[1],
-				WindowSize = WindowSize.Minimized
+				WindowSize = WindowSize.Minimized,
 			},
 		];
 

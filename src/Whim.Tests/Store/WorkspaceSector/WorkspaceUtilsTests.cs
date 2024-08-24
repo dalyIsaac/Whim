@@ -50,7 +50,7 @@ public class WorkspaceUtilsTests
 		{
 			LayoutEngines = [engine1, engine2, engine3],
 			ActiveLayoutEngineIndex = 1,
-			LastFocusedWindowHandle = lastFocusedWindowHandle
+			LastFocusedWindowHandle = lastFocusedWindowHandle,
 		};
 		int newActiveLayoutEngineIndex = 2;
 
@@ -85,7 +85,7 @@ public class WorkspaceUtilsTests
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
 			LayoutEngines = [engine],
-			ActiveLayoutEngineIndex = 0
+			ActiveLayoutEngineIndex = 0,
 		};
 		int newActiveLayoutEngineIndex = 0;
 
@@ -204,7 +204,7 @@ public class WorkspaceUtilsTests
 		AddWindowToSector(root, window);
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
-			WindowPositions = ImmutableDictionary<HWND, WindowPosition>.Empty.Add(window.Handle, new())
+			WindowPositions = ImmutableDictionary<HWND, WindowPosition>.Empty.Add(window.Handle, new()),
 		};
 
 		bool isWindowRequiredInWorkspace = true;

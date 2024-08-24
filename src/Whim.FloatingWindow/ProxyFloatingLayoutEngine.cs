@@ -180,7 +180,7 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 			{
 				Window = window,
 				Rectangle = rectangle.ToMonitor(loc),
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			};
 		}
 

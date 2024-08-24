@@ -136,7 +136,7 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window, I
 			X = ViewModel.Monitor.WorkingArea.X + x,
 			Y = ViewModel.Monitor.WorkingArea.Y + y,
 			Width = width,
-			Height = (int)height
+			Height = (int)height,
 		};
 
 		WindowContainer.MaxHeight = height;

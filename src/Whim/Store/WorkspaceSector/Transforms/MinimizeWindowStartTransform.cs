@@ -35,13 +35,13 @@ internal record MinimizeWindowStartTransform(Guid WorkspaceId, HWND WindowHandle
 				LayoutEngines = workspace.LayoutEngines.SetItem(
 					workspace.ActiveLayoutEngineIndex,
 					activeLayoutEngine.MinimizeWindowStart(window)
-				)
+				),
 			};
 		}
 
 		workspace = workspace with
 		{
-			WindowPositions = workspace.WindowPositions.SetItem(window.Handle, new WindowPosition())
+			WindowPositions = workspace.WindowPositions.SetItem(window.Handle, new WindowPosition()),
 		};
 
 		for (int idx = 0; idx < workspace.LayoutEngines.Count; idx++)
@@ -51,7 +51,7 @@ internal record MinimizeWindowStartTransform(Guid WorkspaceId, HWND WindowHandle
 				LayoutEngines = workspace.LayoutEngines.SetItem(
 					idx,
 					workspace.LayoutEngines[idx].MinimizeWindowStart(window)
-				)
+				),
 			};
 		}
 

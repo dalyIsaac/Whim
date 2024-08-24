@@ -25,7 +25,7 @@ internal record MoveWindowToPointInWorkspaceTransform(WorkspaceId WorkspaceId, H
 				LayoutEngines = workspace.LayoutEngines.SetItem(
 					workspace.ActiveLayoutEngineIndex,
 					workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex].MoveWindowToPoint(window, Point)
-				)
+				),
 			};
 		}
 
@@ -40,7 +40,7 @@ internal record MoveWindowToPointInWorkspaceTransform(WorkspaceId WorkspaceId, H
 		{
 			// Dummy window position until it's correctly set when performing a workspace layout operation.
 			WindowPositions = workspace.WindowPositions.SetItem(window.Handle, new WindowPosition()),
-			LayoutEngines = newLayoutEngines.ToImmutable()
+			LayoutEngines = newLayoutEngines.ToImmutable(),
 		};
 	}
 }

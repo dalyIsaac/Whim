@@ -14,7 +14,7 @@ public class SelectVariantRowViewModelTests
 				Id = "id",
 				Title = "title",
 				IsSelected = isSelected,
-				IsEnabled = IsEnabled
+				IsEnabled = IsEnabled,
 			}
 		);
 		return modelMock;

@@ -29,7 +29,7 @@ public class ActiveLayoutWidgetViewModelTests
 					{
 						Workspace = workspace,
 						PreviousLayoutEngine = workspace.ActiveLayoutEngine,
-						CurrentLayoutEngine = workspace.ActiveLayoutEngine
+						CurrentLayoutEngine = workspace.ActiveLayoutEngine,
 					}
 				)
 		);

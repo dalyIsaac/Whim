@@ -56,7 +56,7 @@ public class SelectVariantViewModelTests
 		IEnumerable<SelectOption> optionsMock = Substitute.For<IEnumerable<SelectOption>>();
 		optionsMock.GetEnumerator().Returns((_) => new List<SelectOption>().GetEnumerator());
 
-		SelectVariantConfig activationConfig = new() { Callback = (items) => { }, Options = optionsMock, };
+		SelectVariantConfig activationConfig = new() { Callback = (items) => { }, Options = optionsMock };
 
 		// When
 		selectVariantViewModel.Activate(activationConfig);
@@ -111,7 +111,7 @@ public class SelectVariantViewModelTests
 			{
 				Callback = (items) => { },
 				Options = optionsMock,
-				ConfirmButtonText = "Call"
+				ConfirmButtonText = "Call",
 			};
 
 		selectVariantViewModel.Activate(activationConfig);
@@ -146,11 +146,11 @@ public class SelectVariantViewModelTests
 						Title = "title",
 						IsSelected = false,
 						IsEnabled = false,
-					}
+					},
 				}.GetEnumerator()
 			);
 
-		SelectVariantConfig activationConfig = new() { Callback = (items) => { }, Options = optionsMock, };
+		SelectVariantConfig activationConfig = new() { Callback = (items) => { }, Options = optionsMock };
 
 		selectVariantViewModel.Activate(activationConfig);
 
@@ -201,7 +201,7 @@ public class SelectVariantViewModelTests
 				Title = "title3",
 				IsSelected = false,
 				IsEnabled = false,
-			}
+			},
 		];
 
 		(var selectRowFactory, var selectRowFactoryResults) = SelectRowFactoryWithMocks();
@@ -433,21 +433,21 @@ public class SelectVariantViewModelTests
 					Id = "4",
 					Title = "title4",
 					IsSelected = true,
-					IsEnabled = false
+					IsEnabled = false,
 				},
 				new()
 				{
 					Id = "5",
 					Title = "title5",
 					IsSelected = false,
-					IsEnabled = false
+					IsEnabled = false,
 				},
 				new()
 				{
 					Id = "6",
 					Title = "title6",
 					IsSelected = false,
-					IsEnabled = false
+					IsEnabled = false,
 				},
 			]
 		);
@@ -477,7 +477,7 @@ public class SelectVariantViewModelTests
 					Id = "5",
 					Title = "title5",
 					IsSelected = false,
-					IsEnabled = false
+					IsEnabled = false,
 				},
 			]
 		);
@@ -534,10 +534,10 @@ public class SelectVariantViewModelTests
 				Id = "5",
 				Title = "title5",
 				IsSelected = false,
-				IsEnabled = false
+				IsEnabled = false,
 			};
 
-		List<SelectOption> updatedOptions = [options[0], newOption, options[2],];
+		List<SelectOption> updatedOptions = [options[0], newOption, options[2]];
 
 		List<SelectVariantRowModel> updatedVariantItems = updatedOptions
 			.Select(o => new SelectVariantRowModel(o))
@@ -593,7 +593,7 @@ public class SelectVariantViewModelTests
 				Id = "5",
 				Title = "title5",
 				IsSelected = false,
-				IsEnabled = false
+				IsEnabled = false,
 			};
 		List<SelectOption> secondOptions = [secondNewOption];
 		List<SelectVariantRowModel> secondVariantItems = secondOptions
@@ -620,7 +620,7 @@ public class SelectVariantViewModelTests
 				Id = "6",
 				Title = "title6",
 				IsSelected = false,
-				IsEnabled = false
+				IsEnabled = false,
 			};
 		List<SelectOption> thirdOptions = [secondNewOption, thirdNewOption];
 		List<SelectVariantRowModel> thirdVariantItems = thirdOptions.Select(o => new SelectVariantRowModel(o)).ToList();

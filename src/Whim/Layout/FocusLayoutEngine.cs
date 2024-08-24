@@ -154,7 +154,7 @@ public record FocusLayoutEngine : ILayoutEngine
 				{
 					Window = window,
 					Rectangle = rectangle,
-					WindowSize = WindowSize.Minimized
+					WindowSize = WindowSize.Minimized,
 				};
 			}
 			else
@@ -199,7 +199,7 @@ public record FocusLayoutEngine : ILayoutEngine
 		{
 			Direction.Left => index - 1,
 			Direction.Up => index - 1,
-			_ => index + 1
+			_ => index + 1,
 		};
 		newIndex = newIndex.Mod(_list.Count);
 
@@ -223,7 +223,7 @@ public record FocusLayoutEngine : ILayoutEngine
 		{
 			Direction.Left => index - 1,
 			Direction.Up => index - 1,
-			_ => index + 1
+			_ => index + 1,
 		};
 		newIndex = newIndex.Mod(_list.Count);
 

@@ -23,7 +23,7 @@ public class SwapWindowInDirectionTests
 			// Last overflow window, top left
 			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Up | Direction.Left, 5, 1 },
 			// Slice 1, down across slices
-			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Down, 3, 4 }
+			{ SampleSliceLayouts.CreateNestedLayout(), 6, Direction.Down, 3, 4 },
 		};
 
 	[Theory]

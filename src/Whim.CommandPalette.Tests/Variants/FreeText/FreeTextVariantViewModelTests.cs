@@ -21,7 +21,7 @@ public class FreeTextVariantViewModelCustomization : ICustomization
 			{
 				InitialText = "Hello, world!",
 				Callback = callback,
-				Prompt = "Hello, world!"
+				Prompt = "Hello, world!",
 			};
 		fixture.Inject(config);
 	}

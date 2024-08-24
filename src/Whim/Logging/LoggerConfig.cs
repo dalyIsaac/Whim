@@ -30,7 +30,7 @@ public class LoggerConfig
 		{
 			FileName = "whim.log",
 			MinLogLevel = LogLevel.Verbose,
-			RollingInterval = FileSinkConfigRollingInterval.Day
+			RollingInterval = FileSinkConfigRollingInterval.Day,
 		};
 
 	/// <summary>

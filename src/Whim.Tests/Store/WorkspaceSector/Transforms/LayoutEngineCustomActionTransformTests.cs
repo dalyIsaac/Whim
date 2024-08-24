@@ -34,8 +34,8 @@ public class LayoutEngineCustomActionTransformTests
 			LayoutEngines =
 			[
 				CreateLayoutEngineNotSupportingAction<IWindow?>(),
-				CreateLayoutEngineNotSupportingAction<IWindow?>()
-			]
+				CreateLayoutEngineNotSupportingAction<IWindow?>(),
+			],
 		};
 		AddWorkspaceToManager(ctx, rootSector, workspace);
 
@@ -62,7 +62,7 @@ public class LayoutEngineCustomActionTransformTests
 				CreateLayoutEngineSupportingAction<IWindow?>(),
 				CreateLayoutEngineNotSupportingAction<IWindow?>(),
 				CreateLayoutEngineSupportingAction<IWindow?>(),
-			]
+			],
 		};
 		AddWorkspaceToManager(ctx, root, workspace);
 
@@ -90,7 +90,7 @@ public class LayoutEngineCustomActionTransformTests
 				{
 					Name = "Action",
 					Payload = window,
-					Window = window
+					Window = window,
 				}
 			);
 
@@ -116,7 +116,7 @@ public class LayoutEngineCustomActionTransformTests
 				{
 					Name = "Action",
 					Payload = window,
-					Window = window
+					Window = window,
 				}
 			);
 

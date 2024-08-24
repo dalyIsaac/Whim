@@ -280,9 +280,9 @@ public class BarLayoutEngineTests
 				{
 					Y = 30,
 					Width = 50,
-					Height = 70
+					Height = 70,
 				},
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
@@ -292,10 +292,10 @@ public class BarLayoutEngineTests
 					X = 50,
 					Y = 30,
 					Width = 50,
-					Height = 70
+					Height = 70,
 				},
-				WindowSize = WindowSize.Normal
-			}
+				WindowSize = WindowSize.Normal,
+			},
 		];
 
 		Rectangle<int> expectedGivenRect =
@@ -303,7 +303,7 @@ public class BarLayoutEngineTests
 			{
 				Y = 30,
 				Width = 100,
-				Height = 70
+				Height = 70,
 			};
 
 		innerLayoutEngine.DoLayout(expectedGivenRect, monitor).Returns(expectedWindowStates);
@@ -342,7 +342,7 @@ public class BarLayoutEngineTests
 			{
 				Name = "Action",
 				Payload = "payload",
-				Window = null
+				Window = null,
 			};
 		innerLayoutEngine.PerformCustomAction(action).Returns(performCustomActionResult);
 
@@ -364,7 +364,7 @@ public class BarLayoutEngineTests
 			{
 				Name = "Action",
 				Payload = "payload",
-				Window = null
+				Window = null,
 			};
 		innerLayoutEngine.PerformCustomAction(action).Returns(innerLayoutEngine);
 

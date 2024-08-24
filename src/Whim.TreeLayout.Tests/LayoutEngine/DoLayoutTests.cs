@@ -40,14 +40,14 @@ public class DoLayoutTests
 			{
 				Rectangle = new Rectangle<int>(),
 				Window = minimizedWindows[0],
-				WindowSize = WindowSize.Minimized
+				WindowSize = WindowSize.Minimized,
 			},
 			new WindowState()
 			{
 				Rectangle = new Rectangle<int>(),
 				Window = minimizedWindows[1],
-				WindowSize = WindowSize.Minimized
-			}
+				WindowSize = WindowSize.Minimized,
+			},
 		];
 
 		// When the windows are added, and DoLayout is called
@@ -85,10 +85,10 @@ public class DoLayoutTests
 					X = 0,
 					Y = 0,
 					Width = 50,
-					Height = 100
+					Height = 100,
 				},
 				Window = windows[0],
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
@@ -97,23 +97,23 @@ public class DoLayoutTests
 					X = 50,
 					Y = 0,
 					Width = 50,
-					Height = 100
+					Height = 100,
 				},
 				Window = windows[1],
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
 				Rectangle = new Rectangle<int>(),
 				Window = minimizedWindows[0],
-				WindowSize = WindowSize.Minimized
+				WindowSize = WindowSize.Minimized,
 			},
 			new WindowState()
 			{
 				Rectangle = new Rectangle<int>(),
 				Window = minimizedWindows[1],
-				WindowSize = WindowSize.Minimized
-			}
+				WindowSize = WindowSize.Minimized,
+			},
 		];
 
 		// When the windows are added, and DoLayout is called

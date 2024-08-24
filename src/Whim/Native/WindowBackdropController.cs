@@ -34,7 +34,7 @@ public enum BackdropType
 	/// A Mica variant which looks different to <see cref="Mica"/> - see <see href="https://learn.microsoft.com/en-us/windows/apps/design/style/mica"/>
 	/// Unsupported on Windows 10 - Whim will fall back to <see cref="Acrylic"/>.
 	/// </summary>
-	MicaAlt
+	MicaAlt,
 }
 
 /// <summary>
@@ -180,7 +180,7 @@ public class WindowBackdropController : IDisposable
 	{
 		_acrylicController ??= new DesktopAcrylicController
 		{
-			Kind = backdrop == BackdropType.AcrylicThin ? DesktopAcrylicKind.Thin : DesktopAcrylicKind.Base
+			Kind = backdrop == BackdropType.AcrylicThin ? DesktopAcrylicKind.Thin : DesktopAcrylicKind.Base,
 		};
 
 		// Enable the system backdrop.
@@ -194,7 +194,7 @@ public class WindowBackdropController : IDisposable
 	{
 		_micaController ??= new MicaController
 		{
-			Kind = backdrop == BackdropType.MicaAlt ? MicaKind.BaseAlt : MicaKind.Base
+			Kind = backdrop == BackdropType.MicaAlt ? MicaKind.BaseAlt : MicaKind.Base,
 		};
 
 		_micaController.AddSystemBackdropTarget(

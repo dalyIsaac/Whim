@@ -95,7 +95,7 @@ public class LayoutPreviewPlugin(IContext context) : IPlugin, IDisposable
 			new()
 			{
 				X = cursorDraggedPoint.X - monitor.WorkingArea.X,
-				Y = cursorDraggedPoint.Y - monitor.WorkingArea.Y
+				Y = cursorDraggedPoint.Y - monitor.WorkingArea.Y,
 			};
 
 		_layoutPreviewWindow?.Update(

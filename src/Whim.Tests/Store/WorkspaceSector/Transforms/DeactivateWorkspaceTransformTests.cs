@@ -31,21 +31,21 @@ public class DeactivateWorkspaceTransformTests
 		Assert.Equal(
 			new WindowPosition() with
 			{
-				WindowSize = WindowSize.Minimized
+				WindowSize = WindowSize.Minimized,
 			},
 			resultWorkspace.WindowPositions[window1.Handle]
 		);
 		Assert.Equal(
 			new WindowPosition() with
 			{
-				WindowSize = WindowSize.Minimized
+				WindowSize = WindowSize.Minimized,
 			},
 			resultWorkspace.WindowPositions[window2.Handle]
 		);
 		Assert.Equal(
 			new WindowPosition() with
 			{
-				WindowSize = WindowSize.Minimized
+				WindowSize = WindowSize.Minimized,
 			},
 			resultWorkspace.WindowPositions[window3.Handle]
 		);

@@ -72,7 +72,7 @@ public class WindowPickersTests
 	{
 		// Given there are three startup windows
 		rootSector.WindowSector.StartupWindows.Returns(
-			new HashSet<HWND> { (HWND)1, (HWND)2, (HWND)3, }.ToImmutableHashSet()
+			new HashSet<HWND> { (HWND)1, (HWND)2, (HWND)3 }.ToImmutableHashSet()
 		);
 
 		HWND handle = (HWND)4;
@@ -89,7 +89,7 @@ public class WindowPickersTests
 	{
 		// Given there are three startup windows
 		rootSector.WindowSector.StartupWindows.Returns(
-			new HashSet<HWND> { (HWND)1, (HWND)2, (HWND)3, }.ToImmutableHashSet()
+			new HashSet<HWND> { (HWND)1, (HWND)2, (HWND)3 }.ToImmutableHashSet()
 		);
 
 		// When we get whether the window is a startup window

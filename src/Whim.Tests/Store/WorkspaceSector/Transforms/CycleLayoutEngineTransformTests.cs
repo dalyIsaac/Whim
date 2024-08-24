@@ -27,7 +27,7 @@ public class CycleLayoutEngineTransformTests
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
 			LayoutEngines = [engine1, engine2, engine3],
-			ActiveLayoutEngineIndex = startIdx
+			ActiveLayoutEngineIndex = startIdx,
 		};
 		AddWorkspaceToManager(ctx, rootSector, workspace);
 

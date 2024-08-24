@@ -191,7 +191,7 @@ public abstract class ProxyLayoutEngineBaseTests
 			{
 				Name = "Action",
 				Payload = "payload",
-				Window = null
+				Window = null,
 			};
 
 		// When

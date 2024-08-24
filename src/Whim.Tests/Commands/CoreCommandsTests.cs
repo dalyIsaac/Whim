@@ -142,7 +142,7 @@ public class CoreCommandsTests
 		IPoint<int> pixelsDeltas = new Point<int>()
 		{
 			X = x * CoreCommands.MoveWindowEdgeDelta,
-			Y = y * CoreCommands.MoveWindowEdgeDelta
+			Y = y * CoreCommands.MoveWindowEdgeDelta,
 		};
 
 		ICommand command = testUtils.GetCommand(commandName);

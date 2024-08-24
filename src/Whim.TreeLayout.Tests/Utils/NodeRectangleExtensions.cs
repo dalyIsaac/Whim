@@ -9,7 +9,7 @@ internal static class NodeRectangleExtensions
 			X = (int)Math.Round(node.X * scale.Width),
 			Y = (int)Math.Round(node.Y * scale.Height),
 			Width = (int)Math.Round(node.Width * scale.Width),
-			Height = (int)Math.Round(node.Height * scale.Height)
+			Height = (int)Math.Round(node.Height * scale.Height),
 		};
 	}
 }

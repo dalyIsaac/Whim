@@ -212,7 +212,7 @@ public class ColumnLayoutEngineTests
 			{
 				Rectangle = new Rectangle<int>(),
 				Window = window,
-				WindowSize = WindowSize.Minimized
+				WindowSize = WindowSize.Minimized,
 			},
 			windowStates[0]
 		);
@@ -239,10 +239,10 @@ public class ColumnLayoutEngineTests
 					X = 0,
 					Y = 0,
 					Width = 1920,
-					Height = 1080
+					Height = 1080,
 				},
 				Window = window,
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			windowStates[0]
 		);
@@ -270,10 +270,10 @@ public class ColumnLayoutEngineTests
 					X = 0,
 					Y = 0,
 					Width = 640,
-					Height = 1080
+					Height = 1080,
 				},
 				Window = window,
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			result[0]
 		);
@@ -286,10 +286,10 @@ public class ColumnLayoutEngineTests
 					X = 640,
 					Y = 0,
 					Width = 640,
-					Height = 1080
+					Height = 1080,
 				},
 				Window = window2,
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			result[1]
 		);
@@ -302,10 +302,10 @@ public class ColumnLayoutEngineTests
 					X = 1280,
 					Y = 0,
 					Width = 640,
-					Height = 1080
+					Height = 1080,
 				},
 				Window = window3,
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			result[2]
 		);
@@ -332,10 +332,10 @@ public class ColumnLayoutEngineTests
 					X = 0,
 					Y = 0,
 					Width = 1920,
-					Height = 1080
+					Height = 1080,
 				},
 				Window = window,
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			result[0]
 		);
@@ -366,10 +366,10 @@ public class ColumnLayoutEngineTests
 					X = 1280,
 					Y = 0,
 					Width = 640,
-					Height = 1080
+					Height = 1080,
 				},
 				Window = window,
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			result[0]
 		);
@@ -382,10 +382,10 @@ public class ColumnLayoutEngineTests
 					X = 640,
 					Y = 0,
 					Width = 640,
-					Height = 1080
+					Height = 1080,
 				},
 				Window = window2,
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			result[1]
 		);
@@ -398,10 +398,10 @@ public class ColumnLayoutEngineTests
 					X = 0,
 					Y = 0,
 					Width = 640,
-					Height = 1080
+					Height = 1080,
 				},
 				Window = window3,
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			result[2]
 		);
@@ -429,7 +429,7 @@ public class ColumnLayoutEngineTests
 			{
 				Rectangle = rect,
 				Window = window,
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			result[0]
 		);
@@ -439,7 +439,7 @@ public class ColumnLayoutEngineTests
 			{
 				Rectangle = new Rectangle<int>(),
 				Window = window2,
-				WindowSize = WindowSize.Minimized
+				WindowSize = WindowSize.Minimized,
 			},
 			result[1]
 		);
@@ -966,7 +966,7 @@ public class ColumnLayoutEngineTests
 			{
 				Name = "Action",
 				Payload = "payload",
-				Window = Substitute.For<IWindow>()
+				Window = Substitute.For<IWindow>(),
 			};
 
 		// When

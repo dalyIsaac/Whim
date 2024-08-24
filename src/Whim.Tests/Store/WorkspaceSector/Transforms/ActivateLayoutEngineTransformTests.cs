@@ -24,7 +24,7 @@ public class ActivateLayoutEngineTransformTests
 		// Given the layout engine doesn't exist
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
-			LayoutEngines = [engine]
+			LayoutEngines = [engine],
 		};
 		AddWorkspaceToManager(ctx, rootSector, workspace);
 
@@ -50,7 +50,7 @@ public class ActivateLayoutEngineTransformTests
 		// Given the layout engine exists
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
-			LayoutEngines = [engine, engine2]
+			LayoutEngines = [engine, engine2],
 		};
 		AddWorkspaceToManager(ctx, rootSector, workspace);
 
@@ -76,7 +76,7 @@ public class ActivateLayoutEngineTransformTests
 		// Given the layout engine exists
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
-			LayoutEngines = [engine, engine2]
+			LayoutEngines = [engine, engine2],
 		};
 		AddWorkspaceToManager(ctx, rootSector, workspace);
 

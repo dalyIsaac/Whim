@@ -23,5 +23,5 @@ public enum WindowProcessorResult
 	/// <summary>
 	/// The event should be processed and the processor should be removed.
 	/// </summary>
-	ProcessAndRemove
+	ProcessAndRemove,
 }

@@ -49,13 +49,13 @@ public class LayoutPreviewWindowTests
 			{
 				Window = Substitute.For<IWindow>(),
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 		];
 		int prevHoveredIndex = -1;
@@ -66,7 +66,7 @@ public class LayoutPreviewWindowTests
 			{
 				Window = Substitute.For<IWindow>(),
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Maximized
+				WindowSize = WindowSize.Maximized,
 			},
 		];
 		IPoint<int> cursorPoint = new Rectangle<int>();
@@ -94,13 +94,13 @@ public class LayoutPreviewWindowTests
 			{
 				Window = Substitute.For<IWindow>(),
 				Rectangle = rect,
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 		];
 		int prevHoveredIndex = 0;
@@ -110,13 +110,13 @@ public class LayoutPreviewWindowTests
 			{
 				Window = Substitute.For<IWindow>(),
 				Rectangle = rect,
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 		];
 		IPoint<int> cursorPoint = new Rectangle<int>() { X = 100, Y = 101 };
@@ -144,13 +144,13 @@ public class LayoutPreviewWindowTests
 			{
 				Window = Substitute.For<IWindow>(),
 				Rectangle = rect,
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 			new WindowState()
 			{
 				Window = Substitute.For<IWindow>(),
 				Rectangle = new Rectangle<int>(),
-				WindowSize = WindowSize.Normal
+				WindowSize = WindowSize.Normal,
 			},
 		];
 		int prevHoveredIndex = 0;
