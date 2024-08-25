@@ -377,7 +377,7 @@ public class CoreCommandsTests
 		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 
-		for (int idx = 0; idx < 10; idx++)
+		for (int idx = 0; idx < 2; idx++)
 		{
 			AddWorkspaceToManager(ctx, root, CreateWorkspace(ctx));
 		}

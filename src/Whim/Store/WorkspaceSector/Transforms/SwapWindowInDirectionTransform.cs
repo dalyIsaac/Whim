@@ -8,7 +8,7 @@ namespace Whim;
 /// The id of the workspace to swap the window in. Defaults to the active workspace.
 /// </param>
 /// <param name="Direction">
-/// The direction to swap the window in.
+/// The direction to swap the window in. Defaults to <see cref="Direction.None"/>.
 /// </param>
 /// <param name="WindowHandle">
 /// The handle of the window to swap. If not provided, the last focused window will be used.

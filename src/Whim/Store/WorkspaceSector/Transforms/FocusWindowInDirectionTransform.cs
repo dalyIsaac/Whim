@@ -10,7 +10,7 @@ namespace Whim;
 /// The id of the workspace to focus the window in. Defaults to the active workspace.
 /// </param>
 /// <param name="Direction">
-/// The direction to search for the adjacent window to focus.
+/// The direction to search for the adjacent window to focus. Defaults to <see cref="Direction.None"/>.
 /// </param>
 /// <param name="WindowHandle">
 /// The handle of the window from which to focus the adjacent window. Default to the last focused
