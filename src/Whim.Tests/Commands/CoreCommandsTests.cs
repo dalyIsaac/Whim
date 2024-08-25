@@ -184,7 +184,7 @@ public class CoreCommandsTests
 		window3.IsMinimized.Returns(false);
 
 		Workspace workspace = CreateWorkspace(ctx) with { LastFocusedWindowHandle = window1.Handle };
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor(), workspace);
+		AddActiveWorkspace(ctx, root, workspace);
 		PopulateWindowWorkspaceMap(ctx, root, window1, workspace);
 		PopulateWindowWorkspaceMap(ctx, root, window2, workspace);
 		PopulateWindowWorkspaceMap(ctx, root, window3, workspace);
@@ -214,7 +214,7 @@ public class CoreCommandsTests
 		window2.IsMinimized.Returns(false);
 
 		Workspace workspace = CreateWorkspace(ctx);
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor(), workspace);
+		AddActiveWorkspace(ctx, root, workspace);
 		PopulateWindowWorkspaceMap(ctx, root, window1, workspace);
 		PopulateWindowWorkspaceMap(ctx, root, window2, workspace);
 
@@ -319,8 +319,7 @@ public class CoreCommandsTests
 	{
 		// Given there is an active workspace
 		Workspace workspace = CreateWorkspace(ctx);
-		IMonitor monitor = CreateMonitor((HMONITOR)1);
-		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
+		AddActiveWorkspace(ctx, root, workspace);
 
 		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
@@ -458,7 +457,7 @@ public class CoreCommandsTests
 		PluginCommandsTestUtils testUtils = new(commands);
 
 		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [layoutEngine] };
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor(), workspace);
+		AddActiveWorkspace(ctx, root, workspace);
 
 		ICommand command = testUtils.GetCommand("whim.core.focus_layout.toggle_maximized");
 
@@ -482,7 +481,7 @@ public class CoreCommandsTests
 
 		FocusLayoutEngine engine = new(new LayoutEngineIdentity());
 		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [engine] };
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor(), workspace);
+		AddActiveWorkspace(ctx, root, workspace);
 
 		ICommand command = testUtils.GetCommand("whim.core.focus_layout.toggle_maximized");
 
