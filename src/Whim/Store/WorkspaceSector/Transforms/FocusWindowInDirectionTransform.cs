@@ -28,7 +28,11 @@ namespace Whim;
 /// context.Store.Dispatch(new FocusWindowInDirectionTransform(workspaceId, Direction.Left));
 /// </code>
 /// </example>
-public record FocusWindowInDirectionTransform(WorkspaceId WorkspaceId = default, Direction Direction = Direction.None, HWND WindowHandle = default)
+public record FocusWindowInDirectionTransform(
+	WorkspaceId WorkspaceId = default,
+	Direction Direction = Direction.None,
+	HWND WindowHandle = default
+)
 	: BaseWorkspaceWindowTransform(
 		WorkspaceId,
 		WindowHandle,

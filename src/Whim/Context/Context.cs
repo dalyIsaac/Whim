@@ -14,10 +14,10 @@ namespace Whim;
 internal class Context : IContext
 {
 	private readonly InternalContext _internalContext;
-	
+
 	[Obsolete("Use transforms and pickers to interact with the store instead")]
 	public IButler Butler { get; }
-	
+
 	public IFileManager FileManager { get; }
 	public IResourceManager ResourceManager { get; }
 	public Logger Logger { get; }

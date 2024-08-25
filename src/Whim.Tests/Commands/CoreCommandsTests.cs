@@ -79,27 +79,12 @@ public class CoreCommandsTests
 
 	[InlineAutoSubstituteData("whim.core.move_window_left_edge_left", Direction.Left, -1, 0)]
 	[InlineAutoSubstituteData("whim.core.move_window_left_edge_right", Direction.Left, 1, 0)]
-	[InlineAutoSubstituteData(
-		"whim.core.move_window_right_edge_left",
-		Direction.Right,
-		-1,
-		0
-	)]
-	[InlineAutoSubstituteData(
-		"whim.core.move_window_right_edge_right",
-		Direction.Right,
-		1,
-		0
-	)]
+	[InlineAutoSubstituteData("whim.core.move_window_right_edge_left", Direction.Right, -1, 0)]
+	[InlineAutoSubstituteData("whim.core.move_window_right_edge_right", Direction.Right, 1, 0)]
 	[InlineAutoSubstituteData("whim.core.move_window_top_edge_up", Direction.Up, 0, -1)]
 	[InlineAutoSubstituteData("whim.core.move_window_top_edge_down", Direction.Up, 0, 1)]
 	[InlineAutoSubstituteData("whim.core.move_window_bottom_edge_up", Direction.Down, 0, -1)]
-	[InlineAutoSubstituteData(
-		"whim.core.move_window_bottom_edge_down",
-		Direction.Down,
-		0,
-		1
-	)]
+	[InlineAutoSubstituteData("whim.core.move_window_bottom_edge_down", Direction.Down, 0, 1)]
 	[Theory]
 	public void MoveWindowEdgesInDirection(string commandName, Direction direction, int x, int y, IContext ctx)
 	{
@@ -161,7 +146,16 @@ public class CoreCommandsTests
 		PluginCommandsTestUtils testUtils = new(commands);
 		window.Handle.Returns((HWND)123);
 
-		PopulateThreeWayMap(ctx, root, CreateMonitor(), CreateWorkspace(ctx) with { LastFocusedWindowHandle = window.Handle }, window);
+		PopulateThreeWayMap(
+			ctx,
+			root,
+			CreateMonitor(),
+			CreateWorkspace(ctx) with
+			{
+				LastFocusedWindowHandle = window.Handle,
+			},
+			window
+		);
 
 		ICommand command = testUtils.GetCommand("whim.core.maximize_window");
 
@@ -174,7 +168,13 @@ public class CoreCommandsTests
 
 	#region MinimizeWindow
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void MinimizeWindow(IContext ctx, MutableRootSector root, IWindow window1, IWindow window2, IWindow window3)
+	internal void MinimizeWindow(
+		IContext ctx,
+		MutableRootSector root,
+		IWindow window1,
+		IWindow window2,
+		IWindow window3
+	)
 	{
 		// Given
 		CoreCommands commands = new(ctx);
@@ -200,7 +200,12 @@ public class CoreCommandsTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void MinimizeWindow_NoLastFocusedWindow(IContext ctx, MutableRootSector root, IWindow window1, IWindow window2)
+	internal void MinimizeWindow_NoLastFocusedWindow(
+		IContext ctx,
+		MutableRootSector root,
+		IWindow window1,
+		IWindow window2
+	)
 	{
 		// Given
 		CoreCommands commands = new(ctx);
@@ -286,7 +291,11 @@ public class CoreCommandsTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void FocusMonitor_CannotGetWorkspaceForMonitor(IContext ctx, MutableRootSector root, List<object> transforms)
+	internal void FocusMonitor_CannotGetWorkspaceForMonitor(
+		IContext ctx,
+		MutableRootSector root,
+		List<object> transforms
+	)
 	{
 		// Given
 		CoreCommands commands = new(ctx);
@@ -358,7 +367,11 @@ public class CoreCommandsTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void ActivateWorkspaceAtIndex_IndexDoesNotExist(IContext ctx, MutableRootSector root, List<object> transforms)
+	internal void ActivateWorkspaceAtIndex_IndexDoesNotExist(
+		IContext ctx,
+		MutableRootSector root,
+		List<object> transforms
+	)
 	{
 		// Given
 		CoreCommands commands = new(ctx);
@@ -401,7 +414,10 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		Assert.Contains(transforms, t => t.Equals(new ActivateWorkspaceTransform(root.WorkspaceSector.WorkspaceOrder[index - 1])));
+		Assert.Contains(
+			transforms,
+			t => t.Equals(new ActivateWorkspaceTransform(root.WorkspaceSector.WorkspaceOrder[index - 1]))
+		);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -430,7 +446,12 @@ public class CoreCommandsTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void FocusLayoutToggleMaximized_NotFocusLayoutEngine(IContext ctx, MutableRootSector root, ILayoutEngine layoutEngine, List<object> transforms)
+	internal void FocusLayoutToggleMaximized_NotFocusLayoutEngine(
+		IContext ctx,
+		MutableRootSector root,
+		ILayoutEngine layoutEngine,
+		List<object> transforms
+	)
 	{
 		// Given
 		CoreCommands commands = new(ctx);
@@ -449,7 +470,11 @@ public class CoreCommandsTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void FocusLayoutToggleMaximized_FocusLayoutEngine(IContext ctx, MutableRootSector root, List<object> transforms)
+	internal void FocusLayoutToggleMaximized_FocusLayoutEngine(
+		IContext ctx,
+		MutableRootSector root,
+		List<object> transforms
+	)
 	{
 		// Given
 		CoreCommands commands = new(ctx);
@@ -465,8 +490,15 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		Assert.Contains(transforms, t => t.Equals(new LayoutEngineCustomActionTransform(workspace.Id,
-							new() { Name = $"{engine.Name}.toggle_maximized", Window = null }
-			)));
+		Assert.Contains(
+			transforms,
+			t =>
+				t.Equals(
+					new LayoutEngineCustomActionTransform(
+						workspace.Id,
+						new() { Name = $"{engine.Name}.toggle_maximized", Window = null }
+					)
+				)
+		);
 	}
 }

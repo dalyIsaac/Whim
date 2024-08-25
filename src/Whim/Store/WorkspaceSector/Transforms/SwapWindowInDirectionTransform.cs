@@ -14,7 +14,11 @@ namespace Whim;
 /// The handle of the window to swap. If not provided, the last focused window will be used.
 /// If provided, this window must exist in the workspace.
 /// </param>
-public record SwapWindowInDirectionTransform(WorkspaceId WorkspaceId = default, Direction Direction = Direction.None, HWND WindowHandle = default)
+public record SwapWindowInDirectionTransform(
+	WorkspaceId WorkspaceId = default,
+	Direction Direction = Direction.None,
+	HWND WindowHandle = default
+)
 	: BaseWorkspaceWindowTransform(
 		WorkspaceId,
 		WindowHandle,

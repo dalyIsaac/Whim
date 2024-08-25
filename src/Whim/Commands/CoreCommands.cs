@@ -38,7 +38,8 @@ internal class CoreCommands : PluginCommands
 			.Add(
 				identifier: "focus_window_in_direction.right",
 				title: "Focus the window in the right direction",
-				callback: () => _context.Store.Dispatch(new FocusWindowInDirectionTransform(Direction: Direction.Right)),
+				callback: () =>
+					_context.Store.Dispatch(new FocusWindowInDirectionTransform(Direction: Direction.Right)),
 				keybind: new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_RIGHT)
 			)
 			.Add(
@@ -261,13 +262,13 @@ internal class CoreCommands : PluginCommands
 					);
 				},
 				condition: () =>
-				_context.Store.Pick(PickActiveLayoutEngine()).GetLayoutEngine<FocusLayoutEngine>() is not null
-				
+					_context.Store.Pick(PickActiveLayoutEngine()).GetLayoutEngine<FocusLayoutEngine>() is not null
 			)
 			.Add(
 				identifier: "close_current_workspace",
 				title: "Close the current workspace",
-				callback: () => {
+				callback: () =>
+				{
 					WorkspaceId activeWorkspaceId = _context.Store.Pick(PickActiveWorkspaceId());
 					_context.Store.Dispatch(new RemoveWorkspaceByIdTransform(activeWorkspaceId));
 				},
