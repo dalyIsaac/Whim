@@ -4,7 +4,9 @@ namespace Whim;
 /// Base transform for a workspace operation. The return value from the store dispatch is whether
 /// the workspace has changed.
 /// </summary>
-/// <param name="WorkspaceId"></param>
+/// <param name="WorkspaceId">
+/// Defaults to the active workspace.
+/// </param>
 /// <param name="SkipDoLayout"></param>
 public abstract record BaseWorkspaceTransform(WorkspaceId WorkspaceId, bool SkipDoLayout = false) : Transform<bool>
 {
@@ -28,10 +30,11 @@ public abstract record BaseWorkspaceTransform(WorkspaceId WorkspaceId, bool Skip
 	internal override Result<bool> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		WorkspaceSector sector = rootSector.WorkspaceSector;
+		WorkspaceId workspaceId = WorkspaceId.OrActiveWorkspace(ctx);
 
-		if (!sector.Workspaces.TryGetValue(WorkspaceId, out Workspace? workspace))
+		if (!sector.Workspaces.TryGetValue(workspaceId, out Workspace? workspace))
 		{
-			return Result.FromException<bool>(StoreExceptions.WorkspaceNotFound(WorkspaceId));
+			return Result.FromException<bool>(StoreExceptions.WorkspaceNotFound(workspaceId));
 		}
 
 		Result<Workspace> newWorkspaceResult = WorkspaceOperation(ctx, internalCtx, rootSector, workspace);

@@ -6,19 +6,6 @@ namespace Whim.Tests;
 [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class BaseWorkspaceTransformTests
 {
-	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WorkspaceNotFound(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
-	{
-		// Given the workspace doesn't exist
-		FailedWorkspaceTransform sut = new(Guid.NewGuid());
-
-		// When we execute the transform (outside of the store)
-		var result = sut.Execute(ctx, internalCtx, root);
-
-		// Then we get an error
-		Assert.False(result.IsSuccessful);
-	}
-
 	private record FailedWorkspaceTransform(Guid WorkspaceId) : BaseWorkspaceTransform(WorkspaceId)
 	{
 		private protected override Result<Workspace> WorkspaceOperation(
@@ -27,6 +14,48 @@ public class BaseWorkspaceTransformTests
 			MutableRootSector rootSector,
 			Workspace workspace
 		) => Result.FromException<Workspace>(new InvalidOperationException());
+	}
+
+	private record SuccessfulWorkspaceTransform(Guid WorkspaceId, bool SkipDoLayout = false)
+		: BaseWorkspaceTransform(WorkspaceId, SkipDoLayout)
+	{
+		private protected override Result<Workspace> WorkspaceOperation(
+			IContext ctx,
+			IInternalContext internalCtx,
+			MutableRootSector rootSector,
+			Workspace workspace
+		) => workspace with { BackingName = "bob" };
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WorkspaceNotFound(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
+	{
+		// Given the workspace doesn't exist
+		SuccessfulWorkspaceTransform sut = new(Guid.NewGuid());
+
+		// When we execute the transform (outside of the store)
+		var result = sut.Execute(ctx, internalCtx, root);
+
+		// Then we get an error
+		Assert.False(result.IsSuccessful);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WorkspaceNotFound_DefaultsToActiveWorkspace(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector root
+	)
+	{
+		// Given the workspace doesn't exist, but there is an active workspace
+		AddActiveWorkspace(ctx, root, CreateWorkspace(ctx));
+		SuccessfulWorkspaceTransform sut = new(default);
+
+		// When we execute the transform (outside of the store)
+		var result = sut.Execute(ctx, internalCtx, root);
+
+		// Then we get an error
+		Assert.True(result.IsSuccessful);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -72,17 +101,6 @@ public class BaseWorkspaceTransformTests
 		Assert.True(result.IsSuccessful);
 		Assert.False(result.Value);
 		Assert.Empty(root.WorkspaceSector.WorkspacesToLayout);
-	}
-
-	private record SuccessfulWorkspaceTransform(Guid WorkspaceId, bool SkipDoLayout)
-		: BaseWorkspaceTransform(WorkspaceId, SkipDoLayout)
-	{
-		private protected override Result<Workspace> WorkspaceOperation(
-			IContext ctx,
-			IInternalContext internalCtx,
-			MutableRootSector rootSector,
-			Workspace workspace
-		) => workspace with { BackingName = "bob" };
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]

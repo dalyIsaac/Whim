@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Whim;
 
 /// <summary>
@@ -12,15 +14,25 @@ namespace Whim;
 internal class Context : IContext
 {
 	private readonly InternalContext _internalContext;
+
+	[Obsolete("Use transforms and pickers to interact with the store instead")]
 	public IButler Butler { get; }
+
 	public IFileManager FileManager { get; }
 	public IResourceManager ResourceManager { get; }
 	public Logger Logger { get; }
 	public UncaughtExceptionHandling UncaughtExceptionHandling { get; set; } = UncaughtExceptionHandling.Log;
 	public INativeManager NativeManager { get; }
+
+	[Obsolete("Use transforms and pickers to interact with the store instead")]
 	public IWorkspaceManager WorkspaceManager { get; }
+
+	[Obsolete("Use transforms and pickers to interact with the store instead")]
 	public IWindowManager WindowManager { get; }
+
+	[Obsolete("Use transforms and pickers to interact with the store instead")]
 	public IMonitorManager MonitorManager { get; }
+
 	public IRouterManager RouterManager { get; }
 	public IFilterManager FilterManager { get; }
 	private readonly CommandManager _commandManager;

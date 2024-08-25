@@ -3,7 +3,7 @@ namespace Whim;
 internal static class WorkspaceUtils
 {
 	public static WorkspaceId OrActiveWorkspace(this WorkspaceId WorkspaceId, IContext ctx) =>
-		WorkspaceId == default ? ctx.WorkspaceManager.ActiveWorkspace.Id : WorkspaceId;
+		WorkspaceId == default ? ctx.Store.Pick(PickActiveWorkspaceId()) : WorkspaceId;
 
 	/// <summary>
 	/// Set the active layout engine in the workspace.

@@ -1,5 +1,6 @@
 namespace Whim;
 
+[Obsolete("This class is obsolete and will be removed in a future version.")]
 internal partial class Butler : IButler
 {
 	private readonly IContext _context;

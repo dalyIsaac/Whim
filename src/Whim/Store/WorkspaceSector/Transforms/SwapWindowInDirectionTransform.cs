@@ -5,16 +5,20 @@ namespace Whim;
 /// with the given <paramref name="WorkspaceId"/>
 /// </summary>
 /// <param name="WorkspaceId">
-/// The id of the workspace to swap the window in.
+/// The id of the workspace to swap the window in. Defaults to the active workspace.
 /// </param>
 /// <param name="Direction">
-/// The direction to swap the window in.
+/// The direction to swap the window in. Defaults to <see cref="Direction.None"/>.
 /// </param>
 /// <param name="WindowHandle">
 /// The handle of the window to swap. If not provided, the last focused window will be used.
 /// If provided, this window must exist in the workspace.
 /// </param>
-public record SwapWindowInDirectionTransform(WorkspaceId WorkspaceId, Direction Direction, HWND WindowHandle = default)
+public record SwapWindowInDirectionTransform(
+	WorkspaceId WorkspaceId = default,
+	Direction Direction = Direction.None,
+	HWND WindowHandle = default
+)
 	: BaseWorkspaceWindowTransform(
 		WorkspaceId,
 		WindowHandle,

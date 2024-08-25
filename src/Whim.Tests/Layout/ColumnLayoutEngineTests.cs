@@ -15,6 +15,7 @@ public class ColumnLayoutEngineCustomization : ICustomization
 	}
 }
 
+[Obsolete("Tests for ColumnLayoutEngine")]
 public class ColumnLayoutEngineTests
 {
 	private static readonly LayoutEngineIdentity identity = new();
