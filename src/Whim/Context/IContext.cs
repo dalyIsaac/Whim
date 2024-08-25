@@ -37,15 +37,19 @@ public interface IContext
 	IResourceManager ResourceManager { get; }
 
 	/// <inheritdoc cref="IButler"/>
+	[Obsolete("Use transforms and pickers to interact with the store instead")]
 	IButler Butler { get; }
 
 	/// <inheritdoc cref="IWorkspaceManager" />
+	[Obsolete("Use transforms and pickers to interact with the store instead")]
 	IWorkspaceManager WorkspaceManager { get; }
 
 	/// <inheritdoc cref="IWindowManager" />
+	[Obsolete("Use transforms and pickers to interact with the store instead")]
 	IWindowManager WindowManager { get; }
 
 	/// <inheritdoc cref="IMonitorManager" />
+	[Obsolete("Use transforms and pickers to interact with the store instead")]
 	IMonitorManager MonitorManager { get; }
 
 	/// <inheritdoc cref="IRouterManager" />
