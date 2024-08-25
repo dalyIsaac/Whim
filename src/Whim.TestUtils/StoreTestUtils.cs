@@ -9,6 +9,7 @@ namespace Whim.TestUtils;
 internal static class StoreTestUtils
 {
 	private static int _workspaceCounter = 1;
+	private static int _monitorCounter = 1;
 
 	public static Workspace CreateWorkspace(IContext ctx, Guid? providedId = null)
 	{
@@ -31,10 +32,17 @@ internal static class StoreTestUtils
 		return new Workspace(ctx, workspaceId) { LayoutEngines = [engine], ActiveLayoutEngineIndex = 0 };
 	}
 
-	public static IMonitor CreateMonitor(HMONITOR handle)
+	public static IMonitor CreateMonitor(HMONITOR? handle = null)
 	{
 		IMonitor monitor = Substitute.For<IMonitor>();
-		monitor.Handle.Returns(handle);
+
+		if (handle is null)
+		{
+			handle = new HMONITOR(_monitorCounter);
+			_monitorCounter++;
+		}
+
+		monitor.Handle.Returns(handle.Value);
 		monitor.WorkingArea.Returns(new Rectangle<int>(0, 0, 1920, 1080));
 		monitor.ScaleFactor.Returns(100);
 		return monitor;
@@ -76,6 +84,26 @@ internal static class StoreTestUtils
 			{
 				AddWorkspaceToManager(ctx, rootSector, workspace);
 			}
+		}
+	}
+
+	/// <summary>
+	/// Adds the given workspace, sets it to the active workspace using an existing monitor.
+	/// If an existing monitor doesn't exist, it creates one.
+	/// </summary>
+	/// <param name="ctx"></param>
+	/// <param name="root"></param>
+	/// <param name="workspace"></param>
+	public static void AddActiveWorkspace(IContext ctx, MutableRootSector root, Workspace workspace)
+	{
+		AddWorkspaceToManager(ctx, root, workspace);
+		if (root.MonitorSector.Monitors.Length == 0)
+		{
+			PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor(), workspace);
+		}
+		else
+		{
+			root.MapSector.MonitorWorkspaceMap.SetItem(root.MonitorSector.ActiveMonitorHandle, workspace.Id);
 		}
 	}
 

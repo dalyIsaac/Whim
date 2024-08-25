@@ -91,7 +91,7 @@ public static partial class Pickers
 	{
 		if (workspaceId == default)
 		{
-			workspaceId = PickActiveWorkspaceId()(rootSector);
+			return operation(PickActiveWorkspace()(rootSector));
 		}
 
 		if (!rootSector.WorkspaceSector.Workspaces.TryGetValue(workspaceId, out Workspace? workspace))
@@ -146,6 +146,15 @@ public static partial class Pickers
 			);
 
 	/// <summary>
+	/// Get the active layout engine in the active workspace.
+	/// </summary>
+	/// <returns>
+	/// The active layout engine in the active workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// </returns>
+	public static PurePicker<ILayoutEngine> PickActiveLayoutEngine() =>
+		(IRootSector rootSector) => PickActiveLayoutEngine(PickActiveWorkspaceId()(rootSector))(rootSector).Value;
+
+	/// <summary>
 	/// Get all the windows in the provided workspace.
 	/// </summary>
 	/// <param name="workspaceId"></param>
@@ -156,6 +165,15 @@ public static partial class Pickers
 	public static PurePicker<Result<IEnumerable<IWindow>>> PickWorkspaceWindows(WorkspaceId workspaceId) =>
 		(IRootSector rootSector) =>
 			BaseWorkspacePicker(workspaceId, rootSector, workspace => GetWorkspaceWindows(rootSector, workspace));
+
+	/// <summary>
+	/// Get all the windows in the active workspace.
+	/// </summary>
+	/// <returns>
+	/// All the windows in the active workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// </returns>
+	public static PurePicker<IEnumerable<IWindow>> PickActiveWorkspaceWindows() =>
+		(IRootSector rootSector) => GetWorkspaceWindows(rootSector, PickActiveWorkspace()(rootSector));
 
 	internal static IEnumerable<IWindow> GetWorkspaceWindows(IRootSector rootSector, IWorkspace workspace)
 	{

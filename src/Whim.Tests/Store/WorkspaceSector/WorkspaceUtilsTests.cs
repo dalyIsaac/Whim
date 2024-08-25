@@ -5,13 +5,13 @@ namespace Whim.Tests;
 [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WorkspaceUtilsTests
 {
-	[Theory, AutoSubstituteData]
-	public void OrActiveWorkspace_ReturnsActiveWorkspace(IContext ctx)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void OrActiveWorkspace_ReturnsActiveWorkspace(IContext ctx, MutableRootSector root)
 	{
 		// Given the workspace id is default
 		Guid workspaceId = default;
 		Guid activeWorkspaceId = Guid.NewGuid();
-		ctx.WorkspaceManager.ActiveWorkspace.Returns(CreateWorkspace(ctx) with { Id = activeWorkspaceId });
+		AddActiveWorkspace(ctx, root, CreateWorkspace(ctx) with { Id = activeWorkspaceId });
 
 		// When
 		Guid result = WorkspaceUtils.OrActiveWorkspace(workspaceId, ctx);
@@ -20,13 +20,13 @@ public class WorkspaceUtilsTests
 		Assert.Equal(activeWorkspaceId, result);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void OrActiveWorkspace_ReturnsProvidedWorkspace(IContext ctx)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void OrActiveWorkspace_ReturnsProvidedWorkspace(IContext ctx, MutableRootSector root)
 	{
 		// Given the workspace id is not default
 		Guid workspaceId = Guid.NewGuid();
 		Guid activeWorkspaceId = Guid.NewGuid();
-		ctx.WorkspaceManager.ActiveWorkspace.Returns(CreateWorkspace(ctx) with { Id = activeWorkspaceId });
+		AddActiveWorkspace(ctx, root, CreateWorkspace(ctx) with { Id = activeWorkspaceId });
 
 		// When
 		Guid result = WorkspaceUtils.OrActiveWorkspace(workspaceId, ctx);
