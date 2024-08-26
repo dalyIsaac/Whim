@@ -4,5 +4,5 @@ requests==2.32.3
 # indirect dependencies, frozen to use cache by `actions/setup-python`
 certifi==2024.7.4
 charset-normalizer==3.3.2
-idna==3.7
+idna==3.8
 urllib3==2.2.2
