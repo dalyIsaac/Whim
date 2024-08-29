@@ -137,18 +137,18 @@ public class ActivateWorkspaceTransformTests
 	internal void DeactivateOldWorkspace(IContext ctx, MutableRootSector rootSector, List<object> executedTransforms)
 	{
 		// Given the target monitor has an old workspace, and the new workspace wasn't previously activated
-		Workspace workspace1 = CreateWorkspace(ctx);
+		Workspace oldWorkspace = CreateWorkspace(ctx);
 		Workspace workspace2 = CreateWorkspace(ctx);
-		Workspace workspace3 = CreateWorkspace(ctx);
+		Workspace newWorkspace = CreateWorkspace(ctx);
 
 		IMonitor monitor1 = CreateMonitor((HMONITOR)1);
 		IMonitor monitor2 = CreateMonitor((HMONITOR)2);
 
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor1, workspace1);
+		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor1, oldWorkspace);
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor2, workspace2);
-		AddWorkspacesToManager(ctx, rootSector, workspace3);
+		AddWorkspacesToManager(ctx, rootSector, newWorkspace);
 
-		ActivateWorkspaceTransform sut = new(workspace3.Id, monitor1.Handle);
+		ActivateWorkspaceTransform sut = new(newWorkspace.Id, monitor1.Handle);
 
 		// When we activate the workspace on the target monitor
 		var (result, evs) = AssertRaises(ctx, rootSector, sut);
@@ -158,13 +158,16 @@ public class ActivateWorkspaceTransformTests
 
 		Assert.Single(evs);
 
-		Assert.Same(workspace1, evs[0].PreviousWorkspace);
-		Assert.Same(workspace3, evs[0].CurrentWorkspace);
+		Assert.Same(oldWorkspace, evs[0].PreviousWorkspace);
+		Assert.Same(newWorkspace, evs[0].CurrentWorkspace);
 		Assert.Same(monitor1, evs[0].Monitor);
 
-		Assert.DoesNotContain(executedTransforms, t => t.Equals(new DoWorkspaceLayoutTransform(workspace1.Id)));
-		Assert.Contains(executedTransforms, t => t.Equals(new DoWorkspaceLayoutTransform(workspace3.Id)));
-		Assert.Contains(executedTransforms, t => t.Equals(new FocusWorkspaceTransform(workspace3.Id)));
+		Assert.DoesNotContain(executedTransforms, t => t.Equals(new DoWorkspaceLayoutTransform(oldWorkspace.Id)));
+		Assert.Contains(executedTransforms, t => t.Equals(new DeactivateWorkspaceTransform(oldWorkspace.Id)));
+
+		Assert.Contains(executedTransforms, t => t.Equals(new DoWorkspaceLayoutTransform(newWorkspace.Id)));
+		Assert.Contains(executedTransforms, t => t.Equals(new FocusWorkspaceTransform(newWorkspace.Id)));
+		Assert.DoesNotContain(executedTransforms, t => t.Equals(new DeactivateWorkspaceTransform(newWorkspace.Id)));
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]

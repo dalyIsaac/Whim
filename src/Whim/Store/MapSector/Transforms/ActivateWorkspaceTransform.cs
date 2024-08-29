@@ -76,7 +76,10 @@ public record ActivateWorkspaceTransform(
 		}
 		else
 		{
-			ctx.Store.Dispatch(new DeactivateWorkspaceTransform(workspace.Id));
+			if (oldWorkspace is not null)
+			{
+				ctx.Store.Dispatch(new DeactivateWorkspaceTransform(oldWorkspace.Id));
+			}
 
 			// Temporarily focus the monitor's desktop HWND, to prevent another window from being focused.
 			ctx.Store.Dispatch(new FocusMonitorDesktopTransform(targetMonitorHandle));
