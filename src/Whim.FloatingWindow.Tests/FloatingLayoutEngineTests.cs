@@ -37,6 +37,21 @@ public class FloatingLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
+	public void AddWindow_UntrackedWindow(IContext context)
+	{
+		// Given a window which isn't tracked by the store
+		IWindow window = Substitute.For<IWindow>();
+		ILayoutEngine engine = new FloatingLayoutEngine(context, identity);
+
+		// When
+		ILayoutEngine newLayoutEngine = engine.AddWindow(window);
+
+		// Then
+		Assert.Equal(0, engine.Count);
+		Assert.Same(engine, newLayoutEngine);
+	}
+
+	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	public void AddWindow_WindowAlreadyPresent(IContext context, IWindow window)
 	{
 		// Given
