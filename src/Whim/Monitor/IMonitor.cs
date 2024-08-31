@@ -93,7 +93,7 @@ public static class MonitorHelpers
 
 	/// <summary>
 	/// Converts the <paramref name="rectangle"/> from the unit square to the
-	/// <paramref name="monitor"/>'s coordinate system.
+	/// <paramref name="monitor"/>'s coordinate system. The rectangle is clamped to the monitor's bounds.
 	/// </summary>
 	/// <param name="monitor"></param>
 	/// <param name="rectangle">The point to translate.</param>
@@ -106,10 +106,31 @@ public static class MonitorHelpers
 		int translatedX = rectangle.X - monitor.X;
 		int translatedY = rectangle.Y - monitor.Y;
 
-		double x = Math.Abs((double)translatedX / monitor.Width);
-		double y = Math.Abs((double)translatedY / monitor.Height);
+		double x = (double)translatedX / monitor.Width;
+		double y = (double)translatedY / monitor.Height;
+
 		double width = Math.Abs((double)rectangle.Width / monitor.Width);
 		double height = Math.Abs((double)rectangle.Height / monitor.Height);
+
+		// Clamp the rectangle to the monitor's bounds.
+		if (x < 0)
+		{
+			x = 0;
+		}
+		else if (x > 1)
+		{
+			x = 1 - width;
+		}
+
+		if (y < 0)
+		{
+			y = 0;
+		}
+		else if (y > 1)
+		{
+			y = 1 - height;
+		}
+
 		return new Rectangle<double>()
 		{
 			X = x,

@@ -24,7 +24,7 @@ public class MoveWindowToPointTransformTests
 		// Given there is no workspace for the monitor at the given point
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
 		Point<int> point = new(10, 10);
-		SetupMonitorAtPoint(ctx, internalCtx, rootSector, point, monitor);
+		SetupMonitorAtPoint(ctx, internalCtx, rootSector, monitor, point);
 
 		MoveWindowToPointTransform sut = new((HWND)10, point);
 
@@ -45,7 +45,7 @@ public class MoveWindowToPointTransformTests
 		Point<int> point = new(10, 10);
 
 		AddWindowToSector(rootSector, window);
-		SetupMonitorAtPoint(ctx, internalCtx, rootSector, point, monitor);
+		SetupMonitorAtPoint(ctx, internalCtx, rootSector, monitor, point);
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, workspace);
 
 		MoveWindowToPointTransform sut = new(window.Handle, point);
@@ -71,7 +71,7 @@ public class MoveWindowToPointTransformTests
 		Point<int> point = new(10, 10);
 
 		AddWindowToSector(rootSector, window);
-		SetupMonitorAtPoint(ctx, internalCtx, rootSector, point, monitor);
+		SetupMonitorAtPoint(ctx, internalCtx, rootSector, monitor, point);
 		PopulateThreeWayMap(ctx, rootSector, monitor, workspace, window);
 
 		MoveWindowToPointTransform sut = new(window.Handle, point);
@@ -113,7 +113,7 @@ public class MoveWindowToPointTransformTests
 		Point<int> point = new(10, 10);
 
 		AddWindowToSector(rootSector, window);
-		SetupMonitorAtPoint(ctx, internalCtx, rootSector, point, targetMonitor);
+		SetupMonitorAtPoint(ctx, internalCtx, rootSector, targetMonitor, point);
 		PopulateThreeWayMap(ctx, rootSector, sourceMonitor, sourceWorkspace, window);
 		PopulateMonitorWorkspaceMap(ctx, rootSector, targetMonitor, targetWorkspace);
 

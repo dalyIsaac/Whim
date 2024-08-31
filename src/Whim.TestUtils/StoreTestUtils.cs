@@ -159,7 +159,26 @@ internal static class StoreTestUtils
 			monitor.Handle,
 			workspace.Id
 		);
-		rootSector.MonitorSector.Monitors = rootSector.MonitorSector.Monitors.Add(monitor);
+
+		// If the monitor already exists, just update it.
+		int foundIdx = -1;
+		for (int idx = 0; idx < rootSector.MonitorSector.Monitors.Length; idx++)
+		{
+			if (rootSector.MonitorSector.Monitors[idx].Handle == monitor.Handle)
+			{
+				foundIdx = idx;
+				break;
+			}
+		}
+
+		if (foundIdx != -1)
+		{
+			rootSector.MonitorSector.Monitors = rootSector.MonitorSector.Monitors.SetItem(foundIdx, monitor);
+		}
+		else
+		{
+			rootSector.MonitorSector.Monitors = rootSector.MonitorSector.Monitors.Add(monitor);
+		}
 
 		if (rootSector.MonitorSector.Monitors.Length == 1)
 		{
@@ -187,8 +206,8 @@ internal static class StoreTestUtils
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector rootSector,
-		IPoint<int> point,
-		IMonitor monitor
+		IMonitor monitor,
+		IPoint<int>? point = null
 	)
 	{
 		// We need to compare the coordinates by value, so we can't pass in the `point` directly.
@@ -199,6 +218,11 @@ internal static class StoreTestUtils
 			)
 			.Returns(callInfo =>
 			{
+				if (point == null)
+				{
+					return monitor.Handle;
+				}
+
 				System.Drawing.Point calledPoint = callInfo.Arg<System.Drawing.Point>();
 				if (calledPoint.X == point.X && calledPoint.Y == point.Y)
 				{

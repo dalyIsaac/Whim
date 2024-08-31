@@ -24,8 +24,8 @@ public class LayoutPreviewPluginCustomization : StoreCustomization
 			_ctx,
 			_internalCtx,
 			_store._root.MutableRootSector,
-			new Point<int>(0, 0),
-			monitor
+			monitor,
+			new Point<int>(0, 0)
 		);
 		StoreTestUtils.PopulateMonitorWorkspaceMap(_ctx, _store._root.MutableRootSector, monitor, workspace);
 	}

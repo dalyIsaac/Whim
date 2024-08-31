@@ -222,6 +222,7 @@ public class MonitorHelpersTests
 	public static TheoryData<Rectangle<int>, Rectangle<int>, Rectangle<double>> NormalizeRectangle_Double =>
 		new()
 		{
+			// Monitor: 1920x1080, from the origin. Rectangle: at (192, 108).
 			{
 				new Rectangle<int>() { Width = 1920, Height = 1080 },
 				new Rectangle<int>()
@@ -239,6 +240,7 @@ public class MonitorHelpersTests
 					Height = 0.1,
 				}
 			},
+			// Monitor 1920x1080, from (100, 100). Rectangle: at (192, 108).
 			{
 				new Rectangle<int>()
 				{
@@ -262,6 +264,7 @@ public class MonitorHelpersTests
 					Height = 0.1,
 				}
 			},
+			// Monitor 1920x1080, from (-100, -100). Rectangle: at (98, 8).
 			{
 				new Rectangle<int>()
 				{
@@ -281,6 +284,42 @@ public class MonitorHelpersTests
 				{
 					X = 0.1,
 					Y = 0.1,
+					Width = 0.1,
+					Height = 0.1,
+				}
+			},
+			// Monitor 1920x1080, from the origin. Rectangle: at (-192, -108).
+			{
+				new Rectangle<int>() { Width = 1920, Height = 1080 },
+				new Rectangle<int>()
+				{
+					X = -192,
+					Y = -108,
+					Width = 192,
+					Height = 108,
+				},
+				new Rectangle<double>()
+				{
+					X = 0,
+					Y = 0,
+					Width = 0.1,
+					Height = 0.1,
+				}
+			},
+			// Monitor 1920x1080, from the origin. Rectangle at (1920 + 192, 1080 + 108).
+			{
+				new Rectangle<int>() { Width = 1920, Height = 1080 },
+				new Rectangle<int>()
+				{
+					X = 1920 + 192,
+					Y = 1080 + 108,
+					Width = 192,
+					Height = 108,
+				},
+				new Rectangle<double>()
+				{
+					X = 0.9,
+					Y = 0.9,
 					Width = 0.1,
 					Height = 0.1,
 				}
