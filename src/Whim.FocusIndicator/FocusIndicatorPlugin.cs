@@ -15,6 +15,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	private readonly CancellationTokenSource _cancellationTokenSource;
 	private readonly CancellationToken _cancellationToken;
 	private FocusIndicatorWindow? _focusIndicatorWindow;
+	private Task? _task;
 	private int _lastFocusStartTime;
 	private bool _disposedValue;
 
@@ -44,12 +45,22 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	public void PreInitialize()
 	{
 		_context.FilterManager.AddTitleMatchFilter(FocusIndicatorConfig.Title);
-		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
+		_context.Store.WindowEvents.WindowFocused += WindowEvents_WindowFocused;
+		_context.Store.MonitorEvents.MonitorsChanged += MonitorEvents_MonitorsChanged;
 	}
 
-	private void WindowManager_WindowFocused(object? sender, WindowFocusedEventArgs e)
+	private void WindowEvents_WindowFocused(object? sender, WindowFocusedEventArgs e)
 	{
 		_lastFocusStartTime = Environment.TickCount;
+	}
+
+	private void MonitorEvents_MonitorsChanged(object? sender, MonitorsChangedEventArgs e)
+	{
+		if (_task == null || _task.IsCompleted || _task.IsFaulted || _task.IsCanceled || _task.IsCompletedSuccessfully)
+		{
+			Logger.Debug("Restarting polling");
+			StartPolling();
+		}
 	}
 
 	/// <inheritdoc/>
@@ -62,7 +73,12 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 		_focusIndicatorWindow.Activate();
 		_focusIndicatorWindow.Hide(_context);
 
-		Task.Factory.StartNew(
+		StartPolling();
+	}
+
+	private void StartPolling()
+	{
+		_task = Task.Factory.StartNew(
 			ContinuousPolling,
 			_cancellationToken,
 			TaskCreationOptions.LongRunning,
@@ -195,7 +211,9 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 				_cancellationTokenSource.Dispose();
 				_focusIndicatorWindow?.Dispose();
 				_focusIndicatorWindow?.Close();
-				_context.WindowManager.WindowFocused -= WindowManager_WindowFocused;
+				_task?.Dispose();
+				_context.Store.WindowEvents.WindowFocused -= WindowEvents_WindowFocused;
+				_context.Store.MonitorEvents.MonitorsChanged -= MonitorEvents_MonitorsChanged;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
