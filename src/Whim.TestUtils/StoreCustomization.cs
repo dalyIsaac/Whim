@@ -21,7 +21,7 @@ internal class StoreWrapper(IContext ctx, IInternalContext internalCtx) : Store(
 	}
 }
 
-[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "<Pending>")]
+[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable")]
 public class StoreCustomization : ICustomization
 {
 #pragma warning disable CA1051 // Do not declare visible instance fields

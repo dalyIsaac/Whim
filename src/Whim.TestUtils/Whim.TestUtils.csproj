@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Whim.Tests" />
+    <InternalsVisibleTo Include="Whim.FloatingWindow.Tests" />
     <InternalsVisibleTo Include="Whim.LayoutPreview.Tests" />
   </ItemGroup>
 </Project>

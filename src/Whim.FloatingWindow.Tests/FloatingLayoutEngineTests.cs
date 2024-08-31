@@ -1,28 +1,8 @@
-﻿using AutoFixture;
-using NSubstitute;
+﻿using NSubstitute;
 using Whim.TestUtils;
-using Windows.Win32.Foundation;
 using Xunit;
 
 namespace Whim.FloatingWindow.Tests;
-
-public class FloatingLayoutEngineCustomization : ICustomization
-{
-	public void Customize(IFixture fixture)
-	{
-		IContext context = fixture.Freeze<IContext>();
-		IMonitor monitor = fixture.Freeze<IMonitor>();
-
-		context.MonitorManager.GetMonitorAtPoint(Arg.Any<IRectangle<int>>()).Returns(monitor);
-		monitor.WorkingArea.Returns(new Rectangle<int>() { Width = 1000, Height = 1000 });
-		context
-			.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>())
-			.Returns(new Rectangle<int>() { Width = 100, Height = 100 });
-
-		fixture.Inject(context);
-		fixture.Inject(monitor);
-	}
-}
 
 public class FloatingLayoutEngineTests
 {
@@ -42,7 +22,7 @@ public class FloatingLayoutEngineTests
 	}
 
 	#region AddWindow
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	public void AddWindow(IContext context, IWindow window)
 	{
 		// Given
@@ -56,7 +36,7 @@ public class FloatingLayoutEngineTests
 		Assert.Equal(1, newLayoutEngine.Count);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	public void AddWindow_WindowAlreadyPresent(IContext context, IWindow window)
 	{
 		// Given
@@ -72,7 +52,7 @@ public class FloatingLayoutEngineTests
 	#endregion
 
 	#region RemoveWindow
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	public void Remove(IContext context, IWindow window)
 	{
 		// Given
@@ -86,7 +66,7 @@ public class FloatingLayoutEngineTests
 		Assert.Equal(0, newLayoutEngine.Count);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	public void Remove_NoChanges(IContext context, IWindow window)
 	{
 		// Given
@@ -102,7 +82,7 @@ public class FloatingLayoutEngineTests
 	#endregion RemoveWindow
 
 	#region Contains
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	public void Contains(IContext context, IWindow window)
 	{
 		// Given
@@ -115,7 +95,7 @@ public class FloatingLayoutEngineTests
 		Assert.True(contains);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	public void Contains_False(IContext context, IWindow window)
 	{
 		// Given
@@ -130,7 +110,7 @@ public class FloatingLayoutEngineTests
 	#endregion
 
 	#region DoLayout
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	public void DoLayout_Empty(IContext context)
 	{
 		// Given
@@ -145,15 +125,15 @@ public class FloatingLayoutEngineTests
 		Assert.Empty(windowStates);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
-	public void DoLayout_KeepWindowSize(
-		IContext context,
-		IWindow windowNormal,
-		IWindow windowMinimized,
-		IWindow windowMaximized
-	)
+	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
+	internal void DoLayout_KeepWindowSize(IContext context, MutableRootSector root)
 	{
 		// Given
+		IWindow[] allWindows = root.WindowSector.Windows.Values.ToArray();
+		IWindow windowNormal = allWindows[0];
+		IWindow windowMinimized = allWindows[1];
+		IWindow windowMaximized = allWindows[2];
+
 		windowMinimized.IsMinimized.Returns(true);
 		windowMaximized.IsMaximized.Returns(true);
 		ILayoutEngine engine = new FloatingLayoutEngine(context, identity)
@@ -189,7 +169,7 @@ public class FloatingLayoutEngineTests
 		Assert.Null(result);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	public void GetFirstWindow_SingleWindow(IContext context, IWindow window)
 	{
 		// Given
@@ -204,7 +184,7 @@ public class FloatingLayoutEngineTests
 	#endregion
 
 	#region WindowRelated
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	public void MoveWindowToPoint(IContext context, IWindow window)
 	{
 		// Given
@@ -218,7 +198,7 @@ public class FloatingLayoutEngineTests
 		Assert.Equal(engine, newEngine);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	public void MoveWindowEdgesInDirection(IContext context, IWindow window)
 	{
 		// Given
@@ -232,7 +212,7 @@ public class FloatingLayoutEngineTests
 		Assert.Equal(engine, newEngine);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	public void MinimizeWindowStart(IContext context, IWindow window)
 	{
 		// Given
@@ -245,7 +225,7 @@ public class FloatingLayoutEngineTests
 		Assert.Equal(engine, newEngine);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	public void MinimizeWindowEnd(IContext context, IWindow window)
 	{
 		// Given
@@ -258,7 +238,7 @@ public class FloatingLayoutEngineTests
 		Assert.Equal(engine, newEngine);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	public void FocusWindowInDirection(IContext context, IWindow window)
 	{
 		// Given
@@ -271,7 +251,7 @@ public class FloatingLayoutEngineTests
 		Assert.Equal(engine, newEngine);
 	}
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	public void SwapWindowInDirection(IContext context, IWindow window)
 	{
 		// Given
@@ -285,7 +265,7 @@ public class FloatingLayoutEngineTests
 	}
 	#endregion
 
-	[Theory, AutoSubstituteData<FloatingLayoutEngineCustomization>]
+	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	public void PerformCustomAction(IContext context, IWindow window)
 	{
 		// Given
