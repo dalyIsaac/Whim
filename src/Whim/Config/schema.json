@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/dalyIsaac/Whim/main/src/Whim/Config/schema.json",
+
+  "type": "object",
+  "properties": {
+    "workspaces": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/workspace"
+      }
+    },
+
+    "layoutEngines": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/layoutEngine"
+      }
+    },
+
+    "monitors": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/monitor"
+      }
+    }
+  },
+
+  "$defs": {
+    "workspace": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": ["name"]
+    },
+
+    "layoutEngine": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": ["type", "name"]
+    },
+
+    "monitor": {
+      "type": "object",
+      "properties": {
+        "workspaces": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+
+    "keybind": {
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "string"
+        },
+        "keybind": {
+          "type": "string"
+        }
+      },
+      "required": ["command", "keybind"]
+    },
+
+    "filter": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": ["windowClass", "processFileName", "title", "titleMatch"]
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": ["type", "value"]
+    },
+
+    "router": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": ["windowClass", "processFileName", "title", "titleMatch"]
+        },
+        "value": {
+          "type": "string"
+        },
+        "workspace": {
+          "type": "string"
+        }
+      },
+      "required": ["type", "value", "workspace"]
+    },
+
+    "plugin": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": ["name"]
+    }
+  }
+}
