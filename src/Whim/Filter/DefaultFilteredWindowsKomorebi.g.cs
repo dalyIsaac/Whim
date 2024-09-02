@@ -58,6 +58,10 @@ internal static class DefaultFilteredWindowsKomorebi
 		// Amazon Chime
 		filterManager.Add((window) => window.Title.EndsWith("Meeting Controls"));
 
+		// AutoDesk AutoCAD Suite
+		filterManager.Add((window) => window.WindowClass.Contains("Afx:") && window.ProcessFileName.Equals("acad.exe"));
+		filterManager.Add((window) => window.WindowClass.StartsWith("HwndWrapper[DefaultDomain") && window.ProcessFileName.Equals("acad.exe"));
+
 		// AutoHotkey
 		filterManager.Add((window) => window.Title.StartsWith("Window Spy"));
 		filterManager.AddProcessFileNameFilter("AutoHotkeyUX.exe");
