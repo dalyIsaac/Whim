@@ -17,32 +17,43 @@
   "properties": {
     "workspaces": {
       "type": "array",
-      "items": { "$ref": "#/$defs/Workspace" }
+      "items": { "$ref": "#/$defs/Workspace" },
+      "description": "The workspaces to create"
     },
 
-    "layoutEngines": { "$ref": "#/$defs/LayoutEngineCollection" },
+    "layoutEngines": {
+      "$ref": "#/$defs/LayoutEngineCollection",
+      "description": "The layout engines to use if not specified in the workspace"
+    },
 
     "monitors": {
       "type": "array",
-      "items": { "$ref": "#/$defs/Monitor" }
+      "items": { "$ref": "#/$defs/Monitor" },
+      "description": "Specifies the workspaces that can be displayed on each monitor"
     },
 
     "keybinds": {
       "type": "array",
-      "items": { "$ref": "#/$defs/Keybind" }
+      "items": { "$ref": "#/$defs/Keybind" },
+      "description": "Mappings of commands to keybinds"
     },
 
     "filters": {
       "type": "array",
-      "items": { "$ref": "#/$defs/Filter" }
+      "items": { "$ref": "#/$defs/Filter" },
+      "description": "Filters to apply to windows to determine whether they should be managed by Whim"
     },
 
     "routers": {
       "type": "array",
-      "items": { "$ref": "#/$defs/Router" }
+      "items": { "$ref": "#/$defs/Router" },
+      "description": "Routers to determine which workspace a window should be placed in"
     },
 
-    "plugins": { "$ref": "#/$defs/PluginCollection" }
+    "plugins": {
+      "$ref": "#/$defs/PluginCollection",
+      "description": "Plugins to enable and configure"
+    }
   },
 
   "$defs": {
@@ -51,8 +62,14 @@
       "required": ["name"],
       "additionalProperties": false,
       "properties": {
-        "name": { "type": "string" },
-        "layoutEngines": { "$ref": "#/$defs/LayoutEngineCollection" }
+        "name": {
+          "type": "string",
+          "description": "The name of the workspace"
+        },
+        "layoutEngines": {
+          "$ref": "#/$defs/LayoutEngineCollection",
+          "description": "The layout engines to use for this workspace"
+        }
       }
     },
 
@@ -72,8 +89,14 @@
       "required": ["type"],
       "additionalProperties": false,
       "properties": {
-        "type": { "const": "FocusLayoutEngine" },
-        "name": { "type": "string" }
+        "type": {
+          "const": "FocusLayoutEngine",
+          "description": "The unique identifier of this FocusLayoutEngine"
+        },
+        "name": {
+          "type": "string",
+          "description": "A custom name for this FocusLayoutEngine"
+        }
       }
     },
 
@@ -81,8 +104,14 @@
       "required": ["type"],
       "additionalProperties": false,
       "properties": {
-        "type": { "const": "SliceLayoutEngine" },
-        "name": { "type": "string" },
+        "type": {
+          "const": "SliceLayoutEngine",
+          "description": "The unique identifier of this SliceLayoutEngine"
+        },
+        "name": {
+          "type": "string",
+          "description": "A custom name for this SliceLayoutEngine"
+        },
         "variant": {
           "enum": [
             "ColumnLayout",
@@ -101,7 +130,10 @@
       "properties": {
         "workspaces": {
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string",
+            "description": "The workspaces that can be displayed on this monitor. Use '*' to allow all workspaces"
+          }
         }
       }
     },
@@ -111,8 +143,14 @@
       "required": ["command", "keybind"],
       "additionalProperties": false,
       "properties": {
-        "command": { "type": "string" },
-        "keybind": { "type": "string" }
+        "command": {
+          "type": "string",
+          "description": "The identifier of the command to run. For more, see https://dalyisaac.github.io/Whim/docs/customize/commands.html"
+        },
+        "keybind": {
+          "type": "string",
+          "description": "The keybind to trigger the command. For more, see https://dalyisaac.github.io/Whim/docs/customize/keybinds.html"
+        }
       }
     },
 
@@ -122,9 +160,10 @@
       "additionalProperties": false,
       "properties": {
         "type": {
-          "enum": ["windowClass", "processFileName", "title", "titleMatch"]
+          "enum": ["windowClass", "processFileName", "title", "titleMatch"],
+          "description": "The type of filter to apply. For more, see https://dalyisaac.github.io/Whim/docs/customize/filtering.html"
         },
-        "value": { "type": "string" }
+        "value": { "type": "string", "description": "The value to filter by" }
       }
     },
 
@@ -134,10 +173,14 @@
       "additionalProperties": false,
       "properties": {
         "type": {
-          "enum": ["windowClass", "processFileName", "title", "titleMatch"]
+          "enum": ["windowClass", "processFileName", "title", "titleMatch"],
+          "description": "The type of router to apply. For more, see https://dalyisaac.github.io/Whim/docs/customize/routing.html"
         },
-        "value": { "type": "string" },
-        "workspace": { "type": "string" }
+        "value": { "type": "string", "description": "The value to route by" },
+        "workspace": {
+          "type": "string",
+          "description": "The workspace to route to"
+        }
       }
     },
 
@@ -156,36 +199,71 @@
 
     "GapsPlugin": {
       "type": "object",
-      "required": ["type", "gapSize"],
+      "description": "Plugin to add gaps between windows. For more, see https://dalyisaac.github.io/Whim/docs/plugins/gaps.html",
+      "required": ["type"],
       "additionalProperties": false,
       "properties": {
-        "type": { "const": "GapsPlugin" },
-        "isEnabled": { "type": "boolean" },
-        "gapSize": { "type": "number" }
+        "type": {
+          "const": "GapsPlugin",
+          "description": "The unique identifier of this GapsPlugin"
+        },
+        "isEnabled": {
+          "type": "boolean",
+          "description": "Whether the plugin is enabled"
+        },
+        "outerGapSize": {
+          "type": "number",
+          "description": "The gap between the parent layout engine and the area where windows are placed"
+        },
+        "innerGapSize": {
+          "type": "number",
+          "description": "The gap between windows"
+        }
       }
     },
 
     "FocusIndicatorPlugin": {
       "type": "object",
+      "description": "Plugin to add a focus indicator to the active window. For more, see https://dalyisaac.github.io/Whim/docs/plugins/focus-indicator.html",
       "required": ["type"],
       "additionalProperties": false,
       "properties": {
-        "type": { "const": "FocusIndicatorPlugin" },
-        "isEnabled": { "type": "boolean" },
-        "color": { "type": "string" },
-        "borderSize": { "type": "number" }
+        "type": {
+          "const": "FocusIndicatorPlugin",
+          "description": "The unique identifier of this FocusIndicatorPlugin"
+        },
+        "isEnabled": {
+          "type": "boolean",
+          "description": "Whether the plugin is enabled"
+        },
+        "color": {
+          "type": "string",
+          "description": "The color of the focus indicator. Can be a hex code or a color name"
+        },
+        "borderSize": {
+          "type": "number",
+          "description": "The size of the border of the focus indicator, in pixels"
+        }
       }
     },
 
     "BarPlugin": {
       "type": "object",
+      "description": "Plugin to add a bar and widgets to the top of the screen. For more, see https://dalyisaac.github.io/Whim/docs/plugins/bar.html",
       "required": ["type"],
       "additionalProperties": false,
       "properties": {
-        "type": { "const": "BarPlugin" },
-        "isEnabled": { "type": "boolean" },
+        "type": {
+          "const": "BarPlugin",
+          "description": "The unique identifier of this BarPlugin"
+        },
+        "isEnabled": {
+          "type": "boolean",
+          "description": "Whether the plugin is enabled"
+        },
         "leftComponents": {
           "type": "array",
+          "description": "The widgets to display on the left side of the bar",
           "items": {
             "$ref": "#/$defs/BarWidget"
           }
@@ -199,12 +277,22 @@
 
     "DateTimeWidget": {
       "type": "object",
+      "description": "A widget that displays the current date and time",
       "required": ["type"],
       "additionalProperties": false,
       "properties": {
-        "type": { "const": "DateTimeWidget" },
-        "format": { "type": "string" },
-        "interval": { "type": "number" }
+        "type": {
+          "const": "DateTimeWidget",
+          "description": "The unique identifier of this DateTimeWidget"
+        },
+        "format": {
+          "type": "string",
+          "description": "The format to display the date and time in. For more, see the table in https://learn.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings"
+        },
+        "interval": {
+          "type": "number",
+          "description": "The interval in milliseconds to update the date and time"
+        }
       }
     }
   }

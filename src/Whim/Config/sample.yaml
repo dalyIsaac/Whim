@@ -27,7 +27,7 @@ monitors:
 
 keybinds:
   - command: whim.core.activate_previous_workspace
-    keybind: win+ctrl+left
+    keybind: LWin+LCtrl+Left
 
 filters:
   - type: title
@@ -41,7 +41,7 @@ routers:
 plugins:
   - type: GapsPlugin
     isEnabled: true
-    gapSize: 10
+    outerGapSize: 10
 
   - type: FocusIndicatorPlugin
     isEnabled: true
