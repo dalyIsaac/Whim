@@ -82,7 +82,8 @@
         "name": {
           "type": "string"
         }
-      }
+      },
+      "required": ["type"]
     },
 
     "FocusLayoutEngine": {
@@ -91,8 +92,7 @@
         "type": {
           "const": "FocusLayoutEngine"
         }
-      },
-      "required": ["type"]
+      }
     },
 
     "SliceLayoutEngine": {
@@ -194,7 +194,8 @@
         "isEnabled": {
           "type": "boolean"
         }
-      }
+      },
+      "required": ["type"]
     },
 
     "GapsPlugin": {
@@ -222,8 +223,7 @@
         "borderSize": {
           "type": "number"
         }
-      },
-      "required": ["type"]
+      }
     },
 
     "BarPlugin": {
@@ -238,8 +238,7 @@
             "$ref": "#/$defs/BarWidget"
           }
         }
-      },
-      "required": ["type"]
+      }
     },
 
     "BarWidget": {
