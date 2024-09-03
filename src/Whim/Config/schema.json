@@ -63,7 +63,6 @@
     },
 
     "LayoutEngineCollection": {
-      "type": "array",
       "oneOf": [
         { "$ref": "#/$defs/FocusLayoutEngine" },
         { "$ref": "#/$defs/SliceLayoutEngine" }
@@ -168,7 +167,6 @@
     },
 
     "PluginCollection": {
-      "type": "array",
       "oneOf": [
         { "$ref": "#/$defs/GapsPlugin" },
         { "$ref": "#/$defs/FocusIndicatorPlugin" },
@@ -221,7 +219,6 @@
           "const": ["BarPlugin"]
         },
         "leftComponents": {
-          "type": "array",
           "oneOf": [{ "$ref": "#/$defs/DateTimeWidget" }]
         }
       },
