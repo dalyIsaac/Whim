@@ -58,7 +58,7 @@
         "name": {
           "type": "string"
         },
-        "layoutEngine": {
+        "layoutEngines": {
           "$ref": "#/$defs/LayoutEngineCollection"
         }
       },
