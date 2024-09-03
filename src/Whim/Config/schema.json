@@ -3,6 +3,16 @@
   "$id": "https://raw.githubusercontent.com/dalyIsaac/Whim/main/src/Whim/Config/schema.json",
 
   "type": "object",
+  "required": [
+    "workspaces",
+    "layoutEngines",
+    "monitors",
+    "keybinds",
+    "filters",
+    "routers",
+    "plugins"
+  ],
+
   "properties": {
     "workspaces": {
       "type": "array",
