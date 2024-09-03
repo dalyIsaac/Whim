@@ -11,8 +11,7 @@ workspaces:
 
 layoutEngines:
   - type: SliceLayoutEngine
-    config:
-      type: Column
+    variant: ColumnLayout
   - type: SliceLayoutEngine
     variant: PrimaryStackLayout
 

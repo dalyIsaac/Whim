@@ -12,6 +12,7 @@
     "routers",
     "plugins"
   ],
+  "additionalProperties": false,
 
   "properties": {
     "workspaces": {
@@ -19,7 +20,7 @@
       "items": { "$ref": "#/$defs/Workspace" }
     },
 
-    "layoutEngines": { "$ref": "file:layout-engine-schema.json" },
+    "layoutEngines": { "$ref": "#/$defs/LayoutEngineCollection" },
 
     "monitors": {
       "type": "array",
@@ -41,21 +42,62 @@
       "items": { "$ref": "#/$defs/Router" }
     },
 
-    "plugins": { "$ref": "file:plugin-schema.json" }
+    "plugins": { "$ref": "#/$defs/PluginCollection" }
   },
 
   "$defs": {
     "Workspace": {
       "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
       "properties": {
         "name": { "type": "string" },
-        "layoutEngines": { "$ref": "file:layout-engine-schema.json" }
-      },
-      "required": ["name"]
+        "layoutEngines": { "$ref": "#/$defs/LayoutEngineCollection" }
+      }
+    },
+
+    "LayoutEngineCollection": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/LayoutEngine" }
+    },
+
+    "LayoutEngine": {
+      "oneOf": [
+        { "$ref": "#/$defs/FocusLayoutEngine" },
+        { "$ref": "#/$defs/SliceLayoutEngine" }
+      ]
+    },
+
+    "FocusLayoutEngine": {
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "FocusLayoutEngine" },
+        "name": { "type": "string" }
+      }
+    },
+
+    "SliceLayoutEngine": {
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "SliceLayoutEngine" },
+        "name": { "type": "string" },
+        "variant": {
+          "enum": [
+            "ColumnLayout",
+            "RowLayout",
+            "PrimaryStackLayout",
+            "MultiColumnLayout",
+            "SecondaryPrimaryLayout"
+          ]
+        }
+      }
     },
 
     "Monitor": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "workspaces": {
           "type": "array",
@@ -66,34 +108,104 @@
 
     "Keybind": {
       "type": "object",
+      "required": ["command", "keybind"],
+      "additionalProperties": false,
       "properties": {
         "command": { "type": "string" },
         "keybind": { "type": "string" }
-      },
-      "required": ["command", "keybind"]
+      }
     },
 
     "Filter": {
       "type": "object",
+      "required": ["type", "value"],
+      "additionalProperties": false,
       "properties": {
         "type": {
           "enum": ["windowClass", "processFileName", "title", "titleMatch"]
         },
         "value": { "type": "string" }
-      },
-      "required": ["type", "value"]
+      }
     },
 
     "Router": {
       "type": "object",
+      "required": ["type", "value", "workspace"],
+      "additionalProperties": false,
       "properties": {
         "type": {
           "enum": ["windowClass", "processFileName", "title", "titleMatch"]
         },
         "value": { "type": "string" },
         "workspace": { "type": "string" }
-      },
-      "required": ["type", "value", "workspace"]
+      }
+    },
+
+    "PluginCollection": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Plugin" }
+    },
+
+    "Plugin": {
+      "oneOf": [
+        { "$ref": "#/$defs/GapsPlugin" },
+        { "$ref": "#/$defs/FocusIndicatorPlugin" },
+        { "$ref": "#/$defs/BarPlugin" }
+      ]
+    },
+
+    "GapsPlugin": {
+      "type": "object",
+      "required": ["type", "gapSize"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "GapsPlugin" },
+        "isEnabled": { "type": "boolean" },
+        "gapSize": { "type": "number" }
+      }
+    },
+
+    "FocusIndicatorPlugin": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "FocusIndicatorPlugin" },
+        "isEnabled": { "type": "boolean" },
+        "color": { "type": "string" },
+        "borderSize": { "type": "number" }
+      }
+    },
+
+    "BarPlugin": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "BarPlugin" },
+        "isEnabled": { "type": "boolean" },
+        "leftComponents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/BarWidget"
+          }
+        }
+      }
+    },
+
+    "BarWidget": {
+      "oneOf": [{ "$ref": "#/$defs/DateTimeWidget" }]
+    },
+
+    "DateTimeWidget": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "DateTimeWidget" },
+        "format": { "type": "string" },
+        "interval": { "type": "number" }
+      }
     }
   }
 }
