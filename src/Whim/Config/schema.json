@@ -189,7 +189,7 @@
       "$ref": "#/$defs/PluginBase",
       "properties": {
         "type": {
-          "enum": ["GapsPlugin"]
+          "const": "GapsPlugin"
         },
         "gapSize": {
           "type": "number"
@@ -202,7 +202,7 @@
       "$ref": "#/$defs/PluginBase",
       "properties": {
         "type": {
-          "enum": ["FocusIndicatorPlugin"]
+          "const": ["FocusIndicatorPlugin"]
         },
         "color": {
           "type": "string"
@@ -218,7 +218,7 @@
       "$ref": "#/$defs/PluginBase",
       "properties": {
         "type": {
-          "enum": ["BarPlugin"]
+          "const": ["BarPlugin"]
         },
         "leftComponents": {
           "type": "array",
@@ -232,7 +232,7 @@
       "type": "object",
       "properties": {
         "type": {
-          "enum": ["DateTimeWidget"]
+          "const": ["DateTimeWidget"]
         },
         "format": {
           "type": "string"
