@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/dalyIsaac/Whim/main/src/Whim/Config/plugin-schema.json",
+
+  "$defs": {
+    "PluginCollection": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Plugin" }
+    },
+
+    "Plugin": {
+      "oneOf": [
+        { "$ref": "#/$defs/GapsPlugin" },
+        { "$ref": "#/$defs/FocusIndicatorPlugin" },
+        { "$ref": "#/$defs/BarPlugin" }
+      ]
+    },
+
+    "GapsPlugin": {
+      "type": "object",
+      "required": ["type", "gapSize"],
+      "properties": {
+        "type": { "const": "GapsPlugin" },
+        "isEnabled": { "type": "boolean" },
+        "gapSize": { "type": "number" }
+      }
+    },
+
+    "FocusIndicatorPlugin": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "FocusIndicatorPlugin" },
+        "isEnabled": { "type": "boolean" },
+        "color": { "type": "string" },
+        "borderSize": { "type": "number" }
+      }
+    },
+
+    "BarPlugin": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "BarPlugin" },
+        "isEnabled": { "type": "boolean" },
+        "leftComponents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/BarWidget"
+          }
+        }
+      }
+    },
+
+    "BarWidget": {
+      "oneOf": [{ "$ref": "#/$defs/DateTimeWidget" }]
+    },
+
+    "DateTimeWidget": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "DateTimeWidget" },
+        "format": { "type": "string" },
+        "interval": { "type": "number" }
+      }
+    }
+  }
+}
