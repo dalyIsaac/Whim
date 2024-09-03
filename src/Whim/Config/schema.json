@@ -179,9 +179,6 @@
     "PluginBase": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string"
-        },
         "isEnabled": {
           "type": "boolean"
         }
