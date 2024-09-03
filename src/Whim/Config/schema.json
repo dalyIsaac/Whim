@@ -1,72 +1,52 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://raw.githubusercontent.com/dalyIsaac/Whim/main/src/Whim/Config/schema.json",
 
   "type": "object",
   "properties": {
     "workspaces": {
       "type": "array",
-      "items": {
-        "$ref": "#/$defs/Workspace"
-      }
+      "items": { "$ref": "#/$defs/Workspace" }
     },
 
-    "layoutEngines": {
-      "$ref": "#/$defs/LayoutEngineCollection"
-    },
+    "layoutEngines": { "$ref": "#/$defs/LayoutEngineCollection" },
 
     "monitors": {
       "type": "array",
-      "items": {
-        "$ref": "#/$defs/Monitor"
-      }
+      "items": { "$ref": "#/$defs/Monitor" }
     },
 
     "keybinds": {
       "type": "array",
-      "items": {
-        "$ref": "#/$defs/Keybind"
-      }
+      "items": { "$ref": "#/$defs/Keybind" }
     },
 
     "filters": {
       "type": "array",
-      "items": {
-        "$ref": "#/$defs/Filter"
-      }
+      "items": { "$ref": "#/$defs/Filter" }
     },
 
     "routers": {
       "type": "array",
-      "items": {
-        "$ref": "#/$defs/Router"
-      }
+      "items": { "$ref": "#/$defs/Router" }
     },
 
-    "plugins": {
-      "$ref": "#/$defs/PluginCollection"
-    }
+    "plugins": { "$ref": "#/$defs/PluginCollection" }
   },
 
   "$defs": {
     "Workspace": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string"
-        },
-        "layoutEngines": {
-          "$ref": "#/$defs/LayoutEngineCollection"
-        }
+        "name": { "type": "string" },
+        "layoutEngines": { "$ref": "#/$defs/LayoutEngineCollection" }
       },
       "required": ["name"]
     },
 
     "LayoutEngineCollection": {
       "type": "array",
-      "items": {
-        "$ref": "#/$defs/LayoutEngine"
-      }
+      "items": { "$ref": "#/$defs/LayoutEngine" }
     },
 
     "LayoutEngine": {
@@ -76,31 +56,18 @@
       ]
     },
 
-    "LayoutEngineBase": {
-      "type": "object",
+    "FocusLayoutEngine": {
       "properties": {
-        "name": {
-          "type": "string"
-        }
+        "type": { "const": "FocusLayoutEngine" },
+        "name": { "type": "string" }
       },
       "required": ["type"]
     },
 
-    "FocusLayoutEngine": {
-      "$ref": "#/$defs/LayoutEngineBase",
-      "properties": {
-        "type": {
-          "const": "FocusLayoutEngine"
-        }
-      }
-    },
-
     "SliceLayoutEngine": {
-      "$ref": "#/$defs/LayoutEngineBase",
       "properties": {
-        "type": {
-          "const": "SliceLayoutEngine"
-        },
+        "type": { "const": "SliceLayoutEngine" },
+        "name": { "type": "string" },
         "variant": {
           "enum": [
             "ColumnLayout",
@@ -109,14 +76,9 @@
             "MultiColumnLayout",
             "SecondaryPrimaryLayout"
           ]
-        },
-        "slices": {
-          "type": "array",
-          "items": {
-            "type": "number"
-          }
         }
-      }
+      },
+      "required": ["type"]
     },
 
     "Monitor": {
@@ -124,9 +86,7 @@
       "properties": {
         "workspaces": {
           "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "items": { "type": "string" }
         }
       }
     },
@@ -134,12 +94,8 @@
     "Keybind": {
       "type": "object",
       "properties": {
-        "command": {
-          "type": "string"
-        },
-        "keybind": {
-          "type": "string"
-        }
+        "command": { "type": "string" },
+        "keybind": { "type": "string" }
       },
       "required": ["command", "keybind"]
     },
@@ -150,9 +106,7 @@
         "type": {
           "enum": ["windowClass", "processFileName", "title", "titleMatch"]
         },
-        "value": {
-          "type": "string"
-        }
+        "value": { "type": "string" }
       },
       "required": ["type", "value"]
     },
@@ -163,21 +117,15 @@
         "type": {
           "enum": ["windowClass", "processFileName", "title", "titleMatch"]
         },
-        "value": {
-          "type": "string"
-        },
-        "workspace": {
-          "type": "string"
-        }
+        "value": { "type": "string" },
+        "workspace": { "type": "string" }
       },
       "required": ["type", "value", "workspace"]
     },
 
     "PluginCollection": {
       "type": "array",
-      "items": {
-        "$ref": "#/$defs/Plugin"
-      }
+      "items": { "$ref": "#/$defs/Plugin" }
     },
 
     "Plugin": {
@@ -188,57 +136,37 @@
       ]
     },
 
-    "PluginBase": {
-      "type": "object",
-      "properties": {
-        "isEnabled": {
-          "type": "boolean"
-        }
-      },
-      "required": ["type"]
-    },
-
     "GapsPlugin": {
-      "$ref": "#/$defs/PluginBase",
       "properties": {
-        "type": {
-          "const": "GapsPlugin"
-        },
-        "gapSize": {
-          "type": "number"
-        }
+        "type": { "const": "GapsPlugin" },
+        "isEnabled": { "type": "boolean" },
+        "gapSize": { "type": "number" }
       },
       "required": ["type", "gapSize"]
     },
 
     "FocusIndicatorPlugin": {
-      "$ref": "#/$defs/PluginBase",
       "properties": {
-        "type": {
-          "const": "FocusIndicatorPlugin"
-        },
-        "color": {
-          "type": "string"
-        },
-        "borderSize": {
-          "type": "number"
-        }
-      }
+        "type": { "const": "FocusIndicatorPlugin" },
+        "isEnabled": { "type": "boolean" },
+        "color": { "type": "string" },
+        "borderSize": { "type": "number" }
+      },
+      "required": ["type"]
     },
 
     "BarPlugin": {
-      "$ref": "#/$defs/PluginBase",
       "properties": {
-        "type": {
-          "const": "BarPlugin"
-        },
+        "type": { "const": "BarPlugin" },
+        "isEnabled": { "type": "boolean" },
         "leftComponents": {
           "type": "array",
           "items": {
             "$ref": "#/$defs/BarWidget"
           }
         }
-      }
+      },
+      "required": ["type"]
     },
 
     "BarWidget": {
@@ -248,17 +176,11 @@
     "DateTimeWidget": {
       "type": "object",
       "properties": {
-        "type": {
-          "const": "DateTimeWidget"
-        },
-        "format": {
-          "type": "string"
-        },
-        "interval": {
-          "type": "number"
-        }
+        "type": { "const": "DateTimeWidget" },
+        "format": { "type": "string" },
+        "interval": { "type": "number" }
       },
-      "required": ["type", "format"]
+      "required": ["type"]
     }
   }
 }
