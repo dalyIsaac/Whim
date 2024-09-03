@@ -63,6 +63,13 @@
     },
 
     "LayoutEngineCollection": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/LayoutEngine"
+      }
+    },
+
+    "LayoutEngine": {
       "oneOf": [
         { "$ref": "#/$defs/FocusLayoutEngine" },
         { "$ref": "#/$defs/SliceLayoutEngine" }
@@ -82,7 +89,7 @@
       "$ref": "#/$defs/LayoutEngineBase",
       "properties": {
         "type": {
-          "enum": ["focus"]
+          "const": "FocusLayoutEngine"
         }
       },
       "required": ["type"]
@@ -92,7 +99,7 @@
       "$ref": "#/$defs/LayoutEngineBase",
       "properties": {
         "type": {
-          "enum": ["slice"]
+          "const": "SliceLayoutEngine"
         },
         "variant": {
           "enum": [
@@ -167,6 +174,13 @@
     },
 
     "PluginCollection": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Plugin"
+      }
+    },
+
+    "Plugin": {
       "oneOf": [
         { "$ref": "#/$defs/GapsPlugin" },
         { "$ref": "#/$defs/FocusIndicatorPlugin" },
@@ -200,7 +214,7 @@
       "$ref": "#/$defs/PluginBase",
       "properties": {
         "type": {
-          "const": ["FocusIndicatorPlugin"]
+          "const": "FocusIndicatorPlugin"
         },
         "color": {
           "type": "string"
@@ -216,20 +230,27 @@
       "$ref": "#/$defs/PluginBase",
       "properties": {
         "type": {
-          "const": ["BarPlugin"]
+          "const": "BarPlugin"
         },
         "leftComponents": {
-          "oneOf": [{ "$ref": "#/$defs/DateTimeWidget" }]
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/BarWidget"
+          }
         }
       },
       "required": ["type"]
+    },
+
+    "BarWidget": {
+      "oneOf": [{ "$ref": "#/$defs/DateTimeWidget" }]
     },
 
     "DateTimeWidget": {
       "type": "object",
       "properties": {
         "type": {
-          "const": ["DateTimeWidget"]
+          "const": "DateTimeWidget"
         },
         "format": {
           "type": "string"
