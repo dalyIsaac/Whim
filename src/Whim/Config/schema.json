@@ -82,8 +82,7 @@
         "name": {
           "type": "string"
         }
-      },
-      "required": ["type", "name"]
+      }
     },
 
     "FocusLayoutEngine": {
