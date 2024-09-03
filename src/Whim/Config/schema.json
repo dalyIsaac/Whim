@@ -44,10 +44,7 @@
     },
 
     "plugins": {
-      "type": "array",
-      "items": {
-        "$ref": "#/$defs/Plugin"
-      }
+      "$ref": "#/$defs/PluginCollection"
     }
   },
 
@@ -68,11 +65,8 @@
     "LayoutEngineCollection": {
       "type": "array",
       "oneOf": [
-        {
-          "items": {
-            "$ref": "#/$defs/FocusLayoutEngine"
-          }
-        }
+        { "$ref": "#/$defs/FocusLayoutEngine" },
+        { "$ref": "#/$defs/SliceLayoutEngine" }
       ]
     },
 
@@ -173,14 +167,84 @@
       "required": ["type", "value", "workspace"]
     },
 
-    "Plugin": {
+    "PluginCollection": {
+      "type": "array",
+      "oneOf": [
+        { "$ref": "#/$defs/GapsPlugin" },
+        { "$ref": "#/$defs/FocusIndicatorPlugin" },
+        { "$ref": "#/$defs/BarPlugin" }
+      ]
+    },
+
+    "PluginBase": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string"
+        },
+        "isEnabled": {
+          "type": "boolean"
+        }
+      }
+    },
+
+    "GapsPlugin": {
+      "$ref": "#/$defs/PluginBase",
+      "properties": {
+        "type": {
+          "enum": ["GapsPlugin"]
+        },
+        "gapSize": {
+          "type": "number"
         }
       },
-      "required": ["name"]
+      "required": ["type", "gapSize"]
+    },
+
+    "FocusIndicatorPlugin": {
+      "$ref": "#/$defs/PluginBase",
+      "properties": {
+        "type": {
+          "enum": ["FocusIndicatorPlugin"]
+        },
+        "color": {
+          "type": "string"
+        },
+        "borderSize": {
+          "type": "number"
+        }
+      },
+      "required": ["type"]
+    },
+
+    "BarPlugin": {
+      "$ref": "#/$defs/PluginBase",
+      "properties": {
+        "type": {
+          "enum": ["BarPlugin"]
+        },
+        "leftComponents": {
+          "type": "array",
+          "oneOf": [{ "$ref": "#/$defs/DateTimeWidget" }]
+        }
+      },
+      "required": ["type"]
+    },
+
+    "DateTimeWidget": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": ["DateTimeWidget"]
+        },
+        "format": {
+          "type": "string"
+        },
+        "interval": {
+          "type": "number"
+        }
+      },
+      "required": ["type", "format"]
     }
   }
 }
