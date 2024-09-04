@@ -30,7 +30,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Whim\Whim.csproj" />
   </ItemGroup>
-  </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Whim.Json.Tests" />
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
