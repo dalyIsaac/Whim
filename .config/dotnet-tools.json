@@ -4,21 +4,23 @@
   "tools": {
     "xamlstyler.console": {
       "version": "3.2404.2",
-      "commands": [
-        "xstyler"
-      ]
+      "commands": ["xstyler"],
+      "rollForward": false
     },
     "csharpier": {
       "version": "0.29.1",
-      "commands": [
-        "dotnet-csharpier"
-      ]
+      "commands": ["dotnet-csharpier"],
+      "rollForward": false
     },
     "docfx": {
       "version": "2.77.0",
-      "commands": [
-        "docfx"
-      ]
+      "commands": ["docfx"],
+      "rollForward": false
+    },
+    "corvus.json.jsonschema.typegeneratortool": {
+      "version": "3.1.1",
+      "commands": ["generatejsonschematypes"],
+      "rollForward": false
     }
   }
 }
