@@ -37,5 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Corvus.Json.ExtendedTypes" />
+    <PackageReference Include="Yaml2JsonNode" />
+    <PackageReference Include="YamlDotNet" />
   </ItemGroup>
 </Project>
