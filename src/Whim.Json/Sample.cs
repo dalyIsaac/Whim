@@ -1,0 +1,109 @@
+namespace Whim.Json;
+
+public static class Sample
+{
+	public static Schema GetSample()
+	{
+		string jsonText = """
+		{
+			"workspaces": [
+				{
+					"name": "Browser",
+					"layoutEngines": [
+						{
+							"type": "FocusLayoutEngine"
+						},
+						{
+							"type": "SliceLayoutEngine",
+							"variant": "ColumnLayout"
+						}
+					]
+				},
+				{
+					"name": "Chat"
+				},
+				{
+					"name": "Code"
+				},
+				{
+					"name": "Music"
+				}
+			],
+			"layoutEngines": [
+				{
+					"type": "SliceLayoutEngine",
+					"variant": "ColumnLayout"
+				},
+				{
+					"type": "SliceLayoutEngine",
+					"variant": "PrimaryStackLayout"
+				}
+			],
+			"monitors": [
+				{
+					"workspaces": [
+						"Browser",
+						"Chat",
+						"Music"
+					]
+				},
+				{
+					"workspaces": [
+						"Code"
+					]
+				},
+				{
+					"workspaces": [
+						"*"
+					]
+				}
+			],
+			"keybinds": [
+				{
+					"command": "whim.core.activate_previous_workspace",
+					"keybind": "LWin+LCtrl+Left"
+				}
+			],
+			"filters": [
+				{
+					"type": "title",
+					"value": "whim"
+				}
+			],
+			"routers": [
+				{
+					"type": "processFileName",
+					"value": "Discord.exe",
+					"workspace": "Chat"
+				}
+			],
+			"plugins": [
+				{
+					"type": "GapsPlugin",
+					"isEnabled": true,
+					"outerGapSize": 10
+				},
+				{
+					"type": "FocusIndicatorPlugin",
+					"isEnabled": true,
+					"color": "#ff0000",
+					"borderSize": 2
+				},
+				{
+					"type": "BarPlugin",
+					"isEnabled": true,
+					"leftComponents": [
+						{
+							"type": "DateTimeWidget",
+							"format": "HH:mm",
+							"interval": 1000
+						}
+					]
+				}
+			]
+		}
+		""";
+
+		return Schema.Parse(jsonText);
+	}
+}
