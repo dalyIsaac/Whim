@@ -178,9 +178,10 @@ public class SampleTests
 	public void TestSampleYaml()
 	{
 		// Read the YAML string.
+		string yaml = YamlSchema.Replace("\t", "  ");
 		YamlStream stream = [];
 
-		stream.Load(new StringReader(YamlSchema));
+		stream.Load(new StringReader(yaml));
 		JsonNode? root = stream.ToJsonNode().First();
 		JsonElement element = JsonSerializer.Deserialize<JsonElement>(root);
 
