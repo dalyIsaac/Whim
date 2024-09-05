@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=../Whim.Json/Config/schema.json
+# yaml-language-server: $schema=./schema.json
 workspaces:
   - name: Browser
     layoutEngines:
