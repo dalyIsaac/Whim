@@ -144,7 +144,7 @@
     <ProjectReference Include="..\Whim.FloatingWindow\Whim.FloatingWindow.csproj" />
     <ProjectReference Include="..\Whim.FocusIndicator\Whim.FocusIndicator.csproj" />
     <ProjectReference Include="..\Whim.Gaps\Whim.Gaps.csproj" />
-    <ProjectReference Include="..\Whim.Json\Whim.Json.csproj" />
+    <ProjectReference Include="..\Whim.Yaml\Whim.Yaml.csproj" />
     <ProjectReference Include="..\Whim.LayoutPreview\Whim.LayoutPreview.csproj" />
     <ProjectReference Include="..\Whim.SliceLayout\Whim.SliceLayout.csproj" />
     <ProjectReference Include="..\Whim.TreeLayout.Bar\Whim.TreeLayout.Bar.csproj" />

@@ -362,5 +362,5 @@ bin/whim-install.exe
 api
 _site
 
-# Whim.Json generated files
-src/Whim.Json/Generated/
+# Whim.Yaml generated files
+src/Whim.Yaml/Generated/

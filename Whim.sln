@@ -73,9 +73,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Updater", "src\Whim.Up
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Updater.Tests", "src\Whim.Updater.Tests\Whim.Updater.Tests.csproj", "{741677F5-5C83-474E-83B7-08F7A84DE11D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Json", "src\Whim.Json\Whim.Json.csproj", "{87B4F4D9-352D-46F5-920F-262E2D7FC7FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Yaml", "src\Whim.Yaml\Whim.Yaml.csproj", "{87B4F4D9-352D-46F5-920F-262E2D7FC7FC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Json.Tests", "src\Whim.Json.Tests\Whim.Json.Tests.csproj", "{9FCA57D6-246D-45CE-AA45-76658EFF849C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whim.Yaml.Tests", "src\Whim.Yaml.Tests\Whim.Yaml.Tests.csproj", "{9FCA57D6-246D-45CE-AA45-76658EFF849C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

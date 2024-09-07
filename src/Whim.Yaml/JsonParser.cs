@@ -1,4 +1,4 @@
-namespace Whim.Json;
+namespace Whim.Yaml;
 
 /// <summary>
 /// Parses JSON or YAML configuration files.
