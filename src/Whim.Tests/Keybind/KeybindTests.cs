@@ -80,6 +80,7 @@ public class KeybindTests
 	[Theory]
 	[InlineData("")]
 	[InlineData(" ")]
+	[InlineData("+++++")]
 	[InlineData("A")]
 	[InlineData("A + B")]
 	[InlineData("LCtrl + LShift + LAlt")]
