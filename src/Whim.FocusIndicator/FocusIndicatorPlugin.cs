@@ -211,7 +211,6 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 				_cancellationTokenSource.Dispose();
 				_focusIndicatorWindow?.Dispose();
 				_focusIndicatorWindow?.Close();
-				_task?.Dispose();
 				_context.Store.WindowEvents.WindowFocused -= WindowEvents_WindowFocused;
 				_context.Store.MonitorEvents.MonitorsChanged -= MonitorEvents_MonitorsChanged;
 			}
