@@ -173,4 +173,37 @@ public static class KeyModifiersExtensions
 		}
 		return newModifiers;
 	}
+
+	/// <summary>
+	/// Tries to parse a key modifier from a string.
+	/// </summary>
+	/// <param name="modifier">
+	/// The string to parse. This is case-insensitive.
+	/// </param>
+	/// <param name="keyModifier">
+	/// The parsed key modifier, if successful.
+	/// </param>
+	/// <returns>
+	/// <see langword="true"/> if the parse was successful; otherwise, <see langword="false"/>.
+	/// </returns>
+	public static bool TryParseKeyModifier(this string modifier, out KeyModifiers keyModifier)
+	{
+		keyModifier = modifier.ToUpperInvariant() switch
+		{
+			"CTRL" => KeyModifiers.LControl,
+			"SHIFT" => KeyModifiers.LShift,
+			"ALT" => KeyModifiers.LAlt,
+			"WIN" => KeyModifiers.LWin,
+			"LCTRL" => KeyModifiers.LControl,
+			"LSHIFT" => KeyModifiers.LShift,
+			"LALT" => KeyModifiers.LAlt,
+			"LWIN" => KeyModifiers.LWin,
+			"RCTRL" => KeyModifiers.RControl,
+			"RSHIFT" => KeyModifiers.RShift,
+			"RALT" => KeyModifiers.RAlt,
+			"RWIN" => KeyModifiers.RWin,
+			_ => KeyModifiers.None,
+		};
+		return keyModifier != KeyModifiers.None;
+	}
 }

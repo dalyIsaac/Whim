@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<AnalysisModeDesign>All</AnalysisModeDesign>
 		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
@@ -45,6 +45,8 @@
 	</ItemGroup>
 
 	<Target Name="GenerateSchema" BeforeTargets="Build">
-		<Exec Command="powershell.exe .\scripts\Generate-SourceFromSchema.ps1" WorkingDirectory="..\..\"></Exec>
+		<Exec Command="powershell.exe -NonInteractive -ExecutionPolicy Unrestricted .\scripts\Generate-SourceFromSchema.ps1" WorkingDirectory="..\..\" ConsoleToMsBuild="true">
+			<Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec"/>
+		</Exec>
 	</Target>
 </Project>
