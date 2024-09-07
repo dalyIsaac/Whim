@@ -68,6 +68,7 @@ public readonly record struct Keybind : IKeybind
 
 		foreach (string part in parts)
 		{
+			// Some keys are also modifiers, so we need to check for them first.
 			if (part.Trim().TryParseKeyModifier(out KeyModifiers modifier))
 			{
 				modifiers |= modifier;

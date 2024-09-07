@@ -110,4 +110,31 @@ public class KeyModifiersTests
 		Assert.Equal(expectedModifiers, unifiedKeybind.Modifiers);
 		Assert.Equal(VIRTUAL_KEY.VK_A, unifiedKeybind.Key);
 	}
+
+	[Theory]
+	[InlineData("LShift", KeyModifiers.LShift, true)]
+	[InlineData("RShift", KeyModifiers.RShift, true)]
+	[InlineData("LControl", KeyModifiers.LControl, true)]
+	[InlineData("RControl", KeyModifiers.RControl, true)]
+	[InlineData("LAlt", KeyModifiers.LAlt, true)]
+	[InlineData("RAlt", KeyModifiers.RAlt, true)]
+	[InlineData("LWin", KeyModifiers.LWin, true)]
+	[InlineData("RWin", KeyModifiers.RWin, true)]
+	[InlineData("Ctrl", KeyModifiers.LControl, true)]
+	[InlineData("Shift", KeyModifiers.LShift, true)]
+	[InlineData("Alt", KeyModifiers.LAlt, true)]
+	[InlineData("Win", KeyModifiers.LWin, true)]
+	[InlineData(" ", KeyModifiers.None, false)]
+	[InlineData("", KeyModifiers.None, false)]
+	[InlineData("Bob", KeyModifiers.None, false)]
+	[InlineData("A", KeyModifiers.None, false)]
+	public void TryParseKeyModifier(string keyString, KeyModifiers expected, bool expectedSuccess)
+	{
+		// When
+		bool success = keyString.TryParseKeyModifier(out KeyModifiers key);
+
+		// Then
+		Assert.Equal(expectedSuccess, success);
+		Assert.Equal(expected, key);
+	}
 }

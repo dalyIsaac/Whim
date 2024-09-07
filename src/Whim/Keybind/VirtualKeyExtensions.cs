@@ -49,15 +49,7 @@ public static class VirtualKeyExtensions
 
 		keyString = keyString.ToUpperInvariant();
 		keyString = keyString.Replace(" ", "");
-
-		if (keyString.Length == 1)
-		{
-			keyString = $"VK_{keyString}";
-		}
-		else
-		{
-			keyString = $"VK_{keyString[0].ToString().ToUpper()}{keyString[1..].ToLower()}";
-		}
+		keyString = $"VK_{keyString}";
 
 		if (Enum.TryParse(keyString, out VIRTUAL_KEY k))
 		{

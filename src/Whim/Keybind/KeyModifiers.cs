@@ -191,17 +191,28 @@ public static class KeyModifiersExtensions
 		keyModifier = modifier.ToUpperInvariant() switch
 		{
 			"CTRL" => KeyModifiers.LControl,
-			"SHIFT" => KeyModifiers.LShift,
-			"ALT" => KeyModifiers.LAlt,
-			"WIN" => KeyModifiers.LWin,
+			"CONTROL" => KeyModifiers.LControl,
 			"LCTRL" => KeyModifiers.LControl,
-			"LSHIFT" => KeyModifiers.LShift,
-			"LALT" => KeyModifiers.LAlt,
-			"LWIN" => KeyModifiers.LWin,
+			"LCONTROL" => KeyModifiers.LControl,
+
 			"RCTRL" => KeyModifiers.RControl,
+			"RCONTROL" => KeyModifiers.RControl,
+
+			"SHIFT" => KeyModifiers.LShift,
+			"LSHIFT" => KeyModifiers.LShift,
+
 			"RSHIFT" => KeyModifiers.RShift,
+
+			"ALT" => KeyModifiers.LAlt,
+			"LALT" => KeyModifiers.LAlt,
+
 			"RALT" => KeyModifiers.RAlt,
+
+			"WIN" => KeyModifiers.LWin,
+			"LWIN" => KeyModifiers.LWin,
+
 			"RWIN" => KeyModifiers.RWin,
+
 			_ => KeyModifiers.None,
 		};
 		return keyModifier != KeyModifiers.None;
