@@ -78,6 +78,10 @@ jobs:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2.0.0
 
+      - name: Build schema
+        run: |
+          .\scripts\Generate-SourceFromSchema.ps1
+
       - name: Build
         run: |
           msbuild Whim.sln `
