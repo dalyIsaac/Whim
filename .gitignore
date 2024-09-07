@@ -361,3 +361,6 @@ bin/whim-install.exe
 # docfx
 api
 _site
+
+# Whim.Json generated files
+src/Whim.Json/Generated/

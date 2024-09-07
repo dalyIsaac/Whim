@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<AnalysisModeDesign>All</AnalysisModeDesign>
+		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
+		<AnalysisModeGlobalization>None</AnalysisModeGlobalization>
+		<AnalysisModeInteroperability>All</AnalysisModeInteroperability>
+		<AnalysisModeMaintainability>All</AnalysisModeMaintainability>
+		<AnalysisModeNaming>All</AnalysisModeNaming>
+		<AnalysisModePerformance>All</AnalysisModePerformance>
+		<AnalysisModeReliability>All</AnalysisModeReliability>
+		<AnalysisModeSecurity>All</AnalysisModeSecurity>
+		<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
+		<AnalysisModeStyle>All</AnalysisModeStyle>
+		<AnalysisModeUsage>All</AnalysisModeUsage>
+		<Authors>Isaac Daly</Authors>
+		<BuildInParallel>true</BuildInParallel>
+		<Description>An extensible window manager for Windows.</Description>
+		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<GenerateLibraryLayout>true</GenerateLibraryLayout>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Platforms>x64;arm64;Any CPU</Platforms>
+		<RootNamespace>Whim.Json</RootNamespace>
+		<RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<UseWinUI>true</UseWinUI>
+		<Version>0.7.0</Version>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\Whim\Whim.csproj" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<InternalsVisibleTo Include="Whim.Json.Tests" />
+		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="Corvus.Json.ExtendedTypes" />
+		<PackageReference Include="Yaml2JsonNode" />
+		<PackageReference Include="YamlDotNet" />
+	</ItemGroup>
+
+	<Target Name="GenerateSchema" BeforeTargets="Build">
+		<Exec Command="powershell.exe .\scripts\Generate-SourceFromSchema.ps1" WorkingDirectory="..\..\"></Exec>
+	</Target>
+</Project>

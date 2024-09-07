@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/dalyIsaac/Whim/main/src/Whim/Config/schema.json",
+
+  "type": "object",
+  "required": ["keybinds"],
+  "additionalProperties": false,
+
+  "properties": {
+    "keybinds": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Keybind" },
+      "description": "Mappings of commands to keybinds"
+    }
+  },
+
+  "$defs": {
+    "Keybind": {
+      "type": "object",
+      "required": ["command", "keybind"],
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "type": "string",
+          "description": "The identifier of the command to run. For more, see https://dalyisaac.github.io/Whim/docs/customize/commands.html"
+        },
+        "keybind": {
+          "type": "string",
+          "description": "The keybind to trigger the command. For more, see https://dalyisaac.github.io/Whim/docs/customize/keybinds.html"
+        }
+      }
+    }
+  }
+}
