@@ -44,9 +44,11 @@
 		<PackageReference Include="YamlDotNet" />
 	</ItemGroup>
 
-	<Target Name="GenerateSchema" BeforeTargets="Build">
-		<Exec Command="powershell.exe -NonInteractive -ExecutionPolicy Unrestricted .\scripts\Generate-SourceFromSchema.ps1" WorkingDirectory="..\..\" ConsoleToMsBuild="true">
-			<Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec"/>
+	<Target Name="GenerateSchema" BeforeTargets="BeforeCompile;CoreCompile;PreBuildEvent">
+		<Exec
+			Command="powershell.exe -NonInteractive -ExecutionPolicy Unrestricted .\scripts\Generate-SourceFromSchema.ps1"
+			WorkingDirectory="..\..\" ConsoleToMsBuild="true">
+			<Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
 		</Exec>
 	</Target>
 </Project>
