@@ -43,7 +43,7 @@
           "description": "Routers to determine which workspace a window should be placed in"
         },
 
-        "routingBehavior": { "$ref": "#/$defs/RoutingBehavior" }
+        "routing_behavior": { "$ref": "#/$defs/RoutingBehavior" }
       }
     }
   },
