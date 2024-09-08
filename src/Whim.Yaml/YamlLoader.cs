@@ -73,12 +73,12 @@ public static class YamlLoader
 			ctx.KeybindManager.UnifyKeyModifiers = unifyKeyModifiers;
 		}
 
-		if (schema.Keybinds.Bindings.AsOptional() is not { } bindings)
+		if (schema.Keybinds.Entries.AsOptional() is not { } entries)
 		{
 			return;
 		}
 
-		foreach (Schema.RequiredCommandAndKeybind pair in bindings)
+		foreach (var pair in entries)
 		{
 			if (Keybind.FromString((string)pair.Keybind) is not Keybind keybind)
 			{

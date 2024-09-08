@@ -9,7 +9,7 @@
     "keybinds": {
       "type": "object",
       "properties": {
-        "bindings": {
+        "entries": {
           "type": "array",
           "items": { "$ref": "#/$defs/Keybind" },
           "description": "Mappings of commands to keybinds"

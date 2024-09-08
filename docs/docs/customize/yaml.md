@@ -83,7 +83,7 @@ To treat key modifiers like `LWin` and `RWin` the same, set `unify_key_modifiers
 ```yaml
 # yaml-language-server: $schema=https://raw.githubusercontent.com/dalyIsaac/Whim/main/src/Whim.Yaml/schema.json
 keybinds:
-  bindings:
+  entries:
     - command: whim.core.focus_next_monitor
       keybind: LCtrl+LShift+LAlt+K
 
