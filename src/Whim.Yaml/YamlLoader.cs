@@ -30,6 +30,7 @@ public static class YamlLoader
 
 		UpdateKeybinds(ctx, schema);
 		UpdateFilters(ctx, schema);
+		UpdateRouters(ctx, schema);
 		return true;
 	}
 
@@ -116,6 +117,36 @@ public static class YamlLoader
 					break;
 				default:
 					Logger.Error($"Invalid filter type: {filter.Type}");
+					break;
+			}
+		}
+	}
+
+	private static void UpdateRouters(IContext ctx, Schema schema)
+	{
+		if (!schema.Routers.IsValid())
+		{
+			return;
+		}
+
+		foreach (var router in schema.Routers)
+		{
+			switch ((string)router.Type)
+			{
+				case "windowClass":
+					ctx.RouterManager.AddWindowClassRoute((string)router.Value, (string)router.Workspace);
+					break;
+				case "processFileName":
+					ctx.RouterManager.AddProcessFileNameRoute((string)router.Value, (string)router.Workspace);
+					break;
+				case "title":
+					ctx.RouterManager.AddTitleRoute((string)router.Value, (string)router.Workspace);
+					break;
+				case "titleMatch":
+					ctx.RouterManager.AddTitleMatchRoute((string)router.Value, (string)router.Workspace);
+					break;
+				default:
+					Logger.Error($"Invalid router type: {router.Type}");
 					break;
 			}
 		}

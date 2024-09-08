@@ -81,6 +81,14 @@ public class YamlLoader_UpdateFiltersTests
 			},
 			{
 				"""
+					filters:
+					  - type: windowClass
+					    value: false
+					""",
+				true
+			},
+			{
+				"""
 					{
 						"filters": [
 							{
