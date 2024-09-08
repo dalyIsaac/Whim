@@ -51,6 +51,10 @@ jobs:
         env:
           Configuration: ${{ env.Configuration }}
 
+      - name: Install dotnet tools
+        run: |
+          dotnet tool restore
+
       - run: dotnet tool update -g docfx
       - run: docfx docs/docfx.json
 
