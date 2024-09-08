@@ -99,7 +99,7 @@ public static class YamlLoader
 			return;
 		}
 
-		foreach (var filter in schema.Filters)
+		foreach (var filter in schema.Filters.Entries)
 		{
 			switch ((string)filter.Type)
 			{
@@ -134,7 +134,7 @@ public static class YamlLoader
 			ctx.RouterManager.RoutingBehavior = routingBehavior;
 		}
 
-		foreach (var router in schema.Routers)
+		foreach (var router in schema.Routers.Entries)
 		{
 			switch ((string)router.Type)
 			{

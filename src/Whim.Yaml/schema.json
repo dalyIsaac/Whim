@@ -42,24 +42,7 @@
           "description": "Routers to determine which workspace a window should be placed in"
         },
 
-        "routingBehavior": {
-          "anyOf": [
-            {
-              "const": "routeToLaunchedWorkspace",
-              "description": "Routes windows to the active workspace."
-            },
-            {
-              "const": "routeToActiveWorkspace",
-              "description": "Routes windows to the active workspace."
-            },
-            {
-              "const": "routeToLastTrackedActiveWorkspace",
-              "description": "Routes windows to the workspace which last received an event sent by Windows which Whim did not ignore."
-            }
-          ],
-          "default": "routeToLaunchedWorkspace",
-          "description": "The behavior to use when routing windows to workspaces"
-        }
+        "routingBehavior": { "$ref": "#/$defs/RoutingBehavior" }
       }
     }
   },
@@ -86,11 +69,30 @@
       "required": ["type", "value"],
       "additionalProperties": false,
       "properties": {
-        "type": {
-          "enum": ["windowClass", "processFileName", "title", "titleMatch"],
-          "description": "The type of filter to apply. For more, see https://dalyisaac.github.io/Whim/docs/customize/filtering.html"
+        "filter_type": {
+          "anyOf": [
+            {
+              "const": "windowClass",
+              "description": "Ignores windows with the specified window class"
+            },
+            {
+              "const": "processFileName",
+              "description": "Ignores windows with the specified process file name"
+            },
+            {
+              "const": "title",
+              "description": "Ignores windows with the specified title"
+            },
+            {
+              "const": "titleMatch",
+              "description": "Ignores windows with a title that matches the specified regex"
+            }
+          ]
         },
-        "value": { "type": "string", "description": "The value to filter by" }
+        "value": {
+          "type": "string",
+          "description": "The value to filter by"
+        }
       }
     },
 
@@ -99,9 +101,25 @@
       "required": ["type", "value", "workspace"],
       "additionalProperties": false,
       "properties": {
-        "type": {
-          "enum": ["windowClass", "processFileName", "title", "titleMatch"],
-          "description": "The type of router to apply. For more, see https://dalyisaac.github.io/Whim/docs/customize/routing.html"
+        "router_type": {
+          "anyOf": [
+            {
+              "const": "windowClass",
+              "description": "Routes windows with the specified window class to the specified workspace"
+            },
+            {
+              "const": "processFileName",
+              "description": "Routes windows with the specified process file name to the specified workspace"
+            },
+            {
+              "const": "title",
+              "description": "Routes windows with the specified title to the specified workspace"
+            },
+            {
+              "const": "titleMatch",
+              "description": "Routes windows with a title that matches the specified regex to the specified workspace"
+            }
+          ]
         },
         "value": { "type": "string", "description": "The value to route by" },
         "workspace": {
@@ -109,6 +127,25 @@
           "description": "The workspace to route to"
         }
       }
+    },
+
+    "RoutingBehavior": {
+      "anyOf": [
+        {
+          "const": "route_to_launched_workspace",
+          "description": "Routes windows to the active workspace."
+        },
+        {
+          "const": "route_to_active_workspace",
+          "description": "Routes windows to the active workspace."
+        },
+        {
+          "const": "route_to_last_tracked_active_workspace",
+          "description": "Routes windows to the workspace which last received an event sent by Windows which Whim did not ignore."
+        }
+      ],
+      "default": "routeToLaunchedWorkspace",
+      "description": "The behavior to use when routing windows to workspaces"
     }
   }
 }
