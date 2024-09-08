@@ -18,40 +18,43 @@ public static class YamlLoader
 	/// Loads and applies the declarative configuration from a JSON or YAML file.
 	/// </summary>
 	/// <param name="ctx">The <see cref="IContext"/> to operate on.</param>
-	public static void Load(IContext ctx)
+	/// <returns>
+	/// <see langword="true"/> if the configuration was loaded successfully; otherwise, <see langword="false"/>.
+	/// </returns>
+	public static bool Load(IContext ctx)
 	{
 		if (Parse(ctx) is not Schema schema)
 		{
-			return;
+			return false;
 		}
 
 		UpdateKeybinds(ctx, schema);
+		return true;
 	}
 
 	private static Schema? Parse(IContext ctx)
 	{
-		string jsonConfigPath = ctx.FileManager.GetWhimFileDir(JsonConfigFileName);
 		string yamlConfigPath = ctx.FileManager.GetWhimFileDir(YamlConfigFileName);
-
-		if (ctx.FileManager.FileExists(jsonConfigPath))
-		{
-			string json = ctx.FileManager.ReadAllText(jsonConfigPath);
-			return Schema.Parse(json);
-		}
-
 		if (ctx.FileManager.FileExists(yamlConfigPath))
 		{
 			string yaml = ctx.FileManager.ReadAllText(yamlConfigPath);
 			YamlStream stream = [];
 			stream.Load(new StringReader(yaml));
 
-			if (stream.ToJsonNode().First() is not JsonNode root)
+			if (stream.ToJsonNode().FirstOrDefault() is not JsonNode root)
 			{
 				return null;
 			}
 
 			JsonElement element = JsonSerializer.Deserialize<JsonElement>(root);
 			return Schema.FromJson(element);
+		}
+
+		string jsonConfigPath = ctx.FileManager.GetWhimFileDir(JsonConfigFileName);
+		if (ctx.FileManager.FileExists(jsonConfigPath))
+		{
+			string json = ctx.FileManager.ReadAllText(jsonConfigPath);
+			return Schema.Parse(json);
 		}
 
 		Logger.Debug("No configuration file found.");
@@ -61,7 +64,11 @@ public static class YamlLoader
 	private static void UpdateKeybinds(IContext ctx, Schema schema)
 	{
 		IKeybindManager keybindManager = ctx.KeybindManager;
-		keybindManager.Clear();
+
+		if (!schema.Keybinds.IsValid())
+		{
+			return;
+		}
 
 		foreach (Schema.RequiredCommandAndKeybind pair in schema.Keybinds)
 		{
