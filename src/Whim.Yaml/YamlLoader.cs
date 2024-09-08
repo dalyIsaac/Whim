@@ -101,19 +101,21 @@ public static class YamlLoader
 
 		foreach (var filter in schema.Filters.Entries)
 		{
+			string value = (string)filter.Value;
+
 			switch ((string)filter.FilterType)
 			{
 				case "window_class":
-					ctx.FilterManager.AddWindowClassFilter((string)filter.Value);
+					ctx.FilterManager.AddWindowClassFilter(value);
 					break;
 				case "process_file_name":
-					ctx.FilterManager.AddProcessFileNameFilter((string)filter.Value);
+					ctx.FilterManager.AddProcessFileNameFilter(value);
 					break;
 				case "title":
-					ctx.FilterManager.AddTitleFilter((string)filter.Value);
+					ctx.FilterManager.AddTitleFilter(value);
 					break;
 				case "title_match":
-					ctx.FilterManager.AddTitleMatchFilter((string)filter.Value);
+					ctx.FilterManager.AddTitleMatchFilter(value);
 					break;
 				default:
 					Logger.Error($"Invalid filter type: {filter.FilterType}");
@@ -139,19 +141,22 @@ public static class YamlLoader
 
 		foreach (var router in schema.Routers.Entries)
 		{
+			string value = (string)router.Value;
+			string workspaceName = (string)router.WorkspaceName;
+
 			switch ((string)router.RouterType)
 			{
 				case "window_class":
-					ctx.RouterManager.AddWindowClassRoute((string)router.Value, (string)router.Workspace);
+					ctx.RouterManager.AddWindowClassRoute(value, workspaceName);
 					break;
 				case "process_file_name":
-					ctx.RouterManager.AddProcessFileNameRoute((string)router.Value, (string)router.Workspace);
+					ctx.RouterManager.AddProcessFileNameRoute(value, workspaceName);
 					break;
 				case "title":
-					ctx.RouterManager.AddTitleRoute((string)router.Value, (string)router.Workspace);
+					ctx.RouterManager.AddTitleRoute(value, workspaceName);
 					break;
 				case "title_match":
-					ctx.RouterManager.AddTitleMatchRoute((string)router.Value, (string)router.Workspace);
+					ctx.RouterManager.AddTitleMatchRoute(value, workspaceName);
 					break;
 				default:
 					Logger.Error($"Invalid router type: {router.RouterType}");

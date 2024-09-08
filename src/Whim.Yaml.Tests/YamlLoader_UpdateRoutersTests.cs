@@ -15,16 +15,16 @@ public class YamlLoader_UpdateRoutersTests
 					  entries:
 					  - router_type: window_class
 					    value: class1
-					    workspace: workspace1
+					    workspace_name: workspace1
 					  - router_type: process_file_name
 					    value: process1
-					    workspace: workspace2
+					    workspace_name: workspace2
 					  - router_type: title
 					    value: title1
-					    workspace: workspace3
+					    workspace_name: workspace3
 					  - router_type: title_match
 					    value: titleMatch1
-					    workspace: workspace4
+					    workspace_name: workspace4
 					""",
 				true
 			},
@@ -36,22 +36,22 @@ public class YamlLoader_UpdateRoutersTests
 								{
 									"router_type": "window_class",
 									"value": "class1",
-									"workspace": "workspace1"
+									"workspace_name": "workspace1"
 								},
 								{
 									"router_type": "process_file_name",
 									"value": "process1",
-									"workspace": "workspace2"
+									"workspace_name": "workspace2"
 								},
 								{
 									"router_type": "title",
 									"value": "title1",
-									"workspace": "workspace3"
+									"workspace_name": "workspace3"
 								},
 								{
 									"router_type": "title_match",
 									"value": "titleMatch1",
-									"workspace": "workspace4"
+									"workspace_name": "workspace4"
 								}
 							]
 						}
@@ -88,7 +88,7 @@ public class YamlLoader_UpdateRoutersTests
 					  entries:
 					  - router_type: invalid
 					    value: class1
-					    workspace: workspace1
+					    workspace_name: workspace1
 					""",
 				true
 			},
@@ -100,7 +100,7 @@ public class YamlLoader_UpdateRoutersTests
 								{
 									"router_type": "invalid",
 									"value": "class1",
-									"workspace": "workspace1"
+									"workspace_name": "workspace1"
 								}
 							]
 						}

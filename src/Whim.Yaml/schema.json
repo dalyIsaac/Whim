@@ -102,7 +102,7 @@
 
     "Router": {
       "type": "object",
-      "required": ["router_type", "value", "workspace"],
+      "required": ["router_type", "value", "workspace_name"],
       "additionalProperties": false,
       "properties": {
         "router_type": {
@@ -126,7 +126,7 @@
           ]
         },
         "value": { "type": "string", "description": "The value to route by" },
-        "workspace": {
+        "workspace_name": {
           "type": "string",
           "description": "The workspace to route to"
         }

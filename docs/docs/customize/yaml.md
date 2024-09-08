@@ -168,7 +168,7 @@ filters:
 
 ## Routers
 
-The routers configuration tells Whim to route windows that match the specified criteria to the first workspace with name `workspace`.
+The routers configuration tells Whim to route windows that match the specified criteria to the first workspace with name `workspace_name`.
 
 ### Default Routing Behavior
 
@@ -182,7 +182,7 @@ The available routing behaviors are:
 
 ### Custom Routing Behavior
 
-You can also define custom routing behavior by specifying a list of routing entries. Each routing entry has a `router_type`, `value`, and `workspace`.
+You can also define custom routing behavior by specifying a list of routing entries. Each routing entry has a `router_type`, `value`, and `workspace_name`.
 
 The available router types are:
 
@@ -200,7 +200,7 @@ routers:
   entries:
     - router_type: window_class
       value: Chrome_WidgetWin_1
-      workspace: web
+      workspace_name: web
 ```
 
 #### Process File Name Router
@@ -212,7 +212,7 @@ routers:
   entries:
     - router_type: process_file_name
       value: explorer.exe
-      workspace: file_explorer
+      workspace_name: file_explorer
 ```
 
 #### Title Router
@@ -224,7 +224,7 @@ routers:
   entries:
     - router_type: title
       value: Untitled - Notepad
-      workspace: notepad
+      workspace_name: notepad
 ```
 
 #### Title Match Router
@@ -236,5 +236,5 @@ routers:
   entries:
     - router_type: title_match
       value: ^Untitled - Notepad$
-      workspace: notepad
+      workspace_name: notepad
 ```
