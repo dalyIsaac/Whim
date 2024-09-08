@@ -6,13 +6,13 @@ namespace Whim;
 public enum RouterOptions
 {
 	/// <summary>
-	/// Routes windows to the workspace which is currently active on the monitor the window is on.
+	/// Routes windows to the workspace that the window was launched on by Windows.
 	/// </summary>
 	RouteToLaunchedWorkspace,
 
 	/// <summary>
 	/// Routes windows to the active workspace. This may lead to unexpected results, as the
-	/// <see cref="IMonitorManager.ActiveMonitor"/> and thus <see cref="IWorkspaceManager.ActiveWorkspace"/>
+	/// <see cref="IMonitorSector.ActiveMonitorHandle"/> and thus the active workspace
 	/// will be updated by every window event sent by Windows - even those which Whim ignores.
 	///
 	/// <br/>

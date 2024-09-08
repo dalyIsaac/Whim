@@ -23,15 +23,44 @@
     },
 
     "filters": {
-      "type": "array",
-      "items": { "$ref": "#/$defs/Filter" },
-      "description": "Filters to apply to windows to determine whether they should be managed by Whim"
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Filter" },
+          "description": "Filters to apply to windows to determine whether they should be managed by Whim"
+        }
+      }
     },
 
     "routers": {
-      "type": "array",
-      "items": { "$ref": "#/$defs/Router" },
-      "description": "Routers to determine which workspace a window should be placed in"
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Router" },
+          "description": "Routers to determine which workspace a window should be placed in"
+        },
+
+        "routingBehavior": {
+          "anyOf": [
+            {
+              "const": "routeToLaunchedWorkspace",
+              "description": "Routes windows to the active workspace."
+            },
+            {
+              "const": "routeToActiveWorkspace",
+              "description": "Routes windows to the active workspace."
+            },
+            {
+              "const": "routeToLastTrackedActiveWorkspace",
+              "description": "Routes windows to the workspace which last received an event sent by Windows which Whim did not ignore."
+            }
+          ],
+          "default": "routeToLaunchedWorkspace",
+          "description": "The behavior to use when routing windows to workspaces"
+        }
+      }
     }
   },
 

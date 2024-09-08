@@ -129,6 +129,11 @@ public static class YamlLoader
 			return;
 		}
 
+		if (schema.Routers.RoutingBehavior.TryGetEnum(out RoutingBehavior routingBehavior))
+		{
+			ctx.RouterManager.RoutingBehavior = routingBehavior;
+		}
+
 		foreach (var router in schema.Routers)
 		{
 			switch ((string)router.Type)
