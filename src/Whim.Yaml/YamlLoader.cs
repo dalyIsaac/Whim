@@ -63,14 +63,22 @@ public static class YamlLoader
 
 	private static void UpdateKeybinds(IContext ctx, Schema schema)
 	{
-		IKeybindManager keybindManager = ctx.KeybindManager;
-
 		if (!schema.Keybinds.IsValid())
 		{
 			return;
 		}
 
-		foreach (Schema.RequiredCommandAndKeybind pair in schema.Keybinds)
+		if (schema.Keybinds.UnifyKeyModifiers.TryGetBoolean(out bool unifyKeyModifiers))
+		{
+			ctx.KeybindManager.UnifyKeyModifiers = unifyKeyModifiers;
+		}
+
+		if (schema.Keybinds.Bindings.AsOptional() is not { } bindings)
+		{
+			return;
+		}
+
+		foreach (Schema.RequiredCommandAndKeybind pair in bindings)
 		{
 			if (Keybind.FromString((string)pair.Keybind) is not Keybind keybind)
 			{
@@ -78,7 +86,7 @@ public static class YamlLoader
 				continue;
 			}
 
-			keybindManager.SetKeybind((string)pair.Command, keybind);
+			ctx.KeybindManager.SetKeybind((string)pair.Command, keybind);
 		}
 	}
 }

@@ -101,32 +101,35 @@ public class YamlLoaderTests
 			{
 				"""
 					keybinds:
-					  - command: whim.test.command_id_1
-					    keybind: LCtrl + A
-					  - command: whim.test.command_id_2
-					    keybind: LCtrl + LShift + B
-					  - command: whim.test.command_id_3
-					    keybind: ctrl+shift+alt+c
+					  bindings:
+					    - command: whim.test.command_id_1
+					      keybind: LCtrl + A
+					    - command: whim.test.command_id_2
+					      keybind: LCtrl + LShift + B
+					    - command: whim.test.command_id_3
+					      keybind: ctrl+shift+alt+c
 					""",
 				true
 			},
 			{
 				"""
 					{
-						"keybinds": [
-							{
-								"command": "whim.test.command_id_1",
-								"keybind": "LCtrl + A"
-							},
-							{
-								"command": "whim.test.command_id_2",
-								"keybind": "LCtrl + LShift + B"
-							},
-							{
-								"command": "whim.test.command_id_3",
-								"keybind": "ctrl+shift+alt+c"
-							}
-						]
+						"keybinds": {
+							"bindings": [
+								{
+									"command": "whim.test.command_id_1",
+									"keybind": "LCtrl + A"
+								},
+								{
+									"command": "whim.test.command_id_2",
+									"keybind": "LCtrl + LShift + B"
+								},
+								{
+									"command": "whim.test.command_id_3",
+									"keybind": "ctrl+shift+alt+c"
+								}
+							]
+						}
 					}
 					""",
 				false
@@ -165,6 +168,7 @@ public class YamlLoaderTests
 			{
 				"""
 					keybinds:
+					  bindings:
 					  - command: whim.test.command_id_1
 					    keybind: this is a string but not a keybind
 					""",
@@ -173,28 +177,32 @@ public class YamlLoaderTests
 			{
 				"""
 					keybinds:
-					- command: whim.test.command_id_1
-					  keybind: 
+					  bindings:
+					  - command: whim.test.command_id_1
+					    keybind: 
 					""",
 				true
 			},
 			{
 				"""
 					keybinds:
-					- command: whim.test.command_id_1
-					  keybind: []
+					  bindings:
+					  - command: whim.test.command_id_1
+					    keybind: []
 					""",
 				true
 			},
 			{
 				"""
 					{
-						"keybinds": [
-							{
-								"command": "whim.test.command_id_1",
-								"keybind": "this is a string but not a keybind"
-							}
-						]
+						"keybinds": {
+							"bindings": [
+								{
+									"command": "whim.test.command_id_1",
+									"keybind": "this is a string but not a keybind"
+								}
+							]
+						}
 					}
 					""",
 				false
@@ -202,12 +210,14 @@ public class YamlLoaderTests
 			{
 				"""
 					{
-						"keybinds": [
-							{
-								"command": "whim.test.command_id_1",
-								"keybind": []
-							}
-						]
+						"keybinds": {
+							"bindings": [
+								{
+									"command": "whim.test.command_id_1",
+									"keybind": []
+								}
+							]
+						}
 					}
 					""",
 				false
@@ -215,12 +225,14 @@ public class YamlLoaderTests
 			{
 				"""
 					{
-						"keybinds": [
-							{
-								"command": "whim.test.command_id_1",
-								"keybind": ""
-							}
-						]
+						"keybinds": {
+							"bindings": [
+								{
+									"command": "whim.test.command_id_1",
+									"keybind": ""
+								}
+							]
+						}
 					}
 					""",
 				false
@@ -240,5 +252,59 @@ public class YamlLoaderTests
 		// Then the result is true, and no keybinds are set
 		Assert.True(result);
 		ctx.KeybindManager.DidNotReceive().SetKeybind(Arg.Any<string>(), Arg.Any<IKeybind>());
+	}
+
+	public static TheoryData<string, bool> UnifyKeyModifiersConfig =>
+		new()
+		{
+			{
+				"""
+					keybinds:
+					  unify_key_modifiers: true
+					""",
+				true
+			},
+			{
+				"""
+					keybinds:
+					  unify_key_modifiers: false
+					""",
+				true
+			},
+			{
+				"""
+					{
+						"keybinds": {
+							"unify_key_modifiers": true
+						}
+					}
+					""",
+				false
+			},
+			{
+				"""
+					{
+						"keybinds": {
+							"unify_key_modifiers": false
+						}
+					}
+					""",
+				false
+			},
+		};
+
+	[Theory, MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(UnifyKeyModifiersConfig))]
+	public void Load_UnifyKeyModifiers(string config, bool isYaml, IContext ctx)
+	{
+		// Given a valid config with unifyKeyModifiers set
+		ctx.FileManager.FileExists(Arg.Is<string>(s => s.EndsWith(isYaml ? "yaml" : "json"))).Returns(true);
+		ctx.FileManager.ReadAllText(Arg.Any<string>()).Returns(config);
+
+		// When loading the config
+		bool result = YamlLoader.Load(ctx);
+
+		// Then the result is true, and unifyKeyModifiers is set
+		Assert.True(result);
+		ctx.KeybindManager.Received().UnifyKeyModifiers = config.Contains("true");
 	}
 }

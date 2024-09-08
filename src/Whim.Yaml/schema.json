@@ -3,14 +3,23 @@
   "$id": "https://raw.githubusercontent.com/dalyIsaac/Whim/main/src/Whim/Config/schema.json",
 
   "type": "object",
-  "required": ["keybinds"],
   "additionalProperties": false,
 
   "properties": {
     "keybinds": {
-      "type": "array",
-      "items": { "$ref": "#/$defs/Keybind" },
-      "description": "Mappings of commands to keybinds"
+      "type": "object",
+      "properties": {
+        "bindings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Keybind" },
+          "description": "Mappings of commands to keybinds"
+        },
+
+        "unify_key_modifiers": {
+          "type": "boolean",
+          "description": "Whether to treat key modifiers like `LWin` and `RWin` as the same key modifier. Defaults to `true`."
+        }
+      }
     }
   },
 
