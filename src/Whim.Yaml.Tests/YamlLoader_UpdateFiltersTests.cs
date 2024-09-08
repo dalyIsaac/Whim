@@ -107,6 +107,15 @@ public class YamlLoader_UpdateFiltersTests
 					""",
 				false
 			},
+			{
+				// Not technically invalid, but no filters are set
+				"""
+					{
+						"filters": {}
+					}
+					""",
+				false
+			},
 		};
 
 	[Theory, MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(InvalidFilterConfig))]
