@@ -19,7 +19,7 @@ public static class YamlLoader
 	/// </summary>
 	/// <param name="ctx">The <see cref="IContext"/> to operate on.</param>
 	/// <returns>
-	/// <see langword="true"/> if the configuration was loaded successfully; otherwise, <see langword="false"/>.
+	/// <see langword="true"/> if the configuration was parsed successfully; otherwise, <see langword="false"/>.
 	/// </returns>
 	public static bool Load(IContext ctx)
 	{
@@ -29,6 +29,7 @@ public static class YamlLoader
 		}
 
 		UpdateKeybinds(ctx, schema);
+		UpdateFilters(ctx, schema);
 		return true;
 	}
 
@@ -87,6 +88,36 @@ public static class YamlLoader
 			}
 
 			ctx.KeybindManager.SetKeybind((string)pair.Command, keybind);
+		}
+	}
+
+	private static void UpdateFilters(IContext ctx, Schema schema)
+	{
+		if (!schema.Filters.IsValid())
+		{
+			return;
+		}
+
+		foreach (var filter in schema.Filters)
+		{
+			switch ((string)filter.Type)
+			{
+				case "windowClass":
+					ctx.FilterManager.AddWindowClassFilter((string)filter.Value);
+					break;
+				case "processFileName":
+					ctx.FilterManager.AddProcessFileNameFilter((string)filter.Value);
+					break;
+				case "title":
+					ctx.FilterManager.AddTitleFilter((string)filter.Value);
+					break;
+				case "titleMatch":
+					ctx.FilterManager.AddTitleMatchFilter((string)filter.Value);
+					break;
+				default:
+					Logger.Error($"Invalid filter type: {filter.Type}");
+					break;
+			}
 		}
 	}
 }

@@ -44,7 +44,7 @@
 		<PackageReference Include="YamlDotNet" />
 	</ItemGroup>
 
-	<Target Name="GenerateSchema" BeforeTargets="BeforeCompile;CoreCompile;PreBuildEvent">
+	<Target Name="GenerateSchema" BeforeTargets="BeforeCompile">
 		<Exec
 			Command="powershell.exe -NonInteractive -ExecutionPolicy Unrestricted .\scripts\Generate-SourceFromSchema.ps1"
 			WorkingDirectory="..\..\" ConsoleToMsBuild="true">
