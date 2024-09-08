@@ -127,4 +127,51 @@ public class YamlLoader_UpdateRoutersTests
 		ctx.RouterManager.DidNotReceive().AddTitleRoute(Arg.Any<string>(), Arg.Any<string>());
 		ctx.RouterManager.DidNotReceive().AddTitleMatchRoute(Arg.Any<string>(), Arg.Any<string>());
 	}
+
+	[Theory]
+	[InlineAutoSubstituteData<YamlLoaderCustomization>(
+		"route_to_launched_workspace",
+		RouterOptions.RouteToLaunchedWorkspace
+	)]
+	[InlineAutoSubstituteData<YamlLoaderCustomization>(
+		"route_to_active_workspace",
+		RouterOptions.RouteToActiveWorkspace
+	)]
+	[InlineAutoSubstituteData<YamlLoaderCustomization>(
+		"route_to_last_tracked_active_workspace",
+		RouterOptions.RouteToLastTrackedActiveWorkspace
+	)]
+	public void Load_RouterBehavior(string routerOption, RouterOptions expected, IContext ctx)
+	{
+		// Given a valid config with a router option set
+		string config = "routers:\n" + "  routing_behavior: " + routerOption + "\n";
+		ctx.FileManager.FileExists(Arg.Is<string>(s => s.EndsWith("yaml"))).Returns(true);
+		ctx.FileManager.ReadAllText(Arg.Any<string>()).Returns(config);
+
+		// When loading the config
+		bool result = YamlLoader.Load(ctx);
+
+		// Then the router option is updated
+		Assert.True(result);
+		ctx.RouterManager.Received(1).RouterOptions = expected;
+	}
+
+	[Theory, AutoSubstituteData<YamlLoaderCustomization>]
+	public void Load_InvalidRouterBehavior(IContext ctx)
+	{
+		// Given an invalid config with a router option set
+		string config = """
+			routers:
+			  routing_behavior: route_to_bogus_workspace
+			""";
+		ctx.FileManager.FileExists(Arg.Is<string>(s => s.EndsWith("yaml"))).Returns(true);
+		ctx.FileManager.ReadAllText(Arg.Any<string>()).Returns(config);
+
+		// When loading the config
+		bool result = YamlLoader.Load(ctx);
+
+		// Then the router option is not updated
+		Assert.True(result);
+		ctx.RouterManager.DidNotReceive().RouterOptions = Arg.Any<RouterOptions>();
+	}
 }

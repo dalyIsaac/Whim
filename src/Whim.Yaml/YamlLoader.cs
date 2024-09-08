@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Corvus.Json;
@@ -94,12 +95,12 @@ public static class YamlLoader
 
 	private static void UpdateFilters(IContext ctx, Schema schema)
 	{
-		if (!schema.Filters.IsValid())
+		if (!schema.Filters.IsValid() || schema.Filters.Entries.AsOptional() is not { } entries)
 		{
 			return;
 		}
 
-		foreach (var filter in schema.Filters.Entries)
+		foreach (var filter in entries)
 		{
 			string value = (string)filter.Value;
 
@@ -133,13 +134,18 @@ public static class YamlLoader
 
 		if (
 			schema.Routers.RoutingBehavior.TryGetString(out string? routingBehavior)
-			&& Enum.TryParse(routingBehavior, out RouterOptions routerOptions)
+			&& Enum.TryParse(routingBehavior?.SnakeToPascal(), out RouterOptions routerOptions)
 		)
 		{
 			ctx.RouterManager.RouterOptions = routerOptions;
 		}
 
-		foreach (var router in schema.Routers.Entries)
+		if (schema.Routers.Entries.AsOptional() is not { } entries)
+		{
+			return;
+		}
+
+		foreach (var router in entries)
 		{
 			string value = (string)router.Value;
 			string workspaceName = (string)router.WorkspaceName;
@@ -163,5 +169,19 @@ public static class YamlLoader
 					break;
 			}
 		}
+	}
+
+	internal static string SnakeToPascal(this string snake)
+	{
+		string[] parts = snake.Split('_');
+		StringBuilder builder = new(snake.Length);
+
+		foreach (string part in parts)
+		{
+			builder.Append(char.ToUpper(part[0]));
+			builder.Append(part.AsSpan(1));
+		}
+
+		return builder.ToString();
 	}
 }
