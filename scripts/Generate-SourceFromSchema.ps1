@@ -4,7 +4,12 @@ $schemaPath = ".\src\Whim.Yaml\schema.json"
 $outputPath = ".\src\Whim.Yaml\Generated"
 $metadataPath = "$outputPath\metadata.json"
 $now = Get-Date
-$gitSha = $env:CI ? $env:GITHUB_SHA : (git rev-parse HEAD)
+if ($env:CI) {
+    $gitSha = $env:GITHUB_SHA
+}
+else {
+    $gitSha = (git rev-parse HEAD)
+}
 
 function Test-Regenerate {
     param (
@@ -45,9 +50,6 @@ if (!(Test-Regenerate -schemaPath $schemaPath -outputPath $outputPath)) {
     Write-Host "Skipping generation..."
     return
 }
-
-Write-Host "Removing old generated files..."
-Remove-Item "$outputPath\*" -Recurse -Force
 
 dotnet tool run generatejsonschematypes `
     $schemaPath `
