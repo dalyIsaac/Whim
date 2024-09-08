@@ -72,18 +72,6 @@ public static class YamlLoader
 
 		foreach (Schema.RequiredCommandAndKeybind pair in schema.Keybinds)
 		{
-			if (!pair.Keybind.IsValid())
-			{
-				Logger.Error($"Invalid keybind: {pair.Keybind}");
-				continue;
-			}
-
-			if (!pair.Command.IsValid())
-			{
-				Logger.Error($"Invalid command: {pair.Command}");
-				continue;
-			}
-
 			if (Keybind.FromString((string)pair.Keybind) is not Keybind keybind)
 			{
 				Logger.Error($"Invalid keybind: {pair.Keybind}");

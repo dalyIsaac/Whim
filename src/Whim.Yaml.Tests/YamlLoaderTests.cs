@@ -158,4 +158,87 @@ public class YamlLoaderTests
 				new Keybind(KeyModifiers.LControl | KeyModifiers.LShift | KeyModifiers.LAlt, VIRTUAL_KEY.VK_C)
 			);
 	}
+
+	public static TheoryData<string, bool> InvalidKeybindConfig =>
+		new()
+		{
+			{
+				"""
+					keybinds:
+					  - command: whim.test.command_id_1
+					    keybind: this is a string but not a keybind
+					""",
+				true
+			},
+			{
+				"""
+					keybinds:
+					- command: whim.test.command_id_1
+					  keybind: 
+					""",
+				true
+			},
+			{
+				"""
+					keybinds:
+					- command: whim.test.command_id_1
+					  keybind: []
+					""",
+				true
+			},
+			{
+				"""
+					{
+						"keybinds": [
+							{
+								"command": "whim.test.command_id_1",
+								"keybind": "this is a string but not a keybind"
+							}
+						]
+					}
+					""",
+				false
+			},
+			{
+				"""
+					{
+						"keybinds": [
+							{
+								"command": "whim.test.command_id_1",
+								"keybind": []
+							}
+						]
+					}
+					""",
+				false
+			},
+			{
+				"""
+					{
+						"keybinds": [
+							{
+								"command": "whim.test.command_id_1",
+								"keybind": ""
+							}
+						]
+					}
+					""",
+				false
+			},
+		};
+
+	[Theory, MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(InvalidKeybindConfig))]
+	public void Load_InvalidKeybinds(string config, bool isYaml, IContext ctx)
+	{
+		// Given an invalid config with keybinds set
+		ctx.FileManager.FileExists(Arg.Is<string>(s => s.EndsWith(isYaml ? "yaml" : "json"))).Returns(true);
+		ctx.FileManager.ReadAllText(Arg.Any<string>()).Returns(config);
+
+		// When loading the config
+		bool result = YamlLoader.Load(ctx);
+
+		// Then the result is true, and no keybinds are set
+		Assert.True(result);
+		ctx.KeybindManager.DidNotReceive().SetKeybind(Arg.Any<string>(), Arg.Any<IKeybind>());
+	}
 }
