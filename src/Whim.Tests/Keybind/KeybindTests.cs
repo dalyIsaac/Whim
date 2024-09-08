@@ -59,4 +59,34 @@ public class KeybindTests
 		Keybind keybind = new(modifiers, key);
 		Assert.Equal(expected, keybind.ToString(unifyKeyModifiers: true));
 	}
+
+	[Theory]
+	[InlineData("LShift + A", KeyModifiers.LShift, VIRTUAL_KEY.VK_A)]
+	[InlineData("LCtrl + A", KeyModifiers.LControl, VIRTUAL_KEY.VK_A)]
+	[InlineData("LAlt + A", KeyModifiers.LAlt, VIRTUAL_KEY.VK_A)]
+	[InlineData(
+		"LWin+LCtrl+LShift+LAlt+A",
+		KeyModifiers.LWin | KeyModifiers.LControl | KeyModifiers.LShift | KeyModifiers.LAlt,
+		VIRTUAL_KEY.VK_A
+	)]
+	public void Keybind_FromString(string input, KeyModifiers expectedModifiers, VIRTUAL_KEY expectedKey)
+	{
+		IKeybind? keybind = Keybind.FromString(input);
+		Assert.NotNull(keybind);
+		Assert.Equal(expectedModifiers, keybind.Modifiers);
+		Assert.Equal(expectedKey, keybind.Key);
+	}
+
+	[Theory]
+	[InlineData("")]
+	[InlineData(" ")]
+	[InlineData("+++++")]
+	[InlineData("A")]
+	[InlineData("A + B")]
+	[InlineData("LCtrl + LShift + LAlt")]
+	public void Keybind_FromString_Invalid_ReturnsNull(string input)
+	{
+		IKeybind? keybind = Keybind.FromString(input);
+		Assert.Null(keybind);
+	}
 }

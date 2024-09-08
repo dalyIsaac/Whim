@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/dalyIsaac/Whim/main/src/Whim/Config/schema.json",
+
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "keybinds": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Keybind" },
+          "description": "Mappings of commands to keybinds"
+        },
+
+        "unify_key_modifiers": {
+          "type": "boolean",
+          "description": "Whether to treat key modifiers like `LWin` and `RWin` as the same key modifier. Defaults to `true`."
+        }
+      }
+    }
+  },
+
+  "$defs": {
+    "Keybind": {
+      "type": "object",
+      "required": ["command", "keybind"],
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "type": "string",
+          "description": "The identifier of the command to run. For more, see https://dalyisaac.github.io/Whim/docs/customize/commands.html"
+        },
+        "keybind": {
+          "type": "string",
+          "description": "The keybind to trigger the command. For more, see https://dalyisaac.github.io/Whim/docs/customize/keybinds.html"
+        }
+      }
+    }
+  }
+}

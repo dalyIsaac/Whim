@@ -20,6 +20,7 @@ items:
   - href: customize/logging.md
   - href: customize/styling.md
   - href: customize/snippets.md
+  - href: customize/yaml.md
 
   - name: Plugins
   - href: plugins/bar.md

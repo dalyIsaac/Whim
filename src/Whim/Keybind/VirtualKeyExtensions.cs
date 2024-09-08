@@ -20,4 +20,43 @@ public static class VirtualKeyExtensions
 		// Return the keybinding, capitalizing the first letter.
 		return string.Concat(keyString[0].ToString().ToUpper(), keyString[1..].ToLower());
 	}
+
+	/// <summary>
+	/// Try to parse a key from a string.
+	/// </summary>
+	/// <param name="keyString">
+	/// The string to parse.
+	/// </param>
+	/// <param name="key">
+	/// The parsed key.
+	/// </param>
+	/// <returns>
+	/// <see langword="true"/> if the key was parsed successfully; otherwise, <see langword="false"/>.
+	/// </returns>
+	/// <remarks>
+	/// This method is case-insensitive.
+	/// </remarks>
+	/// <seealso cref="GetKeyString(VIRTUAL_KEY)"/>
+	/// <seealso cref="VIRTUAL_KEY"/>
+	public static bool TryParseKey(this string keyString, out VIRTUAL_KEY key)
+	{
+		key = VIRTUAL_KEY.None;
+
+		if (string.IsNullOrWhiteSpace(keyString))
+		{
+			return false;
+		}
+
+		keyString = keyString.ToUpperInvariant();
+		keyString = keyString.Replace(" ", "");
+		keyString = $"VK_{keyString}";
+
+		if (Enum.TryParse(keyString, out VIRTUAL_KEY k))
+		{
+			key = k;
+			return true;
+		}
+
+		return false;
+	}
 }

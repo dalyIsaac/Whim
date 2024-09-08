@@ -110,4 +110,49 @@ public class KeyModifiersTests
 		Assert.Equal(expectedModifiers, unifiedKeybind.Modifiers);
 		Assert.Equal(VIRTUAL_KEY.VK_A, unifiedKeybind.Key);
 	}
+
+	[Theory]
+	[InlineData("CTRL", KeyModifiers.LControl, true)]
+	[InlineData("Ctrl", KeyModifiers.LControl, true)]
+	[InlineData("CONTROL", KeyModifiers.LControl, true)]
+	[InlineData("Control", KeyModifiers.LControl, true)]
+	[InlineData("LCTRL", KeyModifiers.LControl, true)]
+	[InlineData("Lctrl", KeyModifiers.LControl, true)]
+	[InlineData("LCONTROL", KeyModifiers.LControl, true)]
+	[InlineData("Lcontrol", KeyModifiers.LControl, true)]
+	[InlineData("RCTRL", KeyModifiers.RControl, true)]
+	[InlineData("Rctrl", KeyModifiers.RControl, true)]
+	[InlineData("RCONTROL", KeyModifiers.RControl, true)]
+	[InlineData("Rcontrol", KeyModifiers.RControl, true)]
+	[InlineData("SHIFT", KeyModifiers.LShift, true)]
+	[InlineData("Shift", KeyModifiers.LShift, true)]
+	[InlineData("LSHIFT", KeyModifiers.LShift, true)]
+	[InlineData("Lshift", KeyModifiers.LShift, true)]
+	[InlineData("RSHIFT", KeyModifiers.RShift, true)]
+	[InlineData("Rshift", KeyModifiers.RShift, true)]
+	[InlineData("ALT", KeyModifiers.LAlt, true)]
+	[InlineData("Alt", KeyModifiers.LAlt, true)]
+	[InlineData("LALT", KeyModifiers.LAlt, true)]
+	[InlineData("Lalt", KeyModifiers.LAlt, true)]
+	[InlineData("RALT", KeyModifiers.RAlt, true)]
+	[InlineData("Ralt", KeyModifiers.RAlt, true)]
+	[InlineData("WIN", KeyModifiers.LWin, true)]
+	[InlineData("Win", KeyModifiers.LWin, true)]
+	[InlineData("LWIN", KeyModifiers.LWin, true)]
+	[InlineData("Lwin", KeyModifiers.LWin, true)]
+	[InlineData("RWIN", KeyModifiers.RWin, true)]
+	[InlineData("Rwin", KeyModifiers.RWin, true)]
+	[InlineData(" ", KeyModifiers.None, false)]
+	[InlineData("", KeyModifiers.None, false)]
+	[InlineData("Bob", KeyModifiers.None, false)]
+	[InlineData("A", KeyModifiers.None, false)]
+	public void TryParseKeyModifier(string keyString, KeyModifiers expected, bool expectedSuccess)
+	{
+		// When
+		bool success = keyString.TryParseKeyModifier(out KeyModifiers key);
+
+		// Then
+		Assert.Equal(expectedSuccess, success);
+		Assert.Equal(expected, key);
+	}
 }

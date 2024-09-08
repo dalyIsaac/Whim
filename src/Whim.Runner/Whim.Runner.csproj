@@ -1,269 +1,284 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AnalysisModeDesign>All</AnalysisModeDesign>
-    <AnalysisModeDocumentation>All</AnalysisModeDocumentation>
-    <AnalysisModeGlobalization>None</AnalysisModeGlobalization>
-    <AnalysisModeInteroperability>All</AnalysisModeInteroperability>
-    <AnalysisModeMaintainability>All</AnalysisModeMaintainability>
-    <AnalysisModeNaming>All</AnalysisModeNaming>
-    <AnalysisModePerformance>All</AnalysisModePerformance>
-    <AnalysisModeReliability>All</AnalysisModeReliability>
-    <AnalysisModeSecurity>All</AnalysisModeSecurity>
-    <AnalysisModeSingleFile>All</AnalysisModeSingleFile>
-    <AnalysisModeStyle>All</AnalysisModeStyle>
-    <AnalysisModeUsage>All</AnalysisModeUsage>
-    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <ApplicationIcon>Assets\Icon.ico</ApplicationIcon>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Authors>Isaac Daly</Authors>
-    <Description>An extensible window manager for Windows.</Description>
-    <EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-    <Nullable>enable</Nullable>
-    <OutputType>WinExe</OutputType>
-    <Platforms>x64;arm64;Any CPU</Platforms>
-    <PublishProfile>Properties\PublishProfiles\win-$(Platform).pubxml</PublishProfile>
-    <PublishProfile>win-$(Platform).pubxml</PublishProfile>
-    <RootNamespace>Whim.Runner</RootNamespace>
-    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
-    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
-    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-    <UseWinUI>true</UseWinUI>
-    <Version>0.7.0</Version>
-    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-    <WindowsPackageType>None</WindowsPackageType>
-    <WinUISDKReferences>false</WinUISDKReferences>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Any CPU'">
-    <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Any CPU'">
-    <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Any CPU'">
-    <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Any CPU'">
-    <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Any CPU'">
-    <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Any CPU'">
-    <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm64'">
-    <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm64'">
-    <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
-  </PropertyGroup>
-  <ItemGroup>
-    <Content Remove="Assets\LargeTile.scale-100.png" />
-    <Content Remove="Assets\LargeTile.scale-125.png" />
-    <Content Remove="Assets\LargeTile.scale-150.png" />
-    <Content Remove="Assets\LargeTile.scale-200.png" />
-    <Content Remove="Assets\LargeTile.scale-400.png" />
-    <Content Remove="Assets\LockScreenLogo.scale-200.png" />
-    <Content Remove="Assets\SmallTile.scale-100.png" />
-    <Content Remove="Assets\SmallTile.scale-125.png" />
-    <Content Remove="Assets\SmallTile.scale-150.png" />
-    <Content Remove="Assets\SmallTile.scale-200.png" />
-    <Content Remove="Assets\SmallTile.scale-400.png" />
-    <Content Remove="Assets\SplashScreen.scale-100.png" />
-    <Content Remove="Assets\SplashScreen.scale-125.png" />
-    <Content Remove="Assets\SplashScreen.scale-150.png" />
-    <Content Remove="Assets\SplashScreen.scale-200.png" />
-    <Content Remove="Assets\SplashScreen.scale-400.png" />
-    <Content Remove="Assets\Square150x150Logo.scale-100.png" />
-    <Content Remove="Assets\Square150x150Logo.scale-125.png" />
-    <Content Remove="Assets\Square150x150Logo.scale-150.png" />
-    <Content Remove="Assets\Square150x150Logo.scale-200.png" />
-    <Content Remove="Assets\Square150x150Logo.scale-400.png" />
-    <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-16.png" />
-    <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-24.png" />
-    <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-256.png" />
-    <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-32.png" />
-    <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-48.png" />
-    <Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-16.png" />
-    <Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-24.png" />
-    <Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-256.png" />
-    <Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-32.png" />
-    <Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-48.png" />
-    <Content Remove="Assets\Square44x44Logo.scale-100.png" />
-    <Content Remove="Assets\Square44x44Logo.scale-125.png" />
-    <Content Remove="Assets\Square44x44Logo.scale-150.png" />
-    <Content Remove="Assets\Square44x44Logo.scale-200.png" />
-    <Content Remove="Assets\Square44x44Logo.scale-400.png" />
-    <Content Remove="Assets\Square44x44Logo.targetsize-16.png" />
-    <Content Remove="Assets\Square44x44Logo.targetsize-24.png" />
-    <Content Remove="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
-    <Content Remove="Assets\Square44x44Logo.targetsize-256.png" />
-    <Content Remove="Assets\Square44x44Logo.targetsize-32.png" />
-    <Content Remove="Assets\Square44x44Logo.targetsize-48.png" />
-    <Content Remove="Assets\StoreLogo.png" />
-    <Content Remove="Assets\StoreLogo.scale-100.png" />
-    <Content Remove="Assets\StoreLogo.scale-125.png" />
-    <Content Remove="Assets\StoreLogo.scale-150.png" />
-    <Content Remove="Assets\StoreLogo.scale-200.png" />
-    <Content Remove="Assets\StoreLogo.scale-400.png" />
-    <Content Remove="Assets\Wide310x150Logo.scale-100.png" />
-    <Content Remove="Assets\Wide310x150Logo.scale-125.png" />
-    <Content Remove="Assets\Wide310x150Logo.scale-150.png" />
-    <Content Remove="Assets\Wide310x150Logo.scale-200.png" />
-    <Content Remove="Assets\Wide310x150Logo.scale-400.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Assets\Icon.ico" />
-    <None Remove="ExceptionWindow.xaml" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Scripting" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
-    <Manifest Include="$(ApplicationManifest)" />
-  </ItemGroup>
-  <!-- Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<AnalysisModeDesign>All</AnalysisModeDesign>
+		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
+		<AnalysisModeGlobalization>None</AnalysisModeGlobalization>
+		<AnalysisModeInteroperability>All</AnalysisModeInteroperability>
+		<AnalysisModeMaintainability>All</AnalysisModeMaintainability>
+		<AnalysisModeNaming>All</AnalysisModeNaming>
+		<AnalysisModePerformance>All</AnalysisModePerformance>
+		<AnalysisModeReliability>All</AnalysisModeReliability>
+		<AnalysisModeSecurity>All</AnalysisModeSecurity>
+		<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
+		<AnalysisModeStyle>All</AnalysisModeStyle>
+		<AnalysisModeUsage>All</AnalysisModeUsage>
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+		<ApplicationIcon>Assets\Icon.ico</ApplicationIcon>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<Authors>Isaac Daly</Authors>
+		<Description>An extensible window manager for Windows.</Description>
+		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+		<Nullable>enable</Nullable>
+		<OutputType>WinExe</OutputType>
+		<Platforms>x64;arm64;Any CPU</Platforms>
+		<PublishProfile>Properties\PublishProfiles\win-$(Platform).pubxml</PublishProfile>
+		<PublishProfile>win-$(Platform).pubxml</PublishProfile>
+		<RootNamespace>Whim.Runner</RootNamespace>
+		<RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<UseWinUI>true</UseWinUI>
+		<Version>0.7.0</Version>
+		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+		<WindowsPackageType>None</WindowsPackageType>
+		<WinUISDKReferences>false</WinUISDKReferences>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Any CPU'">
+		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Any CPU'">
+		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Any CPU'">
+		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Any CPU'">
+		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Any CPU'">
+		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Any CPU'">
+		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm64'">
+		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm64'">
+		<DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+	</PropertyGroup>
+	<ItemGroup>
+		<Content Remove="Assets\LargeTile.scale-100.png" />
+		<Content Remove="Assets\LargeTile.scale-125.png" />
+		<Content Remove="Assets\LargeTile.scale-150.png" />
+		<Content Remove="Assets\LargeTile.scale-200.png" />
+		<Content Remove="Assets\LargeTile.scale-400.png" />
+		<Content Remove="Assets\LockScreenLogo.scale-200.png" />
+		<Content Remove="Assets\SmallTile.scale-100.png" />
+		<Content Remove="Assets\SmallTile.scale-125.png" />
+		<Content Remove="Assets\SmallTile.scale-150.png" />
+		<Content Remove="Assets\SmallTile.scale-200.png" />
+		<Content Remove="Assets\SmallTile.scale-400.png" />
+		<Content Remove="Assets\SplashScreen.scale-100.png" />
+		<Content Remove="Assets\SplashScreen.scale-125.png" />
+		<Content Remove="Assets\SplashScreen.scale-150.png" />
+		<Content Remove="Assets\SplashScreen.scale-200.png" />
+		<Content Remove="Assets\SplashScreen.scale-400.png" />
+		<Content Remove="Assets\Square150x150Logo.scale-100.png" />
+		<Content Remove="Assets\Square150x150Logo.scale-125.png" />
+		<Content Remove="Assets\Square150x150Logo.scale-150.png" />
+		<Content Remove="Assets\Square150x150Logo.scale-200.png" />
+		<Content Remove="Assets\Square150x150Logo.scale-400.png" />
+		<Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-16.png" />
+		<Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-24.png" />
+		<Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-256.png" />
+		<Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-32.png" />
+		<Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-48.png" />
+		<Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-16.png" />
+		<Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-24.png" />
+		<Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-256.png" />
+		<Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-32.png" />
+		<Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-48.png" />
+		<Content Remove="Assets\Square44x44Logo.scale-100.png" />
+		<Content Remove="Assets\Square44x44Logo.scale-125.png" />
+		<Content Remove="Assets\Square44x44Logo.scale-150.png" />
+		<Content Remove="Assets\Square44x44Logo.scale-200.png" />
+		<Content Remove="Assets\Square44x44Logo.scale-400.png" />
+		<Content Remove="Assets\Square44x44Logo.targetsize-16.png" />
+		<Content Remove="Assets\Square44x44Logo.targetsize-24.png" />
+		<Content Remove="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+		<Content Remove="Assets\Square44x44Logo.targetsize-256.png" />
+		<Content Remove="Assets\Square44x44Logo.targetsize-32.png" />
+		<Content Remove="Assets\Square44x44Logo.targetsize-48.png" />
+		<Content Remove="Assets\StoreLogo.png" />
+		<Content Remove="Assets\StoreLogo.scale-100.png" />
+		<Content Remove="Assets\StoreLogo.scale-125.png" />
+		<Content Remove="Assets\StoreLogo.scale-150.png" />
+		<Content Remove="Assets\StoreLogo.scale-200.png" />
+		<Content Remove="Assets\StoreLogo.scale-400.png" />
+		<Content Remove="Assets\Wide310x150Logo.scale-100.png" />
+		<Content Remove="Assets\Wide310x150Logo.scale-125.png" />
+		<Content Remove="Assets\Wide310x150Logo.scale-150.png" />
+		<Content Remove="Assets\Wide310x150Logo.scale-200.png" />
+		<Content Remove="Assets\Wide310x150Logo.scale-400.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Remove="Assets\Icon.ico" />
+		<None Remove="ExceptionWindow.xaml" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.Scripting" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
+		<Manifest Include="$(ApplicationManifest)" />
+	</ItemGroup>
+	<!-- Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
 		Tools extension to be activated for this project even if the Windows App SDK Nuget
 		package has not yet been restored -->
-  <ItemGroup
-    Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnablePreviewMsixTooling)'=='true'">
-    <ProjectCapability Include="Msix" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Whim.Bar\Whim.Bar.csproj" />
-    <ProjectReference Include="..\Whim.CommandPalette\Whim.CommandPalette.csproj" />
-    <ProjectReference Include="..\Whim.FloatingWindow\Whim.FloatingWindow.csproj" />
-    <ProjectReference Include="..\Whim.FocusIndicator\Whim.FocusIndicator.csproj" />
-    <ProjectReference Include="..\Whim.Gaps\Whim.Gaps.csproj" />
-    <ProjectReference Include="..\Whim.LayoutPreview\Whim.LayoutPreview.csproj" />
-    <ProjectReference Include="..\Whim.SliceLayout\Whim.SliceLayout.csproj" />
-    <ProjectReference Include="..\Whim.TreeLayout.Bar\Whim.TreeLayout.Bar.csproj" />
-    <ProjectReference
-      Include="..\Whim.TreeLayout.CommandPalette\Whim.TreeLayout.CommandPalette.csproj" />
-    <ProjectReference Include="..\Whim.TreeLayout\Whim.TreeLayout.csproj" />
-    <ProjectReference Include="..\Whim.Updater\Whim.Updater.csproj" />
-    <ProjectReference Include="..\Whim\Whim.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="ExceptionWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <!--Whim.Bar-->
-  <Target Name="CopyBarAfterBuild" AfterTargets="Build;Publish">
-    <ItemGroup>
-      <BarSourceFile Include="$(SolutionDir)\src\Whim.Bar\$(OutDir)\Whim.Bar\**\*" />
-      <BarDestinationFile
-        Include="@(BarSourceFile-&gt;'$(TargetDir)plugins\Whim.Bar\%(RecursiveDir)%(Filename)%(Extension)')" />
-    </ItemGroup>
-    <Copy SourceFiles="@(BarSourceFile)" DestinationFiles="@(BarDestinationFile)"
-      SkipUnchangedFiles="true" />
-    <Copy SourceFiles="$(SolutionDir)src\Whim.Bar\$(OutDir)Whim.Bar.dll"
-      DestinationFolder="$(TargetDir)plugins\Whim.Bar\" SkipUnchangedFiles="true" />
-  </Target>
-  <!--Whim.CommandPalette-->
-  <Target Name="CopyCommandPaletteAfterBuild" AfterTargets="Build;Publish">
-    <ItemGroup>
-      <CommandPaletteSourceFile
-        Include="$(SolutionDir)\src\Whim.CommandPalette\$(OutDir)\Whim.CommandPalette\**\*" />
-      <CommandPaletteDestinationFile
-        Include="@(CommandPaletteSourceFile-&gt;'$(TargetDir)plugins\Whim.CommandPalette\%(RecursiveDir)%(Filename)%(Extension)')" />
-    </ItemGroup>
-    <Copy SourceFiles="@(CommandPaletteSourceFile)"
-      DestinationFiles="@(CommandPaletteDestinationFile)" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="$(SolutionDir)src\Whim.CommandPalette\$(OutDir)Whim.CommandPalette.dll"
-      DestinationFolder="$(TargetDir)plugins\Whim.CommandPalette\" SkipUnchangedFiles="true" />
-  </Target>
-  <!--Whim.FloatingWindow-->
-  <Target Name="CopyFloatingWindowAfterBuild" AfterTargets="Build;Publish">
-    <Copy SourceFiles="$(SolutionDir)src\Whim.FloatingWindow\$(OutDir)Whim.FloatingWindow.dll"
-      DestinationFolder="$(TargetDir)plugins\Whim.FloatingWindow\" SkipUnchangedFiles="true" />
-  </Target>
-  <!--Whim.FocusIndicator-->
-  <Target Name="CopyFocusIndicatorAfterBuild" AfterTargets="Build;Publish">
-    <ItemGroup>
-      <FocusIndicatorSourceFile
-        Include="$(SolutionDir)\src\Whim.FocusIndicator\$(OutDir)\Whim.FocusIndicator\**\*" />
-      <FocusIndicatorDestinationFile
-        Include="@(FocusIndicatorSourceFile-&gt;'$(TargetDir)plugins\Whim.FocusIndicator\%(RecursiveDir)%(Filename)%(Extension)')" />
-    </ItemGroup>
-    <Copy SourceFiles="@(FocusIndicatorSourceFile)"
-      DestinationFiles="@(FocusIndicatorDestinationFile)" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="$(SolutionDir)src\Whim.FocusIndicator\$(OutDir)Whim.FocusIndicator.dll"
-      DestinationFolder="$(TargetDir)plugins\Whim.FocusIndicator\" SkipUnchangedFiles="true" />
-  </Target>
-  <!--Whim.Gaps-->
-  <Target Name="CopyGapsAfterBuild" AfterTargets="Build;Publish">
-    <Copy SourceFiles="$(SolutionDir)src\Whim.Gaps\$(OutDir)Whim.Gaps.dll"
-      DestinationFolder="$(TargetDir)plugins\Whim.Gaps\" SkipUnchangedFiles="true" />
-  </Target>
-  <!--Whim.LayoutPreview-->
-  <Target Name="CopyLayoutPreviewAfterBuild" AfterTargets="Build;Publish">
-    <ItemGroup>
-      <LayoutPreviewSourceFile
-        Include="$(SolutionDir)\src\Whim.LayoutPreview\$(OutDir)\Whim.LayoutPreview\**\*" />
-      <LayoutPreviewDestinationFile
-        Include="@(LayoutPreviewSourceFile-&gt;'$(TargetDir)plugins\Whim.LayoutPreview\%(RecursiveDir)%(Filename)%(Extension)')" />
-    </ItemGroup>
-    <Copy SourceFiles="@(LayoutPreviewSourceFile)"
-      DestinationFiles="@(LayoutPreviewDestinationFile)" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="$(SolutionDir)src\Whim.LayoutPreview\$(OutDir)Whim.LayoutPreview.dll"
-      DestinationFolder="$(TargetDir)plugins\Whim.LayoutPreview\" SkipUnchangedFiles="true" />
-  </Target>
-  <!--Whim.SliceLayout-->
-  <Target Name="CopySliceLayoutAfterBuild" AfterTargets="Build;Publish">
-    <Copy SourceFiles="$(SolutionDir)src\Whim.SliceLayout\$(OutDir)Whim.SliceLayout.dll"
-      DestinationFolder="$(TargetDir)plugins\Whim.SliceLayout\" SkipUnchangedFiles="true" />
-  </Target>
-  <!--Whim.TreeLayout-->
-  <Target Name="CopyTreeLayoutAfterBuild" AfterTargets="Build;Publish">
-    <Copy SourceFiles="$(SolutionDir)src\Whim.TreeLayout\$(OutDir)Whim.TreeLayout.dll"
-      DestinationFolder="$(TargetDir)plugins\Whim.TreeLayout\" SkipUnchangedFiles="true" />
-  </Target>
-  <!--Whim.TreeLayout.Bar-->
-  <Target Name="CopyTreeLayoutBarAfterBuild"
-    AfterTargets="Build;Publish;CopyBarAfterBuild;CopyTreeLayoutAfterBuild">
-    <ItemGroup>
-      <TreeLayoutBarSourceFile
-        Include="$(SolutionDir)\src\Whim.TreeLayout.Bar\$(OutDir)\Whim.TreeLayout.Bar\**\*" />
-      <TreeLayoutBarDestinationFile
-        Include="@(TreeLayoutBarSourceFile-&gt;'$(TargetDir)plugins\Whim.TreeLayout.Bar\%(RecursiveDir)%(Filename)%(Extension)')" />
-    </ItemGroup>
-    <Copy SourceFiles="@(TreeLayoutBarSourceFile)"
-      DestinationFiles="@(TreeLayoutBarDestinationFile)" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="$(SolutionDir)src\Whim.TreeLayout.Bar\$(OutDir)Whim.TreeLayout.Bar.dll"
-      DestinationFolder="$(TargetDir)plugins\Whim.TreeLayout.Bar\" SkipUnchangedFiles="true" />
-  </Target>
-  <!--Whim.TreeLayout.CommandPalette-->
-  <Target Name="CopyTreeLayoutCommandPaletteAfterBuild"
-    AfterTargets="Build;Publish;CopyCommandPaletteAfterBuild;CopyTreeLayoutAfterBuild">
-    <Copy
-      SourceFiles="$(SolutionDir)src\Whim.TreeLayout.CommandPalette\$(OutDir)Whim.TreeLayout.CommandPalette.dll"
-      DestinationFolder="$(TargetDir)plugins\Whim.TreeLayout.CommandPalette\"
-      SkipUnchangedFiles="true" />
-  </Target>
-  <!-- Whim.Updater -->
-  <Target Name="CopyUpdaterAfterBuild" AfterTargets="Build;Publish">
-    <ItemGroup>
-      <UpdaterSourceFile Include="$(SolutionDir)\src\Whim.Updater\$(OutDir)\Whim.Updater\**\*" />
-      <UpdaterDestinationFile
-        Include="@(UpdaterSourceFile-&gt;'$(TargetDir)plugins\Whim.Updater\%(RecursiveDir)%(Filename)%(Extension)')" />
-    </ItemGroup>
-    <Copy SourceFiles="@(UpdaterSourceFile)" DestinationFiles="@(UpdaterDestinationFile)"
-      SkipUnchangedFiles="true" />
-    <Copy SourceFiles="$(SolutionDir)src\Whim.Updater\$(OutDir)Whim.Updater.dll"
-      DestinationFolder="$(TargetDir)plugins\Whim.Updater\" SkipUnchangedFiles="true" />
-  </Target>
-  <ItemGroup>
-    <_DeploymentManifestIconFile Remove="Assets\Icon.ico" />
-  </ItemGroup>
+	<ItemGroup
+		Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnablePreviewMsixTooling)'=='true'">
+		<ProjectCapability Include="Msix" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Whim.Bar\Whim.Bar.csproj" />
+		<ProjectReference Include="..\Whim.CommandPalette\Whim.CommandPalette.csproj" />
+		<ProjectReference Include="..\Whim.FloatingWindow\Whim.FloatingWindow.csproj" />
+		<ProjectReference Include="..\Whim.FocusIndicator\Whim.FocusIndicator.csproj" />
+		<ProjectReference Include="..\Whim.Gaps\Whim.Gaps.csproj" />
+		<ProjectReference Include="..\Whim.Yaml\Whim.Yaml.csproj" />
+		<ProjectReference Include="..\Whim.LayoutPreview\Whim.LayoutPreview.csproj" />
+		<ProjectReference Include="..\Whim.SliceLayout\Whim.SliceLayout.csproj" />
+		<ProjectReference Include="..\Whim.TreeLayout.Bar\Whim.TreeLayout.Bar.csproj" />
+		<ProjectReference
+			Include="..\Whim.TreeLayout.CommandPalette\Whim.TreeLayout.CommandPalette.csproj" />
+		<ProjectReference Include="..\Whim.TreeLayout\Whim.TreeLayout.csproj" />
+		<ProjectReference Include="..\Whim.Updater\Whim.Updater.csproj" />
+		<ProjectReference Include="..\Whim.Yaml\Whim.Yaml.csproj" />
+		<ProjectReference Include="..\Whim\Whim.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<Page Update="ExceptionWindow.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+	<!--Whim.Bar-->
+	<Target Name="CopyBarAfterBuild" AfterTargets="Build;Publish">
+		<ItemGroup>
+			<BarSourceFile Include="$(SolutionDir)\src\Whim.Bar\$(OutDir)\Whim.Bar\**\*" />
+			<BarDestinationFile
+				Include="@(BarSourceFile->'$(TargetDir)plugins\Whim.Bar\%(RecursiveDir)%(Filename)%(Extension)')" />
+		</ItemGroup>
+		<Copy SourceFiles="@(BarSourceFile)" DestinationFiles="@(BarDestinationFile)"
+			SkipUnchangedFiles="true" />
+		<Copy SourceFiles="$(SolutionDir)src\Whim.Bar\$(OutDir)Whim.Bar.dll"
+			DestinationFolder="$(TargetDir)plugins\Whim.Bar\" SkipUnchangedFiles="true" />
+	</Target>
+	<!--Whim.CommandPalette-->
+	<Target Name="CopyCommandPaletteAfterBuild" AfterTargets="Build;Publish">
+		<ItemGroup>
+			<CommandPaletteSourceFile
+				Include="$(SolutionDir)\src\Whim.CommandPalette\$(OutDir)\Whim.CommandPalette\**\*" />
+			<CommandPaletteDestinationFile
+				Include="@(CommandPaletteSourceFile->'$(TargetDir)plugins\Whim.CommandPalette\%(RecursiveDir)%(Filename)%(Extension)')" />
+		</ItemGroup>
+		<Copy SourceFiles="@(CommandPaletteSourceFile)"
+			DestinationFiles="@(CommandPaletteDestinationFile)" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="$(SolutionDir)src\Whim.CommandPalette\$(OutDir)Whim.CommandPalette.dll"
+			DestinationFolder="$(TargetDir)plugins\Whim.CommandPalette\" SkipUnchangedFiles="true" />
+	</Target>
+	<!--Whim.FloatingWindow-->
+	<Target Name="CopyFloatingWindowAfterBuild" AfterTargets="Build;Publish">
+		<Copy SourceFiles="$(SolutionDir)src\Whim.FloatingWindow\$(OutDir)Whim.FloatingWindow.dll"
+			DestinationFolder="$(TargetDir)plugins\Whim.FloatingWindow\" SkipUnchangedFiles="true" />
+	</Target>
+	<!--Whim.FocusIndicator-->
+	<Target Name="CopyFocusIndicatorAfterBuild" AfterTargets="Build;Publish">
+		<ItemGroup>
+			<FocusIndicatorSourceFile
+				Include="$(SolutionDir)\src\Whim.FocusIndicator\$(OutDir)\Whim.FocusIndicator\**\*" />
+			<FocusIndicatorDestinationFile
+				Include="@(FocusIndicatorSourceFile->'$(TargetDir)plugins\Whim.FocusIndicator\%(RecursiveDir)%(Filename)%(Extension)')" />
+		</ItemGroup>
+		<Copy SourceFiles="@(FocusIndicatorSourceFile)"
+			DestinationFiles="@(FocusIndicatorDestinationFile)" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="$(SolutionDir)src\Whim.FocusIndicator\$(OutDir)Whim.FocusIndicator.dll"
+			DestinationFolder="$(TargetDir)plugins\Whim.FocusIndicator\" SkipUnchangedFiles="true" />
+	</Target>
+	<!--Whim.Gaps-->
+	<Target Name="CopyGapsAfterBuild" AfterTargets="Build;Publish">
+		<Copy SourceFiles="$(SolutionDir)src\Whim.Gaps\$(OutDir)Whim.Gaps.dll"
+			DestinationFolder="$(TargetDir)plugins\Whim.Gaps\" SkipUnchangedFiles="true" />
+	</Target>
+	<!--Whim.LayoutPreview-->
+	<Target Name="CopyLayoutPreviewAfterBuild" AfterTargets="Build;Publish">
+		<ItemGroup>
+			<LayoutPreviewSourceFile
+				Include="$(SolutionDir)\src\Whim.LayoutPreview\$(OutDir)\Whim.LayoutPreview\**\*" />
+			<LayoutPreviewDestinationFile
+				Include="@(LayoutPreviewSourceFile->'$(TargetDir)plugins\Whim.LayoutPreview\%(RecursiveDir)%(Filename)%(Extension)')" />
+		</ItemGroup>
+		<Copy SourceFiles="@(LayoutPreviewSourceFile)"
+			DestinationFiles="@(LayoutPreviewDestinationFile)" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="$(SolutionDir)src\Whim.LayoutPreview\$(OutDir)Whim.LayoutPreview.dll"
+			DestinationFolder="$(TargetDir)plugins\Whim.LayoutPreview\" SkipUnchangedFiles="true" />
+	</Target>
+	<!--Whim.SliceLayout-->
+	<Target Name="CopySliceLayoutAfterBuild" AfterTargets="Build;Publish">
+		<Copy SourceFiles="$(SolutionDir)src\Whim.SliceLayout\$(OutDir)Whim.SliceLayout.dll"
+			DestinationFolder="$(TargetDir)plugins\Whim.SliceLayout\" SkipUnchangedFiles="true" />
+	</Target>
+	<!--Whim.TreeLayout-->
+	<Target Name="CopyTreeLayoutAfterBuild" AfterTargets="Build;Publish">
+		<Copy SourceFiles="$(SolutionDir)src\Whim.TreeLayout\$(OutDir)Whim.TreeLayout.dll"
+			DestinationFolder="$(TargetDir)plugins\Whim.TreeLayout\" SkipUnchangedFiles="true" />
+	</Target>
+	<!--Whim.TreeLayout.Bar-->
+	<Target Name="CopyTreeLayoutBarAfterBuild"
+		AfterTargets="Build;Publish;CopyBarAfterBuild;CopyTreeLayoutAfterBuild">
+		<ItemGroup>
+			<TreeLayoutBarSourceFile
+				Include="$(SolutionDir)\src\Whim.TreeLayout.Bar\$(OutDir)\Whim.TreeLayout.Bar\**\*" />
+			<TreeLayoutBarDestinationFile
+				Include="@(TreeLayoutBarSourceFile->'$(TargetDir)plugins\Whim.TreeLayout.Bar\%(RecursiveDir)%(Filename)%(Extension)')" />
+		</ItemGroup>
+		<Copy SourceFiles="@(TreeLayoutBarSourceFile)"
+			DestinationFiles="@(TreeLayoutBarDestinationFile)" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="$(SolutionDir)src\Whim.TreeLayout.Bar\$(OutDir)Whim.TreeLayout.Bar.dll"
+			DestinationFolder="$(TargetDir)plugins\Whim.TreeLayout.Bar\" SkipUnchangedFiles="true" />
+	</Target>
+	<!--Whim.TreeLayout.CommandPalette-->
+	<Target Name="CopyTreeLayoutCommandPaletteAfterBuild"
+		AfterTargets="Build;Publish;CopyCommandPaletteAfterBuild;CopyTreeLayoutAfterBuild">
+		<Copy
+			SourceFiles="$(SolutionDir)src\Whim.TreeLayout.CommandPalette\$(OutDir)Whim.TreeLayout.CommandPalette.dll"
+			DestinationFolder="$(TargetDir)plugins\Whim.TreeLayout.CommandPalette\"
+			SkipUnchangedFiles="true" />
+	</Target>
+	<!-- Whim.Updater -->
+	<Target Name="CopyUpdaterAfterBuild" AfterTargets="Build;Publish">
+		<ItemGroup>
+			<UpdaterSourceFile Include="$(SolutionDir)\src\Whim.Updater\$(OutDir)\Whim.Updater\**\*" />
+			<UpdaterDestinationFile
+				Include="@(UpdaterSourceFile->'$(TargetDir)plugins\Whim.Updater\%(RecursiveDir)%(Filename)%(Extension)')" />
+		</ItemGroup>
+		<Copy SourceFiles="@(UpdaterSourceFile)" DestinationFiles="@(UpdaterDestinationFile)"
+			SkipUnchangedFiles="true" />
+		<Copy SourceFiles="$(SolutionDir)src\Whim.Updater\$(OutDir)Whim.Updater.dll"
+			DestinationFolder="$(TargetDir)plugins\Whim.Updater\" SkipUnchangedFiles="true" />
+	</Target>
+	<!-- Whim.Yaml -->
+	<Target Name="CopyYamlAfterBuild" AfterTargets="Build;Publish">
+		<ItemGroup>
+			<YamlSourceFile Include="$(SolutionDir)\src\Whim.Yaml\schema.json" />
+			<YamlDestinationFile
+				Include="@(YamlSourceFile->'$(TargetDir)plugins\Whim.Yaml\%(Filename)%(Extension)')" />
+		</ItemGroup>
+		<Copy SourceFiles="@(YamlSourceFile)" DestinationFiles="@(YamlDestinationFile)"
+			SkipUnchangedFiles="true" />
+		<Copy SourceFiles="$(SolutionDir)src\Whim.Yaml\$(OutDir)Whim.Yaml.dll"
+			DestinationFolder="$(TargetDir)plugins\Whim.Yaml\" SkipUnchangedFiles="true" />
+	</Target>
+
+	<ItemGroup>
+		<_DeploymentManifestIconFile Remove="Assets\Icon.ico" />
+	</ItemGroup>
 </Project>

@@ -361,3 +361,6 @@ bin/whim-install.exe
 # docfx
 api
 _site
+
+# Whim.Yaml generated files
+src/Whim.Yaml/Generated/
