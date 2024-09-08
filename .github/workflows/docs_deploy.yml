@@ -51,6 +51,10 @@ jobs:
         env:
           Configuration: ${{ env.Configuration }}
 
+      - name: Build schema
+        run: |
+          .\scripts\Generate-SourceFromSchema.ps1
+
       - run: dotnet tool update -g docfx
       - run: docfx docs/docfx.json
 
