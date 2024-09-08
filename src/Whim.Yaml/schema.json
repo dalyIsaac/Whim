@@ -20,6 +20,18 @@
           "description": "Whether to treat key modifiers like `LWin` and `RWin` as the same key modifier. Defaults to `true`."
         }
       }
+    },
+
+    "filters": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Filter" },
+      "description": "Filters to apply to windows to determine whether they should be managed by Whim"
+    },
+
+    "routers": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Router" },
+      "description": "Routers to determine which workspace a window should be placed in"
     }
   },
 
@@ -36,6 +48,36 @@
         "keybind": {
           "type": "string",
           "description": "The keybind to trigger the command. For more, see https://dalyisaac.github.io/Whim/docs/customize/keybinds.html"
+        }
+      }
+    },
+
+    "Filter": {
+      "type": "object",
+      "required": ["type", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": ["windowClass", "processFileName", "title", "titleMatch"],
+          "description": "The type of filter to apply. For more, see https://dalyisaac.github.io/Whim/docs/customize/filtering.html"
+        },
+        "value": { "type": "string", "description": "The value to filter by" }
+      }
+    },
+
+    "Router": {
+      "type": "object",
+      "required": ["type", "value", "workspace"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": ["windowClass", "processFileName", "title", "titleMatch"],
+          "description": "The type of router to apply. For more, see https://dalyisaac.github.io/Whim/docs/customize/routing.html"
+        },
+        "value": { "type": "string", "description": "The value to route by" },
+        "workspace": {
+          "type": "string",
+          "description": "The workspace to route to"
         }
       }
     }
