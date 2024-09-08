@@ -17,7 +17,8 @@
 
         "unify_key_modifiers": {
           "type": "boolean",
-          "description": "Whether to treat key modifiers like `LWin` and `RWin` as the same key modifier. Defaults to `true`."
+          "description": "Whether to treat key modifiers like `LWin` and `RWin` as the same key modifier. Defaults to `true`.",
+          "default": true
         }
       }
     },
@@ -66,17 +67,17 @@
 
     "Filter": {
       "type": "object",
-      "required": ["type", "value"],
+      "required": ["filter_type", "value"],
       "additionalProperties": false,
       "properties": {
         "filter_type": {
           "anyOf": [
             {
-              "const": "windowClass",
+              "const": "window_class",
               "description": "Ignores windows with the specified window class"
             },
             {
-              "const": "processFileName",
+              "const": "process_file_name",
               "description": "Ignores windows with the specified process file name"
             },
             {
@@ -84,7 +85,7 @@
               "description": "Ignores windows with the specified title"
             },
             {
-              "const": "titleMatch",
+              "const": "title_match",
               "description": "Ignores windows with a title that matches the specified regex"
             }
           ]
@@ -98,17 +99,17 @@
 
     "Router": {
       "type": "object",
-      "required": ["type", "value", "workspace"],
+      "required": ["router_type", "value", "workspace"],
       "additionalProperties": false,
       "properties": {
         "router_type": {
           "anyOf": [
             {
-              "const": "windowClass",
+              "const": "window_class",
               "description": "Routes windows with the specified window class to the specified workspace"
             },
             {
-              "const": "processFileName",
+              "const": "process_file_name",
               "description": "Routes windows with the specified process file name to the specified workspace"
             },
             {
@@ -116,7 +117,7 @@
               "description": "Routes windows with the specified title to the specified workspace"
             },
             {
-              "const": "titleMatch",
+              "const": "title_match",
               "description": "Routes windows with a title that matches the specified regex to the specified workspace"
             }
           ]
@@ -144,7 +145,7 @@
           "description": "Routes windows to the workspace which last received an event sent by Windows which Whim did not ignore."
         }
       ],
-      "default": "routeToLaunchedWorkspace",
+      "default": "route_to_launched_workspace",
       "description": "The behavior to use when routing windows to workspaces"
     }
   }

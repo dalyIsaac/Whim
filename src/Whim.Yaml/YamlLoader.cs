@@ -101,22 +101,22 @@ public static class YamlLoader
 
 		foreach (var filter in schema.Filters.Entries)
 		{
-			switch ((string)filter.Type)
+			switch ((string)filter.FilterType)
 			{
-				case "windowClass":
+				case "window_class":
 					ctx.FilterManager.AddWindowClassFilter((string)filter.Value);
 					break;
-				case "processFileName":
+				case "process_file_name":
 					ctx.FilterManager.AddProcessFileNameFilter((string)filter.Value);
 					break;
 				case "title":
 					ctx.FilterManager.AddTitleFilter((string)filter.Value);
 					break;
-				case "titleMatch":
+				case "title_match":
 					ctx.FilterManager.AddTitleMatchFilter((string)filter.Value);
 					break;
 				default:
-					Logger.Error($"Invalid filter type: {filter.Type}");
+					Logger.Error($"Invalid filter type: {filter.FilterType}");
 					break;
 			}
 		}
@@ -129,29 +129,32 @@ public static class YamlLoader
 			return;
 		}
 
-		if (schema.Routers.RoutingBehavior.TryGetEnum(out RoutingBehavior routingBehavior))
+		if (
+			schema.Routers.RoutingBehavior.TryGetString(out string? routingBehavior)
+			&& Enum.TryParse(routingBehavior, out RouterOptions routerOptions)
+		)
 		{
-			ctx.RouterManager.RoutingBehavior = routingBehavior;
+			ctx.RouterManager.RouterOptions = routerOptions;
 		}
 
 		foreach (var router in schema.Routers.Entries)
 		{
-			switch ((string)router.Type)
+			switch ((string)router.RouterType)
 			{
-				case "windowClass":
+				case "window_class":
 					ctx.RouterManager.AddWindowClassRoute((string)router.Value, (string)router.Workspace);
 					break;
-				case "processFileName":
+				case "process_file_name":
 					ctx.RouterManager.AddProcessFileNameRoute((string)router.Value, (string)router.Workspace);
 					break;
 				case "title":
 					ctx.RouterManager.AddTitleRoute((string)router.Value, (string)router.Workspace);
 					break;
-				case "titleMatch":
+				case "title_match":
 					ctx.RouterManager.AddTitleMatchRoute((string)router.Value, (string)router.Workspace);
 					break;
 				default:
-					Logger.Error($"Invalid router type: {router.Type}");
+					Logger.Error($"Invalid router type: {router.RouterType}");
 					break;
 			}
 		}

@@ -12,46 +12,49 @@ public class YamlLoader_UpdateRoutersTests
 			{
 				"""
 					routers:
-					  - type: windowClass
-					    value: "class1"
-					    workspace: "workspace1"
-					  - type: processFileName
-					    value: "process1"
-					    workspace: "workspace2"
-					  - type: title
-					    value: "title1"
-					    workspace: "workspace3"
-					  - type: titleMatch
-					    value: "titleMatch1"
-					    workspace: "workspace4"
+					  entries:
+					  - router_type: window_class
+					    value: class1
+					    workspace: workspace1
+					  - router_type: process_file_name
+					    value: process1
+					    workspace: workspace2
+					  - router_type: title
+					    value: title1
+					    workspace: workspace3
+					  - router_type: title_match
+					    value: titleMatch1
+					    workspace: workspace4
 					""",
 				true
 			},
 			{
 				"""
 					{
-						"routers": [
-							{
-								"type": "windowClass",
-								"value": "class1",
-								"workspace": "workspace1"
-							},
-							{
-								"type": "processFileName",
-								"value": "process1",
-								"workspace": "workspace2"
-							},
-							{
-								"type": "title",
-								"value": "title1",
-								"workspace": "workspace3"
-							},
-							{
-								"type": "titleMatch",
-								"value": "titleMatch1",
-								"workspace": "workspace4"
-							}
-						]
+						"routers": {
+							"entries": [
+								{
+									"router_type": "window_class",
+									"value": "class1",
+									"workspace": "workspace1"
+								},
+								{
+									"router_type": "process_file_name",
+									"value": "process1",
+									"workspace": "workspace2"
+								},
+								{
+									"router_type": "title",
+									"value": "title1",
+									"workspace": "workspace3"
+								},
+								{
+									"router_type": "title_match",
+									"value": "titleMatch1",
+									"workspace": "workspace4"
+								}
+							]
+						}
 					}
 					""",
 				false
@@ -82,22 +85,25 @@ public class YamlLoader_UpdateRoutersTests
 			{
 				"""
 					routers:
-					  - type: invalid
-					    value: "class1"
-					    workspace: "workspace1"
+					  entries:
+					  - router_type: invalid
+					    value: class1
+					    workspace: workspace1
 					""",
 				true
 			},
 			{
 				"""
 					{
-						"routers": [
-							{
-								"type": "invalid",
-								"value": "class1",
-								"workspace": "workspace1"
-							}
-						]
+						"routers": {
+							"entries": [
+								{
+									"router_type": "invalid",
+									"value": "class1",
+									"workspace": "workspace1"
+								}
+							]
+						}
 					}
 					""",
 				false

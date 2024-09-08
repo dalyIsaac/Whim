@@ -12,38 +12,41 @@ public class YamlLoader_UpdateFiltersTests
 			{
 				"""
 					filters:
-					  - type: windowClass
-					    value: "class1"
-					  - type: processFileName
-					    value: "process1"
-					  - type: title
-					    value: "title1"
-					  - type: titleMatch
-					    value: "titleMatch1"
+					  entries:
+					  - filter_type: window_class
+					    value: class1
+					  - filter_type: process_file_name
+					    value: process1
+					  - filter_type: title
+					    value: title1
+					  - filter_type: title_match
+					    value: titleMatch1
 					""",
 				true
 			},
 			{
 				"""
 					{
-						"filters": [
-							{
-								"type": "windowClass",
-								"value": "class1"
-							},
-							{
-								"type": "processFileName",
-								"value": "process1"
-							},
-							{
-								"type": "title",
-								"value": "title1"
-							},
-							{
-								"type": "titleMatch",
-								"value": "titleMatch1"
-							}
-						]
+						"filters": {
+							"entries": [
+								{
+									"filter_type": "window_class",
+									"value": "class1"
+								},
+								{
+									"filter_type": "process_file_name",
+									"value": "process1"
+								},
+								{
+									"filter_type": "title",
+									"value": "title1"
+								},
+								{
+									"filter_type": "title_match",
+									"value": "titleMatch1"
+								}
+							]
+						}
 					}
 					""",
 				false
@@ -74,14 +77,16 @@ public class YamlLoader_UpdateFiltersTests
 			{
 				"""
 					filters:
-					  - type: invalid
-					    value: "class1"
+					  entries:
+					  - filter_type: invalid
+					    value: class1
 					""",
 				true
 			},
 			{
 				"""
 					filters:
+					  entries:
 					  - type: windowClass
 					    value: false
 					""",
@@ -90,12 +95,14 @@ public class YamlLoader_UpdateFiltersTests
 			{
 				"""
 					{
-						"filters": [
-							{
-								"type": "invalid",
-								"value": "class1"
-							}
-						]
+						"filters": {
+							"entries": [
+								{
+									"filter_type": "invalid",
+									"value": "class1"
+								}
+							]
+						}
 					}
 					""",
 				false
