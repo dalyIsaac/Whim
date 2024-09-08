@@ -81,7 +81,6 @@ To treat key modifiers like `LWin` and `RWin` the same, set `unify_key_modifiers
 ### Keybinds Example
 
 ```yaml
-# yaml-language-server: $schema=https://raw.githubusercontent.com/dalyIsaac/Whim/main/src/Whim.Yaml/schema.json
 keybinds:
   entries:
     - command: whim.core.focus_next_monitor
@@ -106,4 +105,136 @@ keybinds:
       keybind: Win+LCtrl+Q
 
   unify_key_modifiers: true
+```
+
+## Filters
+
+By default, Whim ignores a built-in list of windows that are known to cause problems with dynamic tiling window manager. Behind the scenes, Whim automatically updates the built-in list of ignored windows based on a subset of the rules from the community-driven [collection of application rules](https://github.com/LGUG2Z/komorebi-application-specific-configuration) managed by komorebi.
+
+### Custom Filtering Behavior
+
+The filters configuration tells Whim to ignore windows that match the specified criteria.
+
+You can filter windows by:
+
+- `window_class`
+- `process_file_name`
+- `title`
+- `title_match`
+
+### Window Class Filter
+
+For example, to filter out Chromium windows with the class `Chrome_WidgetWin_1`, add the following to your configuration:
+
+```yaml
+filters:
+  entries:
+    - filter_type: window_class
+      value: Chrome_WidgetWin_1
+```
+
+### Process File Name Filter
+
+For example, to filter out windows with the process file name `explorer.exe`, add the following to your configuration:
+
+```yaml
+filters:
+  entries:
+    - filter_type: process_file_name
+      value: explorer.exe
+```
+
+### Title Filter
+
+For example, to filter out windows with the title `Untitled - Notepad`, add the following to your configuration:
+
+```yaml
+filters:
+  entries:
+    - filter_type: title
+      value: Untitled - Notepad
+```
+
+### Title Match Filter
+
+For example, to filter out windows with the title that matches the regex `^Untitled - Notepad$`, add the following to your configuration:
+
+```yaml
+filters:
+  entries:
+    - filter_type: title_match
+      value: ^Untitled - Notepad$
+```
+
+## Routers
+
+The routers configuration tells Whim to route windows that match the specified criteria to the first workspace with name `workspace`.
+
+### Default Routing Behavior
+
+To customize the default window routing behavior, you can use the `routing_behavior` property. The default routing behavior is `route_to_launched_workspace`.
+
+The available routing behaviors are:
+
+- `route_to_launched_workspace`
+- `route_to_active_workspace`
+- `route_to_last_tracked_active_workspace`
+
+### Custom Routing Behavior
+
+You can also define custom routing behavior by specifying a list of routing entries. Each routing entry has a `router_type`, `value`, and `workspace`.
+
+The available router types are:
+
+- `window_class`
+- `process_file_name`
+- `title`
+- `title_match`
+
+#### Window Class Router
+
+For example, to route Chromium windows with the class `Chrome_WidgetWin_1` to the workspace `web`, add the following to your configuration:
+
+```yaml
+routers:
+  entries:
+    - router_type: window_class
+      value: Chrome_WidgetWin_1
+      workspace: web
+```
+
+#### Process File Name Router
+
+For example, to route windows with the process file name `explorer.exe` to the workspace `file_explorer`, add the following to your configuration:
+
+```yaml
+routers:
+  entries:
+    - router_type: process_file_name
+      value: explorer.exe
+      workspace: file_explorer
+```
+
+#### Title Router
+
+For example, to route windows with the title `Untitled - Notepad` to the workspace `notepad`, add the following to your configuration:
+
+```yaml
+routers:
+  entries:
+    - router_type: title
+      value: Untitled - Notepad
+      workspace: notepad
+```
+
+#### Title Match Router
+
+For example, to route windows with the title that matches the regex `^Untitled - Notepad$` to the workspace `notepad`, add the following to your configuration:
+
+```yaml
+routers:
+  entries:
+    - router_type: title_match
+      value: ^Untitled - Notepad$
+      workspace: notepad
 ```

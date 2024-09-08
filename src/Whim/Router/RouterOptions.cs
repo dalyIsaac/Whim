@@ -18,7 +18,7 @@ public enum RouterOptions
 	/// <br/>
 	///
 	/// For example, launching an app from the taskbar on Windows 11 will cause <c>Shell_TrayWnd</c>
-	/// to focus on the main monitor, overriding the <see cref="IMonitorManager.ActiveMonitor"/>.
+	/// to focus on the main monitor, overriding the <see cref="IMonitorSector.ActiveMonitorHandle"/>.
 	/// As a result, the window will be routed to the workspace on the main monitor.
 	/// </summary>
 	RouteToActiveWorkspace,

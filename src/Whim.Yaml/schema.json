@@ -43,7 +43,10 @@
           "description": "Routers to determine which workspace a window should be placed in"
         },
 
-        "routing_behavior": { "$ref": "#/$defs/RoutingBehavior" }
+        "routing_behavior": {
+          "$ref": "#/$defs/RoutingBehavior",
+          "description": "The behavior to use when routing windows to workspaces"
+        }
       }
     }
   },
@@ -134,19 +137,18 @@
       "anyOf": [
         {
           "const": "route_to_launched_workspace",
-          "description": "Routes windows to the active workspace."
+          "description": "Routes windows to the workspace that the window was launched on by Windows."
         },
         {
           "const": "route_to_active_workspace",
-          "description": "Routes windows to the active workspace."
+          "description": "Routes windows to the workspace which last received an event sent by Windows."
         },
         {
           "const": "route_to_last_tracked_active_workspace",
           "description": "Routes windows to the workspace which last received an event sent by Windows which Whim did not ignore."
         }
       ],
-      "default": "route_to_launched_workspace",
-      "description": "The behavior to use when routing windows to workspaces"
+      "default": "route_to_launched_workspace"
     }
   }
 }
