@@ -29,7 +29,7 @@ internal class RouterManager(IContext context) : IRouterManager
 		{
 			if (window.ProcessFileName?.ToLower() == processFileName)
 			{
-				return _context.WorkspaceManager.TryGet(workspaceName);
+				return _context.Store.Pick(PickWorkspaceByName(workspaceName)).ValueOrDefault;
 			}
 			return null;
 		});
@@ -59,7 +59,7 @@ internal class RouterManager(IContext context) : IRouterManager
 		{
 			if (window.Title.Equals(title, StringComparison.CurrentCultureIgnoreCase))
 			{
-				return _context.WorkspaceManager.TryGet(workspaceName);
+				return _context.Store.Pick(PickWorkspaceByName(workspaceName)).ValueOrDefault;
 			}
 			return null;
 		});
@@ -89,7 +89,7 @@ internal class RouterManager(IContext context) : IRouterManager
 		{
 			if (regex.IsMatch(window.Title))
 			{
-				return _context.WorkspaceManager.TryGet(workspaceName);
+				return _context.Store.Pick(PickWorkspaceByName(workspaceName)).ValueOrDefault;
 			}
 			return null;
 		});
@@ -136,7 +136,7 @@ internal class RouterManager(IContext context) : IRouterManager
 		{
 			if (window.WindowClass.Equals(windowClass, StringComparison.CurrentCultureIgnoreCase))
 			{
-				return _context.WorkspaceManager.TryGet(workspaceName);
+				return _context.Store.Pick(PickWorkspaceByName(workspaceName)).ValueOrDefault;
 			}
 			return null;
 		});
