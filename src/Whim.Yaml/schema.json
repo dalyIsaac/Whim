@@ -17,7 +17,35 @@
 
         "unify_key_modifiers": {
           "type": "boolean",
-          "description": "Whether to treat key modifiers like `LWin` and `RWin` as the same key modifier. Defaults to `true`."
+          "description": "Whether to treat key modifiers like `LWin` and `RWin` as the same key modifier. Defaults to `true`.",
+          "default": true
+        }
+      }
+    },
+
+    "filters": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Filter" },
+          "description": "Filters to apply to windows to determine whether they should be managed by Whim"
+        }
+      }
+    },
+
+    "routers": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Router" },
+          "description": "Routers to determine which workspace a window should be placed in"
+        },
+
+        "routing_behavior": {
+          "$ref": "#/$defs/RoutingBehavior",
+          "description": "The behavior to use when routing windows to workspaces"
         }
       }
     }
@@ -38,6 +66,89 @@
           "description": "The keybind to trigger the command. For more, see https://dalyisaac.github.io/Whim/docs/customize/keybinds.html"
         }
       }
+    },
+
+    "Filter": {
+      "type": "object",
+      "required": ["filter_type", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "filter_type": {
+          "anyOf": [
+            {
+              "const": "window_class",
+              "description": "Ignores windows with the specified window class"
+            },
+            {
+              "const": "process_file_name",
+              "description": "Ignores windows with the specified process file name"
+            },
+            {
+              "const": "title",
+              "description": "Ignores windows with the specified title"
+            },
+            {
+              "const": "title_regex",
+              "description": "Ignores windows with a title that matches the specified regex"
+            }
+          ]
+        },
+        "value": {
+          "type": "string",
+          "description": "The value to filter by"
+        }
+      }
+    },
+
+    "Router": {
+      "type": "object",
+      "required": ["router_type", "value", "workspace_name"],
+      "additionalProperties": false,
+      "properties": {
+        "router_type": {
+          "anyOf": [
+            {
+              "const": "window_class",
+              "description": "Routes windows with the specified window class to the specified workspace"
+            },
+            {
+              "const": "process_file_name",
+              "description": "Routes windows with the specified process file name to the specified workspace"
+            },
+            {
+              "const": "title",
+              "description": "Routes windows with the specified title to the specified workspace"
+            },
+            {
+              "const": "title_regex",
+              "description": "Routes windows with a title that matches the specified regex to the specified workspace"
+            }
+          ]
+        },
+        "value": { "type": "string", "description": "The value to route by" },
+        "workspace_name": {
+          "type": "string",
+          "description": "The workspace to route to"
+        }
+      }
+    },
+
+    "RoutingBehavior": {
+      "anyOf": [
+        {
+          "const": "route_to_launched_workspace",
+          "description": "Routes windows to the workspace that the window was launched on by Windows."
+        },
+        {
+          "const": "route_to_active_workspace",
+          "description": "Routes windows to the workspace which last received an event sent by Windows."
+        },
+        {
+          "const": "route_to_last_tracked_active_workspace",
+          "description": "Routes windows to the workspace which last received an event sent by Windows which Whim did not ignore."
+        }
+      ],
+      "default": "route_to_launched_workspace"
     }
   }
 }

@@ -93,4 +93,18 @@ public class YamlLoaderTests
 		Assert.False(result);
 		ctx.KeybindManager.DidNotReceive().SetKeybind(Arg.Any<string>(), Arg.Any<IKeybind>());
 	}
+
+	[Theory]
+	[InlineData("route_to_launched_workspace", "RouteToLaunchedWorkspace")]
+	[InlineData("route_to_active_workspace", "RouteToActiveWorkspace")]
+	[InlineData(" ", " ")]
+	public void SnakeToPascal(string snake, string expected)
+	{
+		// Given a snake case string
+		// When converting it to Pascal case
+		string result = snake.SnakeToPascal();
+
+		// Then the string is converted to camel case
+		Assert.Equal(expected, result);
+	}
 }

@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Corvus.Json;
@@ -19,7 +20,7 @@ public static class YamlLoader
 	/// </summary>
 	/// <param name="ctx">The <see cref="IContext"/> to operate on.</param>
 	/// <returns>
-	/// <see langword="true"/> if the configuration was loaded successfully; otherwise, <see langword="false"/>.
+	/// <see langword="true"/> if the configuration was parsed successfully; otherwise, <see langword="false"/>.
 	/// </returns>
 	public static bool Load(IContext ctx)
 	{
@@ -29,6 +30,8 @@ public static class YamlLoader
 		}
 
 		UpdateKeybinds(ctx, schema);
+		UpdateFilters(ctx, schema);
+		UpdateRouters(ctx, schema);
 		return true;
 	}
 
@@ -88,5 +91,97 @@ public static class YamlLoader
 
 			ctx.KeybindManager.SetKeybind((string)pair.Command, keybind);
 		}
+	}
+
+	private static void UpdateFilters(IContext ctx, Schema schema)
+	{
+		if (!schema.Filters.IsValid() || schema.Filters.Entries.AsOptional() is not { } entries)
+		{
+			return;
+		}
+
+		foreach (var filter in entries)
+		{
+			string value = (string)filter.Value;
+
+			switch ((string)filter.FilterType)
+			{
+				case "window_class":
+					ctx.FilterManager.AddWindowClassFilter(value);
+					break;
+				case "process_file_name":
+					ctx.FilterManager.AddProcessFileNameFilter(value);
+					break;
+				case "title":
+					ctx.FilterManager.AddTitleFilter(value);
+					break;
+				case "title_regex":
+					ctx.FilterManager.AddTitleMatchFilter(value);
+					break;
+				default:
+					Logger.Error($"Invalid filter type: {filter.FilterType}");
+					break;
+			}
+		}
+	}
+
+	private static void UpdateRouters(IContext ctx, Schema schema)
+	{
+		if (!schema.Routers.IsValid())
+		{
+			return;
+		}
+
+		if (
+			schema.Routers.RoutingBehavior.TryGetString(out string? routingBehavior)
+			&& Enum.TryParse(routingBehavior?.SnakeToPascal(), out RouterOptions routerOptions)
+		)
+		{
+			ctx.RouterManager.RouterOptions = routerOptions;
+		}
+
+		if (schema.Routers.Entries.AsOptional() is not { } entries)
+		{
+			return;
+		}
+
+		foreach (var router in entries)
+		{
+			string value = (string)router.Value;
+			string workspaceName = (string)router.WorkspaceName;
+
+			switch ((string)router.RouterType)
+			{
+				case "window_class":
+					ctx.RouterManager.AddWindowClassRoute(value, workspaceName);
+					break;
+				case "process_file_name":
+					ctx.RouterManager.AddProcessFileNameRoute(value, workspaceName);
+					break;
+				case "title":
+					ctx.RouterManager.AddTitleRoute(value, workspaceName);
+					break;
+				case "title_regex":
+					ctx.RouterManager.AddTitleMatchRoute(value, workspaceName);
+					break;
+				default:
+					Logger.Error($"Invalid router type: {router.RouterType}");
+					break;
+			}
+		}
+	}
+
+	internal static string SnakeToPascal(this string snake)
+	{
+		string[] parts = snake.Split('_');
+		StringBuilder builder = new(snake.Length);
+
+		foreach (string part in parts)
+		{
+			builder.Append(char.ToUpper(part[0]));
+			builder.Append(part.AsSpan(1));
+		}
+
+		return builder.ToString();
 	}
 }
