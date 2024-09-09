@@ -20,7 +20,6 @@ public class RouterManagerCustomization : StoreCustomization
 			BackingName = "Test",
 		};
 		fixture.Inject(workspace);
-
 		AddWorkspaceToManager(_ctx, _store._root.MutableRootSector, workspace);
 
 		// Setup window
@@ -176,7 +175,6 @@ public class RouterManagerTests
 	internal void CustomRouter(RouterManager routerManager, IWindow window, Workspace workspace)
 	{
 		// Given
-
 		routerManager.Add((w) => w.WindowClass == "Not Test" ? Substitute.For<IWorkspace>() : null);
 
 		// When
