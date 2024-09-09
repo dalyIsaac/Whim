@@ -19,7 +19,7 @@ public class YamlLoader_UpdateFiltersTests
 					    value: process1
 					  - filter_type: title
 					    value: title1
-					  - filter_type: title_match
+					  - filter_type: title_regex
 					    value: titleMatch1
 					""",
 				true
@@ -42,7 +42,7 @@ public class YamlLoader_UpdateFiltersTests
 									"value": "title1"
 								},
 								{
-									"filter_type": "title_match",
+									"filter_type": "title_regex",
 									"value": "titleMatch1"
 								}
 							]

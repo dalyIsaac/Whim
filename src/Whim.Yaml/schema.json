@@ -88,7 +88,7 @@
               "description": "Ignores windows with the specified title"
             },
             {
-              "const": "title_match",
+              "const": "title_regex",
               "description": "Ignores windows with a title that matches the specified regex"
             }
           ]
@@ -120,7 +120,7 @@
               "description": "Routes windows with the specified title to the specified workspace"
             },
             {
-              "const": "title_match",
+              "const": "title_regex",
               "description": "Routes windows with a title that matches the specified regex to the specified workspace"
             }
           ]

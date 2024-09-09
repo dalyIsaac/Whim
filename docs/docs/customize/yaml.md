@@ -120,7 +120,7 @@ You can filter windows by:
 - `window_class`
 - `process_file_name`
 - `title`
-- `title_match`
+- `title_regex`
 
 ### Window Class Filter
 
@@ -162,7 +162,7 @@ For example, to filter out windows with the title that matches the regex `^Untit
 ```yaml
 filters:
   entries:
-    - filter_type: title_match
+    - filter_type: title_regex
       value: ^Untitled - Notepad$
 ```
 
@@ -189,7 +189,7 @@ The available router types are:
 - `window_class`
 - `process_file_name`
 - `title`
-- `title_match`
+- `title_regex`
 
 #### Window Class Router
 
@@ -234,7 +234,7 @@ For example, to route windows with the title that matches the regex `^Untitled -
 ```yaml
 routers:
   entries:
-    - router_type: title_match
+    - router_type: title_regex
       value: ^Untitled - Notepad$
       workspace_name: notepad
 ```

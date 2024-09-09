@@ -22,7 +22,7 @@ public class YamlLoader_UpdateRoutersTests
 					  - router_type: title
 					    value: title1
 					    workspace_name: workspace3
-					  - router_type: title_match
+					  - router_type: title_regex
 					    value: titleMatch1
 					    workspace_name: workspace4
 					""",
@@ -49,7 +49,7 @@ public class YamlLoader_UpdateRoutersTests
 									"workspace_name": "workspace3"
 								},
 								{
-									"router_type": "title_match",
+									"router_type": "title_regex",
 									"value": "titleMatch1",
 									"workspace_name": "workspace4"
 								}

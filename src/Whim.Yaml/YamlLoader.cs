@@ -115,7 +115,7 @@ public static class YamlLoader
 				case "title":
 					ctx.FilterManager.AddTitleFilter(value);
 					break;
-				case "title_match":
+				case "title_regex":
 					ctx.FilterManager.AddTitleMatchFilter(value);
 					break;
 				default:
@@ -161,7 +161,7 @@ public static class YamlLoader
 				case "title":
 					ctx.RouterManager.AddTitleRoute(value, workspaceName);
 					break;
-				case "title_match":
+				case "title_regex":
 					ctx.RouterManager.AddTitleMatchRoute(value, workspaceName);
 					break;
 				default:
