@@ -30,6 +30,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Whim.Gaps\Whim.Gaps.csproj" />
 		<ProjectReference Include="..\Whim\Whim.csproj" />
 	</ItemGroup>
 
@@ -45,9 +46,7 @@
 	</ItemGroup>
 
 	<Target Name="GenerateSchema" BeforeTargets="BeforeCompile">
-		<Exec
-			Command="powershell.exe -NonInteractive -ExecutionPolicy Unrestricted .\scripts\Generate-SourceFromSchema.ps1"
-			WorkingDirectory="..\..\" ConsoleToMsBuild="true">
+		<Exec Command="powershell.exe -NonInteractive -ExecutionPolicy Unrestricted .\scripts\Generate-SourceFromSchema.ps1" WorkingDirectory="..\..\" ConsoleToMsBuild="true">
 			<Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
 		</Exec>
 	</Target>
