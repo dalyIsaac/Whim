@@ -53,10 +53,9 @@
     "plugins": {
       "type": "object",
       "properties": {
-        "entries": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/Plugin" },
-          "description": "Configuration for plugins"
+        "gaps": {
+          "$ref": "#/$defs/GapsPlugin",
+          "description": "Plugin to add gaps between windows"
         }
       }
     }
@@ -163,7 +162,7 @@
     },
 
     "Plugin": {
-      "oneOf": [{ "$ref": "#/$defs/GapsPlugin" }]
+      "anyOf": [{ "$ref": "#/$defs/GapsPlugin" }]
     },
 
     "GapsPlugin": {
@@ -172,32 +171,28 @@
       "required": ["type"],
       "additionalProperties": false,
       "properties": {
-        "type": {
-          "const": "GapsPlugin",
-          "description": "The unique identifier of this GapsPlugin"
-        },
         "is_enabled": {
           "type": "boolean",
           "description": "Whether the plugin is enabled",
           "default": true
         },
         "outer_gap": {
-          "type": "number",
+          "type": "integer",
           "description": "The gap between the parent layout engine and the area where windows are placed",
           "default": 10
         },
         "inner_gap": {
-          "type": "number",
+          "type": "integer",
           "description": "The gap between windows",
           "default": 10
         },
         "default_outer_delta": {
-          "type": "number",
+          "type": "integer",
           "description": "The default outer gap used by commands `gaps.outer.increase` and `gaps.outer.decrease`",
           "default": 2
         },
         "default_inner_delta": {
-          "type": "number",
+          "type": "integer",
           "description": "The default inner gap used by commands `gaps.inner.increase` and `gaps.inner.decrease`",
           "default": 2
         }
