@@ -168,7 +168,6 @@
     "GapsPlugin": {
       "type": "object",
       "description": "Plugin to add gaps between windows. For more, see https://dalyisaac.github.io/Whim/docs/plugins/gaps.html",
-      "required": ["type"],
       "additionalProperties": false,
       "properties": {
         "is_enabled": {

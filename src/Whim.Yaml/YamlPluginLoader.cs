@@ -3,7 +3,10 @@ using Whim.Gaps;
 
 namespace Whim.Yaml;
 
-public static class YamlPluginLoader
+/// <summary>
+/// Loads plugins from the YAML configuration.
+/// </summary>
+internal static class YamlPluginLoader
 {
 	public static void LoadPlugins(IContext ctx, Schema schema)
 	{

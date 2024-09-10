@@ -57,8 +57,7 @@ public class YamlLoader_UpdateFiltersTests
 	public void Load_Filters(string config, bool isYaml, IContext ctx)
 	{
 		// Given a valid config with filters set
-		ctx.FileManager.FileExists(Arg.Is<string>(s => s.EndsWith(isYaml ? "yaml" : "json"))).Returns(true);
-		ctx.FileManager.ReadAllText(Arg.Any<string>()).Returns(config);
+		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the config
 		bool result = YamlLoader.Load(ctx);
@@ -122,8 +121,7 @@ public class YamlLoader_UpdateFiltersTests
 	public void Load_InvalidFilters(string config, bool isYaml, IContext ctx)
 	{
 		// Given an invalid config with filters set
-		ctx.FileManager.FileExists(Arg.Is<string>(s => s.EndsWith(isYaml ? "yaml" : "json"))).Returns(true);
-		ctx.FileManager.ReadAllText(Arg.Any<string>()).Returns(config);
+		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the config
 		bool result = YamlLoader.Load(ctx);

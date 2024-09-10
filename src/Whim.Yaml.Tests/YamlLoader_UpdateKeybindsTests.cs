@@ -52,8 +52,7 @@ public class YamlLoader_UpdateKeybindsTests
 	public void Load_Keybinds(string config, bool isYaml, IContext ctx)
 	{
 		// Given a valid config with keybinds set
-		ctx.FileManager.FileExists(Arg.Is<string>(s => s.EndsWith(isYaml ? "yaml" : "json"))).Returns(true);
-		ctx.FileManager.ReadAllText(Arg.Any<string>()).Returns(config);
+		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the config
 		bool result = YamlLoader.Load(ctx);
@@ -155,8 +154,7 @@ public class YamlLoader_UpdateKeybindsTests
 	public void Load_InvalidKeybinds(string config, bool isYaml, IContext ctx)
 	{
 		// Given an invalid config with keybinds set
-		ctx.FileManager.FileExists(Arg.Is<string>(s => s.EndsWith(isYaml ? "yaml" : "json"))).Returns(true);
-		ctx.FileManager.ReadAllText(Arg.Any<string>()).Returns(config);
+		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the config
 		bool result = YamlLoader.Load(ctx);
@@ -209,8 +207,7 @@ public class YamlLoader_UpdateKeybindsTests
 	public void Load_UnifyKeyModifiers(string config, bool isYaml, IContext ctx)
 	{
 		// Given a valid config with unifyKeyModifiers set
-		ctx.FileManager.FileExists(Arg.Is<string>(s => s.EndsWith(isYaml ? "yaml" : "json"))).Returns(true);
-		ctx.FileManager.ReadAllText(Arg.Any<string>()).Returns(config);
+		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the config
 		bool result = YamlLoader.Load(ctx);

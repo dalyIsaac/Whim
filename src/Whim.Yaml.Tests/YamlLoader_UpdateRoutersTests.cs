@@ -65,8 +65,7 @@ public class YamlLoader_UpdateRoutersTests
 	public void Load_Routers(string config, bool isYaml, IContext ctx)
 	{
 		// Given a valid config with routers set
-		ctx.FileManager.FileExists(Arg.Is<string>(s => s.EndsWith(isYaml ? "yaml" : "json"))).Returns(true);
-		ctx.FileManager.ReadAllText(Arg.Any<string>()).Returns(config);
+		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the config
 		bool result = YamlLoader.Load(ctx);
@@ -114,8 +113,7 @@ public class YamlLoader_UpdateRoutersTests
 	public void Load_InvalidRouters(string config, bool isYaml, IContext ctx)
 	{
 		// Given an invalid config with routers set
-		ctx.FileManager.FileExists(Arg.Is<string>(s => s.EndsWith(isYaml ? "yaml" : "json"))).Returns(true);
-		ctx.FileManager.ReadAllText(Arg.Any<string>()).Returns(config);
+		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the config
 		bool result = YamlLoader.Load(ctx);
