@@ -32,6 +32,8 @@ public static class YamlLoader
 		UpdateKeybinds(ctx, schema);
 		UpdateFilters(ctx, schema);
 		UpdateRouters(ctx, schema);
+
+		YamlPluginLoader.LoadPlugins(ctx, schema);
 		return true;
 	}
 
@@ -68,6 +70,7 @@ public static class YamlLoader
 	{
 		if (!schema.Keybinds.IsValid())
 		{
+			Logger.Debug("Keybinds plugin is not valid.");
 			return;
 		}
 
@@ -78,6 +81,7 @@ public static class YamlLoader
 
 		if (schema.Keybinds.Entries.AsOptional() is not { } entries)
 		{
+			Logger.Debug("No keybinds found.");
 			return;
 		}
 
@@ -95,8 +99,15 @@ public static class YamlLoader
 
 	private static void UpdateFilters(IContext ctx, Schema schema)
 	{
-		if (!schema.Filters.IsValid() || schema.Filters.Entries.AsOptional() is not { } entries)
+		if (!schema.Filters.IsValid())
 		{
+			Logger.Debug("Filters plugin is not valid.");
+			return;
+		}
+
+		if (schema.Filters.Entries.AsOptional() is not { } entries)
+		{
+			Logger.Debug("No filters found.");
 			return;
 		}
 
@@ -129,6 +140,7 @@ public static class YamlLoader
 	{
 		if (!schema.Routers.IsValid())
 		{
+			Logger.Debug("Routers plugin is not valid.");
 			return;
 		}
 
