@@ -273,7 +273,7 @@ internal static class DefaultFilteredWindowsKomorebi
 		filterManager.Add((window) => (window.Title.StartsWith("Hotkey sink") || window.Title.EndsWith("Hotkey sink")));
 
 		// Zebar
-		filterManager.AddProcessFileNameFilter("Zebar.exe");
+		filterManager.AddProcessFileNameFilter("zebar.exe");
 
 		// Zoom
 		filterManager.AddProcessFileNameFilter("Zoom.exe");
