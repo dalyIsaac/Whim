@@ -289,5 +289,9 @@ internal static class DefaultFilteredWindowsKomorebi
 
 		// ueli
 		filterManager.AddProcessFileNameFilter("ueli.exe");
+
+		// visio
+		filterManager.AddWindowClassFilter("VISIOS");
+		filterManager.AddWindowClassFilter("VISIOQ");
 	}
 }
