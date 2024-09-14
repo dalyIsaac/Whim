@@ -292,6 +292,29 @@ public class YamlPluginLoader_CommandPalettePluginTests
 				BackdropType.None,
 				true
 			},
+			// YAML, nothing specified
+			{
+				"""
+					plugins:
+					  command_palette: {}
+					""",
+				true,
+				BackdropType.Mica,
+				true
+			},
+			// JSON, nothing specified
+			{
+				"""
+					{
+						"plugins": {
+							"command_palette": {}
+						}
+					}
+					""",
+				false,
+				BackdropType.Mica,
+				true
+			},
 		};
 
 	[Theory]

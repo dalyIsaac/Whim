@@ -192,7 +192,8 @@
               "const": "mica_alt",
               "description": "A Mica variant which looks different to Mica - see <see href='https://learn.microsoft.com/en-us/windows/apps/design/style/mica'/>. Unsupported on Windows 10 - Whim will fall back to Acrylic."
             }
-          ]
+          ],
+          "default": "mica"
         },
         "always_show_backdrop": {
           "type": "boolean",

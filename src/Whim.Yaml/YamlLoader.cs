@@ -211,7 +211,7 @@ public static class YamlLoader
 
 	internal static WindowBackdropConfig ParseWindowBackdropConfig(WindowBackdropConfigEntity entity)
 	{
-		BackdropType backdropType = BackdropType.None;
+		BackdropType backdropType = BackdropType.Mica;
 		bool alwaysShowBackdrop = true;
 
 		if (entity.BackdropType.AsOptional() is { } backdropTypeStr)
