@@ -177,19 +177,19 @@
               "description": "No backdrop"
             },
             {
-              "const": "Acrylic",
+              "const": "acrylic",
               "description": "Acrylic backdrop - see <see href='https://learn.microsoft.com/en-us/windows/apps/design/style/acrylic'/>."
             },
             {
-              "const": "AcrylicThin",
+              "const": "acrylic_thin",
               "description": "A more transparent Acrylic backdrop - based on the Acrylic backdrop."
             },
             {
-              "const": "Mica",
+              "const": "mica",
               "description": "Mica backdrop - see <see href='https://learn.microsoft.com/en-us/windows/apps/design/style/mica'/>. Unsupported on Windows 10 - Whim will fall back to Acrylic."
             },
             {
-              "const": "MicaAlt",
+              "const": "mica_alt",
               "description": "A Mica variant which looks different to Mica - see <see href='https://learn.microsoft.com/en-us/windows/apps/design/style/mica'/>. Unsupported on Windows 10 - Whim will fall back to Acrylic."
             }
           ]

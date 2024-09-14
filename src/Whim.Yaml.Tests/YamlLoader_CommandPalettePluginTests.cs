@@ -242,7 +242,7 @@ public class YamlPluginLoader_CommandPalettePluginTests
 					""",
 				true,
 				BackdropType.MicaAlt,
-				false
+				true
 			},
 			// JSON, backdrop mica alt, default always show
 			{
@@ -259,7 +259,7 @@ public class YamlPluginLoader_CommandPalettePluginTests
 					""",
 				false,
 				BackdropType.MicaAlt,
-				false
+				true
 			},
 			// YAML, backdrop none, always show
 			{

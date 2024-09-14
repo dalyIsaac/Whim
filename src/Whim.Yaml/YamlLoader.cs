@@ -4,6 +4,7 @@ using System.Text.Json.Nodes;
 using Corvus.Json;
 using Yaml2JsonNode;
 using YamlDotNet.RepresentationModel;
+using static Whim.Yaml.Schema;
 
 namespace Whim.Yaml;
 
@@ -207,4 +208,22 @@ public static class YamlLoader
 			"mica_alt" => BackdropType.MicaAlt,
 			_ => BackdropType.None,
 		};
+
+	internal static WindowBackdropConfig ParseWindowBackdropConfig(WindowBackdropConfigEntity entity)
+	{
+		BackdropType backdropType = BackdropType.None;
+		bool alwaysShowBackdrop = true;
+
+		if (entity.BackdropType.AsOptional() is { } backdropTypeStr)
+		{
+			backdropType = ((string)backdropTypeStr).ParseBackdropType();
+		}
+
+		if (entity.AlwaysShowBackdrop.AsOptional() is { } alwaysShowBackdropValue)
+		{
+			alwaysShowBackdrop = alwaysShowBackdropValue;
+		}
+
+		return new WindowBackdropConfig(backdropType, alwaysShowBackdrop);
+	}
 }
