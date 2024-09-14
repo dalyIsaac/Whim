@@ -30,6 +30,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Whim.CommandPalette\Whim.CommandPalette.csproj" />
 		<ProjectReference Include="..\Whim.Gaps\Whim.Gaps.csproj" />
 		<ProjectReference Include="..\Whim\Whim.csproj" />
 	</ItemGroup>

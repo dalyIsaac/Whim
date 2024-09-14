@@ -196,4 +196,15 @@ public static class YamlLoader
 
 		return builder.ToString();
 	}
+
+	internal static BackdropType ParseBackdropType(this string backdropType) =>
+		backdropType switch
+		{
+			"none" => BackdropType.None,
+			"acrylic" => BackdropType.Acrylic,
+			"acrylic_thin" => BackdropType.AcrylicThin,
+			"mica" => BackdropType.Mica,
+			"mica_alt" => BackdropType.MicaAlt,
+			_ => BackdropType.None,
+		};
 }
