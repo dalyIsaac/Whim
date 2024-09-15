@@ -57,11 +57,40 @@ internal static class YamlLoaderUtils
 	{
 		if (brush.StartsWith(HexColorStart))
 		{
-			byte r = Convert.ToByte(brush.Substring(1, 2), 16);
-			byte g = Convert.ToByte(brush.Substring(3, 2), 16);
-			byte b = Convert.ToByte(brush.Substring(5, 2), 16);
-			byte a = Convert.ToByte(brush.Substring(7, 2), 16);
-			return new SolidColorBrush(ColorHelper.FromArgb(a, r, g, b));
+			byte r = 255;
+			byte g = 255;
+			byte b = 255;
+			byte a = 255;
+
+			if (brush.Length == 4)
+			{
+				r = byte.Parse(brush[1].ToString(), System.Globalization.NumberStyles.HexNumber);
+				g = byte.Parse(brush[2].ToString(), System.Globalization.NumberStyles.HexNumber);
+				b = byte.Parse(brush[3].ToString(), System.Globalization.NumberStyles.HexNumber);
+			}
+			else if (brush.Length == 7)
+			{
+				r = byte.Parse(brush[1..3], System.Globalization.NumberStyles.HexNumber);
+				g = byte.Parse(brush[3..5], System.Globalization.NumberStyles.HexNumber);
+				b = byte.Parse(brush[5..7], System.Globalization.NumberStyles.HexNumber);
+			}
+			else if (brush.Length == 9)
+			{
+				r = byte.Parse(brush[1..3], System.Globalization.NumberStyles.HexNumber);
+				g = byte.Parse(brush[3..5], System.Globalization.NumberStyles.HexNumber);
+				b = byte.Parse(brush[5..7], System.Globalization.NumberStyles.HexNumber);
+				a = byte.Parse(brush[7..9], System.Globalization.NumberStyles.HexNumber);
+			}
+			
+			return new SolidColorBrush(
+				new Windows.UI.Color()
+				{
+					R = r,
+					G = g,
+					B = b,
+					A = a,
+				}
+			);
 		}
 
 		string colorStr = brush.SnakeToPascal();
