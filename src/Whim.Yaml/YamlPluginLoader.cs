@@ -1,6 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using Corvus.Json;
+using Microsoft.UI;
+using Microsoft.UI.Xaml.Media;
 using Whim.CommandPalette;
+using Whim.FocusIndicator;
 using Whim.Gaps;
 
 namespace Whim.Yaml;
@@ -19,6 +22,7 @@ internal static class YamlPluginLoader
 	{
 		LoadGapsPlugin(ctx, schema);
 		LoadCommandPalettePlugin(ctx, schema);
+		LoadFocusIndicatorPlugin(ctx, schema);
 	}
 
 	private static void LoadGapsPlugin(IContext ctx, Schema schema)
@@ -101,5 +105,46 @@ internal static class YamlPluginLoader
 		}
 
 		ctx.PluginManager.AddPlugin(new CommandPalettePlugin(ctx, config));
+	}
+
+	private static void LoadFocusIndicatorPlugin(IContext ctx, Schema schema)
+	{
+		var focusIndicator = schema.Plugins.FocusIndicator;
+
+		if (!focusIndicator.IsValid())
+		{
+			Logger.Debug("FocusIndicator plugin is not valid.");
+			return;
+		}
+
+		if (focusIndicator.IsEnabled.AsOptional() is { } isEnabled && !isEnabled)
+		{
+			Logger.Debug("FocusIndicator plugin is not enabled.");
+			return;
+		}
+
+		FocusIndicatorConfig config = new();
+
+		if (focusIndicator.Color.AsOptional() is { } color)
+		{
+			config.Color = ((string)color).ParseBrush();
+		}
+
+		if (focusIndicator.BorderSize.AsOptional() is { } borderSize)
+		{
+			config.BorderSize = (int)borderSize;
+		}
+
+		if (focusIndicator.FadeEnabled.AsOptional() is { } fadeEnabled)
+		{
+			config.FadeEnabled = fadeEnabled;
+		}
+
+		if (focusIndicator.FadeTimeout.AsOptional() is { } fadeTimeout)
+		{
+			config.FadeTimeout = TimeSpan.FromMilliseconds((int)fadeTimeout);
+		}
+
+		ctx.PluginManager.AddPlugin(new FocusIndicatorPlugin(ctx, config));
 	}
 }

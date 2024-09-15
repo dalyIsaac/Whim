@@ -2,6 +2,8 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Corvus.Json;
+using Microsoft.UI;
+using Microsoft.UI.Xaml.Media;
 using Yaml2JsonNode;
 using YamlDotNet.RepresentationModel;
 using static Whim.Yaml.Schema;
@@ -15,6 +17,7 @@ public static class YamlLoader
 {
 	private const string JsonConfigFileName = "whim.config.json";
 	private const string YamlConfigFileName = "whim.config.yaml";
+	private const string HexColorStart = "#";
 
 	/// <summary>
 	/// Loads and applies the declarative configuration from a JSON or YAML file.
@@ -225,5 +228,25 @@ public static class YamlLoader
 		}
 
 		return new WindowBackdropConfig(backdropType, alwaysShowBackdrop);
+	}
+
+
+
+	internal static Brush ParseBrush(this string brush)
+	{
+
+		if (brush.StartsWith(HexColorStart))
+		{
+			byte r = Convert.ToByte(brush.Substring(1, 2), 16);
+			byte g = Convert.ToByte(brush.Substring(3, 2), 16);
+			byte b = Convert.ToByte(brush.Substring(5, 2), 16);
+			byte a = Convert.ToByte(brush.Substring(7, 2), 16);
+			return new SolidColorBrush(ColorHelper.FromArgb(a, r, g, b));
+		}
+
+		string colorStr = brush.SnakeToPascal();
+		System.Drawing.Color color = System.Drawing.Color.FromName(colorStr);
+
+		return new SolidColorBrush(new Windows.UI.Color() { R = color.R, G = color.G, B = color.B });
 	}
 }
