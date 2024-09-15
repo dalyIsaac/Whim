@@ -1,7 +1,7 @@
+using System.Text;
 using Corvus.Json;
 using Microsoft.UI;
 using Microsoft.UI.Xaml.Media;
-using System.Text;
 using static Whim.Yaml.Schema;
 
 namespace Whim.Yaml;
@@ -81,7 +81,7 @@ internal static class YamlLoaderUtils
 				b = byte.Parse(brush[5..7], System.Globalization.NumberStyles.HexNumber);
 				a = byte.Parse(brush[7..9], System.Globalization.NumberStyles.HexNumber);
 			}
-			
+
 			return new SolidColorBrush(
 				new Windows.UI.Color()
 				{
