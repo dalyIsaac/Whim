@@ -4,6 +4,7 @@ using System.Text.Json.Nodes;
 using Corvus.Json;
 using Yaml2JsonNode;
 using YamlDotNet.RepresentationModel;
+using static Whim.Yaml.Schema;
 
 namespace Whim.Yaml;
 
@@ -195,5 +196,34 @@ public static class YamlLoader
 		}
 
 		return builder.ToString();
+	}
+
+	internal static BackdropType ParseBackdropType(this string backdropType) =>
+		backdropType switch
+		{
+			"none" => BackdropType.None,
+			"acrylic" => BackdropType.Acrylic,
+			"acrylic_thin" => BackdropType.AcrylicThin,
+			"mica" => BackdropType.Mica,
+			"mica_alt" => BackdropType.MicaAlt,
+			_ => BackdropType.None,
+		};
+
+	internal static WindowBackdropConfig ParseWindowBackdropConfig(WindowBackdropConfigEntity entity)
+	{
+		BackdropType backdropType = BackdropType.Mica;
+		bool alwaysShowBackdrop = true;
+
+		if (entity.BackdropType.AsOptional() is { } backdropTypeStr)
+		{
+			backdropType = ((string)backdropTypeStr).ParseBackdropType();
+		}
+
+		if (entity.AlwaysShowBackdrop.AsOptional() is { } alwaysShowBackdropValue)
+		{
+			alwaysShowBackdrop = alwaysShowBackdropValue;
+		}
+
+		return new WindowBackdropConfig(backdropType, alwaysShowBackdrop);
 	}
 }
