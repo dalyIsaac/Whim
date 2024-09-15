@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Whim.Yaml.Tests;
 
-public class YamlLoader_UpdateRoutersTests
+public class YamlLoader_LoadRoutersTests
 {
 	public static TheoryData<string, bool> RouterConfig =>
 		new()

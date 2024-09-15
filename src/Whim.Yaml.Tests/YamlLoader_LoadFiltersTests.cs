@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Whim.Yaml.Tests;
 
-public class YamlLoader_UpdateFiltersTests
+public class YamlLoader_LoadFiltersTests
 {
 	public static TheoryData<string, bool> FilterConfig =>
 		new()
