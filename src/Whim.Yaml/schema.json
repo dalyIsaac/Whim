@@ -284,9 +284,8 @@
           "default": true
         },
         "color": {
-          "type": "string",
-          "description": "The color of the focus indicator",
-          "default": "#FF0000"
+          "$ref": "#/$defs/Color",
+          "description": "The color of the focus indicator"
         },
         "border_size": {
           "type": "integer",
@@ -304,6 +303,580 @@
           "default": 10
         }
       }
+    },
+
+    "Color": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
+          "description": "A color in hex format, e.g. `#FF0000`"
+        },
+        {
+          "const": "alice_blue",
+          "description": "Color with ARGB value of #FFF0F8FF."
+        },
+        {
+          "const": "antique_white",
+          "description": "Color with ARGB value of #FFFAEBD7."
+        },
+        {
+          "const": "aqua",
+          "description": "Color with ARGB value of #FF00FFFF."
+        },
+        {
+          "const": "aquamarine",
+          "description": "Color with ARGB value of #FF7FFFD4."
+        },
+        {
+          "const": "azure",
+          "description": "Color with ARGB value of #FFF0FFFF."
+        },
+        {
+          "const": "beige",
+          "description": "Color with ARGB value of #FFF5F5DC."
+        },
+        {
+          "const": "bisque",
+          "description": "Color with ARGB value of #FFFFE4C4."
+        },
+        {
+          "const": "black",
+          "description": "Color with ARGB value of #FF000000."
+        },
+        {
+          "const": "blanched_almond",
+          "description": "Color with ARGB value of #FFFFEBCD."
+        },
+        {
+          "const": "blue",
+          "description": "Color with ARGB value of #FF0000FF."
+        },
+        {
+          "const": "blue_violet",
+          "description": "Color with ARGB value of #FF8A2BE2."
+        },
+        {
+          "const": "brown",
+          "description": "Color with ARGB value of #FFA52A2A."
+        },
+        {
+          "const": "burly_wood",
+          "description": "Color with ARGB value of #FFDEB887."
+        },
+        {
+          "const": "cadet_blue",
+          "description": "Color with ARGB value of #FF5F9EA0."
+        },
+        {
+          "const": "chartreuse",
+          "description": "Color with ARGB value of #FF7FFF00."
+        },
+        {
+          "const": "chocolate",
+          "description": "Color with ARGB value of #FFD2691E."
+        },
+        {
+          "const": "coral",
+          "description": "Color with ARGB value of #FFFF7F50."
+        },
+        {
+          "const": "cornflower_blue",
+          "description": "Color with ARGB value of #FF6495ED."
+        },
+        {
+          "const": "cornsilk",
+          "description": "Color with ARGB value of #FFFFF8DC."
+        },
+        {
+          "const": "crimson",
+          "description": "Color with ARGB value of #FFDC143C."
+        },
+        {
+          "const": "cyan",
+          "description": "Color with ARGB value of #FF00FFFF."
+        },
+        {
+          "const": "dark_blue",
+          "description": "Color with ARGB value of #FF00008B."
+        },
+        {
+          "const": "dark_cyan",
+          "description": "Color with ARGB value of #FF008B8B."
+        },
+        {
+          "const": "dark_goldenrod",
+          "description": "Color with ARGB value of #FFB8860B."
+        },
+        {
+          "const": "dark_gray",
+          "description": "Color with ARGB value of #FFA9A9A9."
+        },
+        {
+          "const": "dark_green",
+          "description": "Color with ARGB value of #FF006400."
+        },
+        {
+          "const": "dark_khaki",
+          "description": "Color with ARGB value of #FFBDB76B."
+        },
+        {
+          "const": "dark_magenta",
+          "description": "Color with ARGB value of #FF8B008B."
+        },
+        {
+          "const": "dark_olive_green",
+          "description": "Color with ARGB value of #FF556B2F."
+        },
+        {
+          "const": "dark_orange",
+          "description": "Color with ARGB value of #FFFF8C00."
+        },
+        {
+          "const": "dark_orchid",
+          "description": "Color with ARGB value of #FF9932CC."
+        },
+        {
+          "const": "dark_red",
+          "description": "Color with ARGB value of #FF8B0000."
+        },
+        {
+          "const": "dark_salmon",
+          "description": "Color with ARGB value of #FFE9967A."
+        },
+        {
+          "const": "dark_sea_green",
+          "description": "Color with ARGB value of #FF8FBC8F."
+        },
+        {
+          "const": "dark_slate_blue",
+          "description": "Color with ARGB value of #FF483D8B."
+        },
+        {
+          "const": "dark_slate_gray",
+          "description": "Color with ARGB value of #FF2F4F4F."
+        },
+        {
+          "const": "dark_turquoise",
+          "description": "Color with ARGB value of #FF00CED1."
+        },
+        {
+          "const": "dark_violet",
+          "description": "Color with ARGB value of #FF9400D3."
+        },
+        {
+          "const": "deep_pink",
+          "description": "Color with ARGB value of #FFFF1493."
+        },
+        {
+          "const": "deep_sky_blue",
+          "description": "Color with ARGB value of #FF00BFFF."
+        },
+        {
+          "const": "dim_gray",
+          "description": "Color with ARGB value of #FF696969."
+        },
+        {
+          "const": "dodger_blue",
+          "description": "Color with ARGB value of #FF1E90FF."
+        },
+        {
+          "const": "firebrick",
+          "description": "Color with ARGB value of #FFB22222."
+        },
+        {
+          "const": "floral_white",
+          "description": "Color with ARGB value of #FFFFFAF0."
+        },
+        {
+          "const": "forest_green",
+          "description": "Color with ARGB value of #FF228B22."
+        },
+        {
+          "const": "fuchsia",
+          "description": "Color with ARGB value of #FFFF00FF."
+        },
+        {
+          "const": "gainsboro",
+          "description": "Color with ARGB value of #FFDCDCDC."
+        },
+        {
+          "const": "ghost_white",
+          "description": "Color with ARGB value of #FFF8F8FF."
+        },
+        {
+          "const": "gold",
+          "description": "Color with ARGB value of #FFFFD700."
+        },
+        {
+          "const": "goldenrod",
+          "description": "Color with ARGB value of #FFDAA520."
+        },
+        {
+          "const": "gray",
+          "description": "Color with ARGB value of #FF808080."
+        },
+        {
+          "const": "green",
+          "description": "Color with ARGB value of #FF008000."
+        },
+        {
+          "const": "green_yellow",
+          "description": "Color with ARGB value of #FFADFF2F."
+        },
+        {
+          "const": "honeydew",
+          "description": "Color with ARGB value of #FFF0FFF0."
+        },
+        {
+          "const": "hot_pink",
+          "description": "Color with ARGB value of #FFFF69B4."
+        },
+        {
+          "const": "indian_red",
+          "description": "Color with ARGB value of #FFCD5C5C."
+        },
+        {
+          "const": "indigo",
+          "description": "Color with ARGB value of #FF4B0082."
+        },
+        {
+          "const": "ivory",
+          "description": "Color with ARGB value of #FFFFFFF0."
+        },
+        {
+          "const": "khaki",
+          "description": "Color with ARGB value of #FFF0E68C."
+        },
+        {
+          "const": "lavender",
+          "description": "Color with ARGB value of #FFE6E6FA."
+        },
+        {
+          "const": "lavender_blush",
+          "description": "Color with ARGB value of #FFFFF0F5."
+        },
+        {
+          "const": "lawn_green",
+          "description": "Color with ARGB value of #FF7CFC00."
+        },
+        {
+          "const": "lemon_chiffon",
+          "description": "Color with ARGB value of #FFFFFACD."
+        },
+        {
+          "const": "light_blue",
+          "description": "Color with ARGB value of #FFADD8E6."
+        },
+        {
+          "const": "light_coral",
+          "description": "Color with ARGB value of #FFF08080."
+        },
+        {
+          "const": "light_cyan",
+          "description": "Color with ARGB value of #FFE0FFFF."
+        },
+        {
+          "const": "light_goldenrod_yellow",
+          "description": "Color with ARGB value of #FFFAFAD2."
+        },
+        {
+          "const": "light_gray",
+          "description": "Color with ARGB value of #FFD3D3D3."
+        },
+        {
+          "const": "light_green",
+          "description": "Color with ARGB value of #FF90EE90."
+        },
+        {
+          "const": "light_pink",
+          "description": "Color with ARGB value of #FFFFB6C1."
+        },
+        {
+          "const": "light_salmon",
+          "description": "Color with ARGB value of #FFFFA07A."
+        },
+        {
+          "const": "light_sea_green",
+          "description": "Color with ARGB value of #FF20B2AA."
+        },
+        {
+          "const": "light_sky_blue",
+          "description": "Color with ARGB value of #FF87CEFA."
+        },
+        {
+          "const": "light_slate_gray",
+          "description": "Color with ARGB value of #FF778899."
+        },
+        {
+          "const": "light_steel_blue",
+          "description": "Color with ARGB value of #FFB0C4DE."
+        },
+        {
+          "const": "light_yellow",
+          "description": "Color with ARGB value of #FFFFFFE0."
+        },
+        {
+          "const": "lime",
+          "description": "Color with ARGB value of #FF00FF00."
+        },
+        {
+          "const": "lime_green",
+          "description": "Color with ARGB value of #FF32CD32."
+        },
+        {
+          "const": "linen",
+          "description": "Color with ARGB value of #FFFAF0E6."
+        },
+        {
+          "const": "magenta",
+          "description": "Color with ARGB value of #FFFF00FF."
+        },
+        {
+          "const": "maroon",
+          "description": "Color with ARGB value of #FF800000."
+        },
+        {
+          "const": "medium_aquamarine",
+          "description": "Color with ARGB value of #FF66CDAA."
+        },
+        {
+          "const": "medium_blue",
+          "description": "Color with ARGB value of #FF0000CD."
+        },
+        {
+          "const": "medium_orchid",
+          "description": "Color with ARGB value of #FFBA55D3."
+        },
+        {
+          "const": "medium_purple",
+          "description": "Color with ARGB value of #FF9370DB."
+        },
+        {
+          "const": "medium_sea_green",
+          "description": "Color with ARGB value of #FF3CB371."
+        },
+        {
+          "const": "medium_slate_blue",
+          "description": "Color with ARGB value of #FF7B68EE."
+        },
+        {
+          "const": "medium_spring_green",
+          "description": "Color with ARGB value of #FF00FA9A."
+        },
+        {
+          "const": "medium_turquoise",
+          "description": "Color with ARGB value of #FF48D1CC."
+        },
+        {
+          "const": "medium_violet_red",
+          "description": "Color with ARGB value of #FFC71585."
+        },
+        {
+          "const": "midnight_blue",
+          "description": "Color with ARGB value of #FF191970."
+        },
+        {
+          "const": "mint_cream",
+          "description": "Color with ARGB value of #FFF5FFFA."
+        },
+        {
+          "const": "misty_rose",
+          "description": "Color with ARGB value of #FFFFE4E1."
+        },
+        {
+          "const": "moccasin",
+          "description": "Color with ARGB value of #FFFFE4B5."
+        },
+        {
+          "const": "navajo_white",
+          "description": "Color with ARGB value of #FFFFDEAD."
+        },
+        {
+          "const": "navy",
+          "description": "Color with ARGB value of #FF000080."
+        },
+        {
+          "const": "old_lace",
+          "description": "Color with ARGB value of #FFFDF5E6."
+        },
+        {
+          "const": "olive",
+          "description": "Color with ARGB value of #FF808000."
+        },
+        {
+          "const": "olive_drab",
+          "description": "Color with ARGB value of #FF6B8E23."
+        },
+        {
+          "const": "orange",
+          "description": "Color with ARGB value of #FFFFA500."
+        },
+        {
+          "const": "orange_red",
+          "description": "Color with ARGB value of #FFFF4500."
+        },
+        {
+          "const": "orchid",
+          "description": "Color with ARGB value of #FFDA70D6."
+        },
+        {
+          "const": "pale_goldenrod",
+          "description": "Color with ARGB value of #FFEEE8AA."
+        },
+        {
+          "const": "pale_green",
+          "description": "Color with ARGB value of #FF98FB98."
+        },
+        {
+          "const": "pale_turquoise",
+          "description": "Color with ARGB value of #FFAFEEEE."
+        },
+        {
+          "const": "pale_violet_red",
+          "description": "Color with ARGB value of #FFDB7093."
+        },
+        {
+          "const": "papaya_whip",
+          "description": "Color with ARGB value of #FFFFEFD5."
+        },
+        {
+          "const": "peach_puff",
+          "description": "Color with ARGB value of #FFFFDAB9."
+        },
+        {
+          "const": "peru",
+          "description": "Color with ARGB value of #FFCD853F."
+        },
+        {
+          "const": "pink",
+          "description": "Color with ARGB value of #FFFFC0CB."
+        },
+        {
+          "const": "plum",
+          "description": "Color with ARGB value of #FFDDA0DD."
+        },
+        {
+          "const": "powder_blue",
+          "description": "Color with ARGB value of #FFB0E0E6."
+        },
+        {
+          "const": "purple",
+          "description": "Color with ARGB value of #FF800080."
+        },
+        {
+          "const": "red",
+          "description": "Color with ARGB value of #FFFF0000."
+        },
+        {
+          "const": "rosy_brown",
+          "description": "Color with ARGB value of #FFBC8F8F."
+        },
+        {
+          "const": "royal_blue",
+          "description": "Color with ARGB value of #FF4169E1."
+        },
+        {
+          "const": "saddle_brown",
+          "description": "Color with ARGB value of #FF8B4513."
+        },
+        {
+          "const": "salmon",
+          "description": "Color with ARGB value of #FFFA8072."
+        },
+        {
+          "const": "sandy_brown",
+          "description": "Color with ARGB value of #FFF4A460."
+        },
+        {
+          "const": "sea_green",
+          "description": "Color with ARGB value of #FF2E8B57."
+        },
+        {
+          "const": "sea_shell",
+          "description": "Color with ARGB value of #FFFFF5EE."
+        },
+        {
+          "const": "sienna",
+          "description": "Color with ARGB value of #FFA0522D."
+        },
+        {
+          "const": "silver",
+          "description": "Color with ARGB value of #FFC0C0C0."
+        },
+        {
+          "const": "sky_blue",
+          "description": "Color with ARGB value of #FF87CEEB."
+        },
+        {
+          "const": "slate_blue",
+          "description": "Color with ARGB value of #FF6A5ACD."
+        },
+        {
+          "const": "slate_gray",
+          "description": "Color with ARGB value of #FF708090."
+        },
+        {
+          "const": "snow",
+          "description": "Color with ARGB value of #FFFFFAFA."
+        },
+        {
+          "const": "spring_green",
+          "description": "Color with ARGB value of #FF00FF7F."
+        },
+        {
+          "const": "steel_blue",
+          "description": "Color with ARGB value of #FF4682B4."
+        },
+        {
+          "const": "tan",
+          "description": "Color with ARGB value of #FFD2B48C."
+        },
+        {
+          "const": "teal",
+          "description": "Color with ARGB value of #FF008080."
+        },
+        {
+          "const": "thistle",
+          "description": "Color with ARGB value of #FFD8BFD8."
+        },
+        {
+          "const": "tomato",
+          "description": "Color with ARGB value of #FFFF6347."
+        },
+        {
+          "const": "transparent",
+          "description": "Color with ARGB value of #00FFFFFF."
+        },
+        {
+          "const": "turquoise",
+          "description": "Color with ARGB value of #FF40E0D0."
+        },
+        {
+          "const": "violet",
+          "description": "Color with ARGB value of #FFEE82EE."
+        },
+        {
+          "const": "wheat",
+          "description": "Color with ARGB value of #FFF5DEB3."
+        },
+        {
+          "const": "white",
+          "description": "Color with ARGB value of #FFFFFFFF."
+        },
+        {
+          "const": "white_smoke",
+          "description": "Color with ARGB value of #FFF5F5F5."
+        },
+        {
+          "const": "yellow",
+          "description": "Color with ARGB value of #FFFFFF00."
+        },
+        {
+          "const": "yellow_green",
+          "description": "Color with ARGB value of #FF9ACD32."
+        }
+      ]
     }
   }
 }
