@@ -285,7 +285,8 @@
         },
         "color": {
           "$ref": "#/$defs/Color",
-          "description": "The color of the focus indicator"
+          "description": "The color of the focus indicator",
+          "default": "red"
         },
         "border_size": {
           "type": "integer",

@@ -101,7 +101,7 @@ internal static class YamlPluginLoader
 
 		if (commandPalette.Backdrop.AsOptional() is { } backdrop)
 		{
-			config.Backdrop = YamlLoader.ParseWindowBackdropConfig(backdrop);
+			config.Backdrop = YamlLoaderUtils.ParseWindowBackdropConfig(backdrop);
 		}
 
 		ctx.PluginManager.AddPlugin(new CommandPalettePlugin(ctx, config));
