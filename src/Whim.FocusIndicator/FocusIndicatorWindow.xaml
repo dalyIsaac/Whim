@@ -16,9 +16,7 @@
 			RelativePanel.AlignRightWithPanel="True"
 			RelativePanel.AlignTopWithPanel="True"
 			Stroke="{x:Bind Path=FocusIndicatorConfig.Color, Mode=OneWay}"
-			StrokeThickness="{x:Bind Path=FocusIndicatorConfig.BorderSize, Mode=OneWay}"
-			
-			/>
+			StrokeThickness="{x:Bind Path=FocusIndicatorConfig.BorderSize, Mode=OneWay}" />
 
 	</RelativePanel>
 </Window>
