@@ -1,6 +1,4 @@
-using Microsoft.UI;
-using Microsoft.UI.Xaml.Media;
-using Windows.UI;
+using System.Drawing;
 using Xunit;
 
 namespace Whim.Yaml.Tests;
@@ -39,190 +37,184 @@ public class YamlLoaderUtilsTests
 		Assert.Equal(expected, result);
 	}
 
-	// TODO: Try again with .NET 8.0.402 or later
-	// See https://learn.microsoft.com/en-us/windows/apps/winui/winui3/testing/
-	//[Theory]
-	//[InlineData("#FF0000", 255, 0, 0, 255)]
-	//[InlineData("#00FF00", 0, 255, 0, 255)]
-	//[InlineData("#0000FF", 0, 0, 255, 255)]
-	//[InlineData("#FFFFFF", 255, 255, 255, 255)]
-	//[InlineData("#000000", 0, 0, 0, 255)]
-	//[InlineData("#FFFFFF00", 255, 255, 255, 0)]
-	//[InlineData("#000000FF", 0, 0, 0, 255)]
-	//[InlineData("#FFF", 255, 255, 255, 255)]
-	//[InlineData("#000", 0, 0, 0, 255)]
-	//[InlineData("#HHHHHH", 0, 0, 0, 0)]
-	//[InlineData("bob the builder", 0, 0, 0, 0)]
-	//public void ParseBrush_Hex(string brush, byte r, byte g, byte b, byte a)
-	//{
-	//	// Given a hex color string
-	//	// When parsing it
-	//	Brush result = brush.ParseBrush();
+	[Theory]
+	[InlineData("#FF0000", 255, 0, 0, 255)]
+	[InlineData("#00FF00", 0, 255, 0, 255)]
+	[InlineData("#0000FF", 0, 0, 255, 255)]
+	[InlineData("#FFFFFF", 255, 255, 255, 255)]
+	[InlineData("#000000", 0, 0, 0, 255)]
+	[InlineData("#FFFFFF00", 255, 255, 255, 0)]
+	[InlineData("#000000FF", 0, 0, 0, 255)]
+	[InlineData("#HHHHHH", 0, 0, 0, 255)]
+	[InlineData("bob the builder", 0, 0, 0, 0)]
+	public void ParseBrush_Hex(string brush, byte r, byte g, byte b, byte a)
+	{
+		// Given a hex color string
+		// When parsing it
+		Color result = brush.ParseColor();
 
-	//	// Then the string is converted to a brush
-	//	SolidColorBrush solidColor = (SolidColorBrush)result;
-	//	Assert.Equal(r, solidColor.Color.R);
-	//	Assert.Equal(g, solidColor.Color.G);
-	//	Assert.Equal(b, solidColor.Color.B);
-	//	Assert.Equal(a, solidColor.Color.A);
-	//}
+		// Then the string is converted to a brush
+		Assert.Equal(r, result.R);
+		Assert.Equal(g, result.G);
+		Assert.Equal(b, result.B);
+		Assert.Equal(a, result.A);
+	}
 
-	//public static TheoryData<string, Color> ParseBrushData =>
-	//	new()
-	//	{
-	//		{ "alice_blue", Colors.AliceBlue },
-	//		{ "antique_white", Colors.AntiqueWhite },
-	//		{ "aqua", Colors.Aqua },
-	//		{ "aquamarine", Colors.Aquamarine },
-	//		{ "azure", Colors.Azure },
-	//		{ "beige", Colors.Beige },
-	//		{ "bisque", Colors.Bisque },
-	//		{ "black", Colors.Black },
-	//		{ "blanched_almond", Colors.BlanchedAlmond },
-	//		{ "blue", Colors.Blue },
-	//		{ "blue_violet", Colors.BlueViolet },
-	//		{ "brown", Colors.Brown },
-	//		{ "burly_wood", Colors.BurlyWood },
-	//		{ "cadet_blue", Colors.CadetBlue },
-	//		{ "chartreuse", Colors.Chartreuse },
-	//		{ "chocolate", Colors.Chocolate },
-	//		{ "coral", Colors.Coral },
-	//		{ "cornflower_blue", Colors.CornflowerBlue },
-	//		{ "cornsilk", Colors.Cornsilk },
-	//		{ "crimson", Colors.Crimson },
-	//		{ "cyan", Colors.Cyan },
-	//		{ "dark_blue", Colors.DarkBlue },
-	//		{ "dark_cyan", Colors.DarkCyan },
-	//		{ "dark_goldenrod", Colors.DarkGoldenrod },
-	//		{ "dark_gray", Colors.DarkGray },
-	//		{ "dark_green", Colors.DarkGreen },
-	//		{ "dark_khaki", Colors.DarkKhaki },
-	//		{ "dark_magenta", Colors.DarkMagenta },
-	//		{ "dark_olive_green", Colors.DarkOliveGreen },
-	//		{ "dark_orange", Colors.DarkOrange },
-	//		{ "dark_orchid", Colors.DarkOrchid },
-	//		{ "dark_red", Colors.DarkRed },
-	//		{ "dark_salmon", Colors.DarkSalmon },
-	//		{ "dark_sea_green", Colors.DarkSeaGreen },
-	//		{ "dark_slate_blue", Colors.DarkSlateBlue },
-	//		{ "dark_slate_gray", Colors.DarkSlateGray },
-	//		{ "dark_turquoise", Colors.DarkTurquoise },
-	//		{ "dark_violet", Colors.DarkViolet },
-	//		{ "deep_pink", Colors.DeepPink },
-	//		{ "deep_sky_blue", Colors.DeepSkyBlue },
-	//		{ "dim_gray", Colors.DimGray },
-	//		{ "dodger_blue", Colors.DodgerBlue },
-	//		{ "firebrick", Colors.Firebrick },
-	//		{ "floral_white", Colors.FloralWhite },
-	//		{ "forest_green", Colors.ForestGreen },
-	//		{ "fuchsia", Colors.Fuchsia },
-	//		{ "gainsboro", Colors.Gainsboro },
-	//		{ "ghost_white", Colors.GhostWhite },
-	//		{ "gold", Colors.Gold },
-	//		{ "goldenrod", Colors.Goldenrod },
-	//		{ "gray", Colors.Gray },
-	//		{ "green", Colors.Green },
-	//		{ "green_yellow", Colors.GreenYellow },
-	//		{ "honeydew", Colors.Honeydew },
-	//		{ "hot_pink", Colors.HotPink },
-	//		{ "indian_red", Colors.IndianRed },
-	//		{ "indigo", Colors.Indigo },
-	//		{ "ivory", Colors.Ivory },
-	//		{ "khaki", Colors.Khaki },
-	//		{ "lavender", Colors.Lavender },
-	//		{ "lavender_blush", Colors.LavenderBlush },
-	//		{ "lawn_green", Colors.LawnGreen },
-	//		{ "lemon_chiffon", Colors.LemonChiffon },
-	//		{ "light_blue", Colors.LightBlue },
-	//		{ "light_coral", Colors.LightCoral },
-	//		{ "light_cyan", Colors.LightCyan },
-	//		{ "light_goldenrod_yellow", Colors.LightGoldenrodYellow },
-	//		{ "light_gray", Colors.LightGray },
-	//		{ "light_green", Colors.LightGreen },
-	//		{ "light_pink", Colors.LightPink },
-	//		{ "light_salmon", Colors.LightSalmon },
-	//		{ "light_sea_green", Colors.LightSeaGreen },
-	//		{ "light_sky_blue", Colors.LightSkyBlue },
-	//		{ "light_slate_gray", Colors.LightSlateGray },
-	//		{ "light_steel_blue", Colors.LightSteelBlue },
-	//		{ "light_yellow", Colors.LightYellow },
-	//		{ "lime", Colors.Lime },
-	//		{ "lime_green", Colors.LimeGreen },
-	//		{ "linen", Colors.Linen },
-	//		{ "magenta", Colors.Magenta },
-	//		{ "maroon", Colors.Maroon },
-	//		{ "medium_aquamarine", Colors.MediumAquamarine },
-	//		{ "medium_blue", Colors.MediumBlue },
-	//		{ "medium_orchid", Colors.MediumOrchid },
-	//		{ "medium_purple", Colors.MediumPurple },
-	//		{ "medium_sea_green", Colors.MediumSeaGreen },
-	//		{ "medium_slate_blue", Colors.MediumSlateBlue },
-	//		{ "medium_spring_green", Colors.MediumSpringGreen },
-	//		{ "medium_turquoise", Colors.MediumTurquoise },
-	//		{ "medium_violet_red", Colors.MediumVioletRed },
-	//		{ "midnight_blue", Colors.MidnightBlue },
-	//		{ "mint_cream", Colors.MintCream },
-	//		{ "misty_rose", Colors.MistyRose },
-	//		{ "moccasin", Colors.Moccasin },
-	//		{ "navajo_white", Colors.NavajoWhite },
-	//		{ "navy", Colors.Navy },
-	//		{ "old_lace", Colors.OldLace },
-	//		{ "olive", Colors.Olive },
-	//		{ "olive_drab", Colors.OliveDrab },
-	//		{ "orange", Colors.Orange },
-	//		{ "orange_red", Colors.OrangeRed },
-	//		{ "orchid", Colors.Orchid },
-	//		{ "pale_goldenrod", Colors.PaleGoldenrod },
-	//		{ "pale_green", Colors.PaleGreen },
-	//		{ "pale_turquoise", Colors.PaleTurquoise },
-	//		{ "pale_violet_red", Colors.PaleVioletRed },
-	//		{ "papaya_whip", Colors.PapayaWhip },
-	//		{ "peach_puff", Colors.PeachPuff },
-	//		{ "peru", Colors.Peru },
-	//		{ "pink", Colors.Pink },
-	//		{ "plum", Colors.Plum },
-	//		{ "powder_blue", Colors.PowderBlue },
-	//		{ "purple", Colors.Purple },
-	//		{ "red", Colors.Red },
-	//		{ "rosy_brown", Colors.RosyBrown },
-	//		{ "royal_blue", Colors.RoyalBlue },
-	//		{ "saddle_brown", Colors.SaddleBrown },
-	//		{ "salmon", Colors.Salmon },
-	//		{ "sandy_brown", Colors.SandyBrown },
-	//		{ "sea_green", Colors.SeaGreen },
-	//		{ "sea_shell", Colors.SeaShell },
-	//		{ "sienna", Colors.Sienna },
-	//		{ "silver", Colors.Silver },
-	//		{ "sky_blue", Colors.SkyBlue },
-	//		{ "slate_blue", Colors.SlateBlue },
-	//		{ "slate_gray", Colors.SlateGray },
-	//		{ "snow", Colors.Snow },
-	//		{ "spring_green", Colors.SpringGreen },
-	//		{ "steel_blue", Colors.SteelBlue },
-	//		{ "tan", Colors.Tan },
-	//		{ "teal", Colors.Teal },
-	//		{ "thistle", Colors.Thistle },
-	//		{ "tomato", Colors.Tomato },
-	//		{ "transparent", Colors.Transparent },
-	//		{ "turquoise", Colors.Turquoise },
-	//		{ "violet", Colors.Violet },
-	//		{ "wheat", Colors.Wheat },
-	//		{ "white", Colors.White },
-	//		{ "white_smoke", Colors.WhiteSmoke },
-	//		{ "yellow", Colors.Yellow },
-	//		{ "yellow_green", Colors.YellowGreen },
-	//	};
+	public static TheoryData<string, Color> ParseBrushData =>
+		new()
+		{
+			{ "alice_blue", Color.AliceBlue },
+			{ "antique_white", Color.AntiqueWhite },
+			{ "aqua", Color.Aqua },
+			{ "aquamarine", Color.Aquamarine },
+			{ "azure", Color.Azure },
+			{ "beige", Color.Beige },
+			{ "bisque", Color.Bisque },
+			{ "black", Color.Black },
+			{ "blanched_almond", Color.BlanchedAlmond },
+			{ "blue", Color.Blue },
+			{ "blue_violet", Color.BlueViolet },
+			{ "brown", Color.Brown },
+			{ "burly_wood", Color.BurlyWood },
+			{ "cadet_blue", Color.CadetBlue },
+			{ "chartreuse", Color.Chartreuse },
+			{ "chocolate", Color.Chocolate },
+			{ "coral", Color.Coral },
+			{ "cornflower_blue", Color.CornflowerBlue },
+			{ "cornsilk", Color.Cornsilk },
+			{ "crimson", Color.Crimson },
+			{ "cyan", Color.Cyan },
+			{ "dark_blue", Color.DarkBlue },
+			{ "dark_cyan", Color.DarkCyan },
+			{ "dark_goldenrod", Color.DarkGoldenrod },
+			{ "dark_gray", Color.DarkGray },
+			{ "dark_green", Color.DarkGreen },
+			{ "dark_khaki", Color.DarkKhaki },
+			{ "dark_magenta", Color.DarkMagenta },
+			{ "dark_olive_green", Color.DarkOliveGreen },
+			{ "dark_orange", Color.DarkOrange },
+			{ "dark_orchid", Color.DarkOrchid },
+			{ "dark_red", Color.DarkRed },
+			{ "dark_salmon", Color.DarkSalmon },
+			{ "dark_sea_green", Color.DarkSeaGreen },
+			{ "dark_slate_blue", Color.DarkSlateBlue },
+			{ "dark_slate_gray", Color.DarkSlateGray },
+			{ "dark_turquoise", Color.DarkTurquoise },
+			{ "dark_violet", Color.DarkViolet },
+			{ "deep_pink", Color.DeepPink },
+			{ "deep_sky_blue", Color.DeepSkyBlue },
+			{ "dim_gray", Color.DimGray },
+			{ "dodger_blue", Color.DodgerBlue },
+			{ "firebrick", Color.Firebrick },
+			{ "floral_white", Color.FloralWhite },
+			{ "forest_green", Color.ForestGreen },
+			{ "fuchsia", Color.Fuchsia },
+			{ "gainsboro", Color.Gainsboro },
+			{ "ghost_white", Color.GhostWhite },
+			{ "gold", Color.Gold },
+			{ "goldenrod", Color.Goldenrod },
+			{ "gray", Color.Gray },
+			{ "green", Color.Green },
+			{ "green_yellow", Color.GreenYellow },
+			{ "honeydew", Color.Honeydew },
+			{ "hot_pink", Color.HotPink },
+			{ "indian_red", Color.IndianRed },
+			{ "indigo", Color.Indigo },
+			{ "ivory", Color.Ivory },
+			{ "khaki", Color.Khaki },
+			{ "lavender", Color.Lavender },
+			{ "lavender_blush", Color.LavenderBlush },
+			{ "lawn_green", Color.LawnGreen },
+			{ "lemon_chiffon", Color.LemonChiffon },
+			{ "light_blue", Color.LightBlue },
+			{ "light_coral", Color.LightCoral },
+			{ "light_cyan", Color.LightCyan },
+			{ "light_goldenrod_yellow", Color.LightGoldenrodYellow },
+			{ "light_gray", Color.LightGray },
+			{ "light_green", Color.LightGreen },
+			{ "light_pink", Color.LightPink },
+			{ "light_salmon", Color.LightSalmon },
+			{ "light_sea_green", Color.LightSeaGreen },
+			{ "light_sky_blue", Color.LightSkyBlue },
+			{ "light_slate_gray", Color.LightSlateGray },
+			{ "light_steel_blue", Color.LightSteelBlue },
+			{ "light_yellow", Color.LightYellow },
+			{ "lime", Color.Lime },
+			{ "lime_green", Color.LimeGreen },
+			{ "linen", Color.Linen },
+			{ "magenta", Color.Magenta },
+			{ "maroon", Color.Maroon },
+			{ "medium_aquamarine", Color.MediumAquamarine },
+			{ "medium_blue", Color.MediumBlue },
+			{ "medium_orchid", Color.MediumOrchid },
+			{ "medium_purple", Color.MediumPurple },
+			{ "medium_sea_green", Color.MediumSeaGreen },
+			{ "medium_slate_blue", Color.MediumSlateBlue },
+			{ "medium_spring_green", Color.MediumSpringGreen },
+			{ "medium_turquoise", Color.MediumTurquoise },
+			{ "medium_violet_red", Color.MediumVioletRed },
+			{ "midnight_blue", Color.MidnightBlue },
+			{ "mint_cream", Color.MintCream },
+			{ "misty_rose", Color.MistyRose },
+			{ "moccasin", Color.Moccasin },
+			{ "navajo_white", Color.NavajoWhite },
+			{ "navy", Color.Navy },
+			{ "old_lace", Color.OldLace },
+			{ "olive", Color.Olive },
+			{ "olive_drab", Color.OliveDrab },
+			{ "orange", Color.Orange },
+			{ "orange_red", Color.OrangeRed },
+			{ "orchid", Color.Orchid },
+			{ "pale_goldenrod", Color.PaleGoldenrod },
+			{ "pale_green", Color.PaleGreen },
+			{ "pale_turquoise", Color.PaleTurquoise },
+			{ "pale_violet_red", Color.PaleVioletRed },
+			{ "papaya_whip", Color.PapayaWhip },
+			{ "peach_puff", Color.PeachPuff },
+			{ "peru", Color.Peru },
+			{ "pink", Color.Pink },
+			{ "plum", Color.Plum },
+			{ "powder_blue", Color.PowderBlue },
+			{ "purple", Color.Purple },
+			{ "red", Color.Red },
+			{ "rosy_brown", Color.RosyBrown },
+			{ "royal_blue", Color.RoyalBlue },
+			{ "saddle_brown", Color.SaddleBrown },
+			{ "salmon", Color.Salmon },
+			{ "sandy_brown", Color.SandyBrown },
+			{ "sea_green", Color.SeaGreen },
+			{ "sea_shell", Color.SeaShell },
+			{ "sienna", Color.Sienna },
+			{ "silver", Color.Silver },
+			{ "sky_blue", Color.SkyBlue },
+			{ "slate_blue", Color.SlateBlue },
+			{ "slate_gray", Color.SlateGray },
+			{ "snow", Color.Snow },
+			{ "spring_green", Color.SpringGreen },
+			{ "steel_blue", Color.SteelBlue },
+			{ "tan", Color.Tan },
+			{ "teal", Color.Teal },
+			{ "thistle", Color.Thistle },
+			{ "tomato", Color.Tomato },
+			{ "transparent", Color.Transparent },
+			{ "turquoise", Color.Turquoise },
+			{ "violet", Color.Violet },
+			{ "wheat", Color.Wheat },
+			{ "white", Color.White },
+			{ "white_smoke", Color.WhiteSmoke },
+			{ "yellow", Color.Yellow },
+			{ "yellow_green", Color.YellowGreen },
+		};
 
-	//[Theory]
-	//[MemberData(nameof(ParseBrushData))]
-	//public void ParseBrush_String(string brush, Color expected)
-	//{
-	//	// Given a named color string
-	//	// When parsing it
-	//	Brush result = brush.ParseBrush();
+	[Theory]
+	[MemberData(nameof(ParseBrushData))]
+	public void ParseBrush_String(string brush, Color expected)
+	{
+		// Given a named color string
+		// When parsing it
+		Color result = brush.ParseColor();
 
-	//	// Then the string is converted to a brush
-	//	SolidColorBrush solidColor = (SolidColorBrush)result;
-	//	Assert.Equal(expected, solidColor.Color);
-	//}
+		// Then the string is converted to a brush
+		Assert.Equal(expected, result);
+	}
 }

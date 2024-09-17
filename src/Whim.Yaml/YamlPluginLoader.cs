@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using Corvus.Json;
-using Microsoft.UI;
 using Microsoft.UI.Xaml.Media;
 using Whim.CommandPalette;
 using Whim.FocusIndicator;
@@ -127,7 +126,11 @@ internal static class YamlPluginLoader
 
 		if (focusIndicator.Color.AsOptional() is { } color)
 		{
-			config.Color = ((string)color).ParseBrush();
+			string colorStr = (string)color;
+			var rawColor = colorStr.ParseColor();
+			var winUiColor = Windows.UI.Color.FromArgb(rawColor.A, rawColor.R, rawColor.G, rawColor.B);
+
+			config.Color = new SolidColorBrush(winUiColor);
 		}
 
 		if (focusIndicator.BorderSize.AsOptional() is { } borderSize)
@@ -135,14 +138,14 @@ internal static class YamlPluginLoader
 			config.BorderSize = (int)borderSize;
 		}
 
-		if (focusIndicator.FadeEnabled.AsOptional() is { } fadeEnabled)
+		if (focusIndicator.IsFadeEnabled.AsOptional() is { } isFadeEnabled)
 		{
-			config.FadeEnabled = fadeEnabled;
+			config.FadeEnabled = isFadeEnabled;
 		}
 
 		if (focusIndicator.FadeTimeout.AsOptional() is { } fadeTimeout)
 		{
-			config.FadeTimeout = TimeSpan.FromMilliseconds((int)fadeTimeout);
+			config.FadeTimeout = TimeSpan.FromSeconds((int)fadeTimeout);
 		}
 
 		ctx.PluginManager.AddPlugin(new FocusIndicatorPlugin(ctx, config));

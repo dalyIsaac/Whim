@@ -8,6 +8,11 @@ namespace Whim.FocusIndicator;
 public interface IFocusIndicatorPlugin : IPlugin, IDisposable
 {
 	/// <summary>
+	/// The configuration for the focus indicator.
+	/// </summary>
+	FocusIndicatorConfig Config { get; }
+
+	/// <summary>
 	/// Whether the focus indicator is visible.
 	/// </summary>
 	bool IsVisible { get; }

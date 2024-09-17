@@ -293,7 +293,7 @@
           "description": "The size of the border of the focus indicator, in pixels",
           "default": 4
         },
-        "fade_enabled": {
+        "is_fade_enabled": {
           "type": "boolean",
           "description": "When `true`, the focus indicator will be visile for `fade_timeout` seconds after the window is focused",
           "default": true
@@ -310,8 +310,8 @@
       "anyOf": [
         {
           "type": "string",
-          "pattern": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
-          "description": "A color in hex format, e.g. `#FF0000`"
+          "pattern": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$",
+          "description": "A RGB or RGBA color in hex format, e.g. `#FF0000FF`, `#FF00FF` or `#F0F`"
         },
         {
           "const": "alice_blue",

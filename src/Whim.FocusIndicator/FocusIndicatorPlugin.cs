@@ -11,7 +11,6 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 {
 	private bool _isEnabled = true;
 	private readonly IContext _context;
-	private readonly FocusIndicatorConfig _focusIndicatorConfig;
 	private readonly CancellationTokenSource _cancellationTokenSource;
 	private readonly CancellationToken _cancellationToken;
 	private FocusIndicatorWindow? _focusIndicatorWindow;
@@ -25,6 +24,9 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	public string Name => "whim.focus_indicator";
 
 	/// <inheritdoc />
+	public FocusIndicatorConfig Config { get; }
+
+	/// <inheritdoc />
 	public bool IsVisible { get; private set; }
 
 	/// <summary>
@@ -35,7 +37,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	public FocusIndicatorPlugin(IContext context, FocusIndicatorConfig focusIndicatorConfig)
 	{
 		_context = context;
-		_focusIndicatorConfig = focusIndicatorConfig;
+		Config = focusIndicatorConfig;
 
 		_cancellationTokenSource = new CancellationTokenSource();
 		_cancellationToken = _cancellationTokenSource.Token;
@@ -67,7 +69,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	public void PostInitialize()
 	{
 		// The window must be created on the UI thread (so don't do it in the constructor).
-		_focusIndicatorWindow = new FocusIndicatorWindow(_context, _focusIndicatorConfig);
+		_focusIndicatorWindow = new FocusIndicatorWindow(_context, Config);
 
 		// Activate the window so it renders.
 		_focusIndicatorWindow.Activate();
@@ -99,10 +101,10 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	{
 		if (_isEnabled)
 		{
-			if (_focusIndicatorConfig.FadeEnabled)
+			if (Config.FadeEnabled)
 			{
 				int now = Environment.TickCount;
-				if (now - _lastFocusStartTime >= _focusIndicatorConfig.FadeTimeout.TotalMilliseconds)
+				if (now - _lastFocusStartTime >= Config.FadeTimeout.TotalMilliseconds)
 				{
 					Hide();
 					return;
@@ -168,7 +170,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 		else
 		{
 			// Reset the last focus start time so the fade timer starts over.
-			if (_focusIndicatorConfig.FadeEnabled)
+			if (Config.FadeEnabled)
 			{
 				_lastFocusStartTime = Environment.TickCount;
 			}
@@ -178,7 +180,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 	}
 
 	/// <inheritdoc/>
-	public void ToggleFade() => _focusIndicatorConfig.FadeEnabled = !_focusIndicatorConfig.FadeEnabled;
+	public void ToggleFade() => Config.FadeEnabled = !Config.FadeEnabled;
 
 	/// <inheritdoc/>
 	public void ToggleEnabled()
@@ -187,7 +189,7 @@ public class FocusIndicatorPlugin : IFocusIndicatorPlugin
 		if (_isEnabled)
 		{
 			// Reset the last focus start time so the fade timer starts over.
-			if (_focusIndicatorConfig.FadeEnabled)
+			if (Config.FadeEnabled)
 			{
 				_lastFocusStartTime = Environment.TickCount;
 			}
