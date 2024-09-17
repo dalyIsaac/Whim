@@ -296,7 +296,7 @@
         "is_fade_enabled": {
           "type": "boolean",
           "description": "When `true`, the focus indicator will be visile for `fade_timeout` seconds after the window is focused",
-          "default": true
+          "default": false
         },
         "fade_timeout": {
           "type": "integer",

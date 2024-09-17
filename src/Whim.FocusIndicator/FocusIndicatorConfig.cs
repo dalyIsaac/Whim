@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using Microsoft.UI;
 using Microsoft.UI.Xaml.Media;
 using Windows.UI;
 
@@ -31,7 +30,7 @@ public class FocusIndicatorConfig : INotifyPropertyChanged
 	/// </summary>
 	public WindowBackdropConfig Backdrop { get; set; } = new(BackdropType.Mica, AlwaysShowBackdrop: true);
 
-	private Color _color = Colors.Transparent;
+	private Color _color;
 
 	/// <summary>
 	/// The color of the focus indicator.
