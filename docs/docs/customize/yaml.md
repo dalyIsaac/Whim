@@ -445,3 +445,15 @@ The color can be any valid RGB or RGBA hex color. The following named colors are
 | `white_smoke`          | `#FFF5F5F5` | <span style="background:#F5F5F5" class="color-block"></span>         |
 | `yellow`               | `#FFFFFF00` | <span style="background:#FFFF00" class="color-block"></span>         |
 | `yellow_green`         | `#FF9ACD32` | <span style="background:#9ACD32" class="color-block"></span>         |
+
+### Layout Preview Plugin
+
+The `LayoutPreviewPlugin` adds a layout preview to Whim.
+
+![Layout preview demo](../../images/layout-preview-demo.gif)
+
+```yaml
+plugins:
+  layout_preview:
+    is_enabled: true
+```

@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Media;
 using Whim.CommandPalette;
 using Whim.FocusIndicator;
 using Whim.Gaps;
+using Whim.LayoutPreview;
 
 namespace Whim.Yaml;
 
@@ -22,6 +23,7 @@ internal static class YamlPluginLoader
 		LoadGapsPlugin(ctx, schema);
 		LoadCommandPalettePlugin(ctx, schema);
 		LoadFocusIndicatorPlugin(ctx, schema);
+		LoadLayoutPreviewPlugin(ctx, schema);
 	}
 
 	private static void LoadGapsPlugin(IContext ctx, Schema schema)
@@ -149,5 +151,24 @@ internal static class YamlPluginLoader
 		}
 
 		ctx.PluginManager.AddPlugin(new FocusIndicatorPlugin(ctx, config));
+	}
+
+	private static void LoadLayoutPreviewPlugin(IContext ctx, Schema schema)
+	{
+		var layoutPreview = schema.Plugins.LayoutPreview;
+
+		if (!layoutPreview.IsValid())
+		{
+			Logger.Debug("LayoutPreview plugin is not valid.");
+			return;
+		}
+
+		if (layoutPreview.IsEnabled.AsOptional() is { } isEnabled && !isEnabled)
+		{
+			Logger.Debug("LayoutPreview plugin is not enabled.");
+			return;
+		}
+
+		ctx.PluginManager.AddPlugin(new LayoutPreviewPlugin(ctx));
 	}
 }

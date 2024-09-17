@@ -66,6 +66,11 @@
         "focus_indicator": {
           "$ref": "#/$defs/FocusIndicatorPlugin",
           "description": "Plugin to add a focus indicator"
+        },
+
+        "layout_preview": {
+          "$ref": "#/$defs/LayoutPreviewPlugin",
+          "description": "Plugin to add a layout preview"
         }
       }
     }
@@ -302,6 +307,19 @@
           "type": "integer",
           "description": "The time in seconds before the focus indicator fades out",
           "default": 10
+        }
+      }
+    },
+
+    "LayoutPreviewPlugin": {
+      "type": "object",
+      "description": "Plugin to add a layout preview. For more, see https://dalyisaac.github.io/Whim/docs/plugins/layout-preview.html",
+      "additionalProperties": false,
+      "properties": {
+        "is_enabled": {
+          "type": "boolean",
+          "description": "Whether the plugin is enabled",
+          "default": true
         }
       }
     },
