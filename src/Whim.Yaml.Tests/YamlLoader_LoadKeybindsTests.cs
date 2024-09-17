@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Whim.Yaml.Tests;
 
-public class YamlLoader_UpdateKeybindsTests
+public class YamlLoader_LoadKeybindsTests
 {
 	public static TheoryData<string, bool> KeybindConfig =>
 		new()

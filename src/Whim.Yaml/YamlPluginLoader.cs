@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using Corvus.Json;
+using Microsoft.UI.Xaml.Media;
 using Whim.CommandPalette;
+using Whim.FocusIndicator;
 using Whim.Gaps;
 
 namespace Whim.Yaml;
@@ -19,6 +21,7 @@ internal static class YamlPluginLoader
 	{
 		LoadGapsPlugin(ctx, schema);
 		LoadCommandPalettePlugin(ctx, schema);
+		LoadFocusIndicatorPlugin(ctx, schema);
 	}
 
 	private static void LoadGapsPlugin(IContext ctx, Schema schema)
@@ -97,9 +100,54 @@ internal static class YamlPluginLoader
 
 		if (commandPalette.Backdrop.AsOptional() is { } backdrop)
 		{
-			config.Backdrop = YamlLoader.ParseWindowBackdropConfig(backdrop);
+			config.Backdrop = YamlLoaderUtils.ParseWindowBackdropConfig(backdrop);
 		}
 
 		ctx.PluginManager.AddPlugin(new CommandPalettePlugin(ctx, config));
+	}
+
+	private static void LoadFocusIndicatorPlugin(IContext ctx, Schema schema)
+	{
+		var focusIndicator = schema.Plugins.FocusIndicator;
+
+		if (!focusIndicator.IsValid())
+		{
+			Logger.Debug("FocusIndicator plugin is not valid.");
+			return;
+		}
+
+		if (focusIndicator.IsEnabled.AsOptional() is { } isEnabled && !isEnabled)
+		{
+			Logger.Debug("FocusIndicator plugin is not enabled.");
+			return;
+		}
+
+		FocusIndicatorConfig config = new();
+
+		if (focusIndicator.Color.AsOptional() is { } color)
+		{
+			string colorStr = (string)color;
+			var rawColor = colorStr.ParseColor();
+			var winUiColor = Windows.UI.Color.FromArgb(rawColor.A, rawColor.R, rawColor.G, rawColor.B);
+
+			config.Color = new SolidColorBrush(winUiColor);
+		}
+
+		if (focusIndicator.BorderSize.AsOptional() is { } borderSize)
+		{
+			config.BorderSize = (int)borderSize;
+		}
+
+		if (focusIndicator.IsFadeEnabled.AsOptional() is { } isFadeEnabled)
+		{
+			config.FadeEnabled = isFadeEnabled;
+		}
+
+		if (focusIndicator.FadeTimeout.AsOptional() is { } fadeTimeout)
+		{
+			config.FadeTimeout = TimeSpan.FromSeconds((int)fadeTimeout);
+		}
+
+		ctx.PluginManager.AddPlugin(new FocusIndicatorPlugin(ctx, config));
 	}
 }
