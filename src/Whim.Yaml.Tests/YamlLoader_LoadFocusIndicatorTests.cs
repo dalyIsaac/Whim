@@ -188,7 +188,7 @@ public class YamlLoader_LoadFocusIndicatorTests
 	}
 
 	public static TheoryData<string, bool> DisabledFocusIndicatorConfig =>
-		new TheoryData<string, bool>()
+		new()
 		{
 			// YAML, is_enabled set to false
 			{
