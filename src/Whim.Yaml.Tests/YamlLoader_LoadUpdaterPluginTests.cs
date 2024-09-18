@@ -93,7 +93,7 @@ public class YamlLoader_LoadUpdaterPluginTests
 	public static TheoryData<string, bool> UpdaterPluginNotEnabledConfig =>
 		new()
 		{
-			// YAML
+			// YAML, disabled
 			{
 				"""
 					plugins:
@@ -102,13 +102,57 @@ public class YamlLoader_LoadUpdaterPluginTests
 					""",
 				true
 			},
-			// JSON
+			// JSON, disabled
 			{
 				"""
 					{
 						"plugins": {
 							"updater": {
 								"is_enabled": false
+							}
+						}
+					}
+					""",
+				false
+			},
+			// YAML, invalid release channel
+			{
+				"""
+					plugins:
+					  updater:
+					    release_channel: invalid
+					""",
+				true
+			},
+			// JSON, invalid release channel
+			{
+				"""
+					{
+						"plugins": {
+							"updater": {
+								"release_channel": "invalid"
+							}
+						}
+					}
+					""",
+				false
+			},
+			// YAML, invalid update frequency
+			{
+				"""
+					plugins:
+					  updater:
+					    update_frequency: invalid
+					""",
+				true
+			},
+			// JSON, invalid update frequency
+			{
+				"""
+					{
+						"plugins": {
+							"updater": {
+								"update_frequency": "invalid"
 							}
 						}
 					}
