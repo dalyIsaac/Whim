@@ -34,6 +34,7 @@
 		<ProjectReference Include="..\Whim.FocusIndicator\Whim.FocusIndicator.csproj" />
 		<ProjectReference Include="..\Whim.Gaps\Whim.Gaps.csproj" />
 		<ProjectReference Include="..\Whim.LayoutPreview\Whim.LayoutPreview.csproj" />
+		<ProjectReference Include="..\Whim.Updater\Whim.Updater.csproj" />
 		<ProjectReference Include="..\Whim\Whim.csproj" />
 	</ItemGroup>
 

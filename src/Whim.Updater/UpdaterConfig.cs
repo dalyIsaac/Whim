@@ -78,9 +78,9 @@ public static class UpdateFrequencyExtensions
 public class UpdaterConfig
 {
 	/// <summary>
-	/// The release channel to install. Defaults to <see cref="ReleaseChannel.Stable"/>.
+	/// The release channel to install. Defaults to <see cref="ReleaseChannel.Alpha"/>.
 	/// </summary>
-	public ReleaseChannel ReleaseChannel { get; set; } = ReleaseChannel.Stable;
+	public ReleaseChannel ReleaseChannel { get; set; } = ReleaseChannel.Alpha;
 
 	/// <summary>
 	/// The frequency at which the updater should check for updates. Defaults to <see cref="UpdateFrequency.Weekly"/>.

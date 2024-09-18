@@ -353,7 +353,8 @@
               "const": "stable",
               "description": "NOT YET AVAILABLE. Stable releases are the most stable, but have the least features"
             }
-          ]
+          ],
+          "default": "alpha"
         },
         "update_frequency": {
           "anyOf": [
@@ -373,7 +374,8 @@
               "const": "monthly",
               "description": "Check for updates monthly"
             }
-          ]
+          ],
+          "default": "weekly"
         }
       }
     },

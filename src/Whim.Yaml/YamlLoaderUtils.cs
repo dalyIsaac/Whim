@@ -97,4 +97,17 @@ internal static class YamlLoaderUtils
 			return 0;
 		}
 	}
+
+	/// <summary>
+	/// Capitalizes the first letter of the string.
+	/// </summary>
+	/// <param name="str"></param>
+	/// <returns></returns>
+	public static string Capitalize(this string str) =>
+		str.Length switch
+		{
+			0 => str,
+			1 => char.ToUpperInvariant(str[0]).ToString(),
+			_ => char.ToUpperInvariant(str[0]) + str[1..],
+		};
 }

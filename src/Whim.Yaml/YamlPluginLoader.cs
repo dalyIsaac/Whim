@@ -5,6 +5,7 @@ using Whim.CommandPalette;
 using Whim.FocusIndicator;
 using Whim.Gaps;
 using Whim.LayoutPreview;
+using Whim.Updater;
 
 namespace Whim.Yaml;
 
@@ -24,6 +25,7 @@ internal static class YamlPluginLoader
 		LoadCommandPalettePlugin(ctx, schema);
 		LoadFocusIndicatorPlugin(ctx, schema);
 		LoadLayoutPreviewPlugin(ctx, schema);
+		LoadUpdaterPlugin(ctx, schema);
 	}
 
 	private static void LoadGapsPlugin(IContext ctx, Schema schema)
@@ -170,5 +172,42 @@ internal static class YamlPluginLoader
 		}
 
 		ctx.PluginManager.AddPlugin(new LayoutPreviewPlugin(ctx));
+	}
+
+	private static void LoadUpdaterPlugin(IContext ctx, Schema schema)
+	{
+		var updater = schema.Plugins.Updater;
+
+		if (!updater.IsValid())
+		{
+			Logger.Debug("Updater plugin is not valid.");
+			return;
+		}
+
+		if (updater.IsEnabled.AsOptional() is { } isEnabled && !isEnabled)
+		{
+			Logger.Debug("Updater plugin is not enabled.");
+			return;
+		}
+
+		UpdaterConfig config = new();
+
+		if (updater.UpdateFrequency.AsOptional() is { } updateFrequency)
+		{
+			string updateFrequencyStr = ((string)updateFrequency).Capitalize();
+			config.UpdateFrequency = Enum.TryParse<UpdateFrequency>(updateFrequencyStr, out var frequency)
+				? frequency
+				: UpdateFrequency.Never;
+		}
+
+		if (updater.ReleaseChannel.AsOptional() is { } releaseChannel)
+		{
+			string releaseChannelStr = ((string)releaseChannel).Capitalize();
+			config.ReleaseChannel = Enum.TryParse<ReleaseChannel>(releaseChannelStr, out var channel)
+				? channel
+				: ReleaseChannel.Stable;
+		}
+
+		ctx.PluginManager.AddPlugin(new UpdaterPlugin(ctx, config));
 	}
 }
