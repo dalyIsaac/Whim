@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Whim.Yaml.Tests;
 
-public class YamlLoader_LoadLayoutPreviewTests
+public class YamlLoader_LoadLayoutPreviewPluginTests
 {
 	public static TheoryData<string, bool, bool> LayoutPreviewConfig =>
 		new()

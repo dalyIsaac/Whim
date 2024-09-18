@@ -217,4 +217,20 @@ public class YamlLoaderUtilsTests
 		// Then the string is converted to a brush
 		Assert.Equal(expected, result);
 	}
+
+	[Theory]
+	[InlineData(" ", " ")]
+	[InlineData("", "")]
+	[InlineData("a", "A")]
+	[InlineData("ab", "Ab")]
+	[InlineData("abc", "Abc")]
+	public void Capitalize(string str, string expected)
+	{
+		// Given a string
+		// When capitalizing it
+		string result = str.Capitalize();
+
+		// Then the first letter is capitalized
+		Assert.Equal(expected, result);
+	}
 }

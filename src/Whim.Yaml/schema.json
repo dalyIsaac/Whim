@@ -71,6 +71,11 @@
         "layout_preview": {
           "$ref": "#/$defs/LayoutPreviewPlugin",
           "description": "Plugin to add a layout preview"
+        },
+
+        "updater": {
+          "$ref": "#/$defs/UpdaterPlugin",
+          "description": "Plugin to add an updater"
         }
       }
     }
@@ -320,6 +325,57 @@
           "type": "boolean",
           "description": "Whether the plugin is enabled",
           "default": true
+        }
+      }
+    },
+
+    "UpdaterPlugin": {
+      "type": "object",
+      "description": "Plugin to add an updater. For more, see https://dalyisaac.github.io/Whim/docs/plugins/updater.html",
+      "additionalProperties": false,
+      "properties": {
+        "is_enabled": {
+          "type": "boolean",
+          "description": "Whether the plugin is enabled",
+          "default": true
+        },
+        "release_channel": {
+          "anyOf": [
+            {
+              "const": "alpha",
+              "description": "Alpha releases are the most unstable, but have the latest features"
+            },
+            {
+              "const": "beta",
+              "description": "NOT YET AVAILABLE. Beta releases are more stable than alpha releases, but less stable than stable releases"
+            },
+            {
+              "const": "stable",
+              "description": "NOT YET AVAILABLE. Stable releases are the most stable, but have the least features"
+            }
+          ],
+          "default": "alpha"
+        },
+        "update_frequency": {
+          "anyOf": [
+            {
+              "const": "never",
+              "description": "Never check for updates"
+            },
+            {
+              "const": "daily",
+              "description": "Check for updates daily"
+            },
+            {
+              "const": "weekly",
+              "description": "Check for updates weekly"
+            },
+            {
+              "const": "monthly",
+              "description": "Check for updates monthly"
+            }
+          ],
+          "default": "weekly"
         }
       }
     },
