@@ -100,10 +100,10 @@
 
     "Filter": {
       "type": "object",
-      "required": ["filter_type", "value"],
+      "required": ["type", "value"],
       "additionalProperties": false,
       "properties": {
-        "filter_type": {
+        "type": {
           "anyOf": [
             {
               "const": "window_class",
@@ -132,10 +132,10 @@
 
     "Router": {
       "type": "object",
-      "required": ["router_type", "value", "workspace_name"],
+      "required": ["type", "value", "workspace_name"],
       "additionalProperties": false,
       "properties": {
-        "router_type": {
+        "type": {
           "anyOf": [
             {
               "const": "window_class",
@@ -185,7 +185,7 @@
       "type": "object",
       "description": "WinUI supports different backdrops/materials, depending on the OS version. To see the different materials available, see <see href='https://learn.microsoft.com/en-us/windows/apps/design/signature-experiences/materials'/>. The different materials support differing levels and style of transparency. This config lets you specify which backdrop to use for a given Whim window.",
       "properties": {
-        "backdrop_type": {
+        "type": {
           "anyOf": [
             {
               "const": "none",
