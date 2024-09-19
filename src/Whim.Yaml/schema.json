@@ -6,6 +6,17 @@
   "additionalProperties": false,
 
   "properties": {
+    "layout_engines": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/LayoutEngine" },
+          "description": "Layout engines to use for managing windows"
+        }
+      }
+    },
+
     "keybinds": {
       "type": "object",
       "properties": {
@@ -82,6 +93,50 @@
   },
 
   "$defs": {
+    "LayoutEngine": {
+      "required": ["type"],
+      "anyOf": [
+        {
+          "$ref": "#/$defs/FocusLayoutEngine"
+        },
+        {
+          "$ref": "#/$defs/SliceLayoutEngine"
+        }
+      ]
+    },
+
+    "FocusLayoutEngine": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "FocusLayoutEngine"
+        }
+      }
+    },
+
+    "SliceLayoutEngine": {
+      "type": "object",
+      "required": ["type", "variant"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "SliceLayoutEngine"
+        },
+        "variant": {
+          "anyOf": [
+            {
+              "const": "column"
+            },
+            {
+              "const": "row"
+            }
+          ]
+        }
+      }
+    },
+
     "Keybind": {
       "type": "object",
       "required": ["command", "keybind"],
