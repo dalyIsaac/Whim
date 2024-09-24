@@ -13,16 +13,16 @@ public class YamlLoader_LoadRoutersTests
 				"""
 					routers:
 					  entries:
-					  - router_type: window_class
+					  - type: window_class
 					    value: class1
 					    workspace_name: workspace1
-					  - router_type: process_file_name
+					  - type: process_file_name
 					    value: process1
 					    workspace_name: workspace2
-					  - router_type: title
+					  - type: title
 					    value: title1
 					    workspace_name: workspace3
-					  - router_type: title_regex
+					  - type: title_regex
 					    value: titleMatch1
 					    workspace_name: workspace4
 					""",
@@ -34,22 +34,22 @@ public class YamlLoader_LoadRoutersTests
 						"routers": {
 							"entries": [
 								{
-									"router_type": "window_class",
+									"type": "window_class",
 									"value": "class1",
 									"workspace_name": "workspace1"
 								},
 								{
-									"router_type": "process_file_name",
+									"type": "process_file_name",
 									"value": "process1",
 									"workspace_name": "workspace2"
 								},
 								{
-									"router_type": "title",
+									"type": "title",
 									"value": "title1",
 									"workspace_name": "workspace3"
 								},
 								{
-									"router_type": "title_regex",
+									"type": "title_regex",
 									"value": "titleMatch1",
 									"workspace_name": "workspace4"
 								}
@@ -85,7 +85,7 @@ public class YamlLoader_LoadRoutersTests
 				"""
 					routers:
 					  entries:
-					  - router_type: invalid
+					  - type: invalid
 					    value: class1
 					    workspace_name: workspace1
 					""",
@@ -97,7 +97,7 @@ public class YamlLoader_LoadRoutersTests
 						"routers": {
 							"entries": [
 								{
-									"router_type": "invalid",
+									"type": "invalid",
 									"value": "class1",
 									"workspace_name": "workspace1"
 								}

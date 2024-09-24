@@ -13,13 +13,13 @@ public class YamlLoader_LoadFiltersTests
 				"""
 					filters:
 					  entries:
-					  - filter_type: window_class
+					  - type: window_class
 					    value: class1
-					  - filter_type: process_file_name
+					  - type: process_file_name
 					    value: process1
-					  - filter_type: title
+					  - type: title
 					    value: title1
-					  - filter_type: title_regex
+					  - type: title_regex
 					    value: titleMatch1
 					""",
 				true
@@ -30,19 +30,19 @@ public class YamlLoader_LoadFiltersTests
 						"filters": {
 							"entries": [
 								{
-									"filter_type": "window_class",
+									"type": "window_class",
 									"value": "class1"
 								},
 								{
-									"filter_type": "process_file_name",
+									"type": "process_file_name",
 									"value": "process1"
 								},
 								{
-									"filter_type": "title",
+									"type": "title",
 									"value": "title1"
 								},
 								{
-									"filter_type": "title_regex",
+									"type": "title_regex",
 									"value": "titleMatch1"
 								}
 							]
@@ -77,7 +77,7 @@ public class YamlLoader_LoadFiltersTests
 				"""
 					filters:
 					  entries:
-					  - filter_type: invalid
+					  - type: invalid
 					    value: class1
 					""",
 				true
@@ -97,7 +97,7 @@ public class YamlLoader_LoadFiltersTests
 						"filters": {
 							"entries": [
 								{
-									"filter_type": "invalid",
+									"type": "invalid",
 									"value": "class1"
 								}
 							]
