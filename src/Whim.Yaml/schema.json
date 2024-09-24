@@ -7,9 +7,14 @@
 
   "properties": {
     "layout_engines": {
-      "type": "array",
-      "items": { "$ref": "#/$defs/LayoutEngine" },
-      "description": "Layout engines to use for managing windows"
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/LayoutEngine" },
+          "description": "Layout engines to use for workspaces"
+        }
+      }
     },
 
     "keybinds": {
@@ -90,7 +95,6 @@
   "$defs": {
     "LayoutEngine": {
       "required": ["type"],
-      "additionalProperties": false,
       "anyOf": [
         {
           "$ref": "#/$defs/FocusLayoutEngine"
@@ -101,20 +105,10 @@
       ]
     },
 
-    "LayoutEngineBase": {
-      "type": "object",
-      "required": ["type"],
-      "properties": {
-        "type": {
-          "type": "string",
-          "description": "The type of layout engine"
-        }
-      }
-    },
-
     "FocusLayoutEngine": {
+      "type": "object",
       "description": "A layout engine that displays one window at a time",
-      "$ref": "#/$defs/LayoutEngineBase",
+      "required": ["type"],
       "additionalProperties": false,
       "properties": {
         "type": { "const": "FocusLayoutEngine" }
@@ -122,9 +116,9 @@
     },
 
     "SliceLayoutEngine": {
+      "type": "object",
       "description": "A layout engine that divides the screen into \"areas\", which correspond to \"slices\" of a list of windows. This can be used to accomplish a variety of layouts, including master-stack layouts.",
-      "$ref": "#/$defs/LayoutEngineBase",
-      "required": ["variant"],
+      "required": ["type", "variant"],
       "additionalProperties": false,
       "properties": {
         "type": { "const": "SliceLayoutEngine" },
