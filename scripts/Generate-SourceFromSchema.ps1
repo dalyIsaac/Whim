@@ -58,7 +58,7 @@ dotnet tool run generatejsonschematypes `
     --outputPath $outputPath
 
 # If not in CI, write metadata file
-if ($null -eq $env:CI) {
+if ($LASTEXITCODE -eq 0 -and $null -eq $env:CI) {
     Write-Host "Writing metadata file..."
     @{ gitRef = $gitSha; lastWriteTime = $now } | ConvertTo-Json | Set-Content $metadataPath
 }
