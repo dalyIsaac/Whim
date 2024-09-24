@@ -18,7 +18,7 @@
       "rollForward": false
     },
     "corvus.json.jsonschema.typegeneratortool": {
-      "version": "4.0.0-preview.16",
+      "version": "3.1.1",
       "commands": ["generatejsonschematypes"],
       "rollForward": false
     }

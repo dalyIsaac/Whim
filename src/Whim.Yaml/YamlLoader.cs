@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Corvus.Json;
+using Whim.SliceLayout;
 using Yaml2JsonNode;
 using YamlDotNet.RepresentationModel;
 
@@ -31,6 +32,7 @@ public static class YamlLoader
 		UpdateKeybinds(ctx, schema);
 		UpdateFilters(ctx, schema);
 		UpdateRouters(ctx, schema);
+		UpdateLayoutEngines(ctx, schema);
 
 		YamlPluginLoader.LoadPlugins(ctx, schema);
 		return true;
@@ -182,26 +184,65 @@ public static class YamlLoader
 		}
 	}
 
-	private static void UpdateLayoutEngines(IContext cts, Schema schema)
+	private static void UpdateLayoutEngines(IContext ctx, Schema schema)
 	{
-
 		if (!schema.LayoutEngines.IsValid())
 		{
 			Logger.Debug("LayoutEngines plugin is not valid.");
 			return;
 		}
 
-		if (schema.LayoutEngines.AsOptional() is not { } entries)
+		if (schema.LayoutEngines.AsOptional() is not { } layoutEngines)
 		{
 			Logger.Debug("No layout engines found.");
 			return;
 		}
 
-		foreach (var engine in entries)
+		List<CreateLeafLayoutEngine> leafLayoutEngineCreators = [];
+		foreach (var engine in layoutEngines.Entries)
 		{
-			return engine.Match(
-				(in Schema.RequiredType.)
+			engine.Match<object?>(
+				(in Schema.ALayoutEngineThatDisplaysOneWindowAtATime focusLayoutEngine) =>
+				{
+					leafLayoutEngineCreators.Add((id) => new FocusLayoutEngine(id));
+					return null;
+				},
+				(in Schema.RequiredTypeAndVariant sliceLayoutEngine) =>
+				{
+					CreateSliceLayoutEngineCreator(ctx, leafLayoutEngineCreators, sliceLayoutEngine);
+					return null;
+				},
+				// TODO: Throw an error for an unmatched type.
+				(in Schema.RequiredType _) => null
 			);
 		}
+
+		ctx.Store.Dispatch(new SetCreateLayoutEnginesTransform(() => [.. leafLayoutEngineCreators]));
+	}
+
+	private static void CreateSliceLayoutEngineCreator(
+		IContext ctx,
+		List<CreateLeafLayoutEngine> leafLayoutEngineCreators,
+		Schema.RequiredTypeAndVariant sliceLayoutEngine
+	)
+	{
+		if (ctx.PluginManager.LoadedPlugins.First(p => p.Name == "whim.slice_layout") is not ISliceLayoutPlugin plugin)
+		{
+			// TODO: Throw an error.
+			return;
+		}
+
+		if (sliceLayoutEngine.Variant == "row")
+		{
+			leafLayoutEngineCreators.Add((id) => SliceLayouts.CreateRowLayout(ctx, plugin, id));
+			return;
+		}
+
+		if (sliceLayoutEngine.Variant == "column")
+		{
+			leafLayoutEngineCreators.Add((id) => SliceLayouts.CreateColumnLayout(ctx, plugin, id));
+		}
+
+		// TODO: Throw an error for an unmatched variant.
 	}
 }
