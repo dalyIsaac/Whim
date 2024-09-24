@@ -114,7 +114,7 @@ public static class YamlLoader
 		{
 			string value = (string)filter.Value;
 
-			switch ((string)filter.FilterType)
+			switch ((string)filter.Type)
 			{
 				case "window_class":
 					ctx.FilterManager.AddWindowClassFilter(value);
@@ -129,7 +129,7 @@ public static class YamlLoader
 					ctx.FilterManager.AddTitleMatchFilter(value);
 					break;
 				default:
-					Logger.Error($"Invalid filter type: {filter.FilterType}");
+					Logger.Error($"Invalid filter type: {filter.Type}");
 					break;
 			}
 		}
@@ -161,7 +161,7 @@ public static class YamlLoader
 			string value = (string)router.Value;
 			string workspaceName = (string)router.WorkspaceName;
 
-			switch ((string)router.RouterType)
+			switch ((string)router.Type)
 			{
 				case "window_class":
 					ctx.RouterManager.AddWindowClassRoute(value, workspaceName);
@@ -176,9 +176,32 @@ public static class YamlLoader
 					ctx.RouterManager.AddTitleMatchRoute(value, workspaceName);
 					break;
 				default:
-					Logger.Error($"Invalid router type: {router.RouterType}");
+					Logger.Error($"Invalid router type: {router.Type}");
 					break;
 			}
+		}
+	}
+
+	private static void UpdateLayoutEngines(IContext cts, Schema schema)
+	{
+
+		if (!schema.LayoutEngines.IsValid())
+		{
+			Logger.Debug("LayoutEngines plugin is not valid.");
+			return;
+		}
+
+		if (schema.LayoutEngines.AsOptional() is not { } entries)
+		{
+			Logger.Debug("No layout engines found.");
+			return;
+		}
+
+		foreach (var engine in entries)
+		{
+			return engine.Match(
+				(in Schema.RequiredType.)
+			);
 		}
 	}
 }

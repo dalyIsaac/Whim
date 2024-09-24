@@ -7,14 +7,9 @@
 
   "properties": {
     "layout_engines": {
-      "type": "object",
-      "properties": {
-        "entries": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/LayoutEngine" },
-          "description": "Layout engines to use for managing windows"
-        }
-      }
+      "type": "array",
+      "items": { "$ref": "#/$defs/LayoutEngine" },
+      "description": "Layout engines to use for managing windows"
     },
 
     "keybinds": {
@@ -95,6 +90,7 @@
   "$defs": {
     "LayoutEngine": {
       "required": ["type"],
+      "additionalProperties": false,
       "anyOf": [
         {
           "$ref": "#/$defs/FocusLayoutEngine"
@@ -105,25 +101,33 @@
       ]
     },
 
-    "FocusLayoutEngine": {
+    "LayoutEngineBase": {
       "type": "object",
       "required": ["type"],
-      "additionalProperties": false,
       "properties": {
         "type": {
-          "const": "FocusLayoutEngine"
+          "type": "string",
+          "description": "The type of layout engine"
         }
       }
     },
 
-    "SliceLayoutEngine": {
-      "type": "object",
-      "required": ["type", "variant"],
+    "FocusLayoutEngine": {
+      "description": "A layout engine that displays one window at a time",
+      "$ref": "#/$defs/LayoutEngineBase",
       "additionalProperties": false,
       "properties": {
-        "type": {
-          "const": "SliceLayoutEngine"
-        },
+        "type": { "const": "FocusLayoutEngine" }
+      }
+    },
+
+    "SliceLayoutEngine": {
+      "description": "A layout engine that divides the screen into \"areas\", which correspond to \"slices\" of a list of windows. This can be used to accomplish a variety of layouts, including master-stack layouts.",
+      "$ref": "#/$defs/LayoutEngineBase",
+      "required": ["variant"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "SliceLayoutEngine" },
         "variant": {
           "anyOf": [
             {
