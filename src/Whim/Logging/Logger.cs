@@ -50,7 +50,9 @@ public class Logger : IDisposable
 
 		if (fileSink != null)
 		{
-			string loggerFilePath = fileManager.GetWhimFileDir(fileSink.FileName);
+			fileManager.EnsureDirExists(fileManager.LogsDir);
+			string loggerFilePath = fileManager.GetWhimFileLogsDir(fileSink.FileName);
+
 			_loggerConfiguration.WriteTo.File(
 				loggerFilePath,
 				levelSwitch: fileSink.MinLogLevelSwitch,
