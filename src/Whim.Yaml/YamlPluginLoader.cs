@@ -5,12 +5,15 @@ using Whim.CommandPalette;
 using Whim.FocusIndicator;
 using Whim.Gaps;
 using Whim.LayoutPreview;
+using Whim.SliceLayout;
+using Whim.TreeLayout;
 using Whim.Updater;
 
 namespace Whim.Yaml;
 
 /// <summary>
-/// Loads plugins from the YAML configuration.
+/// Loads the SliceLayout plugin based on the provided context and schema.
+/// /// Loads plugins from the YAML configuration.
 /// </summary>
 [SuppressMessage(
 	"Reliability",
@@ -26,6 +29,8 @@ internal static class YamlPluginLoader
 		LoadFocusIndicatorPlugin(ctx, schema);
 		LoadLayoutPreviewPlugin(ctx, schema);
 		LoadUpdaterPlugin(ctx, schema);
+		LoadSliceLayoutPlugin(ctx, schema);
+		LoadTreeLayoutPlugin(ctx, schema);
 	}
 
 	private static void LoadGapsPlugin(IContext ctx, Schema schema)
@@ -209,5 +214,63 @@ internal static class YamlPluginLoader
 		}
 
 		ctx.PluginManager.AddPlugin(new UpdaterPlugin(ctx, config));
+	}
+
+	public static void LoadSliceLayoutPlugin(IContext ctx, Schema? schema = null, bool forceLoad = false)
+	{
+		// If the plugin is disabled and we're not forcing the load, then skip loading the plugin.
+
+		if (schema is not Schema definedSchema)
+		{
+			if (forceLoad)
+			{
+				ctx.PluginManager.AddPlugin(new SliceLayoutPlugin(ctx));
+			}
+
+			return;
+		}
+
+		if (!definedSchema.Plugins.SliceLayout.IsValid() && !forceLoad)
+		{
+			Logger.Debug("SliceLayout plugin is not valid.");
+			return;
+		}
+
+		if (definedSchema.Plugins.SliceLayout.IsEnabled.AsOptional() is { } isEnabled && !isEnabled && !forceLoad)
+		{
+			Logger.Debug("SliceLayout plugin is not enabled.");
+			return;
+		}
+
+		ctx.PluginManager.AddPlugin(new SliceLayoutPlugin(ctx));
+	}
+
+	public static void LoadTreeLayoutPlugin(IContext ctx, Schema? schema = null, bool forceLoad = false)
+	{
+		// If the plugin is disabled and we're not forcing the load, then skip loading the plugin.
+
+		if (schema is not Schema definedSchema)
+		{
+			if (forceLoad)
+			{
+				ctx.PluginManager.AddPlugin(new TreeLayoutPlugin(ctx));
+			}
+
+			return;
+		}
+
+		if (!definedSchema.Plugins.TreeLayout.IsValid() && !forceLoad)
+		{
+			Logger.Debug("TreeLayout plugin is not valid.");
+			return;
+		}
+
+		if (definedSchema.Plugins.TreeLayout.IsEnabled.AsOptional() is { } isEnabled && !isEnabled && !forceLoad)
+		{
+			Logger.Debug("TreeLayout plugin is not enabled.");
+			return;
+		}
+
+		ctx.PluginManager.AddPlugin(new TreeLayoutPlugin(ctx));
 	}
 }

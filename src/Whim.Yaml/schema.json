@@ -87,6 +87,16 @@
         "updater": {
           "$ref": "#/$defs/UpdaterPlugin",
           "description": "Plugin to add an updater"
+        },
+
+        "slice_layout": {
+          "$ref": "#/$defs/SliceLayoutPlugin",
+          "description": "Plugin to add a slice layout"
+        },
+
+        "tree_layout": {
+          "$ref": "#/$defs/TreeLayoutPlugin",
+          "description": "Plugin to add a tree layout"
         }
       }
     }
@@ -101,6 +111,9 @@
         },
         {
           "$ref": "#/$defs/SliceLayoutEngine"
+        },
+        {
+          "$ref": "#/$defs/TreeLayoutEngine"
         }
       ]
     },
@@ -131,6 +144,33 @@
               "const": "row"
             }
           ]
+        }
+      }
+    },
+
+    "TreeLayoutEngine": {
+      "type": "object",
+      "description": "A layout engine that arranges windows in a tree structure",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "TreeLayoutEngine" },
+        "initial_direction": {
+          "anyOf": [
+            {
+              "const": "left"
+            },
+            {
+              "const": "right"
+            },
+            {
+              "const": "up"
+            },
+            {
+              "const": "down"
+            }
+          ],
+          "description": "The initial direction to add windows in"
         }
       }
     },
@@ -429,6 +469,32 @@
             }
           ],
           "default": "weekly"
+        }
+      }
+    },
+
+    "SliceLayoutPlugin": {
+      "type": "object",
+      "description": "Plugin to add a slice layout. For more, see https://dalyisaac.github.io/Whim/docs/plugins/slice-layout.html",
+      "additionalProperties": false,
+      "properties": {
+        "is_enabled": {
+          "type": "boolean",
+          "description": "Whether the plugin is enabled. If a SliceLayoutEngine is enabled, this plugin will be enabled",
+          "default": true
+        }
+      }
+    },
+
+    "TreeLayoutPlugin": {
+      "type": "object",
+      "description": "Plugin to add a tree layout. For more, see https://dalyisaac.github.io/Whim/docs/plugins/tree-layout.html",
+      "additionalProperties": false,
+      "properties": {
+        "is_enabled": {
+          "type": "boolean",
+          "description": "Whether the plugin is enabled. If a TreeLayoutEngine is enabled, this plugin will be enabled",
+          "default": true
         }
       }
     },

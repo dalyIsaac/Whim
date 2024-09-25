@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Corvus.Json;
 using Whim.SliceLayout;
+using Whim.TreeLayout;
 using Yaml2JsonNode;
 using YamlDotNet.RepresentationModel;
 
@@ -32,9 +33,10 @@ public static class YamlLoader
 		UpdateKeybinds(ctx, schema);
 		UpdateFilters(ctx, schema);
 		UpdateRouters(ctx, schema);
-		UpdateLayoutEngines(ctx, schema);
 
 		YamlPluginLoader.LoadPlugins(ctx, schema);
+		UpdateLayoutEngines(ctx, schema);
+
 		return true;
 	}
 
@@ -212,6 +214,11 @@ public static class YamlLoader
 					CreateSliceLayoutEngineCreator(ctx, leafLayoutEngineCreators, sliceLayoutEngine);
 					return null;
 				},
+				(in Schema.ALayoutEngineThatArrangesWindowsInATreeStructure treeLayoutEngine) =>
+				{
+					CreateTreeLayoutEngineCreator(ctx, leafLayoutEngineCreators, treeLayoutEngine);
+					return null;
+				},
 				// TODO: Throw an error for an unmatched type.
 				(in Schema.RequiredType _) => null
 			);
@@ -226,23 +233,66 @@ public static class YamlLoader
 		Schema.RequiredTypeAndVariant sliceLayoutEngine
 	)
 	{
-		if (ctx.PluginManager.LoadedPlugins.First(p => p.Name == "whim.slice_layout") is not ISliceLayoutPlugin plugin)
+		if (!sliceLayoutEngine.IsValid())
 		{
-			// TODO: Throw an error.
 			return;
+		}
+
+		if (
+			ctx.PluginManager.LoadedPlugins.FirstOrDefault(p => p.Name == "whim.slice_layout")
+			is not SliceLayoutPlugin plugin
+		)
+		{
+			plugin = new(ctx);
+			ctx.PluginManager.AddPlugin(plugin);
 		}
 
 		if (sliceLayoutEngine.Variant == "row")
 		{
 			leafLayoutEngineCreators.Add((id) => SliceLayouts.CreateRowLayout(ctx, plugin, id));
-			return;
 		}
-
-		if (sliceLayoutEngine.Variant == "column")
+		else if (sliceLayoutEngine.Variant == "column")
 		{
 			leafLayoutEngineCreators.Add((id) => SliceLayouts.CreateColumnLayout(ctx, plugin, id));
 		}
+	}
 
-		// TODO: Throw an error for an unmatched variant.
+	private static void CreateTreeLayoutEngineCreator(
+		IContext ctx,
+		List<CreateLeafLayoutEngine> leafLayoutEngineCreators,
+		Schema.ALayoutEngineThatArrangesWindowsInATreeStructure treeLayoutEngine
+	)
+	{
+		if (!treeLayoutEngine.IsValid())
+		{
+			return;
+		}
+
+		if (
+			ctx.PluginManager.LoadedPlugins.FirstOrDefault(p => p.Name == "whim.tree_layout")
+			is not TreeLayoutPlugin plugin
+		)
+		{
+			plugin = new(ctx);
+			ctx.PluginManager.AddPlugin(plugin);
+		}
+
+		Direction defaultAddNodeDirection = (string)treeLayoutEngine.InitialDirection switch
+		{
+			"left" => Direction.Left,
+			"right" => Direction.Right,
+			"up" => Direction.Up,
+			"down" => Direction.Down,
+			_ => Direction.Right,
+		};
+
+		leafLayoutEngineCreators.Add(
+			(id) =>
+			{
+				TreeLayoutEngine engine = new(ctx, plugin, id);
+				plugin.SetAddWindowDirection(engine, defaultAddNodeDirection);
+				return engine;
+			}
+		);
 	}
 }
