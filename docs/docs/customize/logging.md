@@ -25,6 +25,4 @@ if (context.Logger.Config.DebugSink is SinkConfig debugSinkConfig)
 
 ## Logs Location
 
-By default logs will be located in the `.whim/logs` directory.
-
-To customize the location of the `logs` directory, set the `--logs-dir` CLI argument when starting Whim.
+Logs will be located in the `.whim/logs` directory, with respect to actual location of the `.whim` directory.
