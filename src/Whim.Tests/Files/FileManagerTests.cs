@@ -152,6 +152,19 @@ public class FileManagerTests
 	}
 
 	[Fact]
+	public void LogsDir()
+	{
+		// Given
+		FileManager fileManager = new([]);
+
+		// When
+		string logsDir = fileManager.LogsDir;
+
+		// Then
+		Assert.Equal(ExpectedWhimLogsDir, logsDir);
+	}
+
+	[Fact]
 	public void GetWhimFileLogsDir()
 	{
 		// Given
