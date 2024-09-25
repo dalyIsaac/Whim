@@ -7,7 +7,7 @@ internal class FileManager : IFileManager
 	public string WhimDir { get; } =
 		Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".whim");
 
-	public string LogsDir { get; }
+	public string LogsDir => Path.Combine(WhimDir, "logs");
 
 	public string SavedStateDir => Path.Combine(WhimDir, "state");
 
@@ -18,56 +18,31 @@ internal class FileManager : IFileManager
 		{
 			WhimDir = dir;
 		}
-
-		string? logsDir = GetLogsDirFromArgs(args);
-
-		if (logsDir != null)
-		{
-			LogsDir = logsDir;
-		}
-		else
-		{
-			LogsDir = Path.Combine(WhimDir, "logs");
-		}
 	}
 
 	private static string? GetDirFromArgs(string[] args)
 	{
 		const string dirArg = "--dir";
-		return GetValueFromArgs(args, dirArg);
-	}
-
-	private static string? GetLogsDirFromArgs(string[] args)
-	{
-		const string logsDir = "--logs-dir";
-		return GetValueFromArgs(args, logsDir);
-	}
-
-	private static string? GetValueFromArgs(string[] args, string argName)
-	{
 		for (int i = 0; i < args.Length; i++)
 		{
 			string arg = args[i];
-
-			if (!arg.StartsWith(argName))
+			if (!arg.StartsWith(dirArg))
 			{
 				continue;
 			}
 
-			if (arg.Length > argName.Length + 1)
+			if (arg.Length > dirArg.Length + 1)
 			{
-				return arg[(argName.Length + 1)..];
+				return arg[(dirArg.Length + 1)..];
 			}
 
 			for (int j = i + 1; j < args.Length; j++)
 			{
 				string nextArg = args[j];
-
 				if (string.IsNullOrEmpty(nextArg))
 				{
 					continue;
 				}
-
 				if (nextArg.StartsWith("--"))
 				{
 					return null;
