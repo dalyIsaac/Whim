@@ -67,14 +67,38 @@ internal static class YamlLayoutEngineLoader
 			ctx.PluginManager.AddPlugin(plugin);
 		}
 
-		if (sliceLayoutEngine.Variant == "row")
-		{
-			leafLayoutEngineCreators.Add((id) => SliceLayouts.CreateRowLayout(ctx, plugin, id));
-		}
-		else if (sliceLayoutEngine.Variant == "column")
-		{
-			leafLayoutEngineCreators.Add((id) => SliceLayouts.CreateColumnLayout(ctx, plugin, id));
-		}
+		sliceLayoutEngine.Variant.Match<object?>(
+			(in Schema.RequiredTypeAndVariant.VariantEntity.CreatesAColumnLayoutWhereWindowsAreStackedVertically _) =>
+			{
+				leafLayoutEngineCreators.Add((id) => SliceLayouts.CreateColumnLayout(ctx, plugin, id));
+				return null;
+			},
+			(in Schema.RequiredTypeAndVariant.VariantEntity.CreatesARowLayoutWhereWindowsAreStackedHorizontally _) =>
+			{
+				leafLayoutEngineCreators.Add((id) => SliceLayouts.CreateRowLayout(ctx, plugin, id));
+				return null;
+			},
+			(in Schema.RequiredTypeAndVariant.VariantEntity.RequiredType _) =>
+			{
+				leafLayoutEngineCreators.Add((id) => SliceLayouts.CreatePrimaryStackLayout(ctx, plugin, id));
+				return null;
+			},
+			(in Schema.RequiredTypeAndVariant.VariantEntity.RequiredTypeAndColumns multiColumnLayout) =>
+			{
+				var columns = multiColumnLayout.Columns;
+				uint[] unsignedColumns = columns.Select(c => (uint)c).ToArray();
+				leafLayoutEngineCreators.Add(
+					(id) => SliceLayouts.CreateMultiColumnLayout(ctx, plugin, id, unsignedColumns)
+				);
+				return null;
+			},
+			(in Schema.RequiredTypeAndVariant.VariantEntity.AnyOfRequiredType _) =>
+			{
+				leafLayoutEngineCreators.Add((id) => SliceLayouts.CreateSecondaryPrimaryLayout(ctx, plugin, id));
+				return null;
+			},
+			(in Schema.RequiredTypeAndVariant.VariantEntity _) => null
+		);
 	}
 
 	private static void CreateTreeLayoutEngineCreator(

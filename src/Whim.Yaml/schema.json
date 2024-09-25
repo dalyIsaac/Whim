@@ -138,10 +138,66 @@
         "variant": {
           "anyOf": [
             {
-              "const": "column"
+              "type": "object",
+              "required": ["type"],
+              "additionalProperties": false,
+              "description": "Creates a column layout, where windows are stacked vertically.",
+              "properties": {
+                "type": {
+                  "const": "column"
+                }
+              }
             },
             {
-              "const": "row"
+              "type": "object",
+              "required": ["type"],
+              "additionalProperties": false,
+              "description": "Creates a row layout, where windows are stacked horizontally.",
+              "properties": {
+                "type": {
+                  "const": "row"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": ["type"],
+              "additionalProperties": false,
+              "description": "Creates a primary stack layout, where the first window takes up half the screen, and the remaining windows are stacked vertically on the other half.",
+              "properties": {
+                "type": {
+                  "const": "primary_stack"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": ["type", "columns"],
+              "additionalProperties": false,
+              "description": "Creates a multi-column layout with the given number of windows in each column. [2, 1, 0] will create a layout with 3 columns, where the first column has 2 windows, the second column has 1 window, and the third column has infinite windows.",
+              "properties": {
+                "type": {
+                  "const": "multi_column_stack"
+                },
+                "columns": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": ["type"],
+              "additionalProperties": false,
+              "description": "Creates a three-column layout, where the primary column is in the middle, the secondary column is on the left, and the overflow column is on the right. The middle column takes up 50% of ths creen, and the left and right columns take up 25%.",
+              "properties": {
+                "type": {
+                  "const": "secondary_primary_stack"
+                }
+              }
             }
           ]
         }
