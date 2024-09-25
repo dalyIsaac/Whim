@@ -12,6 +12,7 @@ public class FileManagerTests
 		Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
 		"test"
 	);
+	private static readonly string ExpectedWhimLogsDir = Path.Combine(ExpectedWhimDir, "logs");
 	private const string DIR_ARG = "--dir";
 
 	[Fact]
@@ -148,5 +149,31 @@ public class FileManagerTests
 
 		// Then
 		Assert.Equal(Path.Combine(ExpectedWhimDir, "test", "subdir"), whimFileDir);
+	}
+
+	[Fact]
+	public void GetWhimFileLogsDir()
+	{
+		// Given
+		FileManager fileManager = new([]);
+
+		// When
+		string whimFileLogsDir = fileManager.GetWhimFileLogsDir("test");
+
+		// Then
+		Assert.Equal(Path.Combine(ExpectedWhimLogsDir, "test"), whimFileLogsDir);
+	}
+
+	[Fact]
+	public void GetWhimFileLogsDir_WithSubDir()
+	{
+		// Given
+		FileManager fileManager = new([]);
+
+		// When
+		string whimFileLogsDir = fileManager.GetWhimFileLogsDir(Path.Combine("test", "subdir"));
+
+		// Then
+		Assert.Equal(Path.Combine(ExpectedWhimLogsDir, "test", "subdir"), whimFileLogsDir);
 	}
 }
