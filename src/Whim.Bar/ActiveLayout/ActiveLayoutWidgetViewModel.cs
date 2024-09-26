@@ -23,7 +23,12 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 	/// The name of the active layout engine.
 	/// </summary>
 	public ObservableCollection<string> LayoutEngines =>
-		new(_context.Butler.Pantry.GetWorkspaceForMonitor(Monitor)?.LayoutEngines.Select(layoutEngine => layoutEngine.Name).ToArray() ?? []);
+		new(
+			_context
+				.Butler.Pantry.GetWorkspaceForMonitor(Monitor)
+				?.LayoutEngines.Select(layoutEngine => layoutEngine.Name)
+				.ToArray() ?? []
+		);
 
 	/// <summary>
 	/// The name of the active layout engine.
@@ -33,9 +38,11 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 		get => _context.Butler.Pantry.GetWorkspaceForMonitor(Monitor)?.ActiveLayoutEngine.Name ?? "";
 		set
 		{
-			if (_context.Butler.Pantry.GetWorkspaceForMonitor(Monitor) is IWorkspace workspace
+			if (
+				_context.Butler.Pantry.GetWorkspaceForMonitor(Monitor) is IWorkspace workspace
 				&& workspace.ActiveLayoutEngine.Name != value
-				&& workspace.TrySetLayoutEngineFromName(value))
+				&& workspace.TrySetLayoutEngineFromName(value)
+			)
 			{
 				OnPropertyChanged(nameof(ActiveLayoutEngine));
 			}

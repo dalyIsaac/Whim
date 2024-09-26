@@ -59,7 +59,14 @@
 	</Style>
 
 	<!--  Active layout widget  -->
-	<StaticResource x:Key="bar:active_layout:button" ResourceKey="_base:button" />
+	<Style x:Key="bar:active_layout:combo_box" TargetType="ComboBox">
+		<Setter Property="Margin" Value="0" />
+		<Setter Property="Padding" Value="0" />
+		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="CornerRadius" Value="4" />
+		<Setter Property="FontSize" Value="14" />
+		<Setter Property="FontFamily" Value="{StaticResource _font:family}" />
+	</Style>
 
 	<!--  Tree layout engine widget  -->
 	<StaticResource x:Key="bar:tree_layout:button" ResourceKey="_base:button" />
