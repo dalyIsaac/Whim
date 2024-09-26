@@ -60,8 +60,9 @@
 
 	<!--  Active layout widget  -->
 	<Style x:Key="bar:active_layout:combo_box" TargetType="ComboBox">
-		<Setter Property="Margin" Value="0" />
-		<Setter Property="Padding" Value="0" />
+		<Setter Property="Margin" Value="5,0" />
+		<Setter Property="Padding" Value="5,0" />
+		<Setter Property="Width" Value="175" />
 		<Setter Property="BorderThickness" Value="0" />
 		<Setter Property="CornerRadius" Value="4" />
 		<Setter Property="FontSize" Value="14" />
