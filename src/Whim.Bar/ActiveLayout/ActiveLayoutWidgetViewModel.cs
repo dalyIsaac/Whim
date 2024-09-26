@@ -1,5 +1,7 @@
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 
 namespace Whim.Bar;
 
@@ -20,13 +22,25 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 	/// <summary>
 	/// The name of the active layout engine.
 	/// </summary>
-	public string ActiveLayoutEngine =>
-		_context.Butler.Pantry.GetWorkspaceForMonitor(Monitor)?.ActiveLayoutEngine.Name ?? "";
+	public ObservableCollection<string> LayoutEngines =>
+		new(_context.Butler.Pantry.GetWorkspaceForMonitor(Monitor)?.LayoutEngines.Select(layoutEngine => layoutEngine.Name).ToArray() ?? []);
 
 	/// <summary>
-	/// Command to switch to the next layout engine.
+	/// The name of the active layout engine.
 	/// </summary>
-	public System.Windows.Input.ICommand NextLayoutEngineCommand { get; }
+	public string ActiveLayoutEngine
+	{
+		get => _context.Butler.Pantry.GetWorkspaceForMonitor(Monitor)?.ActiveLayoutEngine.Name ?? "";
+		set
+		{
+			if (_context.Butler.Pantry.GetWorkspaceForMonitor(Monitor) is IWorkspace workspace
+				&& workspace.ActiveLayoutEngine.Name != value
+				&& workspace.TrySetLayoutEngineFromName(value))
+			{
+				OnPropertyChanged(nameof(ActiveLayoutEngine));
+			}
+		}
+	}
 
 	/// <summary>
 	///
@@ -37,7 +51,6 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 	{
 		_context = context;
 		Monitor = monitor;
-		NextLayoutEngineCommand = new NextLayoutEngineCommand(context, this);
 
 		_context.WorkspaceManager.ActiveLayoutEngineChanged += WorkspaceManager_ActiveLayoutEngineChanged;
 		_context.Butler.MonitorWorkspaceChanged += Butler_MonitorWorkspaceChanged;
