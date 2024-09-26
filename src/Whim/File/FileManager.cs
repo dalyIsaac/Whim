@@ -7,6 +7,8 @@ internal class FileManager : IFileManager
 	public string WhimDir { get; } =
 		Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".whim");
 
+	public string LogsDir => Path.Combine(WhimDir, "logs");
+
 	public string SavedStateDir => Path.Combine(WhimDir, "state");
 
 	public FileManager(string[] args)
@@ -64,6 +66,8 @@ internal class FileManager : IFileManager
 	public bool FileExists(string filePath) => File.Exists(filePath);
 
 	public string GetWhimFileDir(string fileName) => Path.Combine(WhimDir, fileName);
+
+	public string GetWhimFileLogsDir(string fileName) => Path.Combine(LogsDir, fileName);
 
 	public Stream OpenRead(string filePath) => File.OpenRead(filePath);
 

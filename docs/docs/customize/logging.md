@@ -22,3 +22,7 @@ if (context.Logger.Config.DebugSink is SinkConfig debugSinkConfig)
 
 > [!NOTE]
 > Logging can be changed during runtime to be more restrictive, but cannot be made more permissive than the initial configuration.
+
+## Logs Location
+
+Logs will be located in the `.whim/logs` directory, with respect to actual location of the `.whim` directory.

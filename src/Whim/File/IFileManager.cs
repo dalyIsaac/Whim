@@ -13,6 +13,11 @@ public interface IFileManager
 	string WhimDir { get; }
 
 	/// <summary>
+	/// The path to the Whim logs directory.
+	/// </summary>
+	string LogsDir { get; }
+
+	/// <summary>
 	/// The path to the saved state directory.
 	/// </summary>
 	string SavedStateDir { get; }
@@ -36,6 +41,13 @@ public interface IFileManager
 	/// <param name="fileName">The file name.</param>
 	/// <returns>The file path.</returns>
 	string GetWhimFileDir(string fileName);
+
+	/// <summary>
+	/// Gets a file path in the Whim logs directory.
+	/// </summary>
+	/// <param name="fileName">The file name.</param>
+	/// <returns>The file path inside the logs directory.</returns>
+	string GetWhimFileLogsDir(string fileName);
 
 	/// <summary>
 	/// Opens an existing file for reading.
