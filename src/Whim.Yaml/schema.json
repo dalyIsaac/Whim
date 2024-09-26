@@ -196,6 +196,18 @@
               "properties": {
                 "type": {
                   "const": "secondary_primary_stack"
+                },
+                "primary_capacity": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "The number of rows in the primary column. This must be a non-negative integer.",
+                  "default": 1
+                },
+                "secondary_capacity": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "The number of rows in the secondary column. This must be a non-negative integer.",
+                  "default": 2
                 }
               }
             }

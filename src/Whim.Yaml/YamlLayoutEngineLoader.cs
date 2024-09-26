@@ -92,9 +92,15 @@ internal static class YamlLayoutEngineLoader
 				);
 				return null;
 			},
-			(in Schema.RequiredTypeAndVariant.VariantEntity.AnyOfRequiredType _) =>
+			(in Schema.RequiredTypeAndVariant.VariantEntity.AnyOfRequiredType secondaryPrimaryStack) =>
 			{
-				leafLayoutEngineCreators.Add((id) => SliceLayouts.CreateSecondaryPrimaryLayout(ctx, plugin, id));
+				var primaryCapacity = (uint?)secondaryPrimaryStack.PrimaryCapacity.AsOptional() ?? 1;
+				var secondaryCapacity = (uint?)secondaryPrimaryStack.SecondaryCapacity.AsOptional() ?? 2;
+
+				leafLayoutEngineCreators.Add(
+					(id) =>
+						SliceLayouts.CreateSecondaryPrimaryLayout(ctx, plugin, id, primaryCapacity, secondaryCapacity)
+				);
 				return null;
 			},
 			(in Schema.RequiredTypeAndVariant.VariantEntity _) => null
