@@ -9,4 +9,11 @@ public static class YamlLoaderTestUtils
 		ctx.FileManager.FileExists(Arg.Is<string>(s => s.EndsWith(isYaml ? "yaml" : "json"))).Returns(true);
 		ctx.FileManager.ReadAllText(Arg.Is<string>(s => s.EndsWith(isYaml ? "yaml" : "json"))).Returns(config);
 	}
+
+	public static ILayoutEngine[] GetLayoutEngines(IContext ctx)
+	{
+		SetCreateLayoutEnginesTransform transform = (SetCreateLayoutEnginesTransform)
+			ctx.Store.ReceivedCalls().First().GetArguments()[0]!;
+		return transform.CreateLayoutEnginesFn().Select(x => x(new())).ToArray();
+	}
 }
