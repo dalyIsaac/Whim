@@ -95,6 +95,8 @@ public class SliceLayoutEngineTests
 	{
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+		sut = sut.AddWindow(Substitute.For<IWindow>());
+		sut = sut.MinimizeWindowStart(Substitute.For<IWindow>());
 
 		// When
 		int hashCode = sut.GetHashCode();

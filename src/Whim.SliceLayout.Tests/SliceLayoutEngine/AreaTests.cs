@@ -15,6 +15,30 @@ public class AreaTests
 		Assert.Equal(area1, area2);
 	}
 
+	public static TheoryData<ParentArea, ParentArea> ParentArea_NotEqual =>
+		new()
+		{
+			{
+				new(isRow: true, (1, new OverflowArea(isRow: true))),
+				new(isRow: false, (1, new OverflowArea(isRow: true)))
+			},
+			{
+				new(isRow: true, (1, new OverflowArea(isRow: true))),
+				new(isRow: true, (1, new OverflowArea(isRow: false)))
+			},
+			{
+				new(isRow: true, (1, new OverflowArea(isRow: true))),
+				new(isRow: true, (1, new OverflowArea(isRow: true)), (1, new OverflowArea(isRow: true)))
+			},
+		};
+
+	[Theory, MemberData(nameof(ParentArea_NotEqual))]
+	public void ParentArea_Equals_NotEqual(ParentArea area1, ParentArea area2)
+	{
+		// Then
+		Assert.NotEqual(area1, area2);
+	}
+
 	[Fact]
 	public void ParentArea_GetHashCode()
 	{
