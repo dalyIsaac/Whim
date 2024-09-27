@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Whim.TestUtils;
 using Xunit;
 
@@ -14,17 +13,18 @@ public class SliceLayoutsTests
 		ILayoutEngine sut = SliceLayouts.CreateColumnLayout(ctx, plugin, identity);
 
 		// Then
-		new SliceLayoutEngine(
-			ctx,
-			plugin,
-			identity,
-			new ParentArea(isRow: false, (1, new SliceArea(order: 0, maxChildren: 0)))
-		)
-		{
-			Name = "Column",
-		}
-			.Should()
-			.BeEquivalentTo(sut);
+		Assert.Equal(
+			new SliceLayoutEngine(
+				ctx,
+				plugin,
+				identity,
+				new ParentArea(isRow: false, (1, new OverflowArea(isRow: false)))
+			)
+			{
+				Name = "Column",
+			},
+			sut
+		);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -35,18 +35,18 @@ public class SliceLayoutsTests
 		ILayoutEngine sut = SliceLayouts.CreateRowLayout(ctx, plugin, identity);
 
 		// Then
-		// Then
-		new SliceLayoutEngine(
-			ctx,
-			plugin,
-			identity,
-			new ParentArea(isRow: true, (1, new SliceArea(order: 0, maxChildren: 0)))
-		)
-		{
-			Name = "Row",
-		}
-			.Should()
-			.BeEquivalentTo(sut);
+		Assert.Equal(
+			new SliceLayoutEngine(
+				ctx,
+				plugin,
+				identity,
+				new ParentArea(isRow: true, (1, new OverflowArea(isRow: true)))
+			)
+			{
+				Name = "Row",
+			},
+			sut
+		);
 	}
 
 	[Theory, AutoSubstituteData]
@@ -57,17 +57,18 @@ public class SliceLayoutsTests
 		ILayoutEngine sut = SliceLayouts.CreatePrimaryStackLayout(ctx, plugin, identity);
 
 		// Then
-		new SliceLayoutEngine(
-			ctx,
-			plugin,
-			identity,
-			new ParentArea(isRow: true, (0.5, new SliceArea(order: 0, maxChildren: 0)), (0.5, new OverflowArea()))
-		)
-		{
-			Name = "Primary stack",
-		}
-			.Should()
-			.BeEquivalentTo(sut);
+		Assert.Equal(
+			new SliceLayoutEngine(
+				ctx,
+				plugin,
+				identity,
+				new ParentArea(isRow: true, (0.5, new SliceArea(order: 0, maxChildren: 1)), (0.5, new OverflowArea()))
+			)
+			{
+				Name = "Primary stack",
+			},
+			sut
+		);
 	}
 
 	[Fact]
@@ -77,14 +78,56 @@ public class SliceLayoutsTests
 		ParentArea sut = SliceLayouts.CreateMultiColumnArea([2, 1, 0, 0]);
 
 		// Then
-		new ParentArea(
-			isRow: true,
-			(0.25, new SliceArea(order: 0, maxChildren: 2)),
-			(0.25, new SliceArea(order: 1, maxChildren: 1)),
-			(0.25, new SliceArea(order: 2, maxChildren: 0)),
-			(0.25, new OverflowArea())
-		)
-			.Should()
-			.BeEquivalentTo(sut);
+		Assert.Equal(
+			new ParentArea(
+				isRow: true,
+				(0.25, new SliceArea(order: 0, maxChildren: 2)),
+				(0.25, new SliceArea(order: 1, maxChildren: 1)),
+				(0.25, new SliceArea(order: 2, maxChildren: 0)),
+				(0.25, new OverflowArea())
+			),
+			sut
+		);
+	}
+
+	// TODO: SecondaryPrimaryArea
+	[Theory]
+	[InlineAutoSubstituteData(1, 2)]
+	[InlineAutoSubstituteData(3, 1)]
+	public void CreateSecondaryPrimaryLayout(
+		uint primaryCount,
+		uint secondaryCount,
+		IContext ctx,
+		ISliceLayoutPlugin plugin
+	)
+	{
+		// Given
+		LayoutEngineIdentity identity = new();
+		ILayoutEngine sut = SliceLayouts.CreateSecondaryPrimaryLayout(
+			ctx,
+			plugin,
+			identity,
+			primaryCount,
+			secondaryCount
+		);
+
+		// Then
+		Assert.Equal(
+			new SliceLayoutEngine(
+				ctx,
+				plugin,
+				identity,
+				new ParentArea(
+					isRow: true,
+					(0.25, new SliceArea(order: 1, maxChildren: secondaryCount)),
+					(0.5, new SliceArea(order: 0, maxChildren: primaryCount)),
+					(0.25, new OverflowArea())
+				)
+			)
+			{
+				Name = "Secondary primary",
+			},
+			sut
+		);
 	}
 }

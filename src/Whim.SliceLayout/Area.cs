@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace Whim.SliceLayout;
 
@@ -64,6 +66,44 @@ public record ParentArea : BaseArea
 		IsRow = isRow;
 		Weights = weights;
 		Children = children;
+	}
+
+	/// <summary>
+	/// Determines whether the specified object is equal to the current object. This compares
+	/// the contents of the weights and children.
+	/// </summary>
+	/// <param name="other"></param>
+	/// <returns></returns>
+	public virtual bool Equals(ParentArea? other)
+	{
+		if (other is null)
+		{
+			return false;
+		}
+
+		if (ReferenceEquals(this, other))
+		{
+			return true;
+		}
+
+		return IsRow == other.IsRow && Weights.SequenceEqual(other.Weights) && Children.SequenceEqual(other.Children);
+	}
+
+	/// <inheritdoc/>
+	public override int GetHashCode()
+	{
+		// Get the hash code of the weights and children
+		int hash = HashCode.Combine(IsRow);
+		foreach (double weight in Weights)
+		{
+			hash = HashCode.Combine(hash, weight);
+		}
+		foreach (IArea child in Children)
+		{
+			hash = HashCode.Combine(hash, child);
+		}
+
+		return hash;
 	}
 }
 

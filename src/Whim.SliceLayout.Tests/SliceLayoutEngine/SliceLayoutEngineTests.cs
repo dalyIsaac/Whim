@@ -64,6 +64,45 @@ public class SliceLayoutEngineTests
 		Assert.Equal(windowCount + minimizedWindowCount, sut.Count);
 	}
 
+	[Theory, AutoSubstituteData]
+	public void Equals_Null(IContext ctx, SliceLayoutPlugin plugin)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+
+		// When
+		bool equals = sut.Equals(null);
+
+		// Then
+		Assert.False(equals);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void Equals_Same(IContext ctx, SliceLayoutPlugin plugin)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+
+		// When
+		bool equals = sut.Equals(sut);
+
+		// Then
+		Assert.True(equals);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void SliceLayoutEngine_GetHashCode(IContext ctx, SliceLayoutPlugin plugin)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+
+		// When
+		int hashCode = sut.GetHashCode();
+
+		// Then
+		Assert.NotEqual(0, hashCode);
+	}
+
 	#region AddWindow
 	[Theory, AutoSubstituteData]
 	public void AddWindow(IContext ctx, SliceLayoutPlugin plugin, IWindow window)
