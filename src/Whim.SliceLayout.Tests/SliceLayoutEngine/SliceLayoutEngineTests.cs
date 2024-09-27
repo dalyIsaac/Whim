@@ -91,6 +91,20 @@ public class SliceLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
+	public void Equals_DifferentType(IContext ctx, SliceLayoutPlugin plugin)
+	{
+		// Given
+		ILayoutEngine a = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+		ILayoutEngine b = SliceLayouts.CreateColumnLayout(ctx, plugin, identity);
+
+		// When
+		bool equals = a.Equals(b);
+
+		// Then
+		Assert.False(equals);
+	}
+
+	[Theory, AutoSubstituteData]
 	public void SliceLayoutEngine_GetHashCode(IContext ctx, SliceLayoutPlugin plugin)
 	{
 		// Given
