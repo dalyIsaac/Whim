@@ -54,6 +54,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
 		Assert.Single(engines);
 		Assert.Equal(SliceLayouts.CreateColumnLayout(ctx, plugin, engines[0].Identity), engines[0]);
+		ctx.PluginManager.Received(1).AddPlugin(Arg.Any<ISliceLayoutPlugin>());
 	}
 
 	public static TheoryData<string, bool> RowConfig =>
@@ -103,6 +104,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
 		Assert.Single(engines);
 		Assert.Equal(SliceLayouts.CreateRowLayout(ctx, plugin, engines[0].Identity), engines[0]);
+		ctx.PluginManager.Received(1).AddPlugin(Arg.Any<ISliceLayoutPlugin>());
 	}
 
 	public static TheoryData<string, bool> PrimaryStackConfig =>
@@ -152,6 +154,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
 		Assert.Single(engines);
 		Assert.Equal(SliceLayouts.CreatePrimaryStackLayout(ctx, plugin, engines[0].Identity), engines[0]);
+		ctx.PluginManager.Received(1).AddPlugin(Arg.Any<ISliceLayoutPlugin>());
 	}
 
 	public static TheoryData<string, uint[], bool> MultiColumnConfig =>
@@ -211,6 +214,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
 		Assert.Single(engines);
 		Assert.Equal(SliceLayouts.CreateMultiColumnLayout(ctx, plugin, engines[0].Identity, columns), engines[0]);
+		ctx.PluginManager.Received(1).AddPlugin(Arg.Any<ISliceLayoutPlugin>());
 	}
 
 	public static TheoryData<string, uint, uint, bool> SecondaryPrimaryConfig =>
@@ -309,6 +313,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 			SliceLayouts.CreateSecondaryPrimaryLayout(ctx, plugin, engines[0].Identity, primaryCount, secondaryCount),
 			engines[0]
 		);
+		ctx.PluginManager.Received(1).AddPlugin(Arg.Any<ISliceLayoutPlugin>());
 	}
 
 	public static TheoryData<string, bool> InvalidConfig =>
@@ -354,6 +359,9 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 
 		// Then the layout engine is not loaded
 		Assert.True(result);
-		ctx.Store.DidNotReceive().Dispatch(Arg.Any<SetCreateLayoutEnginesTransform>());
+
+		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
+		Assert.Empty(engines);
+		ctx.PluginManager.DidNotReceive().AddPlugin(Arg.Any<ISliceLayoutPlugin>());
 	}
 }

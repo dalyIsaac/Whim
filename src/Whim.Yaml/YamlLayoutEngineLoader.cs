@@ -8,12 +8,6 @@ internal static class YamlLayoutEngineLoader
 {
 	public static void UpdateLayoutEngines(IContext ctx, Schema schema)
 	{
-		if (!schema.LayoutEngines.IsValid())
-		{
-			Logger.Debug("LayoutEngines plugin is not valid.");
-			return;
-		}
-
 		if (schema.LayoutEngines.AsOptional() is not { } layoutEngines)
 		{
 			Logger.Debug("No layout engines found.");
