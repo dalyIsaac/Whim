@@ -36,7 +36,9 @@ public abstract class BaseMemberAutoSubstituteDataAttribute : MemberDataAttribut
 	{
 		ArgumentNullException.ThrowIfNull(testMethod);
 
-		Type? type = (MemberType ?? testMethod.DeclaringType) ?? throw new ArgumentException(
+		Type? type =
+			(MemberType ?? testMethod.DeclaringType)
+			?? throw new ArgumentException(
 				string.Format(
 					CultureInfo.CurrentCulture,
 					"Could not determine member type for member '{0}'",
@@ -44,7 +46,9 @@ public abstract class BaseMemberAutoSubstituteDataAttribute : MemberDataAttribut
 				)
 			);
 
-		Func<object?> accessor = (GetPropertyAccessor(type) ?? GetFieldAccessor(type) ?? GetMethodAccessor(type)) ?? throw new ArgumentException(
+		Func<object?> accessor =
+			(GetPropertyAccessor(type) ?? GetFieldAccessor(type) ?? GetMethodAccessor(type))
+			?? throw new ArgumentException(
 				string.Format(
 					CultureInfo.CurrentCulture,
 					"Could not find public static member (property, field, or method) named '{0}' on {1}{2}",
@@ -227,12 +231,11 @@ public abstract class BaseMemberAutoSubstituteDataAttribute : MemberDataAttribut
 
 		for (int idx = 0; idx < parameters.Length; ++idx)
 		{
-
 			Type? currentType = parameterTypes[idx];
 
 			if (
-				currentType != null &&
-				parameterTypes[idx] != null
+				currentType != null
+				&& parameterTypes[idx] != null
 				&& !parameters[idx].ParameterType.GetTypeInfo().IsAssignableFrom(currentType.GetTypeInfo())
 			)
 			{
@@ -254,8 +257,7 @@ public abstract class BaseMemberAutoSubstituteDataAttribute : MemberDataAttribut
 /// <param name="memberName"></param>
 /// <param name="parameters"></param>
 public class MemberAutoSubstituteDataAttribute(string memberName, params object[] parameters)
-	: BaseMemberAutoSubstituteDataAttribute(memberName, parameters)
-{ }
+	: BaseMemberAutoSubstituteDataAttribute(memberName, parameters) { }
 
 /// <summary>
 /// Creates an AutoFixture fixture with NSubstitute support and injects the given arguments, to be
