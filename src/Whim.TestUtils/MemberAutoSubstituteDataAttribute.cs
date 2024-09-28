@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -16,6 +17,7 @@ namespace Whim.TestUtils;
 /// Creates an AutoFixture fixture with NSubstitute support and injects the given arguments, to be
 /// used like <c>MemberData</c> for an xunit <c>Theory</c>.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public abstract class BaseMemberAutoSubstituteDataAttribute : MemberDataAttributeBase
 {
 	/// <summary>
