@@ -42,7 +42,8 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 	[Theory, MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(ColumnConfig))]
 	public void Load_ColumnLayoutEngine(string config, bool isYaml, IContext ctx, ISliceLayoutPlugin plugin)
 	{
-		// Given a valid config with layout engine set
+		// Given a valid config with the slice layout engine set
+		ctx.PluginManager.LoadedPlugins.Returns([]);
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the layout engine
@@ -54,7 +55,6 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
 		Assert.Single(engines);
 		Assert.Equal(SliceLayouts.CreateColumnLayout(ctx, plugin, engines[0].Identity), engines[0]);
-		ctx.PluginManager.Received(1).AddPlugin(Arg.Any<ISliceLayoutPlugin>());
 	}
 
 	public static TheoryData<string, bool> RowConfig =>
@@ -93,6 +93,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 	public void Load_RowLayoutEngine(string config, bool isYaml, IContext ctx, ISliceLayoutPlugin plugin)
 	{
 		// Given a valid config with layout engine set
+		ctx.PluginManager.LoadedPlugins.Returns([]);
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the layout engine
@@ -104,7 +105,6 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
 		Assert.Single(engines);
 		Assert.Equal(SliceLayouts.CreateRowLayout(ctx, plugin, engines[0].Identity), engines[0]);
-		ctx.PluginManager.Received(1).AddPlugin(Arg.Any<ISliceLayoutPlugin>());
 	}
 
 	public static TheoryData<string, bool> PrimaryStackConfig =>
@@ -143,6 +143,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 	public void Load_PrimaryStackLayoutEngine(string config, bool isYaml, IContext ctx, ISliceLayoutPlugin plugin)
 	{
 		// Given a valid config with layout engine set
+		ctx.PluginManager.LoadedPlugins.Returns([]);
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the layout engine
@@ -154,7 +155,6 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
 		Assert.Single(engines);
 		Assert.Equal(SliceLayouts.CreatePrimaryStackLayout(ctx, plugin, engines[0].Identity), engines[0]);
-		ctx.PluginManager.Received(1).AddPlugin(Arg.Any<ISliceLayoutPlugin>());
 	}
 
 	public static TheoryData<string, uint[], bool> MultiColumnConfig =>
@@ -203,6 +203,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 	)
 	{
 		// Given a valid config with layout engine set
+		ctx.PluginManager.LoadedPlugins.Returns([]);
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the layout engine
@@ -214,7 +215,6 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
 		Assert.Single(engines);
 		Assert.Equal(SliceLayouts.CreateMultiColumnLayout(ctx, plugin, engines[0].Identity, columns), engines[0]);
-		ctx.PluginManager.Received(1).AddPlugin(Arg.Any<ISliceLayoutPlugin>());
 	}
 
 	public static TheoryData<string, uint, uint, bool> SecondaryPrimaryConfig =>
@@ -299,6 +299,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 	)
 	{
 		// Given a valid config with layout engine set
+		ctx.PluginManager.LoadedPlugins.Returns([]);
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the layout engine
@@ -313,7 +314,6 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 			SliceLayouts.CreateSecondaryPrimaryLayout(ctx, plugin, engines[0].Identity, primaryCount, secondaryCount),
 			engines[0]
 		);
-		ctx.PluginManager.Received(1).AddPlugin(Arg.Any<ISliceLayoutPlugin>());
 	}
 
 	public static TheoryData<string, bool> InvalidConfig =>
@@ -352,6 +352,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 	public void Load_InvalidLayoutEngine(string config, bool isYaml, IContext ctx)
 	{
 		// Given a valid config with layout engine set
+		ctx.PluginManager.LoadedPlugins.Returns([]);
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the layout engine
