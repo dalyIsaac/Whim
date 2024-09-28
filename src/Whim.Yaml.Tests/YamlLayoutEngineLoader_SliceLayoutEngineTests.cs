@@ -1,3 +1,4 @@
+using NSubstitute;
 using Whim.SliceLayout;
 using Whim.TestUtils;
 using Xunit;
@@ -222,8 +223,41 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 					    - type: SliceLayoutEngine
 					      variant:
 					        type: secondary_primary_stack
-					        primary_capacity: 1
-					        secondary_capacity: 2
+					        primary_capacity: 3
+					        secondary_capacity: 4
+					""",
+				3u,
+				4u,
+				true
+			},
+			{
+				"""
+					{
+						"layout_engines": {
+							"entries": [
+								{
+									"type": "SliceLayoutEngine",
+									"variant": {
+										"type": "secondary_primary_stack",
+										"primary_capacity": 3,
+										"secondary_capacity": 4
+									}
+								}
+							]
+						}
+					}
+					""",
+				3u,
+				4u,
+				false
+			},
+			{
+				"""
+					layout_engines:
+					  entries:
+					  - type: SliceLayoutEngine
+					    variant:
+					      type: secondary_primary_stack
 					""",
 				1u,
 				2u,
@@ -237,9 +271,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 								{
 									"type": "SliceLayoutEngine",
 									"variant": {
-										"type": "secondary_primary_stack",
-										"primary_capacity": 1,
-										"secondary_capacity": 2
+										"type": "secondary_primary_stack"
 									}
 								}
 							]
@@ -277,5 +309,51 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 			SliceLayouts.CreateSecondaryPrimaryLayout(ctx, plugin, engines[0].Identity, primaryCount, secondaryCount),
 			engines[0]
 		);
+	}
+
+	public static TheoryData<string, bool> InvalidConfig =>
+		new()
+		{
+			{
+				"""
+					layout_engines:
+					  entries:
+					    - type: SliceLayoutEngine
+					      variant:
+					        type: invalid
+					""",
+				true
+			},
+			{
+				"""
+					{
+						"layout_engines": {
+							"entries": [
+								{
+									"type": "SliceLayoutEngine",
+									"variant": {
+										"type": "invalid"
+									}
+								}
+							]
+						}
+					}
+					""",
+				false
+			},
+		};
+
+	[Theory, MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(InvalidConfig))]
+	public void Load_InvalidLayoutEngine(string config, bool isYaml, IContext ctx)
+	{
+		// Given a valid config with layout engine set
+		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
+
+		// When loading the layout engine
+		bool result = YamlLoader.Load(ctx);
+
+		// Then the layout engine is not loaded
+		Assert.True(result);
+		ctx.Store.DidNotReceive().Dispatch(Arg.Any<SetCreateLayoutEnginesTransform>());
 	}
 }
