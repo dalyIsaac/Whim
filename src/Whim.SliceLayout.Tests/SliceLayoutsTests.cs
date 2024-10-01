@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Whim.TestUtils;
 using Xunit;
 

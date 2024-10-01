@@ -112,42 +112,6 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	}
 
 	/// <inheritdoc />
-	public virtual bool Equals(SliceLayoutEngine? other)
-	{
-		if (other is null)
-		{
-			return false;
-		}
-
-		if (ReferenceEquals(this, other))
-		{
-			return true;
-		}
-
-		return _windows.SequenceEqual(other._windows)
-			&& _minimizedWindows.SequenceEqual(other._minimizedWindows)
-			&& _rootArea.Equals(other._rootArea)
-			&& Name == other.Name
-			&& Identity.Equals(other.Identity);
-	}
-
-	/// <inheritdoc />
-	public override int GetHashCode()
-	{
-		int hash = HashCode.Combine(_context, _plugin, Name, Identity);
-		foreach (IWindow window in _windows)
-		{
-			hash = HashCode.Combine(hash, window);
-		}
-		foreach (IWindow window in _minimizedWindows)
-		{
-			hash = HashCode.Combine(hash, window);
-		}
-		hash = HashCode.Combine(hash, _rootArea);
-		return hash;
-	}
-
-	/// <inheritdoc />
 	public ILayoutEngine AddWindow(IWindow window)
 	{
 		Logger.Debug($"Adding {window}");
