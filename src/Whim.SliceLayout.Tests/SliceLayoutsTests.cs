@@ -50,6 +50,19 @@ public class SliceLayoutsTests
 	}
 
 	[Theory, AutoSubstituteData]
+	public void RowNotEqualToColumn(IContext ctx, ISliceLayoutPlugin plugin)
+	{
+		// A sanity check to ensure that the two layouts are not equal.
+		// Given
+		LayoutEngineIdentity identity = new();
+		ILayoutEngine row = SliceLayouts.CreateRowLayout(ctx, plugin, identity);
+		ILayoutEngine column = SliceLayouts.CreateColumnLayout(ctx, plugin, identity);
+
+		// Then
+		Assert.NotEqual(row, column);
+	}
+
+	[Theory, AutoSubstituteData]
 	public void CreatePrimaryStackLayout(IContext ctx, ISliceLayoutPlugin plugin)
 	{
 		// Given
