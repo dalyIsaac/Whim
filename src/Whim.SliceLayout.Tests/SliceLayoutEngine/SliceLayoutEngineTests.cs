@@ -107,7 +107,7 @@ public class SliceLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void SliceLayoutEngine_SliceLayoutEngine_GetHashCode(IContext ctx, SliceLayoutPlugin plugin)
+	public void SliceLayoutEngine_GetHashCode(IContext ctx, SliceLayoutPlugin plugin)
 	{
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());

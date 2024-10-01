@@ -27,7 +27,6 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	private readonly IContext _context;
 	private readonly ImmutableList<IWindow> _windows;
 	private readonly ImmutableList<IWindow> _minimizedWindows;
-	private readonly ParentArea _rootArea;
 	private readonly ISliceLayoutPlugin _plugin;
 
 	/// <inheritdoc />
@@ -54,10 +53,18 @@ public partial record SliceLayoutEngine : ILayoutEngine
 	/// </summary>
 	private IWindowState[]? _cachedWindowStates;
 
+	// The following two parent areas are important for equality comparisons. The record will automatically use
+	// these in its auto-generated equality method.
+
+	/// <summary>
+	/// The raw root area, with no pruning - see <see cref="PrunedRootArea"/>.
+	/// </summary>
+	public ParentArea RootArea { get; }
+
 	/// <summary>
 	/// The root area, with any empty areas pruned.
 	/// </summary>
-	private readonly ParentArea _prunedRootArea;
+	public ParentArea PrunedRootArea { get; }
 
 	private SliceLayoutEngine(
 		SliceLayoutEngine engine,
@@ -73,8 +80,8 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		_windows = windows;
 		_minimizedWindows = minimizedWindows;
 
-		(_rootArea, _windowAreas) = engine._rootArea.SetStartIndexes();
-		_prunedRootArea = _rootArea.Prune(_windows.Count);
+		(RootArea, _windowAreas) = engine.RootArea.SetStartIndexes();
+		PrunedRootArea = RootArea.Prune(_windows.Count);
 	}
 
 	/// <summary>
@@ -100,8 +107,8 @@ public partial record SliceLayoutEngine : ILayoutEngine
 		_windows = [];
 		_minimizedWindows = [];
 
-		(_rootArea, _windowAreas) = rootArea.SetStartIndexes();
-		_prunedRootArea = _rootArea.Prune(_windows.Count);
+		(RootArea, _windowAreas) = rootArea.SetStartIndexes();
+		PrunedRootArea = RootArea.Prune(_windows.Count);
 	}
 
 	/// <inheritdoc />
@@ -197,7 +204,7 @@ public partial record SliceLayoutEngine : ILayoutEngine
 
 		// Get the rectangles for each window
 		SliceRectangleItem[] items = new SliceRectangleItem[_windows.Count];
-		_prunedRootArea.DoParentLayout(rectangle, items);
+		PrunedRootArea.DoParentLayout(rectangle, items);
 
 		// Get the window states
 		IWindowState[] windowStates = new IWindowState[_windows.Count];
