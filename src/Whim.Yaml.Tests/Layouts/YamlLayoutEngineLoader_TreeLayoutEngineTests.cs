@@ -119,17 +119,14 @@ public class YamlLayoutEngineLoader_TreeLayoutEngineTests
 
 	[Theory]
 	[MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(TreeConfig))]
-	public void LoadTreeLayoutEngine(
-		string yaml,
-		bool isValid,
-		Direction direction,
-		IContext ctx,
-		ITreeLayoutPlugin plugin
-	)
+	public void LoadTreeLayoutEngine(string yaml, bool isValid, Direction direction, IContext ctx)
 	{
 		// Given a valid config with the tree layout engine set
 		ctx.PluginManager.LoadedPlugins.Returns([]);
 		YamlLoaderTestUtils.SetupFileConfig(ctx, yaml, isValid);
+
+		TreeLayoutPlugin? plugin = null;
+		ctx.PluginManager.AddPlugin(Arg.Do<TreeLayoutPlugin>(t => plugin = t));
 
 		// When loading the layout engine
 		bool result = YamlLoader.Load(ctx);
@@ -139,10 +136,15 @@ public class YamlLayoutEngineLoader_TreeLayoutEngineTests
 
 		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
 		Assert.Single(engines);
-		new TreeLayoutEngine(ctx, plugin, engines[0].Identity).Should().BeEquivalentTo(engines[0]);
+		new TreeLayoutEngine(ctx, Substitute.For<ITreeLayoutPlugin>(), engines[0].Identity)
+			.Should()
+			.BeEquivalentTo(engines[0]);
 
+		// ...and the tree layout plugin should be added...
 		ctx.PluginManager.Received(1).AddPlugin(Arg.Any<TreeLayoutPlugin>());
+		Assert.IsType<TreeLayoutPlugin>(plugin);
 
-		//plugin.Received(1).SetAddWindowDirection(Arg.Any<TreeLayoutEngine>(), direction);
+		// ...and the direction was set.
+		Assert.Equal(plugin.GetAddWindowDirection((TreeLayoutEngine)engines[0]), direction);
 	}
 }
