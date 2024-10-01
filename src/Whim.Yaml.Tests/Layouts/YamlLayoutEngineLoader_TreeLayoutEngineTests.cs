@@ -1,3 +1,4 @@
+using FluentAssertions;
 using NSubstitute;
 using Whim.TestUtils;
 using Whim.TreeLayout;
@@ -138,7 +139,7 @@ public class YamlLayoutEngineLoader_TreeLayoutEngineTests
 
 		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
 		Assert.Single(engines);
-		Assert.Equal(new TreeLayoutEngine(ctx, plugin, engines[0].Identity), engines[0]);
+		new TreeLayoutEngine(ctx, plugin, engines[0].Identity).Should().BeEquivalentTo(engines[0]);
 
 		ctx.PluginManager.Received(1).AddPlugin(Arg.Any<ITreeLayoutPlugin>());
 

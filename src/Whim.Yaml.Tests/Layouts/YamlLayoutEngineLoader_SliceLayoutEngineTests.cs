@@ -1,3 +1,4 @@
+using FluentAssertions;
 using NSubstitute;
 using Whim.SliceLayout;
 using Whim.TestUtils;
@@ -54,7 +55,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 
 		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
 		Assert.Single(engines);
-		Assert.Equal(SliceLayouts.CreateColumnLayout(ctx, plugin, engines[0].Identity), engines[0]);
+		SliceLayouts.CreateColumnLayout(ctx, plugin, engines[0].Identity).Should().BeEquivalentTo(engines[0]);
 	}
 
 	public static TheoryData<string, bool> RowConfig =>
@@ -104,7 +105,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 
 		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
 		Assert.Single(engines);
-		Assert.Equal(SliceLayouts.CreateRowLayout(ctx, plugin, engines[0].Identity), engines[0]);
+		SliceLayouts.CreateRowLayout(ctx, plugin, engines[0].Identity).Should().BeEquivalentTo(engines[0]);
 	}
 
 	public static TheoryData<string, bool> PrimaryStackConfig =>
@@ -154,7 +155,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 
 		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
 		Assert.Single(engines);
-		Assert.Equal(SliceLayouts.CreatePrimaryStackLayout(ctx, plugin, engines[0].Identity), engines[0]);
+		SliceLayouts.CreatePrimaryStackLayout(ctx, plugin, engines[0].Identity).Should().BeEquivalentTo(engines[0]);
 	}
 
 	public static TheoryData<string, uint[], bool> MultiColumnConfig =>
@@ -214,7 +215,10 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 
 		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
 		Assert.Single(engines);
-		Assert.Equal(SliceLayouts.CreateMultiColumnLayout(ctx, plugin, engines[0].Identity, columns), engines[0]);
+		SliceLayouts
+			.CreateMultiColumnLayout(ctx, plugin, engines[0].Identity, columns)
+			.Should()
+			.BeEquivalentTo(engines[0]);
 	}
 
 	public static TheoryData<string, uint, uint, bool> SecondaryPrimaryConfig =>
@@ -310,10 +314,10 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 
 		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
 		Assert.Single(engines);
-		Assert.Equal(
-			SliceLayouts.CreateSecondaryPrimaryLayout(ctx, plugin, engines[0].Identity, primaryCount, secondaryCount),
-			engines[0]
-		);
+		SliceLayouts
+			.CreateSecondaryPrimaryLayout(ctx, plugin, engines[0].Identity, primaryCount, secondaryCount)
+			.Should()
+			.BeEquivalentTo(engines[0]);
 	}
 
 	public static TheoryData<string, bool> InvalidConfig =>
