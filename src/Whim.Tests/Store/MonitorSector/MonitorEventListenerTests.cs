@@ -98,7 +98,7 @@ public class MonitorEventListenerTests
 	internal async Task WindowMessageMonitor_SessionChanged(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given the listener is initialized
-		MonitorEventListener listener = new(ctx, internalCtx);
+		MonitorEventListener listener = new(ctx, internalCtx, 500);
 		listener.Initialize();
 
 		NativeManagerUtils.SetupTryEnqueue(ctx);
@@ -108,7 +108,7 @@ public class MonitorEventListenerTests
 			ctx.Store.MonitorEvents,
 			_windowMessageArgs
 		);
-		await Task.Delay(5200);
+		await Task.Delay(2000);
 
 		// Then a dispatch to the store was triggered
 		ctx.Store.Received(1).Dispatch(new MonitorsChangedTransform());

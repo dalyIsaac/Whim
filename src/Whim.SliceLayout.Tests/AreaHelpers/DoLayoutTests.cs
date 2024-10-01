@@ -238,6 +238,54 @@ public class DoLayoutTests
 			},
 		};
 
+	public static TheoryData<IRectangle<int>, ParentArea, IRectangle<int>[]> DoLayout_Column =>
+		new()
+		{
+			// Empty
+			{ new Rectangle<int>(0, 0, 100, 100), SliceLayouts.CreateColumnArea(), Array.Empty<IRectangle<int>>() },
+			// Single window
+			{
+				new Rectangle<int>(0, 0, 100, 100),
+				SliceLayouts.CreateColumnArea(),
+				new[] { new Rectangle<int>(0, 0, 100, 100) }
+			},
+			// Three windows
+			{
+				new Rectangle<int>(0, 0, 100, 100),
+				SliceLayouts.CreateColumnArea(),
+				new[]
+				{
+					new Rectangle<int>(0, 0, 100, 33),
+					new Rectangle<int>(0, 33, 100, 33),
+					new Rectangle<int>(0, 66, 100, 33),
+				}
+			},
+		};
+
+	public static TheoryData<IRectangle<int>, ParentArea, IRectangle<int>[]> DoLayout_Row =>
+		new()
+		{
+			// Empty
+			{ new Rectangle<int>(0, 0, 100, 100), SliceLayouts.CreateRowArea(), Array.Empty<IRectangle<int>>() },
+			// Single window
+			{
+				new Rectangle<int>(0, 0, 100, 100),
+				SliceLayouts.CreateRowArea(),
+				new[] { new Rectangle<int>(0, 0, 100, 100) }
+			},
+			// Three windows
+			{
+				new Rectangle<int>(0, 0, 100, 100),
+				SliceLayouts.CreateRowArea(),
+				new[]
+				{
+					new Rectangle<int>(0, 0, 33, 100),
+					new Rectangle<int>(33, 0, 33, 100),
+					new Rectangle<int>(66, 0, 33, 100),
+				}
+			},
+		};
+
 	[Theory]
 	[MemberAutoSubstituteData(nameof(DoLayout_PrimaryStack))]
 	[MemberAutoSubstituteData(nameof(DoLayout_MultiColumn))]
@@ -245,6 +293,8 @@ public class DoLayoutTests
 	[MemberAutoSubstituteData(nameof(DoLayout_OverflowColumn))]
 	[MemberAutoSubstituteData(nameof(DoLayout_OverflowRow))]
 	[MemberAutoSubstituteData(nameof(DoLayout_Nested))]
+	[MemberAutoSubstituteData(nameof(DoLayout_Column))]
+	[MemberAutoSubstituteData(nameof(DoLayout_Row))]
 	internal void DoLayout(
 		IRectangle<int> rectangle,
 		ParentArea area,

@@ -45,18 +45,14 @@ public static class SliceLayouts
 	/// <param name="context"></param>
 	/// <param name="plugin"></param>
 	/// <param name="identity"></param>
-	/// <param name="leftToRight"></param>
 	/// <returns></returns>
 	public static ILayoutEngine CreateColumnLayout(
 		IContext context,
 		ISliceLayoutPlugin plugin,
-		LayoutEngineIdentity identity,
-		bool leftToRight = true
-	) =>
-		new SliceLayoutEngine(context, plugin, identity, new(isRow: false, (1, new OverflowArea())))
-		{
-			Name = "Column",
-		};
+		LayoutEngineIdentity identity
+	) => new SliceLayoutEngine(context, plugin, identity, CreateColumnArea()) { Name = "Column" };
+
+	internal static ParentArea CreateColumnArea() => new(isRow: false, (1, new OverflowArea()));
 
 	/// <summary>
 	/// Creates a row layout, where windows are stacked horizontally.
@@ -103,7 +99,9 @@ public static class SliceLayouts
 		IContext context,
 		ISliceLayoutPlugin plugin,
 		LayoutEngineIdentity identity
-	) => new SliceLayoutEngine(context, plugin, identity, new(isRow: true, (1, new OverflowArea()))) { Name = "Row" };
+	) => new SliceLayoutEngine(context, plugin, identity, CreateRowArea()) { Name = "Row" };
+
+	internal static ParentArea CreateRowArea() => new(isRow: true, (1, new OverflowArea(isRow: true)));
 
 	/// <summary>
 	/// Creates a primary stack layout, where the first window takes up half the screen, and the
@@ -165,7 +163,7 @@ public static class SliceLayouts
 		new(isRow: true, (0.5, new SliceArea(order: 0, maxChildren: 1)), (0.5, new OverflowArea()));
 
 	/// <summary>
-	/// Creates a multi-column layout with the given number of columns.
+	/// Creates a multi-column layout with the given number of windows in each column.
 	/// <br />
 	/// For example, new <c>uint[] { 2, 1, 0 }</c> will create a layout with 3 columns, where the
 	/// first column has 2 rows, the second column has 1 row, and the third column has infinite rows.

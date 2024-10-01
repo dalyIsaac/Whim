@@ -2,10 +2,11 @@ using System.Threading.Tasks;
 
 namespace Whim;
 
-internal class MonitorEventListener(IContext ctx, IInternalContext internalCtx) : IDisposable
+internal class MonitorEventListener(IContext ctx, IInternalContext internalCtx, int delayMs = 5000) : IDisposable
 {
 	private readonly IContext _ctx = ctx;
 	private readonly IInternalContext _internalCtx = internalCtx;
+	private readonly int _delayMs = delayMs;
 	private bool _disposedValue;
 
 	public void Initialize()
@@ -29,7 +30,7 @@ internal class MonitorEventListener(IContext ctx, IInternalContext internalCtx) 
 		// This gives Windows some to figure out the correct working area.
 		_ctx.NativeManager.TryEnqueue(async () =>
 		{
-			await Task.Delay(5000).ConfigureAwait(true);
+			await Task.Delay(_delayMs).ConfigureAwait(true);
 			WindowMessageMonitor_MonitorsChanged(sender, e);
 		});
 	}

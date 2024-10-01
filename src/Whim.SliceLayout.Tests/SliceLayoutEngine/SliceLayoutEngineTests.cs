@@ -64,6 +64,61 @@ public class SliceLayoutEngineTests
 		Assert.Equal(windowCount + minimizedWindowCount, sut.Count);
 	}
 
+	[Theory, AutoSubstituteData]
+	public void Equals_Null(IContext ctx, SliceLayoutPlugin plugin)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+
+		// When
+		bool equals = sut.Equals(null);
+
+		// Then
+		Assert.False(equals);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void Equals_Same(IContext ctx, SliceLayoutPlugin plugin)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+
+		// When
+		bool equals = sut.Equals(sut);
+
+		// Then
+		Assert.True(equals);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void Equals_DifferentType(IContext ctx, SliceLayoutPlugin plugin)
+	{
+		// Given
+		ILayoutEngine a = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+		ILayoutEngine b = SliceLayouts.CreateColumnLayout(ctx, plugin, identity);
+
+		// When
+		bool equals = a.Equals(b);
+
+		// Then
+		Assert.False(equals);
+	}
+
+	[Theory, AutoSubstituteData]
+	public void SliceLayoutEngine_GetHashCode(IContext ctx, SliceLayoutPlugin plugin)
+	{
+		// Given
+		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
+		sut = sut.AddWindow(Substitute.For<IWindow>());
+		sut = sut.MinimizeWindowStart(Substitute.For<IWindow>());
+
+		// When
+		int hashCode = sut.GetHashCode();
+
+		// Then
+		Assert.NotEqual(0, hashCode);
+	}
+
 	#region AddWindow
 	[Theory, AutoSubstituteData]
 	public void AddWindow(IContext ctx, SliceLayoutPlugin plugin, IWindow window)
