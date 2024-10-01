@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Xunit;
 
 namespace Whim.SliceLayout.Tests;
@@ -12,7 +13,7 @@ public class AreaTests
 		ParentArea area2 = new(isRow: true, (1, new OverflowArea(isRow: true)));
 
 		// Then
-		Assert.Equal(area1, area2);
+		area1.Should().BeEquivalentTo(area2);
 	}
 
 	public static TheoryData<ParentArea, ParentArea> ParentArea_NotEqual =>
@@ -30,6 +31,10 @@ public class AreaTests
 				new(isRow: true, (1, new OverflowArea(isRow: true))),
 				new(isRow: true, (1, new OverflowArea(isRow: true)), (1, new OverflowArea(isRow: true)))
 			},
+			{
+				new(isRow: true, (1, new OverflowArea(isRow: true))),
+				new(isRow: true, (1, new SliceArea(order: 0, maxChildren: 0)))
+			},
 		};
 
 	[Theory, MemberData(nameof(ParentArea_NotEqual))]
@@ -37,17 +42,6 @@ public class AreaTests
 	{
 		// Then
 		Assert.NotEqual(area1, area2);
-	}
-
-	[Fact]
-	public void ParentArea_GetHashCode()
-	{
-		// Given
-		ParentArea area1 = new(isRow: true, (1, new OverflowArea(isRow: true)));
-		ParentArea area2 = new(isRow: true, (1, new OverflowArea(isRow: true)));
-
-		// Then
-		Assert.NotEqual(0, area1.GetHashCode());
-		Assert.Equal(area1.GetHashCode(), area2.GetHashCode());
+		area1.Should().NotBeEquivalentTo(area2);
 	}
 }
