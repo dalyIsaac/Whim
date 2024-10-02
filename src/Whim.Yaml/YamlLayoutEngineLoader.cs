@@ -20,7 +20,7 @@ internal static class YamlLayoutEngineLoader
 			engine.Match<object?>(
 				(in Schema.ALayoutEngineThatDisplaysOneWindowAtATime focusLayoutEngine) =>
 				{
-					leafLayoutEngineCreators.Add((id) => new FocusLayoutEngine(id));
+					CreateFocusLayoutEngineCreator(ctx, leafLayoutEngineCreators, focusLayoutEngine);
 					return null;
 				},
 				(in Schema.RequiredTypeAndVariant sliceLayoutEngine) =>
@@ -39,6 +39,21 @@ internal static class YamlLayoutEngineLoader
 		}
 
 		ctx.Store.Dispatch(new SetCreateLayoutEnginesTransform(() => [.. leafLayoutEngineCreators]));
+	}
+
+	private static void CreateFocusLayoutEngineCreator(
+		IContext ctx,
+		List<CreateLeafLayoutEngine> leafLayoutEngineCreators,
+		Schema.ALayoutEngineThatDisplaysOneWindowAtATime focusLayoutEngine
+	)
+	{
+		if (!focusLayoutEngine.IsValid())
+		{
+			return;
+		}
+
+		bool maximize = focusLayoutEngine.Maximize.AsOptional() ?? false;
+		leafLayoutEngineCreators.Add((id) => new FocusLayoutEngine(id, maximize));
 	}
 
 	private static void CreateSliceLayoutEngineCreator(

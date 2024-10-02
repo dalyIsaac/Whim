@@ -124,7 +124,12 @@
       "required": ["type"],
       "additionalProperties": false,
       "properties": {
-        "type": { "const": "FocusLayoutEngine" }
+        "type": { "const": "FocusLayoutEngine" },
+        "maximize": {
+          "type": "boolean",
+          "description": "Whether the focused window should be maximized",
+          "default": false
+        }
       }
     },
 
