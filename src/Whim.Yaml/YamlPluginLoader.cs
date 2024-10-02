@@ -216,27 +216,15 @@ internal static class YamlPluginLoader
 		ctx.PluginManager.AddPlugin(new UpdaterPlugin(ctx, config));
 	}
 
-	public static void LoadSliceLayoutPlugin(IContext ctx, Schema? schema = null, bool forceLoad = false)
+	private static void LoadSliceLayoutPlugin(IContext ctx, Schema schema)
 	{
-		// If the plugin is disabled and we're not forcing the load, then skip loading the plugin.
-
-		if (schema is not Schema definedSchema)
-		{
-			if (forceLoad)
-			{
-				ctx.PluginManager.AddPlugin(new SliceLayoutPlugin(ctx));
-			}
-
-			return;
-		}
-
-		if (!definedSchema.Plugins.SliceLayout.IsValid() && !forceLoad)
+		if (!schema.Plugins.SliceLayout.IsValid())
 		{
 			Logger.Debug("SliceLayout plugin is not valid.");
 			return;
 		}
 
-		if (definedSchema.Plugins.SliceLayout.IsEnabled.AsOptional() is { } isEnabled && !isEnabled && !forceLoad)
+		if (schema.Plugins.SliceLayout.IsEnabled.AsOptional() is { } isEnabled && !isEnabled)
 		{
 			Logger.Debug("SliceLayout plugin is not enabled.");
 			return;
@@ -245,27 +233,15 @@ internal static class YamlPluginLoader
 		ctx.PluginManager.AddPlugin(new SliceLayoutPlugin(ctx));
 	}
 
-	public static void LoadTreeLayoutPlugin(IContext ctx, Schema? schema = null, bool forceLoad = false)
+	private static void LoadTreeLayoutPlugin(IContext ctx, Schema schema)
 	{
-		// If the plugin is disabled and we're not forcing the load, then skip loading the plugin.
-
-		if (schema is not Schema definedSchema)
-		{
-			if (forceLoad)
-			{
-				ctx.PluginManager.AddPlugin(new TreeLayoutPlugin(ctx));
-			}
-
-			return;
-		}
-
-		if (!definedSchema.Plugins.TreeLayout.IsValid() && !forceLoad)
+		if (!schema.Plugins.TreeLayout.IsValid())
 		{
 			Logger.Debug("TreeLayout plugin is not valid.");
 			return;
 		}
 
-		if (definedSchema.Plugins.TreeLayout.IsEnabled.AsOptional() is { } isEnabled && !isEnabled && !forceLoad)
+		if (schema.Plugins.TreeLayout.IsEnabled.AsOptional() is { } isEnabled && !isEnabled)
 		{
 			Logger.Debug("TreeLayout plugin is not enabled.");
 			return;
