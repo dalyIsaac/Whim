@@ -1,0 +1,21 @@
+# Same as csharpierrc
+line-length = 120
+indent-width = 4
+
+# Same as in GHA workflow
+target-version = "py311"
+
+[lint]
+# Enable standard rules in editor
+select = ["F", "E4", "E7", "E9", "I", "B", "ARG"]
+
+# Allow auto-fix for import order
+fixable = ["I"]
+
+[format]
+# Use double quotes for strings
+quote-style = "double"
+
+# Same as csharpierrc
+indent-style = "tab"
+
