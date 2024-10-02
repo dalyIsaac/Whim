@@ -34,6 +34,7 @@ internal static class YamlLayoutEngineLoader
 					return null;
 				},
 				// TODO: Throw an error for an unmatched type.
+				// NOTE: This match means that validation isn't necessary.
 				(in Schema.RequiredType _) => null
 			);
 		}
@@ -47,11 +48,6 @@ internal static class YamlLayoutEngineLoader
 		Schema.ALayoutEngineThatDisplaysOneWindowAtATime focusLayoutEngine
 	)
 	{
-		if (!focusLayoutEngine.IsValid())
-		{
-			return;
-		}
-
 		bool maximize = focusLayoutEngine.Maximize.AsOptional() ?? false;
 		leafLayoutEngineCreators.Add((id) => new FocusLayoutEngine(id, maximize));
 	}
@@ -62,11 +58,6 @@ internal static class YamlLayoutEngineLoader
 		Schema.RequiredTypeAndVariant sliceLayoutEngine
 	)
 	{
-		if (!sliceLayoutEngine.IsValid())
-		{
-			return;
-		}
-
 		if (
 			ctx.PluginManager.LoadedPlugins.FirstOrDefault(p => p.Name == "whim.slice_layout")
 			is not SliceLayoutPlugin plugin
@@ -122,11 +113,6 @@ internal static class YamlLayoutEngineLoader
 		Schema.ALayoutEngineThatArrangesWindowsInATreeStructure treeLayoutEngine
 	)
 	{
-		if (!treeLayoutEngine.IsValid())
-		{
-			return;
-		}
-
 		if (
 			ctx.PluginManager.LoadedPlugins.FirstOrDefault(p => p.Name == "whim.tree_layout")
 			is not TreeLayoutPlugin plugin
