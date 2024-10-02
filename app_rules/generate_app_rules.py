@@ -85,8 +85,11 @@ class GenerateRules:
 
 	def generate_all_rules(self):
 		for app in self.komorebi_rules:
+			if "ignore_identifiers" in app:
+				# windows with matching `ignore_identifiers` are ignored by komorebi
+				Application(app["ignore_identifiers"], app["name"]).generate_rules()
 			if "float_identifiers" in app:
-				# windows with matching `float_identifiers` are ignored by komorebi
+				# also ignore `float_identifiers` for backwards compatibility
 				Application(app["float_identifiers"], app["name"]).generate_rules()
 
 
