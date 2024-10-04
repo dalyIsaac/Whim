@@ -293,5 +293,9 @@ internal static class DefaultFilteredWindowsKomorebi
 		// visio
 		filterManager.AddWindowClassFilter("VISIOS");
 		filterManager.AddWindowClassFilter("VISIOQ");
+
+		// Zen Browser
+		// filterManager.Add((window) => (window.WindowClass.StartsWith("MozillaTaskbarPreviewClass") || window.WindowClass.EndsWith("MozillaTaskbarPreviewClass")));  // duplicate rule
+		filterManager.Add((window) => window.Title.Equals("Picture-in-Picture") && window.ProcessFileName.Equals("zen.exe"));
 	}
 }
