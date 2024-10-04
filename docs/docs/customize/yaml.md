@@ -1,6 +1,6 @@
-# YAML Configuration (WIP - Subject to Change)
+# YAML Configuration (WIP)
 
-Whim is in the process of adding YAML configuration support - this is being tracked in [#1009](https://github.com/dalyIsaac/Whim/issues/1009). This has been implemented in the `Whim.Yaml` plugin.
+Whim is in the process of adding YAML configuration support - this is being tracked in [#1009](https://github.com/dalyIsaac/Whim/issues/1009). This has been implemented in the `Whim.Yaml` plugin, and may have breaking changes in the future.
 
 ## Setup
 
@@ -45,6 +45,51 @@ To use the schema in your JSON file, add the following line at the top of your f
   ...
 }
 ```
+
+## Layout Engines
+
+The layout engines configuration has a list of layout engines that you can use to customize the layout of your windows. These apply to all workspaces, unless overridden by workspace-specific configuration.
+
+### Layout Engines Example
+
+```yaml
+layout_engines:
+  entries:
+    - type: TreeLayoutEngine
+      initial_direction: right
+
+    - type: SliceLayoutEngine
+      variant:
+        type: row
+
+    - type: SliceLayoutEngine
+      variant:
+        type: column
+
+    - type: SliceLayoutEngine
+      variant:
+        type: primary_stack
+
+    - type: SliceLayoutEngine
+      variant:
+        type: secondary_primary_stack
+
+    - type: SliceLayoutEngine
+      variant:
+        type: multi_column_stack
+        columns: [2, 1, 0]
+
+    - type: SliceLayoutEngine
+      variant:
+        type: secondary_primary_stack
+        primary_capacity: 1
+        secondary_capacity: 2
+
+    - type: FocusLayoutEngine
+      maximize: false
+```
+
+TODO: Add layout engine descriptions
 
 ## Keybinds
 
