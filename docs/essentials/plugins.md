@@ -8,7 +8,7 @@ BarPlugin barPlugin = new(context, barConfig);
 context.PluginManager.AddPlugin(barPlugin);
 ```
 
-| Plugin                      | TL;DR                                                                                             | YAML JSON Docs                                                                               | C# Scripting Docs                                                                   |
+| Plugin                      | TL;DR                                                                                             | YAML JSON Docs                                                                               | Docs                                                                                |
 | --------------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | Bar                         | Adds a configurable bar to the top of each screen                                                 | [`plugins.bar`](../customize/plugins/bar.md)                                                 | [`Whim.Bar`](../script/plugins/bar.md)                                              |
 | Command Palette             | Fuzzy command palette filled with [commands](../customize/commands.md)                            | [`plugins.command_palette`](../customize/plugins/command-palette.md)                         | [`Whim.CommandPalette`](../script/plugins/command-palette.md)                       |

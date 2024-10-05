@@ -14,6 +14,7 @@ items:
   - href: core/snippets.md
 
   - name: Plugins
+  - href: plugins/overview.md
   - href: plugins/bar.md
   - href: plugins/command-palette.md
   - href: plugins/floating-window.md

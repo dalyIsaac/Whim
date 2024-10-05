@@ -13,6 +13,7 @@ items:
   - href: core/logging.md
 
   - name: Plugins
+  - href: plugins/overview.md
   - href: plugins/bar.md
   - href: plugins/command-palette.md
   - href: plugins/focus-indicator.md

@@ -23,13 +23,13 @@ void DoConfig(IContext context)
   TreeLayoutPlugin treeLayoutPlugin = new(context);
   context.PluginManager.AddPlugin(treeLayoutPlugin);
 
-    // Tree layout bar
+  // Tree layout bar
   TreeLayoutBarPlugin treeLayoutBarPlugin = new(treeLayoutPlugin);
   context.PluginManager.AddPlugin(treeLayoutBarPlugin);
   rightComponents.Add(treeLayoutBarPlugin.CreateComponent());
 
   // Bar plugin
-    List<BarComponent> leftComponents = new() { WorkspaceWidget.CreateComponent() };
+  List<BarComponent> leftComponents = new() { WorkspaceWidget.CreateComponent() };
   List<BarComponent> centerComponents = new() { FocusedWindowWidget.CreateComponent() };
   List<BarComponent> rightComponents = new()
   {
