@@ -32,8 +32,4 @@ void DoConfig(IContext context)
 return DoConfig;
 ```
 
-## Commands
-
-| Identifier           | Title             | Keybind            |
-| -------------------- | ----------------- | ------------------ |
-| `whim.updater.check` | Check for updates | No default keybind |
+[!INCLUDE [Commands](../../_common/plugins/updater.md)]

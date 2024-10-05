@@ -1,17 +1,17 @@
 items:
-  - href: scripting.md
-  - href: custom-commands.md
-  - href: keybinds.md
-  - href: workspaces.md
-  - href: layout-engines.md
-  - href: monitors.md
-  - href: store.md
-  - href: routing.md
-  - href: filtering.md
-  - href: logging.md
-  - href: styling.md
-  - href: snippets.md
-  - href: yaml.md
+  - href: core/scripting.md
+  - name: Core
+  - href: core/custom-commands.md
+  - href: core/keybinds.md
+  - href: core/workspaces.md
+  - href: core/layout-engines.md
+  - href: core/monitors.md
+  - href: core/store.md
+  - href: core/routing.md
+  - href: core/filtering.md
+  - href: core/logging.md
+  - href: core/styling.md
+  - href: core/snippets.md
 
   - name: Plugins
   - href: plugins/bar.md

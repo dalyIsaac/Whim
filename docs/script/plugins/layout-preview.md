@@ -33,6 +33,4 @@ return DoConfig;
 
 ```
 
-## Commands
-
-N/A
+[!INCLUDE [Commands](../../_common/plugins/layout-preview.md)]

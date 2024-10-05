@@ -9,14 +9,18 @@ plugins:
   command_palette:
     is_enabled: true
 
-    # max_height_pixels is the maximum height of the command palette as a percentage of the monitor height
     max_height_percent: 40
-
-    # max_width_pixels is the maximum width of the command palette in pixels
     max_width_pixels: 800
-
-    # max_width_percent is the y position of the command palette as a percentage of the monitor height
     y_position_percent: 20
 ```
 
-Commands for the `CommandPalettePlugin` can be found at the [Command Palette Plugin](../plugins/command-palette.md#commands) page.
+## Configuration
+
+| Property             | Description                                                                      |
+| -------------------- | -------------------------------------------------------------------------------- |
+| `is_enabled`         | Whether the plugin is enabled. Defaults to `true`.                               |
+| `max_height_percent` | The maximum height of the command palette as a percentage of the monitor height. |
+| `max_width_pixels`   | The maximum width of the command palette in pixels.                              |
+| `y_position_percent` | The y position of the command palette as a percentage of the monitor height.     |
+
+[!INCLUDE [Commands](../../_common/plugins/command-palette.md)]

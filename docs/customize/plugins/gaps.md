@@ -14,4 +14,14 @@ plugins:
     default_inner_delta: 2
 ```
 
-Commands for the `GapsPlugin` can be found at the [Gaps Plugin](../plugins/gaps.md#commands) page.
+## Configuration
+
+| Property              | Description                                                                            |
+| --------------------- | -------------------------------------------------------------------------------------- |
+| `is_enabled`          | Whether the plugin is enabled                                                          |
+| `outer_gap`           | The gap between the parent layout engine and the area where windows are placed         |
+| `inner_gap`           | The gap between windows                                                                |
+| `default_outer_delta` | The default outer gap used by commands `gaps.outer.increase` and `gaps.outer.decrease` |
+| `default_inner_delta` | The default inner gap used by commands `gaps.inner.increase` and `gaps.inner.decrease` |
+
+[!INCLUDE [Commands](../../_common/plugins/gaps.md)]

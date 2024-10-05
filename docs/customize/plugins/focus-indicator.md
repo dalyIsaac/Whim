@@ -14,6 +14,18 @@ plugins:
     color: green
 ```
 
+## Configuration
+
+| Property          | Description                                                                                                                  |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `is_enabled`      | Whether the plugin is enabled. Defaults to `true`.                                                                           |
+| `color`           | The color of the focus indicator. Default is `red`.                                                                          |
+| `border_size`     | The size of the border of the focus indicator, in pixels. Default is `4`.                                                    |
+| `is_fade_enabled` | When `true`, the focus indicator will be visible for `fade_timeout` seconds after the window is focused. Default is `false`. |
+| `fade_timeout`    | The time in seconds before the focus indicator fades out. Default is `10`.                                                   |
+
+## Colors
+
 The color can be any valid RGB or RGBA hex color. The following named colors are also supported:
 
 | Color Name             | RGBA Value  | Preview                                                              |
@@ -159,3 +171,5 @@ The color can be any valid RGB or RGBA hex color. The following named colors are
 | `white_smoke`          | `#FFF5F5F5` | <span style="background:#F5F5F5" class="color-block"></span>         |
 | `yellow`               | `#FFFFFF00` | <span style="background:#FFFF00" class="color-block"></span>         |
 | `yellow_green`         | `#FF9ACD32` | <span style="background:#9ACD32" class="color-block"></span>         |
+
+[!INCLUDE [Commands](../../_common/plugins/focus-indicator.md)]
