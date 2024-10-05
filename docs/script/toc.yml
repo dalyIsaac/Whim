@@ -1,16 +1,16 @@
 items:
   - href: core/scripting.md
   - name: Core
-  - href: core/custom-commands.md
-  - href: core/keybinds.md
+  - href: core/store.md
   - href: core/workspaces.md
   - href: core/layout-engines.md
   - href: core/monitors.md
-  - href: core/store.md
+  - href: core/keybinds.md
+  - href: core/custom-commands.md
   - href: core/routing.md
   - href: core/filtering.md
-  - href: core/logging.md
   - href: core/styling.md
+  - href: core/logging.md
   - href: core/snippets.md
 
   - name: Plugins

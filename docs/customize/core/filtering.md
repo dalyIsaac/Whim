@@ -1,8 +1,8 @@
-## Filters
+# Filters
 
 By default, Whim ignores a built-in list of windows that are known to cause problems with dynamic tiling window manager. Behind the scenes, Whim automatically updates the built-in list of ignored windows based on a subset of the rules from the community-driven [collection of application rules](https://github.com/LGUG2Z/komorebi-application-specific-configuration) managed by komorebi.
 
-### Custom Filtering Behavior
+## Custom Filtering Behavior
 
 The filters configuration tells Whim to ignore windows that match the specified criteria.
 
@@ -13,7 +13,7 @@ You can filter windows by:
 - `title`
 - `title_regex`
 
-### Window Class Filter
+## Window Class Filter
 
 For example, to filter out Chromium windows with the class `Chrome_WidgetWin_1`, add the following to your configuration:
 
@@ -24,7 +24,7 @@ filters:
       value: Chrome_WidgetWin_1
 ```
 
-### Process File Name Filter
+## Process File Name Filter
 
 For example, to filter out windows with the process file name `explorer.exe`, add the following to your configuration:
 
@@ -35,7 +35,7 @@ filters:
       value: explorer.exe
 ```
 
-### Title Filter
+## Title Filter
 
 For example, to filter out windows with the title `Untitled - Notepad`, add the following to your configuration:
 
@@ -46,7 +46,7 @@ filters:
       value: Untitled - Notepad
 ```
 
-### Title Match Filter
+## Title Match Filter
 
 For example, to filter out windows with the title that matches the regex `^Untitled - Notepad$`, add the following to your configuration:
 
