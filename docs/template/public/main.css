@@ -13,6 +13,11 @@
   color: var(--bs-secondary-color) !important;
 }
 
+.active {
+  color: rgba(var(--bs-link-color-rgb), var(--bs-link-opacity, 1)) !important;
+  text-decoration: underline;
+}
+
 .color-block {
   width: 1rem;
   height: 1rem;
