@@ -27,3 +27,9 @@
   height: 1rem;
   display: inline-block;
 }
+
+code {
+  background-color: var(--bs-border-color);
+  padding: 0.1rem 0.2rem;
+  border-radius: 0.25rem;
+}
