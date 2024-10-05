@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
 using NSubstitute;
 using Whim.TestUtils;
@@ -65,6 +66,7 @@ public class SliceLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
+	[SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code")]
 	public void Equals_Null(IContext ctx, SliceLayoutPlugin plugin)
 	{
 		// Given

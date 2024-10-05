@@ -40,7 +40,7 @@ internal static class YamlLoaderUtils
 		BackdropType backdropType = BackdropType.Mica;
 		bool alwaysShowBackdrop = true;
 
-		if (entity.BackdropType.AsOptional() is { } backdropTypeStr)
+		if (entity.Type.AsOptional() is { } backdropTypeStr)
 		{
 			backdropType = ((string)backdropTypeStr).ParseBackdropType();
 		}

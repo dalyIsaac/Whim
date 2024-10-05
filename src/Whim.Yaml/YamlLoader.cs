@@ -33,6 +33,8 @@ public static class YamlLoader
 		UpdateRouters(ctx, schema);
 
 		YamlPluginLoader.LoadPlugins(ctx, schema);
+		YamlLayoutEngineLoader.UpdateLayoutEngines(ctx, schema);
+
 		return true;
 	}
 
@@ -114,7 +116,7 @@ public static class YamlLoader
 		{
 			string value = (string)filter.Value;
 
-			switch ((string)filter.FilterType)
+			switch ((string)filter.Type)
 			{
 				case "window_class":
 					ctx.FilterManager.AddWindowClassFilter(value);
@@ -129,7 +131,7 @@ public static class YamlLoader
 					ctx.FilterManager.AddTitleMatchFilter(value);
 					break;
 				default:
-					Logger.Error($"Invalid filter type: {filter.FilterType}");
+					Logger.Error($"Invalid filter type: {filter.Type}");
 					break;
 			}
 		}
@@ -161,7 +163,7 @@ public static class YamlLoader
 			string value = (string)router.Value;
 			string workspaceName = (string)router.WorkspaceName;
 
-			switch ((string)router.RouterType)
+			switch ((string)router.Type)
 			{
 				case "window_class":
 					ctx.RouterManager.AddWindowClassRoute(value, workspaceName);
@@ -176,7 +178,7 @@ public static class YamlLoader
 					ctx.RouterManager.AddTitleMatchRoute(value, workspaceName);
 					break;
 				default:
-					Logger.Error($"Invalid router type: {router.RouterType}");
+					Logger.Error($"Invalid router type: {router.Type}");
 					break;
 			}
 		}

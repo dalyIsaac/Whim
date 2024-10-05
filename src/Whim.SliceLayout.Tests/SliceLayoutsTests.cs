@@ -4,6 +4,8 @@ using Xunit;
 
 namespace Whim.SliceLayout.Tests;
 
+// NOTE: We deliberately use FluentAssertions to deeply compare the objects, instead of comparing
+// the properties one by one, or comparing by reference.
 public class SliceLayoutsTests
 {
 	[Theory, AutoSubstituteData]

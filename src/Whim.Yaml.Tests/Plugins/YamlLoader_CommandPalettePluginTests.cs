@@ -145,7 +145,7 @@ public class YamlPluginLoader_CommandPalettePluginTests
 					plugins:
 					  command_palette:
 					    backdrop:
-					      backdrop_type: acrylic
+					      type: acrylic
 					      always_show_backdrop: true
 					""",
 				true,
@@ -159,7 +159,7 @@ public class YamlPluginLoader_CommandPalettePluginTests
 						"plugins": {
 							"command_palette": {
 								"backdrop": {
-									"backdrop_type": "acrylic",
+									"type": "acrylic",
 									"always_show_backdrop": true
 								}
 							}
@@ -176,7 +176,7 @@ public class YamlPluginLoader_CommandPalettePluginTests
 					plugins:
 					  command_palette:
 					    backdrop:
-					      backdrop_type: acrylic_thin
+					      type: acrylic_thin
 					      always_show_backdrop: true
 					""",
 				true,
@@ -190,7 +190,7 @@ public class YamlPluginLoader_CommandPalettePluginTests
 						"plugins": {
 							"command_palette": {
 								"backdrop": {
-									"backdrop_type": "acrylic_thin",
+									"type": "acrylic_thin",
 									"always_show_backdrop": true
 								}
 							}
@@ -207,7 +207,7 @@ public class YamlPluginLoader_CommandPalettePluginTests
 					plugins:
 					  command_palette:
 					    backdrop:
-					      backdrop_type: mica
+					      type: mica
 					      always_show_backdrop: false
 					""",
 				true,
@@ -221,7 +221,7 @@ public class YamlPluginLoader_CommandPalettePluginTests
 						"plugins": {
 							"command_palette": {
 								"backdrop": {
-									"backdrop_type": "mica",
+									"type": "mica",
 									"always_show_backdrop": false
 								}
 							}
@@ -238,7 +238,7 @@ public class YamlPluginLoader_CommandPalettePluginTests
 					plugins:
 					  command_palette:
 					    backdrop:
-					      backdrop_type: mica_alt
+					      type: mica_alt
 					""",
 				true,
 				BackdropType.MicaAlt,
@@ -251,7 +251,7 @@ public class YamlPluginLoader_CommandPalettePluginTests
 						"plugins": {
 							"command_palette": {
 								"backdrop": {
-									"backdrop_type": "mica_alt"
+									"type": "mica_alt"
 								}
 							}
 						}
@@ -267,7 +267,7 @@ public class YamlPluginLoader_CommandPalettePluginTests
 					plugins:
 					  command_palette:
 					    backdrop:
-					      backdrop_type: none
+					      type: none
 					      always_show_backdrop: true
 					""",
 				true,
@@ -281,7 +281,7 @@ public class YamlPluginLoader_CommandPalettePluginTests
 						"plugins": {
 							"command_palette": {
 								"backdrop": {
-									"backdrop_type": "none",
+									"type": "none",
 									"always_show_backdrop": true
 								}
 							}

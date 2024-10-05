@@ -6,6 +6,17 @@
   "additionalProperties": false,
 
   "properties": {
+    "layout_engines": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/LayoutEngine" },
+          "description": "Layout engines to use for workspaces"
+        }
+      }
+    },
+
     "keybinds": {
       "type": "object",
       "properties": {
@@ -76,12 +87,167 @@
         "updater": {
           "$ref": "#/$defs/UpdaterPlugin",
           "description": "Plugin to add an updater"
+        },
+
+        "slice_layout": {
+          "$ref": "#/$defs/SliceLayoutPlugin",
+          "description": "Plugin to add a slice layout"
+        },
+
+        "tree_layout": {
+          "$ref": "#/$defs/TreeLayoutPlugin",
+          "description": "Plugin to add a tree layout"
         }
       }
     }
   },
 
   "$defs": {
+    "LayoutEngine": {
+      "required": ["type"],
+      "anyOf": [
+        {
+          "$ref": "#/$defs/FocusLayoutEngine"
+        },
+        {
+          "$ref": "#/$defs/SliceLayoutEngine"
+        },
+        {
+          "$ref": "#/$defs/TreeLayoutEngine"
+        }
+      ]
+    },
+
+    "FocusLayoutEngine": {
+      "type": "object",
+      "description": "A layout engine that displays one window at a time",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "FocusLayoutEngine" },
+        "maximize": {
+          "type": "boolean",
+          "description": "Whether the focused window should be maximized",
+          "default": false
+        }
+      }
+    },
+
+    "SliceLayoutEngine": {
+      "type": "object",
+      "description": "A layout engine that divides the screen into \"areas\", which correspond to \"slices\" of a list of windows. This can be used to accomplish a variety of layouts, including master-stack layouts.",
+      "required": ["type", "variant"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "SliceLayoutEngine" },
+        "variant": {
+          "anyOf": [
+            {
+              "type": "object",
+              "required": ["type"],
+              "additionalProperties": false,
+              "description": "Creates a column layout, where windows are stacked vertically.",
+              "properties": {
+                "type": {
+                  "const": "column"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": ["type"],
+              "additionalProperties": false,
+              "description": "Creates a row layout, where windows are stacked horizontally.",
+              "properties": {
+                "type": {
+                  "const": "row"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": ["type"],
+              "additionalProperties": false,
+              "description": "Creates a primary stack layout, where the first window takes up half the screen, and the remaining windows are stacked vertically on the other half.",
+              "properties": {
+                "type": {
+                  "const": "primary_stack"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": ["type", "columns"],
+              "additionalProperties": false,
+              "description": "Creates a multi-column layout with the given number of windows in each column. [2, 1, 0] will create a layout with 3 columns, where the first column has 2 windows, the second column has 1 window, and the third column has infinite windows.",
+              "properties": {
+                "type": {
+                  "const": "multi_column_stack"
+                },
+                "columns": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": ["type"],
+              "additionalProperties": false,
+              "description": "Creates a three-column layout, where the primary column is in the middle, the secondary column is on the left, and the overflow column is on the right. The middle column takes up 50% of ths creen, and the left and right columns take up 25%.",
+              "properties": {
+                "type": {
+                  "const": "secondary_primary_stack"
+                },
+                "primary_capacity": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "The number of rows in the primary column. This must be a non-negative integer.",
+                  "default": 1
+                },
+                "secondary_capacity": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "The number of rows in the secondary column. This must be a non-negative integer.",
+                  "default": 2
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+
+    "TreeLayoutEngine": {
+      "type": "object",
+      "description": "A layout engine that arranges windows in a tree structure",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "TreeLayoutEngine" },
+        "initial_direction": {
+          "anyOf": [
+            {
+              "const": "left"
+            },
+            {
+              "const": "right"
+            },
+            {
+              "const": "up"
+            },
+            {
+              "const": "down"
+            }
+          ],
+          "description": "The initial direction to add windows in"
+        }
+      }
+    },
+
     "Keybind": {
       "type": "object",
       "required": ["command", "keybind"],
@@ -100,10 +266,10 @@
 
     "Filter": {
       "type": "object",
-      "required": ["filter_type", "value"],
+      "required": ["type", "value"],
       "additionalProperties": false,
       "properties": {
-        "filter_type": {
+        "type": {
           "anyOf": [
             {
               "const": "window_class",
@@ -132,10 +298,10 @@
 
     "Router": {
       "type": "object",
-      "required": ["router_type", "value", "workspace_name"],
+      "required": ["type", "value", "workspace_name"],
       "additionalProperties": false,
       "properties": {
-        "router_type": {
+        "type": {
           "anyOf": [
             {
               "const": "window_class",
@@ -185,7 +351,7 @@
       "type": "object",
       "description": "WinUI supports different backdrops/materials, depending on the OS version. To see the different materials available, see <see href='https://learn.microsoft.com/en-us/windows/apps/design/signature-experiences/materials'/>. The different materials support differing levels and style of transparency. This config lets you specify which backdrop to use for a given Whim window.",
       "properties": {
-        "backdrop_type": {
+        "type": {
           "anyOf": [
             {
               "const": "none",
@@ -376,6 +542,32 @@
             }
           ],
           "default": "weekly"
+        }
+      }
+    },
+
+    "SliceLayoutPlugin": {
+      "type": "object",
+      "description": "Plugin to add a slice layout. For more, see https://dalyisaac.github.io/Whim/docs/plugins/slice-layout.html",
+      "additionalProperties": false,
+      "properties": {
+        "is_enabled": {
+          "type": "boolean",
+          "description": "Whether the plugin is enabled. If a SliceLayoutEngine is enabled, this plugin will be enabled",
+          "default": true
+        }
+      }
+    },
+
+    "TreeLayoutPlugin": {
+      "type": "object",
+      "description": "Plugin to add a tree layout. For more, see https://dalyisaac.github.io/Whim/docs/plugins/tree-layout.html",
+      "additionalProperties": false,
+      "properties": {
+        "is_enabled": {
+          "type": "boolean",
+          "description": "Whether the plugin is enabled. If a TreeLayoutEngine is enabled, this plugin will be enabled",
+          "default": true
         }
       }
     },

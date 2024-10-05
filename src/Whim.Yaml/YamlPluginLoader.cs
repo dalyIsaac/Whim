@@ -5,12 +5,15 @@ using Whim.CommandPalette;
 using Whim.FocusIndicator;
 using Whim.Gaps;
 using Whim.LayoutPreview;
+using Whim.SliceLayout;
+using Whim.TreeLayout;
 using Whim.Updater;
 
 namespace Whim.Yaml;
 
 /// <summary>
-/// Loads plugins from the YAML configuration.
+/// Loads the SliceLayout plugin based on the provided context and schema.
+/// /// Loads plugins from the YAML configuration.
 /// </summary>
 [SuppressMessage(
 	"Reliability",
@@ -26,6 +29,8 @@ internal static class YamlPluginLoader
 		LoadFocusIndicatorPlugin(ctx, schema);
 		LoadLayoutPreviewPlugin(ctx, schema);
 		LoadUpdaterPlugin(ctx, schema);
+		LoadSliceLayoutPlugin(ctx, schema);
+		LoadTreeLayoutPlugin(ctx, schema);
 	}
 
 	private static void LoadGapsPlugin(IContext ctx, Schema schema)
@@ -209,5 +214,39 @@ internal static class YamlPluginLoader
 		}
 
 		ctx.PluginManager.AddPlugin(new UpdaterPlugin(ctx, config));
+	}
+
+	private static void LoadSliceLayoutPlugin(IContext ctx, Schema schema)
+	{
+		if (!schema.Plugins.SliceLayout.IsValid())
+		{
+			Logger.Debug("SliceLayout plugin is not valid.");
+			return;
+		}
+
+		if (schema.Plugins.SliceLayout.IsEnabled.AsOptional() is { } isEnabled && !isEnabled)
+		{
+			Logger.Debug("SliceLayout plugin is not enabled.");
+			return;
+		}
+
+		ctx.PluginManager.AddPlugin(new SliceLayoutPlugin(ctx));
+	}
+
+	private static void LoadTreeLayoutPlugin(IContext ctx, Schema schema)
+	{
+		if (!schema.Plugins.TreeLayout.IsValid())
+		{
+			Logger.Debug("TreeLayout plugin is not valid.");
+			return;
+		}
+
+		if (schema.Plugins.TreeLayout.IsEnabled.AsOptional() is { } isEnabled && !isEnabled)
+		{
+			Logger.Debug("TreeLayout plugin is not enabled.");
+			return;
+		}
+
+		ctx.PluginManager.AddPlugin(new TreeLayoutPlugin(ctx));
 	}
 }
