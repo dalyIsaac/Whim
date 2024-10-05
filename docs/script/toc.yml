@@ -1,0 +1,27 @@
+items:
+  - href: scripting.md
+  - href: commands.md
+  - href: keybinds.md
+  - href: workspaces.md
+  - href: layout-engines.md
+  - href: monitors.md
+  - href: store.md
+  - href: routing.md
+  - href: filtering.md
+  - href: logging.md
+  - href: styling.md
+  - href: snippets.md
+  - href: yaml.md
+
+  - name: Plugins
+  - href: plugins/bar.md
+  - href: plugins/command-palette.md
+  - href: plugins/floating-window.md
+  - href: plugins/focus-indicator.md
+  - href: plugins/gaps.md
+  - href: plugins/layout-preview.md
+  - href: plugins/slice-layout.md
+  - href: plugins/tree-layout.md
+  - href: plugins/tree-layout-bar.md
+  - href: plugins/tree-layout-command-palette.md
+  - href: plugins/updater.md

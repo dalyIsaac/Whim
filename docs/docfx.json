@@ -1,21 +1,5 @@
 {
-  "metadata": [
-    {
-      "src": [
-        {
-          "src": "../src",
-          "files": ["**/Whim*.csproj"],
-          "exclude": [
-            "**/Whim*.Tests.csproj",
-            "**/Whim.Runner.csproj",
-            "**/Whim.TestUtils.csproj"
-          ]
-        }
-      ],
-      "dest": "api",
-      "shouldSkipMarkup": true
-    }
-  ],
+  "metadata": [{}],
   "build": {
     "content": [
       {

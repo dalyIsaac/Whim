@@ -2,7 +2,9 @@
 
 Whim uses the [Microsoft.CodeAnalysis.CSharp](https://learn.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.csharp) scripting engine to run your `.whim/whim.config.csx` file.
 
-An example config file is created in your `.whim` directory when Whim is first run.
+<!-- TODO: Fill out link -->
+
+An example config file can be found at TODO.
 
 ## Directives
 
