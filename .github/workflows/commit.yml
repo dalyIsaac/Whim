@@ -8,22 +8,26 @@ on:
       - ".github/workflows/commit.yml"
       - "src/**"
       - "scripts/**"
+      - "**.py"
       - "whim-installer.iss"
       - "Whim.sln"
       - "Directory.Packages.props"
       - ".csharpierrc"
       - ".xamlstylerrc"
+      - ".ruff.toml"
       - ".config/dotnet-tools.json"
   pull_request:
     paths:
       - ".github/workflows/commit.yml"
       - "src/**"
       - "scripts/**"
+      - "**.py"
       - "whim-installer.iss"
       - "Whim.sln"
       - "Directory.Packages.props"
       - ".csharpierrc"
       - ".xamlstylerrc"
+      - ".ruff.toml"
       - ".config/dotnet-tools.json"
 
 env:
@@ -74,6 +78,16 @@ jobs:
       #   - name: Check analyzers
       #     run: |
       #       dotnet format analyzers Whim.sln --verify-no-changes --no-restore
+
+      - name: Check Python formatting
+        uses: astral-sh/ruff-action@v1
+        with:
+          args: format --check
+
+      - name: Lint Python code
+        uses: astral-sh/ruff-action@v1
+        with:
+          args: check
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2.0.0
