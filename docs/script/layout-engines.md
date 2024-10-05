@@ -1,16 +1,5 @@
 # Layout Engines
 
-A "layout engine" or <xref:Whim.ILayoutEngine> in Whim is responsible for arranging windows in a workspace. Each workspace has a single active layout engine, and can cycle through different layout engines.
-
-There are two different types of layout engines:
-
-- proxy layout engines
-- leaf layout engines
-
-**Proxy layout engines** wrap other engines, and can be used to modify the behavior of other engines. For example, the [`Gaps` plugin](../plugins/gaps.md) will add gaps between windows - normally layout engines won't leave gaps between windows.
-
-**Leaf layout engines** are the lowest level layout engines, and are responsible for actually arranging windows.
-
 ## Available layout engines
 
 | Engine                                    | TL;DR                                                                    |
@@ -21,7 +10,7 @@ There are two different types of layout engines:
 
 ### `FocusLayoutEngine`
 
-<xref:Whim.FocusLayoutEngine> is a layout engine that displays one window at a time:
+<xref:Whim.FocusLayoutEngine> is a layout engine that displays one window at a time.
 
 To focus the window in the specified direction, call <xref:Whim.ILayoutEngine.FocusWindowInDirection(Whim.Direction,Whim.IWindow)>.
 

@@ -6,7 +6,7 @@ Whim differentiates three types of commands.
 
 1. [Core commands](#core-commands) expose common functions as ready-to-use commands, many of which come with a default keybinding.
 2. [Plugin commands](#plugin-commands) are ready-to-use commands exposed by plugins.
-3. [Custom commands](#custom-commands) are user-defined commands, which can compose arbitrary functions.
+3. [Custom commands](../../script/custom-commands.md) are user-defined commands, which can compose arbitrary functions.
 
 ## Core commands
 
@@ -48,27 +48,4 @@ Core commands have identifiers under the `whim.core` namespace.
 
 ## Plugin commands
 
-Plugin commands are namespaced by the string defined in the <xref:Whim.IPlugin.Name> property for plugins - for example, `whim.gaps` for [`GapsPlugin`](../plugins/gaps.md). For a list of available plugin commands, see the "Plugins" section.
-
-## Custom commands
-
-Custom commands can be created using the <xref:Whim.ICommandManager>. They are automatically added to the `whim.custom` namespace. For example, the following command closes the current tracked window:
-
-```csharp
-// Create the command.
-context.CommandManager.Add(
-    // Automatically namespaced to `whim.custom`.
-    identifier: "close_window",
-    title: "Close focused window",
-    callback: () =>
-    {
-        if (context.Store.Pick(Pickers.PickLastFocusedWindow).TryGet(out IWindow window))
-        {
-            window.Close();
-        }
-    }
-);
-
-// Create an associated keybind.
-context.KeybindManager.SetKeybind("whim.custom.close_window", new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_D));
-```
+Plugin commands are namespaced by the string defined in the <xref:Whim.IPlugin.Name> property for plugins - for example, `whim.gaps` for [`GapsPlugin`](../plugins/gaps.md). Commands are listed on the respective plugin documentation pages.

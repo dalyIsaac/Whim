@@ -6,6 +6,7 @@ items:
   - href: core/layout-engines.md
   - href: core/monitors.md
   - href: core/keybinds.md
+  - href: core/commands.md
   - href: core/routing.md
   - href: core/filtering.md
   - href: core/styling.md

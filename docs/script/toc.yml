@@ -1,6 +1,6 @@
 items:
   - href: scripting.md
-  - href: commands.md
+  - href: custom-commands.md
   - href: keybinds.md
   - href: workspaces.md
   - href: layout-engines.md

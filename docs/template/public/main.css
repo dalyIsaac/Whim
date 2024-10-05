@@ -13,6 +13,10 @@
   color: var(--bs-secondary-color) !important;
 }
 
+.nav-link:hover {
+  text-decoration: underline;
+}
+
 .active {
   color: rgba(var(--bs-link-color-rgb), var(--bs-link-opacity, 1)) !important;
   text-decoration: underline;

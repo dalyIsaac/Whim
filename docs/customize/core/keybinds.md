@@ -26,6 +26,10 @@ Key modifiers can be any of the following:
 
 The associated key for each modifier can be any of the <xref:Windows.Win32.UI.Input.KeyboardAndMouse.VIRTUAL_KEY>s.
 
+## Commands
+
+A command is a string that represents a command that can be executed by Whim. The command can be a built-in command, a plugin command, or a custom command. For more, see the [Commands](commands.md) page.
+
 ## Unify Key Modifiers
 
 To treat key modifiers like `LWin` and `RWin` the same, set `unify_key_modifiers` to `true`.
