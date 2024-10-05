@@ -25,3 +25,12 @@ items:
   - href: plugins/tree-layout-bar.md
   - href: plugins/tree-layout-command-palette.md
   - href: plugins/updater.md
+
+  - name: Architecture
+  - href: architecture/context.md
+  - href: architecture/result.md
+  - href: architecture/store.md
+  - href: architecture/layout-engines.md
+  - href: architecture/events.md
+  - href: architecture/native-apis.md
+  - href: architecture/deprecated.md
