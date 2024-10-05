@@ -4,7 +4,9 @@
 
 > All the power to the user!
 
-Whim is a hackable, pluggable and scriptable dynamic window manager for Windows 10 and 11, built using WinUI 3, .NET, and C# scripting.
+Whim is a hackable, pluggable and scriptable dynamic window manager for Windows 10 and 11, built using WinUI 3, .NET, and C# scripting. Whim supports multiple layout engines, workspaces, and plugins. Whim is designed to be highly customizable and extensible, allowing users to create their own layouts, workspaces, and plugins.
+
+Whim can be configured using YAML, JSON, or C# scripting.
 
 ![Whim demo](images/demo.gif)
 
@@ -17,6 +19,8 @@ Installation via package managers is coming in [dalyIsaac/Whim#792](https://gith
 ## Why use Whim?
 
 A window manager is responsible for controlling the layout of windows in your desktop environment. Whim is a [dynamic window manager](https://en.wikipedia.org/wiki/Dynamic_window_manager), where windows are arranged according to different layouts.
+
+<!-- TODO: Link code blocks -->
 
 Whim supports multiple layout engines. Each [workspace](docs/customize/workspaces.md) can switch between different layout engines. For example, the `TreeLayoutEngine` allows users to create arbitrary grids of windows during runtime (similar to `i3`), while the `SliceLayoutEngine` fully automates windows placement using a predefined, customizable logic (similar to `Awesome` or `dwm`) . For more, see [Layout Engines](docs/customize/layout-engines.md).
 
