@@ -1,4 +1,10 @@
-- name: Documentation
-  href: docs/
+- name: Essentials
+  href: essentials/
+- name: Customization
+  href: customization/
+- name: Scripting
+  href: scripting/
 - name: API
   href: api/
+- name: Contributing
+  href: contributing/
