@@ -4,6 +4,8 @@ Whim is in the process of adding YAML configuration support - this is being trac
 
 This has been implemented in the `Whim.Yaml` plugin, and may have breaking changes for the lifetime of the GitHub issue.
 
+In the meantime, Whim can be configured fully in C# - see [Scripting](../script/scripting.md) for more information.
+
 ## Setup
 
 The YAML/JSON configuration is not yet included in the default Whim configuration.
