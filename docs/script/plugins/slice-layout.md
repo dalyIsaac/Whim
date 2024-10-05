@@ -4,7 +4,7 @@
 
 <xref:Whim.SliceLayout.SliceLayoutPlugin> does not load the <xref:Whim.SliceLayout.SliceLayoutEngine> - that is done when creating a workspace via the <xref:Whim.AddWorkspaceTransform>.
 
-For more about the `SliceLayoutEngine`, see the [Layout Engines](../customize//layout-engines.md#slicelayoutengine) page.
+For more about the `SliceLayoutEngine`, see the [Layout Engines](../configure/layout-engines.md#slicelayoutengine) page.
 
 ## Example Config
 

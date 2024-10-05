@@ -11,7 +11,7 @@ There are several key differences between Whim and workspacer:
 workspacer stores all windows in an [`IEnumerable<IWindow>`](https://github.com/workspacer/workspacer/blob/17750d1f84b8bb9015638ee7a733a2976ce08d25/src/workspacer.Shared/Workspace/Workspace.cs#L10) stack which is passed to each [`ILayout` implementation](https://github.com/workspacer/workspacer/blob/17750d1f84b8bb9015638ee7a733a2976ce08d25/src/workspacer.Shared/Layout/ILayoutEngine.cs#L23). This has a number of downsides:
 
 - All layout engines must work with the same list of windows.
-- workspacer cannot support more complex window layouts. In comparison, each <xref:Whim.ILayoutEngine> in Whim stores windows in their own manner. For example, Whim's [tree layout](../plugins/tree-layout.md) uses a n-ary tree structure to store windows in arbitrary grid layouts. For more, see [Layout Engines](../customize/layout-engines.md).
+- workspacer cannot support more complex window layouts. In comparison, each <xref:Whim.ILayoutEngine> in Whim stores windows in their own manner. For example, Whim's [tree layout](../plugins/tree-layout.md) uses a n-ary tree structure to store windows in arbitrary grid layouts. For more, see [Layout Engines](../configurelayout-engines.md).
 
 Whim's <xref:Whim.ILayoutEngine>s also have methods for directional operations, like:
 
@@ -31,4 +31,4 @@ The command palette in Whim is also more powerful than the one in workspacer, us
 
 ## Appearance
 
-Whim is built on top of WinUI 3 instead of Windows Forms. This makes it easier to have a more modern-looking UI, and means it's possible for users to specify styling using XAML - see [Styling](../customize/styling.md).
+Whim is built on top of WinUI 3 instead of Windows Forms. This makes it easier to have a more modern-looking UI, and means it's possible for users to specify styling using XAML - see [Styling](../configurestyling.md).

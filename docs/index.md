@@ -22,10 +22,10 @@ A window manager is responsible for controlling the layout of windows in your de
 
 <!-- TODO: Link code blocks -->
 
-Whim supports multiple layout engines. Each [workspace](docs/customize/workspaces.md) can switch between different layout engines. For example, the `TreeLayoutEngine` allows users to create arbitrary grids of windows during runtime (similar to `i3`), while the `SliceLayoutEngine` fully automates windows placement using a predefined, customizable logic (similar to `Awesome` or `dwm`) . For more, see [Layout Engines](docs/customize/layout-engines.md).
+Whim supports multiple layout engines. Each [workspace](docs/configureworkspaces.md) can switch between different layout engines. For example, the `TreeLayoutEngine` allows users to create arbitrary grids of windows during runtime (similar to `i3`), while the `SliceLayoutEngine` fully automates windows placement using a predefined, customizable logic (similar to `Awesome` or `dwm`) . For more, see [Layout Engines](docs/configurelayout-engines.md).
 
 Whim is configured using C# scripting - no YAML to be found here. This means you can use the full power of C# to configure Whim. Whim also exposes its API for plugins to use. Accordingly, much of the more custom functionality has been implemented as plugins which users can choose to use or not.
 
-Whim works by sitting on top of Windows' own window manager. It listens to window events and moves windows accordingly. Whim does not use Windows' native "virtual" desktops, as they lack the ability to activate "desktops" independently of monitors. Instead, Whim has [workspaces](docs/customize/workspaces.md).
+Whim works by sitting on top of Windows' own window manager. It listens to window events and moves windows accordingly. Whim does not use Windows' native "virtual" desktops, as they lack the ability to activate "desktops" independently of monitors. Instead, Whim has [workspaces](docs/configureworkspaces.md).
 
 To see how Whim compares to other Windows window managers, see [Whim vs. Other Window Managers](docs/getting-started/comparison.md).

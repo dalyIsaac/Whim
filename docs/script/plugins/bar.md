@@ -8,7 +8,7 @@ The <xref:Whim.Bar.BarPlugin> adds a configurable bar at the top of a screen.
 
 The <xref:Whim.Bar.BarConfig> takes in three lists of <xref:Whim.Bar.BarComponent>s in its constructor. These correspond to the left, center, and right components on the bar.
 
-The bar can be styled using XAML - see [Styling](../customize/styling.md).
+The bar can be styled using XAML - see [Styling](../configurestyling.md).
 
 > [!NOTE]
 > The height of the bar can be configured the XAML styling. However, [BarConfig.Height](xref:Whim.Bar.BarConfig.Height) takes precedence over the height specified in the XAML.
