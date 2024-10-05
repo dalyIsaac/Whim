@@ -1,4 +1,4 @@
-# Contributing Guide
+# Guide
 
 Whim is an open-source project and contributions are welcome! This guide will help you get started with contributing to Whim.
 

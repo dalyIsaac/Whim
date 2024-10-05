@@ -1,10 +1,10 @@
 - name: Essentials
   href: essentials/
-- name: Customization
-  href: customization/
-- name: Scripting
-  href: scripting/
+- name: Customize
+  href: customize/
+- name: Script
+  href: script/
 - name: API
   href: api/
-- name: Contributing
-  href: contributing/
+- name: Contribute
+  href: contribute/
