@@ -101,7 +101,7 @@ public class YamlLayoutEngineLoaderTests
 		// Then the layout engine is loaded
 		Assert.True(result);
 
-		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
+		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx)!;
 		Assert.Single(engines);
 		engines[0].Should().BeEquivalentTo(new FocusLayoutEngine(engines[0].Identity, maximize));
 	}
@@ -137,6 +137,45 @@ public class YamlLayoutEngineLoaderTests
 
 	[Theory, MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(InvalidFocusLayoutEngineConfig))]
 	public void Load_InvalidFocusLayoutEngine(string config, bool isYaml, IContext ctx)
+	{
+		// Given an invalid config with FocusLayoutEngine set
+		ctx.PluginManager.LoadedPlugins.Returns([]);
+		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
+
+		// When loading the layout engine
+		bool result = YamlLoader.Load(ctx);
+
+		// Then the layout engine is not loaded
+		Assert.True(result);
+
+		ILayoutEngine[]? engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
+		Assert.Null(engines);
+	}
+
+	public static TheoryData<string, bool> NoLayoutEnginesConfig =>
+		new()
+		{
+			{
+				"""
+					layout_engines:
+					  entries: []
+					""",
+				true
+			},
+			{
+				"""
+					{
+						"layout_engines": {
+							"entries": []
+						}
+					}
+					""",
+				false
+			},
+		};
+
+	[Theory, MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(NoLayoutEnginesConfig))]
+	public void Load_NoLayoutEngines(string config, bool isYaml, IContext ctx)
 	{
 		// Given an invalid config with FocusLayoutEngine set
 		ctx.PluginManager.LoadedPlugins.Returns([]);

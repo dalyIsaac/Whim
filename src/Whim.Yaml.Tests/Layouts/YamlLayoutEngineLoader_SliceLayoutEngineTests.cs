@@ -53,7 +53,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 		// Then the layout engine is loaded
 		Assert.True(result);
 
-		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
+		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx)!;
 		Assert.Single(engines);
 		SliceLayouts.CreateColumnLayout(ctx, plugin, engines[0].Identity).Should().BeEquivalentTo(engines[0]);
 	}
@@ -103,7 +103,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 		// Then the layout engine is loaded
 		Assert.True(result);
 
-		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
+		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx)!;
 		Assert.Single(engines);
 		SliceLayouts.CreateRowLayout(ctx, plugin, engines[0].Identity).Should().BeEquivalentTo(engines[0]);
 	}
@@ -153,7 +153,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 		// Then the layout engine is loaded
 		Assert.True(result);
 
-		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
+		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx)!;
 		Assert.Single(engines);
 		SliceLayouts.CreatePrimaryStackLayout(ctx, plugin, engines[0].Identity).Should().BeEquivalentTo(engines[0]);
 	}
@@ -213,7 +213,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 		// Then the layout engine is loaded
 		Assert.True(result);
 
-		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
+		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx)!;
 		Assert.Single(engines);
 		SliceLayouts
 			.CreateMultiColumnLayout(ctx, plugin, engines[0].Identity, columns)
@@ -312,7 +312,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 		// Then the layout engine is loaded
 		Assert.True(result);
 
-		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
+		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx)!;
 		Assert.Single(engines);
 		SliceLayouts
 			.CreateSecondaryPrimaryLayout(ctx, plugin, engines[0].Identity, primaryCount, secondaryCount)
