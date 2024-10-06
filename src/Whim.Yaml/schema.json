@@ -18,14 +18,7 @@
     },
 
     "layout_engines": {
-      "type": "object",
-      "properties": {
-        "entries": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/LayoutEngine" },
-          "description": "Layout engines to use for workspaces"
-        }
-      }
+      "$ref": "#/$defs/LayoutEngineList"
     },
 
     "keybinds": {
@@ -123,9 +116,20 @@
           "description": "The name of the workspace"
         },
         "layout_engines": {
+          "$ref": "#/$defs/LayoutEngineList",
+          "description": "The layout engines to use for the workspace. If not specified, the layout engines in `layout_engines` will be used."
+        }
+      }
+    },
+
+    "LayoutEngineList": {
+      "type": "object",
+      "required": ["entries"],
+      "properties": {
+        "entries": {
           "type": "array",
           "items": { "$ref": "#/$defs/LayoutEngine" },
-          "description": "The layout engines to use for the workspace. If not specified, the layout engines in `layout_engines` will be used."
+          "description": "Layout engines to use for workspaces"
         }
       }
     },

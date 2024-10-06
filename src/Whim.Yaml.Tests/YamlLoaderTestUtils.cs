@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using NSubstitute;
 
 namespace Whim.Yaml.Tests;
@@ -20,5 +21,33 @@ public static class YamlLoaderTestUtils
 
 		SetCreateLayoutEnginesTransform? transform = (SetCreateLayoutEnginesTransform?)arguments[0];
 		return transform?.CreateLayoutEnginesFn().Select(x => x(new())).ToArray();
+	}
+
+	public static IWorkspace[]? GetWorkspaces(IContext ctx)
+	{
+		List<IWorkspace> workspaces = [];
+
+		foreach (var call in ctx.Store.ReceivedCalls())
+		{
+			var arguments = call.GetArguments();
+			if (arguments.Length == 1 && arguments[0] is AddWorkspaceTransform transform)
+			{
+				IWorkspace workspace = Substitute.For<IWorkspace>();
+
+				workspace.Id.Returns(transform.WorkspaceId);
+
+#pragma warning disable CS0618 // Type or member is obsolete
+				workspace.Name.Returns(transform.Name);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+
+				var engines = transform.CreateLeafLayoutEngines?.Select(c => c(new()));
+				workspace.LayoutEngines.Returns(engines?.ToImmutableList() ?? []);
+
+				workspaces.Add(workspace);
+			}
+		}
+
+		return [.. workspaces];
 	}
 }

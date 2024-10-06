@@ -73,7 +73,7 @@ public static class YamlLoader
 	{
 		if (!schema.Workspaces.IsValid())
 		{
-			Logger.Debug("Workspaces plugin is not valid.");
+			Logger.Debug("Workspaces config is not valid.");
 			return;
 		}
 
@@ -88,7 +88,7 @@ public static class YamlLoader
 			string workspaceName = (string)workspace.Name;
 
 			CreateLeafLayoutEngine[]? engines = null;
-			if (workspace.LayoutEngines.AsOptional() is Schema.RequiredName.RequiredTypeArray definedEngines)
+			if (workspace.LayoutEngines.Entries.AsOptional() is Schema.RequiredEntries.RequiredTypeArray definedEngines)
 			{
 				engines = YamlLayoutEngineLoader.GetCreateLeafLayoutEngines(ctx, [.. definedEngines]);
 			}
@@ -101,7 +101,7 @@ public static class YamlLoader
 	{
 		if (!schema.Keybinds.IsValid())
 		{
-			Logger.Debug("Keybinds plugin is not valid.");
+			Logger.Debug("Keybinds config is not valid.");
 			return;
 		}
 
@@ -132,7 +132,7 @@ public static class YamlLoader
 	{
 		if (!schema.Filters.IsValid())
 		{
-			Logger.Debug("Filters plugin is not valid.");
+			Logger.Debug("Filters config is not valid.");
 			return;
 		}
 
@@ -171,7 +171,7 @@ public static class YamlLoader
 	{
 		if (!schema.Routers.IsValid())
 		{
-			Logger.Debug("Routers plugin is not valid.");
+			Logger.Debug("Routers cohfig is not valid.");
 			return;
 		}
 
