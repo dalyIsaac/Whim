@@ -28,6 +28,8 @@ public static class YamlLoader
 			return false;
 		}
 
+		UpdateWorkspaces(ctx, schema);
+
 		UpdateKeybinds(ctx, schema);
 		UpdateFilters(ctx, schema);
 		UpdateRouters(ctx, schema);
@@ -65,6 +67,34 @@ public static class YamlLoader
 
 		Logger.Debug("No configuration file found.");
 		return null;
+	}
+
+	private static void UpdateWorkspaces(IContext ctx, Schema schema)
+	{
+		if (!schema.Workspaces.IsValid())
+		{
+			Logger.Debug("Workspaces plugin is not valid.");
+			return;
+		}
+
+		if (schema.Workspaces.Entries.AsOptional() is not { } entries)
+		{
+			Logger.Debug("No workspaces found.");
+			return;
+		}
+
+		foreach (var workspace in entries)
+		{
+			string workspaceName = (string)workspace.Name;
+
+			CreateLeafLayoutEngine[]? engines = null;
+			if (workspace.LayoutEngines.AsOptional() is Schema.RequiredName.RequiredTypeArray definedEngines)
+			{
+				engines = YamlLayoutEngineLoader.GetCreateLeafLayoutEngines(ctx, [.. definedEngines]);
+			}
+
+			ctx.Store.Dispatch(new AddWorkspaceTransform(workspaceName, engines));
+		}
 	}
 
 	private static void UpdateKeybinds(IContext ctx, Schema schema)
