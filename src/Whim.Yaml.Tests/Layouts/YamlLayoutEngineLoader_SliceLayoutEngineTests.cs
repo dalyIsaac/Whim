@@ -365,8 +365,8 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 		// Then the layout engine is not loaded
 		Assert.True(result);
 
-		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
-		Assert.Empty(engines);
+		ILayoutEngine[]? engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
+		Assert.Null(engines);
 		ctx.PluginManager.DidNotReceive().AddPlugin(Arg.Any<ISliceLayoutPlugin>());
 	}
 }

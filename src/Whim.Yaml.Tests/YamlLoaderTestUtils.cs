@@ -10,10 +10,15 @@ public static class YamlLoaderTestUtils
 		ctx.FileManager.ReadAllText(Arg.Is<string>(s => s.EndsWith(isYaml ? "yaml" : "json"))).Returns(config);
 	}
 
-	public static ILayoutEngine[] GetLayoutEngines(IContext ctx)
+	public static ILayoutEngine[]? GetLayoutEngines(IContext ctx)
 	{
-		SetCreateLayoutEnginesTransform transform = (SetCreateLayoutEnginesTransform)
-			ctx.Store.ReceivedCalls().First().GetArguments()[0]!;
-		return transform.CreateLayoutEnginesFn().Select(x => x(new())).ToArray();
+		var arguments = ctx.Store.ReceivedCalls().FirstOrDefault()?.GetArguments();
+		if (arguments is null)
+		{
+			return null;
+		}
+
+		SetCreateLayoutEnginesTransform? transform = (SetCreateLayoutEnginesTransform?)arguments[0];
+		return transform?.CreateLayoutEnginesFn().Select(x => x(new())).ToArray();
 	}
 }
