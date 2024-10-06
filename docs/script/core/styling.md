@@ -1,1 +1,1 @@
-[!INCLUDE [Styling](../../_common/core/styling.md)]
+[!INCLUDE [Styling](../../_common/core/styling.md)] <!-- markdownlint-disable-line MD041 -->
