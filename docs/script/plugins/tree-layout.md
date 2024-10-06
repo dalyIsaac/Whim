@@ -30,4 +30,4 @@ void DoConfig(IContext context)
 return DoConfig;
 ```
 
-[!INCLUDE [Commands](../../_common/plugins/tree-layout.md)]
+[!INCLUDE [Commands](../../_includes/plugins/tree-layout.md)]

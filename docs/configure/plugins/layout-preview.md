@@ -16,4 +16,4 @@ plugins:
 | ------------ | -------------------------------------------------- |
 | `is_enabled` | Whether the plugin is enabled. Defaults to `true`. |
 
-[!INCLUDE [Commands](../../_common/plugins/layout-preview.md)]
+[!INCLUDE [Commands](../../_includes/plugins/layout-preview.md)]

@@ -115,6 +115,31 @@ public class YamlLayoutEngineLoader_TreeLayoutEngineTests
 				false,
 				Direction.Down
 			},
+			// Use the default direction.
+			{
+				"""
+					layout_engines:
+					  entries:
+					    - type: TreeLayoutEngine
+					""",
+				true,
+				Direction.Right
+			},
+			{
+				"""
+					{
+						"layout_engines": {
+							"entries": [
+								{
+									"type": "TreeLayoutEngine"
+								}
+							]
+						}
+					}
+					""",
+				false,
+				Direction.Right
+			},
 		};
 
 	[Theory]
@@ -134,7 +159,7 @@ public class YamlLayoutEngineLoader_TreeLayoutEngineTests
 		// Then the tree layout engine should be updated
 		Assert.True(result);
 
-		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx);
+		ILayoutEngine[] engines = YamlLoaderTestUtils.GetLayoutEngines(ctx)!;
 		Assert.Single(engines);
 		new TreeLayoutEngine(ctx, Substitute.For<ITreeLayoutPlugin>(), engines[0].Identity)
 			.Should()

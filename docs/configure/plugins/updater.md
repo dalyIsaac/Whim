@@ -18,4 +18,4 @@ plugins:
 | `release_channel`  | The release channel to use. Options are `alpha`, `beta`, and `stable`. Default is `alpha`.                  |
 | `update_frequency` | How often to check for updates. Options are `never`, `daily`, `weekly`, and `monthly`. Default is `weekly`. |
 
-[!INCLUDE [Commands](../../_common/plugins/updater.md)]
+[!INCLUDE [Commands](../../_includes/plugins/updater.md)]

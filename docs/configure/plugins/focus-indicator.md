@@ -172,4 +172,4 @@ The color can be any valid RGB or RGBA hex color. The following named colors are
 | `yellow`               | `#FFFFFF00` | <span style="background:#FFFF00" class="color-block"></span>         |
 | `yellow_green`         | `#FF9ACD32` | <span style="background:#9ACD32" class="color-block"></span>         |
 
-[!INCLUDE [Commands](../../_common/plugins/focus-indicator.md)]
+[!INCLUDE [Commands](../../_includes/plugins/focus-indicator.md)]

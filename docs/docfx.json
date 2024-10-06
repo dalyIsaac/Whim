@@ -20,7 +20,7 @@
     "content": [
       {
         "files": ["**/*.{md,yml}"],
-        "exclude": ["_site/**"]
+        "exclude": ["_site/**", "_includes/**"]
       }
     ],
     "resource": [

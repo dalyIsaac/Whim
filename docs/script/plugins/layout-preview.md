@@ -33,4 +33,4 @@ return DoConfig;
 
 ```
 
-[!INCLUDE [Commands](../../_common/plugins/layout-preview.md)]
+[!INCLUDE [Commands](../../_includes/plugins/layout-preview.md)]

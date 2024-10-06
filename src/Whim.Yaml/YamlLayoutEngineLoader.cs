@@ -14,8 +14,27 @@ internal static class YamlLayoutEngineLoader
 			return;
 		}
 
+		CreateLeafLayoutEngine[]? engineCreators = GetCreateLeafLayoutEngines(ctx, [.. layoutEngines.Entries]);
+
+		if (engineCreators is not null)
+		{
+			ctx.Store.Dispatch(new SetCreateLayoutEnginesTransform(() => engineCreators));
+		}
+	}
+
+	public static CreateLeafLayoutEngine[]? GetCreateLeafLayoutEngines(
+		IContext ctx,
+		Schema.RequiredType[]? layoutEngines
+	)
+	{
+		if (layoutEngines is null)
+		{
+			return null;
+		}
+
 		List<CreateLeafLayoutEngine> leafLayoutEngineCreators = [];
-		foreach (var engine in layoutEngines.Entries)
+
+		foreach (var engine in layoutEngines)
 		{
 			engine.Match<object?>(
 				(in Schema.ALayoutEngineThatDisplaysOneWindowAtATime focusLayoutEngine) =>
@@ -39,7 +58,7 @@ internal static class YamlLayoutEngineLoader
 			);
 		}
 
-		ctx.Store.Dispatch(new SetCreateLayoutEnginesTransform(() => [.. leafLayoutEngineCreators]));
+		return leafLayoutEngineCreators.Count == 0 ? null : [.. leafLayoutEngineCreators];
 	}
 
 	private static void CreateFocusLayoutEngineCreator(
@@ -122,14 +141,18 @@ internal static class YamlLayoutEngineLoader
 			ctx.PluginManager.AddPlugin(plugin);
 		}
 
-		Direction defaultAddNodeDirection = (string)treeLayoutEngine.InitialDirection switch
+		Direction defaultAddNodeDirection = Direction.Right;
+		if (treeLayoutEngine.InitialDirection.TryGetString(out string? initialDirection))
 		{
-			"left" => Direction.Left,
-			"right" => Direction.Right,
-			"up" => Direction.Up,
-			"down" => Direction.Down,
-			_ => Direction.Right,
-		};
+			defaultAddNodeDirection = initialDirection switch
+			{
+				"left" => Direction.Left,
+				"right" => Direction.Right,
+				"up" => Direction.Up,
+				"down" => Direction.Down,
+				_ => Direction.Right,
+			};
+		}
 
 		leafLayoutEngineCreators.Add(
 			(id) =>

@@ -32,4 +32,4 @@ void DoConfig(IContext context)
 return DoConfig;
 ```
 
-[!INCLUDE [Commands](../../_common/plugins/updater.md)]
+[!INCLUDE [Commands](../../_includes/plugins/updater.md)]

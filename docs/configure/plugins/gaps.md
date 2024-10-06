@@ -24,4 +24,4 @@ plugins:
 | `default_outer_delta` | The default outer gap used by commands `gaps.outer.increase` and `gaps.outer.decrease` |
 | `default_inner_delta` | The default inner gap used by commands `gaps.inner.increase` and `gaps.inner.decrease` |
 
-[!INCLUDE [Commands](../../_common/plugins/gaps.md)]
+[!INCLUDE [Commands](../../_includes/plugins/gaps.md)]

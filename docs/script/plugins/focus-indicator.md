@@ -30,4 +30,4 @@ void DoConfig(IContext context)
 return DoConfig;
 ```
 
-[!INCLUDE [Commands](../../_common/plugins/focus-indicator.md)]
+[!INCLUDE [Commands](../../_includes/plugins/focus-indicator.md)]

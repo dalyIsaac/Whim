@@ -29,4 +29,4 @@ void DoConfig(IContext context)
 return DoConfig;
 ```
 
-[!INCLUDE [Commands](../../_common/plugins/gaps.md)]
+[!INCLUDE [Commands](../../_includes/plugins/gaps.md)]

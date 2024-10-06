@@ -1,3 +1,3 @@
 # Styling
 
-[!INCLUDE [Styling](../../_common/core/styling.md)]
+[!INCLUDE [Styling](../../_includes/core/styling.md)]

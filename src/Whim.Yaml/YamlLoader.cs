@@ -28,6 +28,8 @@ public static class YamlLoader
 			return false;
 		}
 
+		UpdateWorkspaces(ctx, schema);
+
 		UpdateKeybinds(ctx, schema);
 		UpdateFilters(ctx, schema);
 		UpdateRouters(ctx, schema);
@@ -67,11 +69,39 @@ public static class YamlLoader
 		return null;
 	}
 
+	private static void UpdateWorkspaces(IContext ctx, Schema schema)
+	{
+		if (!schema.Workspaces.IsValid())
+		{
+			Logger.Debug("Workspaces config is not valid.");
+			return;
+		}
+
+		if (schema.Workspaces.Entries.AsOptional() is not { } entries)
+		{
+			Logger.Debug("No workspaces found.");
+			return;
+		}
+
+		foreach (var workspace in entries)
+		{
+			string workspaceName = (string)workspace.Name;
+
+			CreateLeafLayoutEngine[]? engines = null;
+			if (workspace.LayoutEngines.Entries.AsOptional() is Schema.RequiredEntries.RequiredTypeArray definedEngines)
+			{
+				engines = YamlLayoutEngineLoader.GetCreateLeafLayoutEngines(ctx, [.. definedEngines]);
+			}
+
+			ctx.Store.Dispatch(new AddWorkspaceTransform(workspaceName, engines));
+		}
+	}
+
 	private static void UpdateKeybinds(IContext ctx, Schema schema)
 	{
 		if (!schema.Keybinds.IsValid())
 		{
-			Logger.Debug("Keybinds plugin is not valid.");
+			Logger.Debug("Keybinds config is not valid.");
 			return;
 		}
 
@@ -102,7 +132,7 @@ public static class YamlLoader
 	{
 		if (!schema.Filters.IsValid())
 		{
-			Logger.Debug("Filters plugin is not valid.");
+			Logger.Debug("Filters config is not valid.");
 			return;
 		}
 
@@ -141,7 +171,7 @@ public static class YamlLoader
 	{
 		if (!schema.Routers.IsValid())
 		{
-			Logger.Debug("Routers plugin is not valid.");
+			Logger.Debug("Routers cohfig is not valid.");
 			return;
 		}
 
