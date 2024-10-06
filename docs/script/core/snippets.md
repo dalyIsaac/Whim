@@ -2,6 +2,8 @@
 
 Potentially useful code snippets.
 
+Each of these snippets (apart from the `using` statements) should be added inside the `DoConfig` function in your `whim.config.csx` file.
+
 ## Minimize a specific window
 
 ```csharp

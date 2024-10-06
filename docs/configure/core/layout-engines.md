@@ -74,6 +74,8 @@ Windows which are not focused are minimized to the taskbar.
 
 The YAML/JSON configuration supports built-in layouts, such as primary/stack, multi-column, and secondary primary stack. Arbitrary layouts can be created by nesting areas in the C# configuration - see [Defining different `SliceLayouts`](../../script/core/layout-engines.md#defining-different-slicelayouts)
 
+Commands for the `SliceLayoutEngine` can be found on the [Slice Layout](../plugins/slice-layout.md#commands) plugin page.
+
 ### Layout Variants
 
 ### Column Layout
@@ -159,9 +161,9 @@ layout_engines:
       initial_direction: right
 ```
 
-<!-- TODO: Commands for the TreeLayoutEngine -->
-
 ![TreeLayoutEngine demo](../../images/tree-layout-demo.gif)
+
+Commands for the `TreeLayoutEngine` can be found on the [Tree Layout](../plugins/tree-layout.md#commands) plugin page.
 
 ## `FloatingLayoutEngine`
 

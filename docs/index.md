@@ -20,9 +20,7 @@ Installation via package managers is coming in [dalyIsaac/Whim#792](https://gith
 
 A window manager is responsible for controlling the layout of windows in your desktop environment. Whim is a [dynamic window manager](https://en.wikipedia.org/wiki/Dynamic_window_manager), where windows are arranged according to different layouts.
 
-<!-- TODO: Link code blocks -->
-
-Whim supports multiple layout engines. Each [workspace](configure/core/workspaces.md) can switch between different layout engines. For example, the `TreeLayoutEngine` allows users to create arbitrary grids of windows during runtime (similar to `i3`), while the `SliceLayoutEngine` fully automates windows placement using a predefined, customizable logic (similar to `Awesome` or `dwm`) . For more, see [Layout Engines](configure/core/layout-engines.md).
+Whim supports multiple layout engines. Each [workspace](configure/core/workspaces.md) can switch between different layout engines. For example, the [`TreeLayoutEngine`](configure/core/layout-engines.md#treelayoutengine) allows users to create arbitrary grids of windows during runtime (similar to `i3`), while the [`SliceLayoutEngine`](configure/core/layout-engines.md#slicelayoutengine) fully automates windows placement using a predefined, customizable logic (similar to `Awesome` or `dwm`) . For more, see [Layout Engines](configure/core/layout-engines.md).
 
 Whim is configured using C# scripting - no YAML to be found here. This means you can use the full power of C# to configure Whim. Whim also exposes its API for plugins to use. Accordingly, much of the more custom functionality has been implemented as plugins which users can choose to use or not.
 
