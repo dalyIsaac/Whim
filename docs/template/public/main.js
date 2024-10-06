@@ -61,6 +61,17 @@ export default {
       element.focus();
     }
 
+    function changeSearchPlaceholder() {
+      const searchElement = document.getElementById("search-query");
+
+      if (searchElement === null) {
+        return;
+      }
+
+      searchElement.placeholder = "Search /";
+    }
+
     document.addEventListener("keydown", listener);
+    changeSearchPlaceholder();
   },
 };

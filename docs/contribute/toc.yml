@@ -1,0 +1,6 @@
+items:
+  - href: guide.md
+  - href: environment-setup.md
+  - href: building-whim.md
+  - href: docs.md
+  - href: releases.md

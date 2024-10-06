@@ -6,6 +6,7 @@ on:
       - .github/workflows/docs_commit.yml
       - docs/**
       - toc.yml
+      - src/**
 
 env:
   # We install the packages to the D:\ drive to avoid the slow IO on the C:\ drive.

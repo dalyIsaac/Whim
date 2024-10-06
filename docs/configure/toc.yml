@@ -1,0 +1,24 @@
+items:
+  - href: yaml-json-configuration.md
+
+  - name: Core
+  - href: core/workspaces.md
+  - href: core/layout-engines.md
+  - href: core/monitors.md
+  - href: core/keybinds.md
+  - href: core/commands.md
+  - href: core/routing.md
+  - href: core/filtering.md
+  - href: core/styling.md
+  - href: core/logging.md
+
+  - name: Plugins
+  - href: plugins/overview.md
+  - href: plugins/bar.md
+  - href: plugins/command-palette.md
+  - href: plugins/focus-indicator.md
+  - href: plugins/gaps.md
+  - href: plugins/layout-preview.md
+  - href: plugins/slice-layout.md
+  - href: plugins/tree-layout.md
+  - href: plugins/updater.md

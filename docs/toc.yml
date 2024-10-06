@@ -1,4 +1,14 @@
-- name: Documentation
-  href: docs/
+- name: Introduction
+  href: intro/
+
+- name: Configure
+  href: configure/
+
+- name: Script
+  href: script/
+
 - name: API
   href: api/
+
+- name: Contribute
+  href: contribute/
