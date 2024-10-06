@@ -4,4 +4,4 @@ The `TreeLayoutPlugin` is automatically loaded when the `TreeLayoutEngine` is us
 
 ## Commands
 
-[!INCLUDE [Commands](../../_common/plugins/tree-layout.md)]
+[!INCLUDE [Commands](../../_includes/plugins/tree-layout.md)]

@@ -28,4 +28,4 @@ void DoConfig(IContext context)
 return DoConfig;
 ```
 
-[!INCLUDE [Commands](../../_common/plugins/slice-layout.md)]
+[!INCLUDE [Commands](../../_includes/plugins/slice-layout.md)]

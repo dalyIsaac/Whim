@@ -35,4 +35,4 @@ void DoConfig(IContext context)
 return DoConfig;
 ```
 
-[!INCLUDE [Commands](../../_common/plugins/command-palette.md)]
+[!INCLUDE [Commands](../../_includes/plugins/command-palette.md)]

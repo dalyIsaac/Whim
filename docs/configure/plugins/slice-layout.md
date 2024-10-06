@@ -4,4 +4,4 @@ The `SliceLayoutPlugin` is automatically loaded when the `SliceLayoutEngine` is 
 
 ## Commands
 
-[!INCLUDE [Commands](../../_common/plugins/slice-layout.md)]
+[!INCLUDE [Commands](../../_includes/plugins/slice-layout.md)]
