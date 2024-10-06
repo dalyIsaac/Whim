@@ -37,5 +37,13 @@ code {
 pre code {
   background-color: unset;
   padding: unset;
-  border-radius: unset;
+  border-radius: var(--bs-border-radius-lg);
+}
+
+/* Make the table have rounded corners */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  border-radius: var(--bs-border-radius-xl);
 }
