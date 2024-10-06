@@ -118,6 +118,20 @@ public class YamlLoader_LoadWorkspacesTests
 					""",
 				false
 			},
+			{
+				"""
+					workspaces:
+					""",
+				true
+			},
+			{
+				"""
+					{
+						"workspaces": {}
+					}
+					""",
+				false
+			},
 		};
 
 	[Theory, MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(NoWorkspacesConfig))]
