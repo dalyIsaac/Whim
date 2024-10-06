@@ -97,4 +97,42 @@ public class YamlLoader_LoadWorkspacesTests
 
 		expectedLayoutEngines.Should().BeEquivalentTo(engines);
 	}
+
+	public static TheoryData<string, bool> NoWorkspacesConfig =>
+		new()
+		{
+			{
+				"""
+					workspaces:
+					  entries: []
+					""",
+				true
+			},
+			{
+				"""
+					{
+						"workspaces": {
+							"entries": []
+						}
+					}
+					""",
+				false
+			},
+		};
+
+	[Theory, MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(NoWorkspacesConfig))]
+	public void Load_NoWorkspaces(string config, bool isYaml, IContext ctx)
+	{
+		// Given a valid config with no workspaces set
+		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
+
+		// When loading the workspaces
+		bool result = YamlLoader.Load(ctx);
+
+		// Then the workspaces are loaded
+		Assert.True(result);
+
+		IWorkspace[] workspaces = YamlLoaderTestUtils.GetWorkspaces(ctx)!;
+		Assert.Empty(workspaces);
+	}
 }
