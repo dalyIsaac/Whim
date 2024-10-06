@@ -58,4 +58,4 @@ context.CommandManager.Add(
 );
 ```
 
-For more, see the [Store](./store.md) and [Commands](./commands.md) pages.
+For more, see the [Store](./store.md) and [Commands](../../configure/core/commands.md) pages.

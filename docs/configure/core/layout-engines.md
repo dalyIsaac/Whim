@@ -72,7 +72,7 @@ Windows which are not focused are minimized to the taskbar.
 
 `SliceLayoutEngine` is an `Awesome`/`dwm`-style layout engine, which arranges following a deterministic algorithm filling a grid configured in the config file.
 
-The YAML/JSON configuration supports built-in layouts, such as primary/stack, multi-column, and secondary primary stack. Arbitrary layouts can be created by nesting areas in the C# configuration - see [Defining different `SliceLayouts`](../../script/layout-engines.md#defining-different-slicelayouts)
+The YAML/JSON configuration supports built-in layouts, such as primary/stack, multi-column, and secondary primary stack. Arbitrary layouts can be created by nesting areas in the C# configuration - see [Defining different `SliceLayouts`](../../script/core/layout-engines.md#defining-different-slicelayouts)
 
 ### Layout Variants
 
@@ -168,6 +168,6 @@ layout_engines:
 > [!WARNING]
 > This is not yet supported by the YAML/JSON configuration.
 
-<xref:Whim.FloatingLayout.FloatingLayoutEngine> is a layout that has all windows being free-floating. To have specific windows float within a different layout, see the [Floating Window Plugin](../plugins/floating-window.md).
+<xref:Whim.FloatingWindow.FloatingLayoutEngine> is a layout that has all windows being free-floating. To have specific windows float within a different layout, see the [Floating Window Plugin](../plugins/floating-window.md).
 
 ![FloatingLayoutEngine demo](../../images/floating-layout-demo.gif)

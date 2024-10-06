@@ -11,7 +11,7 @@ The "butler" or <xref:Whim.IButler> in Whim was responsible for using the <xref:
 
 The "butler pantry" or <xref:Whim.IButlerPantry> stored the assignment of windows to workspaces, and the assignment of workspaces to monitors.
 
-When [scripting](../configurescripting.md), use `IButler` methods to move windows between workspaces and monitors.
+When scripting, use `IButler` methods to move windows between workspaces and monitors.
 
 ## Window Manager
 

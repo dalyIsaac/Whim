@@ -1,12 +1,13 @@
 items:
-  - href: core/scripting.md
+  - href: scripting.md
+
   - name: Core
   - href: core/store.md
   - href: core/workspaces.md
   - href: core/layout-engines.md
   - href: core/monitors.md
   - href: core/keybinds.md
-  - href: core/custom-commands.md
+  - href: core/commands.md
   - href: core/routing.md
   - href: core/filtering.md
   - href: core/styling.md

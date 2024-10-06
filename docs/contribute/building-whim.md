@@ -13,7 +13,7 @@ Visual Studio 2022 is the easiest way to get started with working on Whim. Check
 - The **Configuration Manager** is set to `Debug` and your target architecture is correct (e.g. `x64`).
 - The **green Start arrow** is labeled `Whim.Runner (Unpackaged)`.
 
-![Visual Studio setup](../../images/visual-studio-setup.gif)
+![Visual Studio setup](../images/visual-studio-setup.gif)
 
 **Recommended Extensions:**
 

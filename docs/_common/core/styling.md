@@ -1,6 +1,6 @@
 # Styling
 
-Whim uses XAML resources to style the appearance of certain user interfaces such as the [Bar Plugin](../plugins/bar.md). By default, Whim loads its resources from [Defaults.xaml](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Resources/Defaults.xaml).
+Whim uses XAML resources to style the appearance of certain user interfaces such as the [Bar Plugin](../../configure/plugins/bar.md). By default, Whim loads its resources from [Defaults.xaml](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Resources/Defaults.xaml).
 
 ## Loading custom dictionaries
 

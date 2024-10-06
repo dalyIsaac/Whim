@@ -4,7 +4,7 @@ Keybinds are managed using the <xref:Whim.IKeybindManager>, which can be used to
 
 ## Default Keybinds
 
-See the listing of [core commands](commands.md#core-commands) for a summary of default keybinds. Some plugins also come with additional default keybinds, which are documented on the individual plugin pages.
+See the listing of [core commands](../../configure/core/commands.md#core-commands) for a summary of default keybinds. Some plugins also come with additional default keybinds, which are documented on the individual plugin pages.
 
 ## Creating Keybinds
 

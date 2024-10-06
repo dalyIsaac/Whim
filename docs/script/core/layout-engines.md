@@ -100,6 +100,6 @@ context.PluginManager.AddPlugin(treeLayoutPlugin);
 
 ### `FloatingLayoutEngine`
 
-<xref:Whim.FloatingLayout.FloatingLayoutEngine> is a layout that has all windows being free-floating. To have specific windows float within a different layout, see the [Floating Window Plugin](../plugins/floating-window.md).
+<xref:Whim.FloatingWindow.FloatingLayoutEngine> is a layout that has all windows being free-floating. To have specific windows float within a different layout, see the [Floating Window Plugin](../plugins/floating-window.md).
 
 ![FloatingLayoutEngine demo](../../images/floating-layout-demo.gif)

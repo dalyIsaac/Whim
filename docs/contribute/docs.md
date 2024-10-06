@@ -25,16 +25,6 @@ When linking to the docs for one of Whim's automatically generated docs, prefer 
 
 The IDs to use can be found in the `uid` field of the `xrefmap.yml` file. The `xrefmap.yml` will be generated at `docs/_site/xrefmap.yml`.
 
-## Building the docs
-
-Unfortunately, every time you make a change to the docs, you need to rebuild the docs. This can take a while. If you just need to make a change to the markdown, you can clear the `metadata` field in `docfx.json`, and run:
-
-```shell
-dotnet docfx build .\docfx.json
-```
-
-Just make sure to revert the `metadata` field before making a pull request.
-
 ## Linting
 
 Before making a pull request, please run the `markdownlint` formatter, available as a [Visual Studio Code extension](https://github.com/markdownlint/markdownlint) and as [command line tool](https://github.com/DavidAnson/markdownlint-cli2).

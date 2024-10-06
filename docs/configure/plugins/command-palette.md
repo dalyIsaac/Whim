@@ -24,3 +24,7 @@ plugins:
 | `y_position_percent` | The y position of the command palette as a percentage of the monitor height.     |
 
 [!INCLUDE [Commands](../../_common/plugins/command-palette.md)]
+
+## Tree Layout
+
+👷🏗️🚧

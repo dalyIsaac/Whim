@@ -6,7 +6,7 @@ Whim differentiates three types of commands.
 
 1. [Core commands](#core-commands) expose common functions as ready-to-use commands, many of which come with a default keybinding.
 2. [Plugin commands](#plugin-commands) are ready-to-use commands exposed by plugins.
-3. [Custom commands](../../script/custom-commands.md) are user-defined commands, which can compose arbitrary functions.
+3. [Custom commands](../../script/core/commands.md) are user-defined commands, which can compose arbitrary functions.
 
 ## Core commands
 

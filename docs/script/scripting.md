@@ -46,4 +46,4 @@ The `DoConfig` function is returned at the end of the script so Whim can call it
 
 ### Examples
 
-The rest of this _Customize_ section documents popular configuration options. A few more elaborate examples can be found in [Snippets](./snippets.md).
+The rest of this _Customize_ section documents popular configuration options. A few more elaborate examples can be found in [Snippets](core/snippets.md).

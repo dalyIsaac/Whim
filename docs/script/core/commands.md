@@ -1,4 +1,4 @@
-# Custom commands
+# Commands
 
 Custom commands can be created using the <xref:Whim.ICommandManager>. They are automatically added to the `whim.custom` namespace. For example, the following command closes the current tracked window:
 
