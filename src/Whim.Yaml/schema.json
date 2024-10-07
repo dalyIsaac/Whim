@@ -415,6 +415,144 @@
       }
     },
 
+    "BarPlugin": {
+      "type": "object",
+      "description": "Plugin to add a bar. For more, see https://dalyisaac.github.io/Whim/docs/plugins/bar.html",
+      "additionalProperties": false,
+      "properties": {
+        "is_enabled": {
+          "type": "boolean",
+          "description": "Whether the plugin is enabled",
+          "default": true
+        },
+        "height": {
+          "type": "integer",
+          "description": "The height of the bar in pixels",
+          "default": 30
+        },
+        "color": {
+          "$ref": "#/$defs/Color",
+          "description": "The color of the bar",
+          "default": "black"
+        },
+        "backdrop": {
+          "$ref": "#/$defs/WindowBackdropConfig",
+          "description": "The backdrop to use for the bar"
+        },
+        "left_components": {
+          "$ref": "#/$defs/BarWidgetList",
+          "description": "Widgets to display on the left side of the bar"
+        },
+        "center_components": {
+          "$ref": "#/$defs/BarWidgetList",
+          "description": "Widgets to display in the center of the bar"
+        },
+        "right_components": {
+          "$ref": "#/$defs/BarWidgetList",
+          "description": "Widgets to display on the right side of the bar"
+        }
+      }
+    },
+
+    "BarWidgetList": {
+      "type": "object",
+      "required": ["entries"],
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/BarWidget" },
+          "description": "Widgets to display on the bar"
+        }
+      }
+    },
+
+    "ActiveLayoutBarWidget": {
+      "type": "object",
+      "description": "A widget to display the active layout",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "const": "ActiveLayoutWidget"
+        }
+      }
+    },
+
+    "BatteryBarWidget": {
+      "type": "object",
+      "description": "A widget to display the battery status",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "const": "BatteryWidget"
+        }
+      }
+    },
+
+    "DateTimeBarWidget": {
+      "type": "object",
+      "description": "A widget to display the date and time",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "const": "DateTimeWidget"
+        },
+        "interval": {
+          "type": "integer",
+          "description": "The interval in milliseconds to update the date and time",
+          "default": 1000
+        },
+        "format": {
+          "type": "string",
+          "description": "The format to display the date and time in. For more, see https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings",
+          "default": "HH:mm:ss dd-MMM-yyyy"
+        }
+      }
+    },
+
+    "FocusedWindowBarWidget": {
+      "type": "object",
+      "description": "A widget to display the focused window",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "const": "FocusedWindowWidget"
+        },
+        "shorten_title": {
+          "type": "boolean",
+          "description": "Whether to shorten the title of the focused window",
+          "default": true
+        }
+      }
+    },
+
+    "WorkspaceBarWidget": {
+      "type": "object",
+      "description": "A widget to display the workspace",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "const": "WorkspaceWidget"
+        }
+      }
+    },
+
+    "TreeLayoutEngineBarWidget": {
+      "type": "object",
+      "description": "A widget to display the direction of the tree layout engine",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "const": "TreeLayoutEngineWidget"
+        }
+      }
+    },
+
     "GapsPlugin": {
       "type": "object",
       "description": "Plugin to add gaps between windows. For more, see https://dalyisaac.github.io/Whim/docs/plugins/gaps.html",
