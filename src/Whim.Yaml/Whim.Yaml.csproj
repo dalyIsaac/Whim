@@ -30,12 +30,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Whim.Bar\Whim.Bar.csproj" />
 		<ProjectReference Include="..\Whim.CommandPalette\Whim.CommandPalette.csproj" />
 		<ProjectReference Include="..\Whim.FocusIndicator\Whim.FocusIndicator.csproj" />
 		<ProjectReference Include="..\Whim.Gaps\Whim.Gaps.csproj" />
 		<ProjectReference Include="..\Whim.LayoutPreview\Whim.LayoutPreview.csproj" />
 		<ProjectReference Include="..\Whim.SliceLayout\Whim.SliceLayout.csproj" />
 		<ProjectReference Include="..\Whim.TreeLayout\Whim.TreeLayout.csproj" />
+		<ProjectReference Include="..\Whim.TreeLayout.Bar\Whim.TreeLayout.Bar.csproj" />
 		<ProjectReference Include="..\Whim.Updater\Whim.Updater.csproj" />
 		<ProjectReference Include="..\Whim\Whim.csproj" />
 	</ItemGroup>

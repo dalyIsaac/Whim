@@ -68,6 +68,11 @@
     "plugins": {
       "type": "object",
       "properties": {
+        "bar": {
+          "$ref": "#/$defs/BarPlugin",
+          "description": "Plugin to add a bar"
+        },
+
         "gaps": {
           "$ref": "#/$defs/GapsPlugin",
           "description": "Plugin to add gaps between windows"
@@ -466,6 +471,30 @@
       }
     },
 
+    "BarWidget": {
+      "required": ["type"],
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ActiveLayoutBarWidget"
+        },
+        {
+          "$ref": "#/$defs/BatteryBarWidget"
+        },
+        {
+          "$ref": "#/$defs/DateTimeBarWidget"
+        },
+        {
+          "$ref": "#/$defs/FocusedWindowBarWidget"
+        },
+        {
+          "$ref": "#/$defs/WorkspaceBarWidget"
+        },
+        {
+          "$ref": "#/$defs/TreeLayoutEngineBarWidget"
+        }
+      ]
+    },
+
     "ActiveLayoutBarWidget": {
       "type": "object",
       "description": "A widget to display the active layout",
@@ -524,7 +553,7 @@
         "shorten_title": {
           "type": "boolean",
           "description": "Whether to shorten the title of the focused window",
-          "default": true
+          "default": false
         }
       }
     },
