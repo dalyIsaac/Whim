@@ -40,6 +40,11 @@ internal static class YamlBarPluginLoader
 			config.Height = (int)height;
 		}
 
+		if (bar.Backdrop.AsOptional() is { } backdrop)
+		{
+			config.Backdrop = YamlLoaderUtils.ParseWindowBackdropConfig(backdrop);
+		}
+
 		ctx.PluginManager.AddPlugin(new BarPlugin(ctx, config));
 	}
 
