@@ -14,7 +14,6 @@ namespace Whim.Bar;
 public class BarPlugin(IContext context, BarConfig barConfig) : IBarPlugin
 {
 	private readonly IContext _context = context;
-	private readonly BarConfig _barConfig = barConfig;
 
 	private readonly Dictionary<IMonitor, BarWindow> _monitorBarMap = [];
 	private bool _disposedValue;
@@ -24,12 +23,17 @@ public class BarPlugin(IContext context, BarConfig barConfig) : IBarPlugin
 	/// </summary>
 	public string Name => "whim.bar";
 
+	/// <inheritdoc/>
+	public BarConfig Config => barConfig;
+
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
 		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
 		_context.FilterManager.AddTitleMatchFilter("Whim Bar");
-		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new BarLayoutEngine(_barConfig, layout));
+		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new BarLayoutEngine(Config, layout));
+
+		Config.Initialize();
 	}
 
 	/// <inheritdoc />
@@ -37,7 +41,7 @@ public class BarPlugin(IContext context, BarConfig barConfig) : IBarPlugin
 	{
 		foreach (IMonitor monitor in _context.MonitorManager)
 		{
-			BarWindow barWindow = new(_context, _barConfig, monitor);
+			BarWindow barWindow = new(_context, Config, monitor);
 			_monitorBarMap[monitor] = barWindow;
 		}
 
@@ -57,7 +61,7 @@ public class BarPlugin(IContext context, BarConfig barConfig) : IBarPlugin
 		// Add the new monitors
 		foreach (IMonitor monitor in e.AddedMonitors)
 		{
-			BarWindow barWindow = new(_context, _barConfig, monitor);
+			BarWindow barWindow = new(_context, Config, monitor);
 			_monitorBarMap[monitor] = barWindow;
 		}
 

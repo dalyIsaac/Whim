@@ -435,11 +435,6 @@
           "description": "The height of the bar in pixels",
           "default": 30
         },
-        "color": {
-          "$ref": "#/$defs/Color",
-          "description": "The color of the bar",
-          "default": "black"
-        },
         "backdrop": {
           "$ref": "#/$defs/WindowBackdropConfig",
           "description": "The backdrop to use for the bar"
