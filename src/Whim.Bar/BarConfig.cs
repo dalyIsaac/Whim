@@ -7,10 +7,20 @@ using Microsoft.UI.Xaml.Controls;
 namespace Whim.Bar;
 
 /// <summary>
-/// Delegate for creating a component.
-/// A component will subscribe to <see cref="Microsoft.UI.Xaml.Window.Closed"/> if it has resources to dispose.
+/// A component to display in the bar.
 /// </summary>
-public delegate UserControl BarComponent(IContext context, IMonitor monitor, Microsoft.UI.Xaml.Window window);
+public abstract record BarComponent
+{
+	/// <summary>
+	/// Delegate for creating a component.
+	/// A component will subscribe to <see cref="Microsoft.UI.Xaml.Window.Closed"/> if it has resources to dispose.
+	/// </summary>
+	/// <param name="context"></param>
+	/// <param name="monitor"></param>
+	/// <param name="window"></param>
+	/// <returns></returns>
+	public abstract UserControl CreateWidget(IContext context, IMonitor monitor, Microsoft.UI.Xaml.Window window);
+}
 
 /// <summary>
 /// Configuration for the bar plugin.

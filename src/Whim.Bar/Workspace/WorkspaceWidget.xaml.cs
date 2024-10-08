@@ -32,10 +32,7 @@ public partial class WorkspaceWidget : UserControl, IDisposable
 	/// <summary>
 	/// Create the workspace widget bar component.
 	/// </summary>
-	public static BarComponent CreateComponent()
-	{
-		return new BarComponent((context, monitor, window) => new WorkspaceWidget(context, monitor, window));
-	}
+	public static BarComponent CreateComponent() => new WorkspaceComponent();
 
 	/// <inheritdoc/>
 	protected virtual void Dispose(bool disposing)
@@ -61,4 +58,14 @@ public partial class WorkspaceWidget : UserControl, IDisposable
 		Dispose(disposing: true);
 		GC.SuppressFinalize(this);
 	}
+}
+
+/// <summary>
+/// The bar component for the workspace widget.
+/// </summary>
+public record WorkspaceComponent : BarComponent
+{
+	/// <inheritdoc/>
+	public override UserControl CreateWidget(IContext context, IMonitor monitor, Microsoft.UI.Xaml.Window window) =>
+		new WorkspaceWidget(context, monitor, window);
 }

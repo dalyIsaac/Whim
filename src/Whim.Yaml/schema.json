@@ -460,37 +460,37 @@
       "properties": {
         "entries": {
           "type": "array",
-          "items": { "$ref": "#/$defs/BarWidget" },
+          "items": { "$ref": "#/$defs/Widget" },
           "description": "Widgets to display on the bar"
         }
       }
     },
 
-    "BarWidget": {
+    "Widget": {
       "required": ["type"],
       "anyOf": [
         {
-          "$ref": "#/$defs/ActiveLayoutBarWidget"
+          "$ref": "#/$defs/ActiveLayoutWidget"
         },
         {
-          "$ref": "#/$defs/BatteryBarWidget"
+          "$ref": "#/$defs/BatteryWidget"
         },
         {
-          "$ref": "#/$defs/DateTimeBarWidget"
+          "$ref": "#/$defs/DateTimeWidget"
         },
         {
-          "$ref": "#/$defs/FocusedWindowBarWidget"
+          "$ref": "#/$defs/FocusedWindowWidget"
         },
         {
-          "$ref": "#/$defs/WorkspaceBarWidget"
+          "$ref": "#/$defs/WorkspaceWidget"
         },
         {
-          "$ref": "#/$defs/TreeLayoutEngineBarWidget"
+          "$ref": "#/$defs/TreeLayoutEngineWidget"
         }
       ]
     },
 
-    "ActiveLayoutBarWidget": {
+    "ActiveLayoutWidget": {
       "type": "object",
       "description": "A widget to display the active layout",
       "additionalProperties": false,
@@ -502,7 +502,7 @@
       }
     },
 
-    "BatteryBarWidget": {
+    "BatteryWidget": {
       "type": "object",
       "description": "A widget to display the battery status",
       "additionalProperties": false,
@@ -514,7 +514,7 @@
       }
     },
 
-    "DateTimeBarWidget": {
+    "DateTimeWidget": {
       "type": "object",
       "description": "A widget to display the date and time",
       "additionalProperties": false,
@@ -536,7 +536,7 @@
       }
     },
 
-    "FocusedWindowBarWidget": {
+    "FocusedWindowWidget": {
       "type": "object",
       "description": "A widget to display the focused window",
       "additionalProperties": false,
@@ -553,7 +553,7 @@
       }
     },
 
-    "WorkspaceBarWidget": {
+    "WorkspaceWidget": {
       "type": "object",
       "description": "A widget to display the workspace",
       "additionalProperties": false,
@@ -565,14 +565,14 @@
       }
     },
 
-    "TreeLayoutEngineBarWidget": {
+    "TreeLayoutEngineWidget": {
       "type": "object",
       "description": "A widget to display the direction of the tree layout engine",
       "additionalProperties": false,
       "required": ["type"],
       "properties": {
         "type": {
-          "const": "TreeLayoutEngineWidget"
+          "const": "TreeLayoutWidget"
         }
       }
     },
