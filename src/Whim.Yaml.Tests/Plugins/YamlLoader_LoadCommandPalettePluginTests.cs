@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Whim.Yaml.Tests;
 
-public class YamlPluginLoader_CommandPalettePluginTests
+public class YamlPluginLoader_LoadCommandPalettePluginTests
 {
 	private const int _defaultMaxHeightPercent = 40;
 	private const int _defaultMaxWidthPixels = 800;

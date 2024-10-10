@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Whim.Yaml.Tests;
 
-public class YamlPluginLoader_GapsPluginTests
+public class YamlLoader_LoadGapsPluginTests
 {
 	private const int _defaultOuterGap = 0;
 	private const int _defaultInnerGap = 10;

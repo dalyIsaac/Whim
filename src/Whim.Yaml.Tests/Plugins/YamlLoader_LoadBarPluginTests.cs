@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Whim.Yaml.Tests;
 
-public class YamlBarPluginLoaderTests
+public class YamlLoader_LoadBarPluginTests
 {
 	private static BarPlugin GetBarPlugin(IContext ctx, int idx = 0)
 	{
