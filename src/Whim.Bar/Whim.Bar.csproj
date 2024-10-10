@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Whim.Bar.Tests" />
+	  <InternalsVisibleTo Include="Whim.Yaml.Tests" />
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
   </ItemGroup>
 </Project>

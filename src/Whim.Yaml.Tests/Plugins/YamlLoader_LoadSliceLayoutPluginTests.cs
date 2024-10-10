@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Whim.Yaml.Tests;
 
-public class YamlPluginLoader_SliceLayoutPluginTests
+public class YamlPluginLoader_LoadSliceLayoutPluginTests
 {
 	public static TheoryData<string, bool> SliceLayoutConfig =>
 		new()

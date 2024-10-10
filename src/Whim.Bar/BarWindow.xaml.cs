@@ -50,9 +50,11 @@ public sealed partial class BarWindow : Microsoft.UI.Xaml.Window, System.IDispos
 		_backdropController = new(this, barConfig.Backdrop);
 
 		// Set up the bar.
-		LeftPanel.Children.AddRange(_barConfig.LeftComponents.Select(c => c(_context, _monitor, this)));
-		CenterPanel.Children.AddRange(_barConfig.CenterComponents.Select(c => c(_context, _monitor, this)));
-		RightPanel.Children.AddRange(_barConfig.RightComponents.Select(c => c(_context, _monitor, this)));
+		LeftPanel.Children.AddRange(_barConfig.LeftComponents.Select(c => c.CreateWidget(_context, _monitor, this)));
+		CenterPanel.Children.AddRange(
+			_barConfig.CenterComponents.Select(c => c.CreateWidget(_context, _monitor, this))
+		);
+		RightPanel.Children.AddRange(_barConfig.RightComponents.Select(c => c.CreateWidget(_context, _monitor, this)));
 	}
 
 	internal void UpdateRect()

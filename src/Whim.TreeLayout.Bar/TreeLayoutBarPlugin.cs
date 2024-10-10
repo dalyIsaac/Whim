@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.UI.Xaml.Controls;
 using Whim.Bar;
 
 namespace Whim.TreeLayout.Bar;
@@ -32,16 +33,21 @@ public class TreeLayoutBarPlugin(ITreeLayoutPlugin plugin) : IPlugin
 	/// Create the tree layout engine bar component.
 	/// </summary>
 	/// <returns></returns>
-	public BarComponent CreateComponent()
-	{
-		return new BarComponent(
-			(context, monitor, window) => new TreeLayoutEngineWidget(context, _plugin, monitor, window)
-		);
-	}
+	public BarComponent CreateComponent() => new TreeLayoutComponent(_plugin);
 
 	/// <inheritdoc />
 	public void LoadState(JsonElement state) { }
 
 	/// <inheritdoc />
 	public JsonElement? SaveState() => null;
+}
+
+/// <summary>
+/// The tree layout engine component for the bar.
+/// </summary>
+public record TreeLayoutComponent(ITreeLayoutPlugin Plugin) : BarComponent
+{
+	/// <inheritdoc/>
+	public override UserControl CreateWidget(IContext context, IMonitor monitor, Microsoft.UI.Xaml.Window window) =>
+		new TreeLayoutEngineWidget(context, Plugin, monitor, window);
 }

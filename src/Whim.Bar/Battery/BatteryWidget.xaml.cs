@@ -21,8 +21,15 @@ public partial class BatteryWidget : UserControl
 	/// <summary>
 	/// Creates a new bar component which contains the active layout widget.
 	/// </summary>
-	public static BarComponent CreateComponent()
-	{
-		return new BarComponent((context, monitor, window) => new BatteryWidget(context, monitor));
-	}
+	public static BarComponent CreateComponent() => new BatteryComponent();
+}
+
+/// <summary>
+/// The bar component for the active layout widget.
+/// </summary>
+public record BatteryComponent : BarComponent
+{
+	/// <inheritdoc/>
+	public override UserControl CreateWidget(IContext context, IMonitor monitor, Microsoft.UI.Xaml.Window window) =>
+		new BatteryWidget(context, monitor);
 }

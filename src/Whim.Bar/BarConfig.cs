@@ -7,10 +7,20 @@ using Microsoft.UI.Xaml.Controls;
 namespace Whim.Bar;
 
 /// <summary>
-/// Delegate for creating a component.
-/// A component will subscribe to <see cref="Microsoft.UI.Xaml.Window.Closed"/> if it has resources to dispose.
+/// A component to display in the bar.
 /// </summary>
-public delegate UserControl BarComponent(IContext context, IMonitor monitor, Microsoft.UI.Xaml.Window window);
+public abstract record BarComponent
+{
+	/// <summary>
+	/// Delegate for creating a component.
+	/// A component will subscribe to <see cref="Microsoft.UI.Xaml.Window.Closed"/> if it has resources to dispose.
+	/// </summary>
+	/// <param name="context"></param>
+	/// <param name="monitor"></param>
+	/// <param name="window"></param>
+	/// <returns></returns>
+	public abstract UserControl CreateWidget(IContext context, IMonitor monitor, Microsoft.UI.Xaml.Window window);
+}
 
 /// <summary>
 /// Configuration for the bar plugin.
@@ -21,9 +31,18 @@ public delegate UserControl BarComponent(IContext context, IMonitor monitor, Mic
 /// <remarks>
 /// Creates a new bar configuration.
 /// </remarks>
-/// <param name="leftComponents">The components to display on the left side of the bar.</param>
-/// <param name="centerComponents">The components to display in the center of the bar.</param>
-/// <param name="rightComponents">The components to display on the right side of the bar.</param>
+/// <param name="leftComponents">
+/// The components to display on the left side of the bar. Changes to this list will be respected until the
+/// bar is initialized.
+/// </param>
+/// <param name="centerComponents">
+/// The components to display in the center of the bar. Changes to this list will be respected until the
+/// bar is initialized.
+/// </param>
+/// <param name="rightComponents">
+/// The components to display on the right side of the bar. Changes to this list will be respected until the
+/// bar is initialized.
+/// </param>
 public class BarConfig(
 	IList<BarComponent> leftComponents,
 	IList<BarComponent> centerComponents,
@@ -34,19 +53,25 @@ public class BarConfig(
 	public event PropertyChangedEventHandler? PropertyChanged;
 
 	/// <summary>
-	/// The components to display on the left side of the bar.
+	/// The components to display in the center of the bar. This will be set to the provided list, until
+	/// the bar is initialized.
 	/// </summary>
-	internal IList<BarComponent> LeftComponents = leftComponents;
+	public IReadOnlyList<BarComponent> LeftComponents { get; private set; } =
+		(IReadOnlyList<BarComponent>)leftComponents;
 
 	/// <summary>
-	/// The components to display in the center of the bar.
+	/// The components to display in the center of the bar. This will be set to the provided list, until
+	/// the bar is initialized.
 	/// </summary>
-	internal IList<BarComponent> CenterComponents = centerComponents;
+	public IReadOnlyList<BarComponent> CenterComponents { get; private set; } =
+		(IReadOnlyList<BarComponent>)centerComponents;
 
 	/// <summary>
-	/// The components to display on the right side of the bar.
+	/// The components to display in the center of the bar. This will be set to the provided list, until
+	/// the bar is initialized.
 	/// </summary>
-	internal IList<BarComponent> RightComponents = rightComponents;
+	public IReadOnlyList<BarComponent> RightComponents { get; private set; } =
+		(IReadOnlyList<BarComponent>)rightComponents;
 
 	private int _height = GetHeightFromResourceDictionary() ?? 30;
 
@@ -84,6 +109,17 @@ public class BarConfig(
 	/// To change the opacity for the bar's background color, make sure the hex color includes the alpha values.
 	/// </remarks>
 	public WindowBackdropConfig Backdrop { get; set; } = new(BackdropType.Mica, AlwaysShowBackdrop: true);
+
+	/// <summary>
+	/// Freezes the configuration, making it immutable.
+	/// </summary>
+	/// <returns></returns>
+	internal void Initialize()
+	{
+		LeftComponents = new List<BarComponent>(LeftComponents);
+		CenterComponents = new List<BarComponent>(CenterComponents);
+		RightComponents = new List<BarComponent>(RightComponents);
+	}
 
 	private static int? GetHeightFromResourceDictionary()
 	{

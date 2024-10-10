@@ -30,8 +30,22 @@ public partial class DateTimeWidget : UserControl
 	/// <param name="interval"></param>
 	/// <param name="format"></param>
 	/// <returns></returns>
-	public static BarComponent CreateComponent(int interval = 100, string format = "HH:mm:ss dd-MMM-yyyy")
-	{
-		return new BarComponent((context, monitor, window) => new DateTimeWidget(interval, format));
-	}
+	public static BarComponent CreateComponent(int interval = 100, string format = "HH:mm:ss dd-MMM-yyyy") =>
+		new DateTimeComponent(interval, format);
+}
+
+/// <summary>
+/// The bar component for the date time widget.
+/// </summary>
+/// <param name="IntervalMs">
+/// The interval in milliseconds to update the date time.
+/// </param>
+/// <param name="Format">
+/// The date time format. See <see href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings">Custom date and time format strings</see>.
+/// </param>
+public record DateTimeComponent(int IntervalMs, string Format) : BarComponent
+{
+	/// <inheritdoc/>
+	public override UserControl CreateWidget(IContext context, IMonitor monitor, Microsoft.UI.Xaml.Window window) =>
+		new DateTimeWidget(IntervalMs, Format);
 }

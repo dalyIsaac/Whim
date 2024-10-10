@@ -31,6 +31,9 @@ internal static class YamlPluginLoader
 		LoadUpdaterPlugin(ctx, schema);
 		LoadSliceLayoutPlugin(ctx, schema);
 		LoadTreeLayoutPlugin(ctx, schema);
+
+		// Load the bar plugin last, since it has dependencies on the TreeLayout plugin.
+		YamlBarPluginLoader.LoadBarPlugin(ctx, schema);
 	}
 
 	private static void LoadGapsPlugin(IContext ctx, Schema schema)
