@@ -441,15 +441,15 @@
         },
         "left_components": {
           "$ref": "#/$defs/BarWidgetList",
-          "description": "Widgets to display on the left side of the bar"
+          "description": "The widgets to display on the left side of the bar"
         },
         "center_components": {
           "$ref": "#/$defs/BarWidgetList",
-          "description": "Widgets to display in the center of the bar"
+          "description": "The widgets to display in the center of the bar"
         },
         "right_components": {
           "$ref": "#/$defs/BarWidgetList",
-          "description": "Widgets to display on the right side of the bar"
+          "description": "The widgets to display on the right side of the bar"
         }
       }
     },
@@ -567,7 +567,7 @@
 
     "TreeLayoutEngineWidget": {
       "type": "object",
-      "description": "A widget to display the direction of the tree layout engine",
+      "description": "A widget to display the direction to add windows in the tree layout engine on the current workspace",
       "additionalProperties": false,
       "required": ["type"],
       "properties": {

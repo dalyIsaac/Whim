@@ -1,6 +1,6 @@
 # Bar Plugin
 
-The <xref:Whim.Bar.BarPlugin> adds a configurable bar at the top of a screen.
+The <xref:Whim.Bar.BarPlugin> adds a configurable bar at the top of each monitor.
 
 ![Bar demo](../../images/bar-demo.png)
 
