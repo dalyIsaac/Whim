@@ -497,7 +497,7 @@
       "required": ["type"],
       "properties": {
         "type": {
-          "const": "ActiveLayoutWidget"
+          "const": "active_layout_widget"
         }
       }
     },
@@ -509,7 +509,7 @@
       "required": ["type"],
       "properties": {
         "type": {
-          "const": "BatteryWidget"
+          "const": "battery_widget"
         }
       }
     },
@@ -521,7 +521,7 @@
       "required": ["type"],
       "properties": {
         "type": {
-          "const": "DateTimeWidget"
+          "const": "date_time_widget"
         },
         "interval": {
           "type": "integer",
@@ -543,7 +543,7 @@
       "required": ["type"],
       "properties": {
         "type": {
-          "const": "FocusedWindowWidget"
+          "const": "focused_window_widget"
         },
         "shorten_title": {
           "type": "boolean",
@@ -560,7 +560,7 @@
       "required": ["type"],
       "properties": {
         "type": {
-          "const": "WorkspaceWidget"
+          "const": "workspace_widget"
         }
       }
     },
@@ -572,7 +572,7 @@
       "required": ["type"],
       "properties": {
         "type": {
-          "const": "TreeLayoutWidget"
+          "const": "tree_layout_widget"
         }
       }
     },

@@ -193,7 +193,7 @@ public class YamlLoader_LoadBarPluginTests
 					  bar:
 					    left_components:
 					      entries:
-					        - type: ActiveLayoutWidget
+					        - type: active_layout_widget
 					""",
 				true
 			},
@@ -206,7 +206,7 @@ public class YamlLoader_LoadBarPluginTests
 								"left_components": {
 									"entries": [
 										{
-											"type": "ActiveLayoutWidget"
+											"type": "active_layout_widget"
 										}
 									]
 								}
@@ -245,7 +245,7 @@ public class YamlLoader_LoadBarPluginTests
 					  bar:
 					    left_components:
 					      entries:
-					        - type: BatteryWidget
+					        - type: battery_widget
 					""",
 				true
 			},
@@ -258,7 +258,7 @@ public class YamlLoader_LoadBarPluginTests
 								"left_components": {
 									"entries": [
 										{
-											"type": "BatteryWidget"
+											"type": "battery_widget"
 										}
 									]
 								}
@@ -297,7 +297,7 @@ public class YamlLoader_LoadBarPluginTests
 					  bar:
 					    left_components:
 					      entries:
-					        - type: DateTimeWidget
+					        - type: date_time_widget
 					          format: "yyyy-MM-dd HH:mm:ss"
 					""",
 				true,
@@ -313,7 +313,7 @@ public class YamlLoader_LoadBarPluginTests
 								"left_components": {
 									"entries": [
 										{
-											"type": "DateTimeWidget",
+											"type": "date_time_widget",
 											"format": "yyyy-MM-dd HH:mm:ss"
 										}
 									]
@@ -333,7 +333,7 @@ public class YamlLoader_LoadBarPluginTests
 					  bar:
 					    left_components:
 					      entries:
-					        - type: DateTimeWidget
+					        - type: date_time_widget
 					          interval: 500
 					          format: "yyyy-MM-dd"
 					""",
@@ -350,7 +350,7 @@ public class YamlLoader_LoadBarPluginTests
 								"left_components": {
 									"entries": [
 										{
-											"type": "DateTimeWidget",
+											"type": "date_time_widget",
 											"interval": 500,
 											"format": "yyyy-MM-dd"
 										}
@@ -399,7 +399,7 @@ public class YamlLoader_LoadBarPluginTests
 					  bar:
 					    left_components:
 					      entries:
-					        - type: FocusedWindowWidget
+					        - type: focused_window_widget
 					          shorten_title: false
 					""",
 				true,
@@ -414,7 +414,7 @@ public class YamlLoader_LoadBarPluginTests
 								"left_components": {
 									"entries": [
 										{
-											"type": "FocusedWindowWidget",
+											"type": "focused_window_widget",
 											"shorten_title": false
 										}
 									]
@@ -433,7 +433,7 @@ public class YamlLoader_LoadBarPluginTests
 					  bar:
 					    left_components:
 					      entries:
-					        - type: FocusedWindowWidget
+					        - type: focused_window_widget
 					          shorten_title: true
 					""",
 				true,
@@ -448,7 +448,7 @@ public class YamlLoader_LoadBarPluginTests
 								"left_components": {
 									"entries": [
 										{
-											"type": "FocusedWindowWidget",
+											"type": "focused_window_widget",
 											"shorten_title": true
 										}
 									]
@@ -467,7 +467,7 @@ public class YamlLoader_LoadBarPluginTests
 					  bar:
 					    left_components:
 					      entries:
-					        - type: FocusedWindowWidget
+					        - type: focused_window_widget
 					""",
 				true,
 				false
@@ -512,7 +512,7 @@ public class YamlLoader_LoadBarPluginTests
 					  bar:
 					    left_components:
 					      entries:
-					        - type: WorkspaceWidget
+					        - type: workspace_widget
 					""",
 				true
 			},
@@ -525,7 +525,7 @@ public class YamlLoader_LoadBarPluginTests
 								"left_components": {
 									"entries": [
 										{
-											"type": "WorkspaceWidget"
+											"type": "workspace_widget"
 										}
 									]
 								}
@@ -564,7 +564,7 @@ public class YamlLoader_LoadBarPluginTests
 					  bar:
 					    left_components:
 					      entries:
-					        - type: TreeLayoutWidget
+					        - type: tree_layout_widget
 					""",
 				true
 			},
@@ -577,7 +577,7 @@ public class YamlLoader_LoadBarPluginTests
 								"left_components": {
 									"entries": [
 										{
-											"type": "TreeLayoutWidget"
+											"type": "tree_layout_widget"
 										}
 									]
 								}
@@ -618,15 +618,15 @@ public class YamlLoader_LoadBarPluginTests
 					  bar:
 					    left_components:
 					      entries:
-					        - type: ActiveLayoutWidget
+					        - type: active_layout_widget
 					    center_components:
 					      entries:
-					        - type: DateTimeWidget
+					        - type: date_time_widget
 					          format: "yyyy-MM-dd HH:mm:ss"
 					    right_components:
 					      entries:
-					        - type: FocusedWindowWidget
-					        - type: BatteryWidget
+					        - type: focused_window_widget
+					        - type: battery_widget
 					""",
 				true
 			},
@@ -639,14 +639,14 @@ public class YamlLoader_LoadBarPluginTests
 								"left_components": {
 									"entries": [
 										{
-											"type": "ActiveLayoutWidget"
+											"type": "active_layout_widget"
 										}
 									]
 								},
 								"center_components": {
 									"entries": [
 										{
-											"type": "DateTimeWidget",
+											"type": "date_time_widget",
 											"format": "yyyy-MM-dd HH:mm:ss"
 										}
 									]
@@ -654,10 +654,10 @@ public class YamlLoader_LoadBarPluginTests
 								"right_components": {
 									"entries": [
 										{
-											"type": "FocusedWindowWidget"
+											"type": "focused_window_widget"
 										},
 										{
-											"type": "BatteryWidget"
+											"type": "battery_widget"
 										}
 									]
 								}
