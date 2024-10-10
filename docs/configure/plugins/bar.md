@@ -83,4 +83,4 @@ The `WorkspaceWidget` displays the name of the current workspace.
 
 ### Tree Layout Widget
 
-The `TreeLayoutWidget` displays the direction to add windows in the tree layout engine on the current workspace.
+The `TreeLayoutWidget` displays the direction to add windows in the tree layout engine on the current workspace. This will only show if the current layout in the workspace is a tree layout.
