@@ -291,11 +291,11 @@
       "properties": {
         "command": {
           "type": "string",
-          "description": "The identifier of the command to run. For more, see https://dalyisaac.github.io/Whim/docs/customize/commands.html"
+          "description": "The identifier of the command to run. For more, see https://dalyisaac.github.io/Whim/configure/core/commands.html"
         },
         "keybind": {
           "type": "string",
-          "description": "The keybind to trigger the command. For more, see https://dalyisaac.github.io/Whim/docs/customize/keybinds.html"
+          "description": "The keybind to trigger the command. For more, see https://dalyisaac.github.io/Whim/configure/core/keybinds.html"
         }
       }
     },
@@ -422,7 +422,7 @@
 
     "BarPlugin": {
       "type": "object",
-      "description": "Plugin to add a bar. For more, see https://dalyisaac.github.io/Whim/docs/plugins/bar.html",
+      "description": "Plugin to add a bar. For more, see https://dalyisaac.github.io/Whim/configure/plugins/bar.html",
       "additionalProperties": false,
       "properties": {
         "is_enabled": {
@@ -579,7 +579,7 @@
 
     "GapsPlugin": {
       "type": "object",
-      "description": "Plugin to add gaps between windows. For more, see https://dalyisaac.github.io/Whim/docs/plugins/gaps.html",
+      "description": "Plugin to add gaps between windows. For more, see https://dalyisaac.github.io/Whim/configure/plugins/gaps.html",
       "additionalProperties": false,
       "properties": {
         "is_enabled": {
@@ -612,7 +612,7 @@
 
     "CommandPalettePlugin": {
       "type": "object",
-      "description": "Plugin to add a command palette. For more, see https://dalyisaac.github.io/Whim/docs/plugins/command-palette.html",
+      "description": "Plugin to add a command palette. For more, see https://dalyisaac.github.io/Whim/configure/plugins/command-palette.html",
       "additionalProperties": false,
       "properties": {
         "is_enabled": {
@@ -644,7 +644,7 @@
 
     "FocusIndicatorPlugin": {
       "type": "object",
-      "description": "Plugin to add a focus indicator. For more, see https://dalyisaac.github.io/Whim/docs/plugins/focus-indicator.html",
+      "description": "Plugin to add a focus indicator. For more, see https://https://dalyisaac.github.io/Whim/configure/plugins/command-palette.html",
       "additionalProperties": false,
       "properties": {
         "is_enabled": {
@@ -677,7 +677,7 @@
 
     "LayoutPreviewPlugin": {
       "type": "object",
-      "description": "Plugin to add a layout preview. For more, see https://dalyisaac.github.io/Whim/docs/plugins/layout-preview.html",
+      "description": "Plugin to add a layout preview. For more, see https://dalyisaac.github.io/Whim/configure/plugins/layout-preview.html",
       "additionalProperties": false,
       "properties": {
         "is_enabled": {
@@ -690,7 +690,7 @@
 
     "UpdaterPlugin": {
       "type": "object",
-      "description": "Plugin to add an updater. For more, see https://dalyisaac.github.io/Whim/docs/plugins/updater.html",
+      "description": "Plugin to add an updater. For more, see https://dalyisaac.github.io/Whim/configure/plugins/updater.html",
       "additionalProperties": false,
       "properties": {
         "is_enabled": {
@@ -741,7 +741,7 @@
 
     "SliceLayoutPlugin": {
       "type": "object",
-      "description": "Plugin to add a slice layout. For more, see https://dalyisaac.github.io/Whim/docs/plugins/slice-layout.html",
+      "description": "Plugin to add a slice layout. For more, see https://dalyisaac.github.io/Whim/configure/plugins/slice-layout.html",
       "additionalProperties": false,
       "properties": {
         "is_enabled": {
@@ -754,7 +754,7 @@
 
     "TreeLayoutPlugin": {
       "type": "object",
-      "description": "Plugin to add a tree layout. For more, see https://dalyisaac.github.io/Whim/docs/plugins/tree-layout.html",
+      "description": "Plugin to add a tree layout. For more, see https://dalyisaac.github.io/Whim/configure/plugins/tree-layout.html",
       "additionalProperties": false,
       "properties": {
         "is_enabled": {
