@@ -26,6 +26,7 @@ internal static class YamlPluginLoader
 	{
 		LoadGapsPlugin(ctx, schema);
 		LoadCommandPalettePlugin(ctx, schema);
+		LoadFloatingWindowPlugin(ctx, schema);
 		LoadFocusIndicatorPlugin(ctx, schema);
 		LoadLayoutPreviewPlugin(ctx, schema);
 		LoadUpdaterPlugin(ctx, schema);
@@ -116,6 +117,23 @@ internal static class YamlPluginLoader
 		}
 
 		ctx.PluginManager.AddPlugin(new CommandPalettePlugin(ctx, config));
+	}
+
+	private static void LoadFloatingWindowPlugin(IContext ctx, Schema schema)
+	{
+		if (!schema.Plugins.FloatingWindow.IsValid())
+		{
+			Logger.Debug("FloatingWindow plugin is not valid.");
+			return;
+		}
+
+		if (schema.Plugins.FloatingWindow.IsEnabled.AsOptional() is { } isEnabled && !isEnabled)
+		{
+			Logger.Debug("FloatingWindow plugin is not enabled.");
+			return;
+		}
+
+		ctx.PluginManager.AddPlugin(new FloatingWindowPlugin(ctx));
 	}
 
 	private static void LoadFocusIndicatorPlugin(IContext ctx, Schema schema)
