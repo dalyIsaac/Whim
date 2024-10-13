@@ -15,7 +15,7 @@ public class YamlLayoutEngineLoader_TreeLayoutEngineTests
 				"""
 					layout_engines:
 					  entries:
-					    - type: TreeLayoutEngine
+					    - type: tree
 					      initial_direction: left
 					""",
 				true,
@@ -27,7 +27,7 @@ public class YamlLayoutEngineLoader_TreeLayoutEngineTests
 						"layout_engines": {
 							"entries": [
 								{
-									"type": "TreeLayoutEngine",
+									"type": "tree",
 									"initial_direction": "left"
 								}
 							]
@@ -41,7 +41,7 @@ public class YamlLayoutEngineLoader_TreeLayoutEngineTests
 				"""
 					layout_engines:
 					  entries:
-					    - type: TreeLayoutEngine
+					    - type: tree
 					      initial_direction: right
 					""",
 				true,
@@ -53,7 +53,7 @@ public class YamlLayoutEngineLoader_TreeLayoutEngineTests
 						"layout_engines": {
 							"entries": [
 								{
-									"type": "TreeLayoutEngine",
+									"type": "tree",
 									"initial_direction": "right"
 								}
 							]
@@ -67,7 +67,7 @@ public class YamlLayoutEngineLoader_TreeLayoutEngineTests
 				"""
 					layout_engines:
 					  entries:
-					    - type: TreeLayoutEngine
+					    - type: tree
 					      initial_direction: up
 					""",
 				true,
@@ -79,7 +79,7 @@ public class YamlLayoutEngineLoader_TreeLayoutEngineTests
 						"layout_engines": {
 							"entries": [
 								{
-									"type": "TreeLayoutEngine",
+									"type": "tree",
 									"initial_direction": "up"
 								}
 							]
@@ -93,7 +93,7 @@ public class YamlLayoutEngineLoader_TreeLayoutEngineTests
 				"""
 					layout_engines:
 					  entries:
-					    - type: TreeLayoutEngine
+					    - type: tree
 					      initial_direction: down
 					""",
 				true,
@@ -105,7 +105,7 @@ public class YamlLayoutEngineLoader_TreeLayoutEngineTests
 						"layout_engines": {
 							"entries": [
 								{
-									"type": "TreeLayoutEngine",
+									"type": "tree",
 									"initial_direction": "down"
 								}
 							]
@@ -120,7 +120,7 @@ public class YamlLayoutEngineLoader_TreeLayoutEngineTests
 				"""
 					layout_engines:
 					  entries:
-					    - type: TreeLayoutEngine
+					    - type: tree
 					""",
 				true,
 				Direction.Right
@@ -131,7 +131,7 @@ public class YamlLayoutEngineLoader_TreeLayoutEngineTests
 						"layout_engines": {
 							"entries": [
 								{
-									"type": "TreeLayoutEngine"
+									"type": "tree"
 								}
 							]
 						}

@@ -15,7 +15,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 				"""
 					layout_engines:
 					  entries:
-					    - type: SliceLayoutEngine
+					    - type: slice
 					      variant:
 					        type: column
 					""",
@@ -27,7 +27,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 						"layout_engines": {
 							"entries": [
 								{
-									"type": "SliceLayoutEngine",
+									"type": "slice",
 									"variant": {
 										"type": "column"
 									}
@@ -65,7 +65,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 				"""
 					layout_engines:
 					  entries:
-					    - type: SliceLayoutEngine
+					    - type: slice
 					      variant:
 					        type: row
 					""",
@@ -77,7 +77,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 						"layout_engines": {
 							"entries": [
 								{
-									"type": "SliceLayoutEngine",
+									"type": "slice",
 									"variant": {
 										"type": "row"
 									}
@@ -115,7 +115,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 				"""
 					layout_engines:
 					  entries:
-					    - type: SliceLayoutEngine
+					    - type: slice
 					      variant:
 					        type: primary_stack
 					""",
@@ -127,7 +127,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 						"layout_engines": {
 							"entries": [
 								{
-									"type": "SliceLayoutEngine",
+									"type": "slice",
 									"variant": {
 										"type": "primary_stack"
 									}
@@ -165,7 +165,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 				"""
 					layout_engines:
 					  entries:
-					    - type: SliceLayoutEngine
+					    - type: slice
 					      variant:
 					        type: multi_column_stack
 					        columns: [1, 2, 0, 3]
@@ -179,7 +179,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 						"layout_engines": {
 							"entries": [
 								{
-									"type": "SliceLayoutEngine",
+									"type": "slice",
 									"variant": {
 										"type": "multi_column_stack",
 										"columns": [1, 2, 0, 3]
@@ -228,7 +228,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 				"""
 					layout_engines:
 					  entries:
-					    - type: SliceLayoutEngine
+					    - type: slice
 					      variant:
 					        type: secondary_primary_stack
 					        primary_capacity: 3
@@ -244,7 +244,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 						"layout_engines": {
 							"entries": [
 								{
-									"type": "SliceLayoutEngine",
+									"type": "slice",
 									"variant": {
 										"type": "secondary_primary_stack",
 										"primary_capacity": 3,
@@ -263,7 +263,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 				"""
 					layout_engines:
 					  entries:
-					  - type: SliceLayoutEngine
+					  - type: slice
 					    variant:
 					      type: secondary_primary_stack
 					""",
@@ -277,7 +277,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 						"layout_engines": {
 							"entries": [
 								{
-									"type": "SliceLayoutEngine",
+									"type": "slice",
 									"variant": {
 										"type": "secondary_primary_stack"
 									}
@@ -327,7 +327,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 				"""
 					layout_engines:
 					  entries:
-					    - type: SliceLayoutEngine
+					    - type: slice
 					      variant:
 					        type: invalid
 					""",
@@ -339,7 +339,7 @@ public class YamlLayoutEngineLoader_SliceLayoutEngineTests
 						"layout_engines": {
 							"entries": [
 								{
-									"type": "SliceLayoutEngine",
+									"type": "slice",
 									"variant": {
 										"type": "invalid"
 									}
