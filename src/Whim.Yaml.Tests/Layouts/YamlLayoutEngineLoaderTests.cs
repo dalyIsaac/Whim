@@ -14,7 +14,7 @@ public class YamlLayoutEngineLoaderTests
 				"""
 					layout_engines:
 					  entries:
-					    - type: FocusLayoutEngine
+					    - type: focus
 					""",
 				false,
 				true
@@ -25,7 +25,7 @@ public class YamlLayoutEngineLoaderTests
 						"layout_engines": {
 							"entries": [
 								{
-									"type": "FocusLayoutEngine"
+									"type": "focus"
 								}
 							]
 						}
@@ -38,7 +38,7 @@ public class YamlLayoutEngineLoaderTests
 				"""
 					layout_engines:
 					  entries:
-					    - type: FocusLayoutEngine
+					    - type: focus
 					      maximize: true
 					""",
 				true,
@@ -50,7 +50,7 @@ public class YamlLayoutEngineLoaderTests
 						"layout_engines": {
 							"entries": [
 								{
-									"type": "FocusLayoutEngine",
+									"type": "focus",
 									"maximize": true
 								}
 							]
@@ -64,7 +64,7 @@ public class YamlLayoutEngineLoaderTests
 				"""
 					layout_engines:
 					  entries:
-					    - type: FocusLayoutEngine
+					    - type: focus
 					      maximize: false
 					""",
 				false,
@@ -76,7 +76,7 @@ public class YamlLayoutEngineLoaderTests
 						"layout_engines": {
 							"entries": [
 								{
-									"type": "FocusLayoutEngine",
+									"type": "focus",
 									"maximize": false
 								}
 							]
@@ -113,7 +113,7 @@ public class YamlLayoutEngineLoaderTests
 				"""
 					layout_engines:
 					  entries:
-					    - type: FocusLayoutEngine
+					    - type: focus
 					      maximize: "bob"
 					""",
 				true
@@ -124,7 +124,7 @@ public class YamlLayoutEngineLoaderTests
 						"layout_engines": {
 							"entries": [
 								{
-									"type": "FocusLayoutEngine",
+									"type": "focus",
 									"maximize": "bob"
 								}
 							]

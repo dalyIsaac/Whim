@@ -20,8 +20,8 @@ public class YamlLoader_LoadWorkspacesTests
 					    - name: workspace3
 					      layout_engines:
 					        entries:
-					          - type: FocusLayoutEngine
-					          - type: SliceLayoutEngine
+					          - type: focus
+					          - type: slice
 					            variant:
 					              type: column
 					""",
@@ -43,10 +43,10 @@ public class YamlLoader_LoadWorkspacesTests
 									"layout_engines": {
 										"entries": [
 											{
-												"type": "FocusLayoutEngine"
+												"type": "focus"
 											},
 											{
-												"type": "SliceLayoutEngine",
+												"type": "slice",
 												"variant": {
 													"type": "column"
 												}

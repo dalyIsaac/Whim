@@ -160,7 +160,7 @@
       "required": ["type"],
       "additionalProperties": false,
       "properties": {
-        "type": { "const": "FocusLayoutEngine" },
+        "type": { "const": "focus" },
         "maximize": {
           "type": "boolean",
           "description": "Whether the focused window should be maximized",
@@ -175,7 +175,7 @@
       "required": ["type", "variant"],
       "additionalProperties": false,
       "properties": {
-        "type": { "const": "SliceLayoutEngine" },
+        "type": { "const": "slice" },
         "variant": {
           "anyOf": [
             {
@@ -263,7 +263,7 @@
       "required": ["type"],
       "additionalProperties": false,
       "properties": {
-        "type": { "const": "TreeLayoutEngine" },
+        "type": { "const": "tree" },
         "initial_direction": {
           "anyOf": [
             {
