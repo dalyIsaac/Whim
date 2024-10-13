@@ -4,59 +4,59 @@ A "layout engine" or <xref:Whim.ILayoutEngine> in Whim is responsible for arrang
 
 ## Available layout engines
 
-| Engine                                    | TL;DR                                                                    |
-| ----------------------------------------- | ------------------------------------------------------------------------ |
-| [`FocusLayoutEngine`](#focuslayoutengine) | One window at a time                                                     |
-| [`SliceLayoutEngine`](#slicelayoutengine) | `Awesome`/`dwm`-style dynamic tiling (primary/stack, multi-column, etc.) |
-| [`TreeLayoutEngine`](#treelayoutengine)   | `i3`-style dynamic tiling (arbitrary grids)                              |
+| Engine            | TL;DR                                                                    |
+| ----------------- | ------------------------------------------------------------------------ |
+| [`focus`](#focus) | One window at a time                                                     |
+| [`slice`](#slice) | `Awesome`/`dwm`-style dynamic tiling (primary/stack, multi-column, etc.) |
+| [`tree`](#tree)   | `i3`-style dynamic tiling (arbitrary grids)                              |
 
 ## Example Usage
 
 ```yaml
 layout_engines:
   entries:
-    - type: TreeLayoutEngine
+    - type: tree
       initial_direction: right
 
-    - type: SliceLayoutEngine
+    - type: slice
       variant:
         type: row
 
-    - type: SliceLayoutEngine
+    - type: slice
       variant:
         type: column
 
-    - type: SliceLayoutEngine
+    - type: slice
       variant:
         type: primary_stack
 
-    - type: SliceLayoutEngine
+    - type: slice
       variant:
         type: secondary_primary_stack
 
-    - type: SliceLayoutEngine
+    - type: slice
       variant:
         type: multi_column_stack
         columns: [2, 1, 0]
 
-    - type: SliceLayoutEngine
+    - type: slice
       variant:
         type: secondary_primary_stack
         primary_capacity: 1
         secondary_capacity: 2
 
-    - type: FocusLayoutEngine
+    - type: focus
       maximize: false
 ```
 
-## `FocusLayoutEngine`
+## `focus`
 
-The `FocusLayoutEngine` is a layout engine that displays one window at a time.
+The `focus` layout engine displays one window at a time.
 
 ```yaml
 layout_engines:
   entries:
-    - type: FocusLayoutEngine
+    - type: focus
       maximize: false
 ```
 
@@ -66,15 +66,15 @@ To reorder windows, calling `whim.core.swap_window_in_direction.(left|right|up|d
 
 Windows which are not focused are minimized to the taskbar.
 
-![FocusLayoutEngine demo](../../images/focus-layout-demo.gif)
+![Focus demo](../../images/focus-layout-demo.gif)
 
-## `SliceLayoutEngine`
+## `slice`
 
-`SliceLayoutEngine` is an `Awesome`/`dwm`-style layout engine, which arranges following a deterministic algorithm filling a grid configured in the config file.
+The `slice` layout engine, inspired by `Awesome` and `dwm`, arranges windows in a configurable grid according to deterministic algorithm.
 
 The YAML/JSON configuration supports built-in layouts, such as primary/stack, multi-column, and secondary primary stack. Arbitrary layouts can be created by nesting areas in the C# configuration - see [Defining different `SliceLayouts`](../../script/core/layout-engines.md#defining-different-slicelayouts)
 
-Commands for the `SliceLayoutEngine` can be found on the [Slice Layout](../plugins/slice-layout.md#commands) plugin page.
+Commands for the `slice` layout engine can be found on the [Slice Layout](../plugins/slice-layout.md#commands) plugin page.
 
 ### Layout Variants
 
@@ -86,7 +86,7 @@ Commands for the `SliceLayoutEngine` can be found on the [Slice Layout](../plugi
   ```yaml
   layout_engines:
     entries:
-      - type: SliceLayoutEngine
+      - type: slice
         variant: column
   ```
 
@@ -98,7 +98,7 @@ Commands for the `SliceLayoutEngine` can be found on the [Slice Layout](../plugi
   ```yaml
   layout_engines:
     entries:
-      - type: SliceLayoutEngine
+      - type: slice
         variant: row
   ```
 
@@ -110,7 +110,7 @@ Commands for the `SliceLayoutEngine` can be found on the [Slice Layout](../plugi
   ```yaml
   layout_engines:
     entries:
-      - type: SliceLayoutEngine
+      - type: slice
         variant: primary_stack
   ```
 
@@ -124,7 +124,7 @@ Commands for the `SliceLayoutEngine` can be found on the [Slice Layout](../plugi
   ```yaml
   layout_engines:
     entries:
-      - type: SliceLayoutEngine
+      - type: slice
         variant: multi_column_stack
         columns: [2, 1, 0]
   ```
@@ -140,30 +140,30 @@ Commands for the `SliceLayoutEngine` can be found on the [Slice Layout](../plugi
   ```yaml
   layout_engines:
     entries:
-      - type: SliceLayoutEngine
+      - type: slice
         variant: secondary_primary_stack
         primary_capacity: 1
         secondary_capacity: 2
   ```
 
-![SliceLayoutEngine demo](../../images/slice-layout-demo.gif)
+![Slice demo](../../images/slice-layout-demo.gif)
 
-## `TreeLayoutEngine`
+## `tree`
 
-<xref:Whim.TreeLayout.TreeLayoutEngine> is a layout that allows users to create arbitrary grid layouts, similar to `i3`. Unlike [`SliceLayoutEngine`](#slicelayoutengine), windows can can be added in any location at runtime.
+The `tree` layout engine is a layout that allows users to create arbitrary grid layouts, similar to `i3`. Unlike the [`slice`](#slice) layout engine, windows can can be added in any location at runtime.
 
-The `TreeLayoutEngine` supports an `initial_direction` property, which specifies the direction of the first split. The available directions are `left`, `right`, `up`, and `down`.
+The `tree` supports an `initial_direction` property, which specifies the direction of the first split. The available directions are `left`, `right`, `up`, and `down`.
 
 ```yaml
 layout_engines:
   entries:
-    - type: TreeLayoutEngine
+    - type: tree
       initial_direction: right
 ```
 
-![TreeLayoutEngine demo](../../images/tree-layout-demo.gif)
+![Tree demo](../../images/tree-layout-demo.gif)
 
-Commands for the `TreeLayoutEngine` can be found on the [Tree Layout](../plugins/tree-layout.md#commands) plugin page.
+Commands for the `tree` layout engine can be found on the [Tree Layout](../plugins/tree-layout.md#commands) plugin page.
 
 ## `FloatingLayoutEngine`
 
