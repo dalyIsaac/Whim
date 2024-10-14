@@ -40,7 +40,7 @@ internal static class YamlLayoutEngineLoader
 			engine.Match<object?>(
 				(in Schema.DefsRequiredType floatingWindow) =>
 				{
-					CreateFloatingLayoutEngineCreator(ctx, leafLayoutEngineCreators, floatingWindow);
+					CreateFloatingLayoutEngineCreator(ctx, leafLayoutEngineCreators);
 					return null;
 				},
 				(in Schema.ALayoutEngineThatDisplaysOneWindowAtATime focusLayoutEngine) =>
@@ -58,9 +58,23 @@ internal static class YamlLayoutEngineLoader
 					CreateTreeLayoutEngineCreator(ctx, leafLayoutEngineCreators, treeLayoutEngine);
 					return null;
 				},
-				// TODO: Throw an error for an unmatched type.
-				// NOTE: This match means that validation isn't necessary.
-				(in Schema.RequiredType _) => null
+				(in Schema.RequiredType fallback) =>
+				{
+					if (fallback.Type.AsString.TryGetString(out string? fallbackType))
+					{
+						switch (fallbackType)
+						{
+							case "floating":
+								CreateFloatingLayoutEngineCreator(ctx, leafLayoutEngineCreators);
+								break;
+							default:
+								// TODO: Throw an error for an unmatched type.
+								break;
+						}
+					}
+
+					return null;
+				}
 			);
 		}
 
@@ -69,8 +83,7 @@ internal static class YamlLayoutEngineLoader
 
 	private static void CreateFloatingLayoutEngineCreator(
 		IContext ctx,
-		List<CreateLeafLayoutEngine> leafLayoutEngineCreators,
-		Schema.DefsRequiredType floatingWindow
+		List<CreateLeafLayoutEngine> leafLayoutEngineCreators
 	)
 	{
 		// The floating layout leaf engine doesn't require the FloatingWindowPlugin.
