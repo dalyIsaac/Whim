@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Corvus.Json;
 using Microsoft.UI.Xaml.Media;
 using Whim.CommandPalette;
+using Whim.FloatingWindow;
 using Whim.FocusIndicator;
 using Whim.Gaps;
 using Whim.LayoutPreview;
