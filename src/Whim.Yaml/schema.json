@@ -147,16 +147,21 @@
     "LayoutEngine": {
       "required": ["type"],
       "anyOf": [
-        {
-          "$ref": "#/$defs/FocusLayoutEngine"
-        },
-        {
-          "$ref": "#/$defs/SliceLayoutEngine"
-        },
-        {
-          "$ref": "#/$defs/TreeLayoutEngine"
-        }
+        { "$ref": "#/$defs/FloatingWindowEngine" },
+        { "$ref": "#/$defs/FocusLayoutEngine" },
+        { "$ref": "#/$defs/SliceLayoutEngine" },
+        { "$ref": "#/$defs/TreeLayoutEngine" }
       ]
+    },
+
+    "FloatingWindowEngine": {
+      "type": "object",
+      "description": "A layout engine that allows windows to arbitrarily float in any position or size",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "float" }
+      }
     },
 
     "FocusLayoutEngine": {
