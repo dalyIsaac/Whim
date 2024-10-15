@@ -85,12 +85,12 @@ internal static class YamlBarPluginLoader
 					components.Add(CreateWorkspaceBarWidget(ctx, widget));
 					return null;
 				},
-				(in Schema.DefsRequiredType2 widget) =>
+				(in Schema.DefsRequiredType3 widget) =>
 				{
 					components.Add(CreateTreeLayoutEngineBarWidget(ctx, widget));
 					return null;
 				},
-				(in Schema.DefsRequiredType _) =>
+				(in Schema.DefsRequiredType2 _) =>
 				{
 					return null;
 				}
@@ -136,7 +136,7 @@ internal static class YamlBarPluginLoader
 		return WorkspaceWidget.CreateComponent();
 	}
 
-	private static BarComponent CreateTreeLayoutEngineBarWidget(IContext ctx, Schema.DefsRequiredType2 widget)
+	private static BarComponent CreateTreeLayoutEngineBarWidget(IContext ctx, Schema.DefsRequiredType3 widget)
 	{
 		if (
 			ctx.PluginManager.LoadedPlugins.FirstOrDefault(p => p.Name == "whim.tree_layout")

@@ -83,6 +83,11 @@
           "description": "Plugin to add a command palette"
         },
 
+        "floating_window": {
+          "$ref": "#/$defs/FloatingWindowPlugin",
+          "description": "Plugin to allow windows to float outside of other layouts"
+        },
+
         "focus_indicator": {
           "$ref": "#/$defs/FocusIndicatorPlugin",
           "description": "Plugin to add a focus indicator"
@@ -142,16 +147,21 @@
     "LayoutEngine": {
       "required": ["type"],
       "anyOf": [
-        {
-          "$ref": "#/$defs/FocusLayoutEngine"
-        },
-        {
-          "$ref": "#/$defs/SliceLayoutEngine"
-        },
-        {
-          "$ref": "#/$defs/TreeLayoutEngine"
-        }
+        { "$ref": "#/$defs/FloatingWindowEngine" },
+        { "$ref": "#/$defs/FocusLayoutEngine" },
+        { "$ref": "#/$defs/SliceLayoutEngine" },
+        { "$ref": "#/$defs/TreeLayoutEngine" }
       ]
+    },
+
+    "FloatingWindowEngine": {
+      "type": "object",
+      "description": "A layout engine that allows windows to arbitrarily float in any position or size",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "floating" }
+      }
     },
 
     "FocusLayoutEngine": {
@@ -1337,6 +1347,19 @@
           "description": "Color with ARGB value of #FF9ACD32."
         }
       ]
+    },
+
+    "FloatingWindowPlugin": {
+      "type": "object",
+      "description": "Plugin to add a floating window. For more, see https://dalyisaac.github.io/Whim/configure/plugins/floating-window.html",
+      "additionalProperties": false,
+      "properties": {
+        "is_enabled": {
+          "type": "boolean",
+          "description": "Whether the plugin is enabled",
+          "default": true
+        }
+      }
     }
   }
 }
