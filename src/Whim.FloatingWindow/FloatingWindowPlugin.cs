@@ -25,8 +25,10 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin, IIn
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
-		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new ProxyFloatingLayoutEngine(_context, this, layout));
-		_context.WindowManager.WindowRemoved += WindowManager_WindowRemoved;
+		_context.Store.Dispatch(
+			new AddProxyLayoutEngineTransform(layout => new ProxyFloatingLayoutEngine(_context, this, layout))
+		);
+		_context.Store.WindowEvents.WindowRemoved += WindowManager_WindowRemoved;
 	}
 
 	/// <inheritdoc />
@@ -39,7 +41,7 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin, IIn
 
 	private void UpdateWindow(IWindow? window, bool markAsFloating)
 	{
-		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+		window ??= _context.Store.Pick(Pickers.PickLastFocusedWindow()).ValueOrDefault;
 
 		if (window == null)
 		{
@@ -53,19 +55,23 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin, IIn
 			return;
 		}
 
-		if (_context.Butler.Pantry.GetWorkspaceForWindow(window) is not IWorkspace workspace)
+		if (!_context.Store.Pick(Pickers.PickWorkspaceByWindow(window.Handle)).TryGet(out IWorkspace? workspace))
 		{
-			Logger.Error($"Window {window} is not in a workspace");
+			Logger.Error($"Could not find workspace for window {window}");
 			return;
 		}
 
-		if (workspace.TryGetWindowState(window) is not IWindowState windowState)
+		if (
+			!_context
+				.Store.Pick(Pickers.PickWindowPosition(workspace.Id, window.Handle))
+				.TryGet(out WindowPosition? windowPosition)
+		)
 		{
-			Logger.Error($"Could not get window state for window {window}");
+			Logger.Error($"Could not get window position for window {window}");
 			return;
 		}
 
-		LayoutEngineIdentity layoutEngineIdentity = workspace.ActiveLayoutEngine.Identity;
+		LayoutEngineIdentity layoutEngineIdentity = workspace.GetActiveLayoutEngine().Identity;
 		ISet<LayoutEngineIdentity> layoutEngines = FloatingWindows.TryGetValue(
 			window,
 			out ISet<LayoutEngineIdentity>? existingLayoutEngines
@@ -93,11 +99,7 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin, IIn
 			_floatingWindows[window] = layoutEngines;
 		}
 
-		// Convert the rectangle to a unit square rectangle.
-		IMonitor monitor = _context.MonitorManager.GetMonitorAtPoint(windowState.Rectangle);
-		IRectangle<double> unitSquareRect = monitor.WorkingArea.NormalizeRectangle(windowState.Rectangle);
-
-		workspace.MoveWindowToPoint(window, unitSquareRect);
+		_context.Store.Dispatch(new MoveWindowToPointTransform(window.Handle, windowPosition.LastWindowRectangle));
 	}
 
 	/// <inheritdoc />
@@ -123,7 +125,8 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin, IIn
 	/// <inheritdoc />
 	public void ToggleWindowFloating(IWindow? window = null)
 	{
-		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+		window ??= _context.Store.Pick(Pickers.PickLastFocusedWindow()).ValueOrDefault;
+
 		if (window == null)
 		{
 			Logger.Error("Could not find window");
