@@ -139,11 +139,7 @@ public static partial class Pickers
 	/// </returns>
 	public static PurePicker<Result<ILayoutEngine>> PickActiveLayoutEngine(WorkspaceId workspaceId) =>
 		(IRootSector rootSector) =>
-			BaseWorkspacePicker(
-				workspaceId,
-				rootSector,
-				static workspace => workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex]
-			);
+			BaseWorkspacePicker(workspaceId, rootSector, static workspace => workspace.GetActiveLayoutEngine());
 
 	/// <summary>
 	/// Get the active layout engine in the active workspace.

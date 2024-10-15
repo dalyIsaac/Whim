@@ -35,7 +35,7 @@ public record SwapWindowInDirectionTransform(
 		IWindow window
 	)
 	{
-		ILayoutEngine oldEngine = workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex];
+		ILayoutEngine oldEngine = workspace.GetActiveLayoutEngine();
 		ILayoutEngine newEngine = oldEngine.SwapWindowInDirection(Direction, window);
 
 		return oldEngine == newEngine
