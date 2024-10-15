@@ -58,23 +58,7 @@ internal static class YamlLayoutEngineLoader
 					CreateTreeLayoutEngineCreator(ctx, leafLayoutEngineCreators, treeLayoutEngine);
 					return null;
 				},
-				(in Schema.RequiredType fallback) =>
-				{
-					if (fallback.Type.AsString.TryGetString(out string? fallbackType))
-					{
-						switch (fallbackType)
-						{
-							case "floating":
-								CreateFloatingLayoutEngineCreator(ctx, leafLayoutEngineCreators);
-								break;
-							default:
-								// TODO: Throw an error for an unmatched type.
-								break;
-						}
-					}
-
-					return null;
-				}
+				(in Schema.RequiredType fallback) => null
 			);
 		}
 

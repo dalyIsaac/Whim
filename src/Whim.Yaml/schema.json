@@ -160,7 +160,7 @@
       "required": ["type"],
       "additionalProperties": false,
       "properties": {
-        "type": { "const": "float" }
+        "type": { "const": "floating" }
       }
     },
 
