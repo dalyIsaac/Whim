@@ -106,9 +106,21 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <inheritdoc />
 	public override ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point)
 	{
-		// If the window is floating, update the rectangle and return.
+		if (IsWindowFloatingInLayoutEngine(window) && !_plugin.FloatingWindows.ContainsKey(window))
+		{
+			// The window is no longer floating.
+			ILayoutEngine newInnerLayoutEngine = InnerLayoutEngine.MoveWindowToPoint(window, point);
+			return new ProxyFloatingLayoutEngine(
+				this,
+				newInnerLayoutEngine,
+				FloatingWindowRects.Remove(window),
+				MinimizedWindows.Remove(window)
+			);
+		}
+
 		if (IsWindowFloating(window))
 		{
+			// If the window is floating, update the rectangle and return.
 			(ProxyFloatingLayoutEngine newEngine, bool error) = UpdateWindowRectangle(window);
 			if (!error)
 			{
@@ -136,7 +148,10 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 	}
 
 	private bool IsWindowFloating(IWindow? window) =>
-		window != null && (_plugin.FloatingWindows.ContainsKey(window) || FloatingWindowRects.ContainsKey(window));
+		window != null && (_plugin.FloatingWindows.ContainsKey(window) || IsWindowFloatingInLayoutEngine(window));
+
+	private bool IsWindowFloatingInLayoutEngine(IWindow window) =>
+		FloatingWindowRects.ContainsKey(window) || MinimizedWindows.ContainsKey(window);
 
 	private (ProxyFloatingLayoutEngine, bool error) UpdateWindowRectangle(IWindow window)
 	{
