@@ -1,5 +1,8 @@
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using Windows.Win32.Foundation;
 
 namespace Whim.FloatingWindow;
 
@@ -17,10 +20,8 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin, IIn
 	/// </summary>
 	public string Name => "whim.floating_window";
 
-	private readonly Dictionary<IWindow, ISet<LayoutEngineIdentity>> _floatingWindows = [];
-
-	/// <inheritdoc/>
-	public IReadOnlyDictionary<IWindow, ISet<LayoutEngineIdentity>> FloatingWindows => _floatingWindows;
+	/// <inheritdoc />
+	public Dictionary<HWND, WindowFloatingState> WindowFloatingStates { get; } = [];
 
 	/// <inheritdoc />
 	public void PreInitialize()
@@ -28,7 +29,7 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin, IIn
 		_context.Store.Dispatch(
 			new AddProxyLayoutEngineTransform(layout => new ProxyFloatingLayoutEngine(_context, this, layout))
 		);
-		_context.Store.WindowEvents.WindowRemoved += WindowManager_WindowRemoved;
+		_context.Store.WindowEvents.WindowRemoved += WindowEvents_WindowRemoved;
 	}
 
 	/// <inheritdoc />
@@ -37,90 +38,75 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin, IIn
 	/// <inheritdoc />
 	public IPluginCommands PluginCommands => new FloatingWindowCommands(this);
 
-	private void WindowManager_WindowRemoved(object? sender, WindowEventArgs e) => _floatingWindows.Remove(e.Window);
+	private void WindowEvents_WindowRemoved(object? sender, WindowEventArgs e) =>
+		WindowFloatingStates.Remove(e.Window.Handle);
 
-	private void UpdateWindow(IWindow? window, bool markAsFloating)
+	/// <inheritdoc />
+	public void MarkWindowAsPossiblyRemoved(HWND hwnd)
+	{
+		WindowFloatingStates[hwnd] = WindowFloatingState.PossiblyRemoved;
+
+		Task.Run(() =>
+		{
+			Thread.Sleep(1000);
+			if (
+				WindowFloatingStates.TryGetValue(hwnd, out WindowFloatingState state)
+				&& state == WindowFloatingState.PossiblyRemoved
+			)
+			{
+				WindowFloatingStates.Remove(hwnd);
+			}
+		});
+	}
+
+	/// <inheritdoc />
+	public bool IsWindowPossiblyRemoved(HWND hwnd) =>
+		WindowFloatingStates.TryGetValue(hwnd, out WindowFloatingState state)
+		&& state == WindowFloatingState.PossiblyRemoved;
+
+	/// <inheritdoc />
+	public void MarkWindowAsFloating(IWindow? window = null)
 	{
 		window ??= _context.Store.Pick(Pickers.PickLastFocusedWindow()).ValueOrDefault;
 
 		if (window == null)
 		{
-			Logger.Error("Could not find window");
+			Logger.Error("No window to mark as floating");
 			return;
 		}
 
-		if (!markAsFloating && !FloatingWindows.ContainsKey(window))
+		if (!_context.Store.Pick(Pickers.PickWindowPosition(window.Handle)).TryGet(out WindowPosition windowPosition))
 		{
-			Logger.Debug($"Window {window} is not floating");
+			Logger.Error($"Could not obtain position for floating window {window}");
 			return;
 		}
 
-		if (!_context.Store.Pick(Pickers.PickWorkspaceByWindow(window.Handle)).TryGet(out IWorkspace? workspace))
-		{
-			Logger.Error($"Could not find workspace for window {window}");
-			return;
-		}
-
-		if (
-			!_context
-				.Store.Pick(Pickers.PickWindowPosition(workspace.Id, window.Handle))
-				.TryGet(out WindowPosition? windowPosition)
-		)
-		{
-			Logger.Error($"Could not get window position for window {window}");
-			return;
-		}
-
-		LayoutEngineIdentity layoutEngineIdentity = workspace.GetActiveLayoutEngine().Identity;
-		ISet<LayoutEngineIdentity> layoutEngines = FloatingWindows.TryGetValue(
-			window,
-			out ISet<LayoutEngineIdentity>? existingLayoutEngines
-		)
-			? existingLayoutEngines
-			: new HashSet<LayoutEngineIdentity>();
-
-		if (markAsFloating)
-		{
-			Logger.Debug($"Marking window {window} as floating");
-			layoutEngines.Add(layoutEngineIdentity);
-		}
-		else
-		{
-			Logger.Debug($"Marking window {window} as docked");
-			layoutEngines.Remove(layoutEngineIdentity);
-		}
-
-		if (layoutEngines.Count == 0)
-		{
-			_floatingWindows.Remove(window);
-		}
-		else
-		{
-			_floatingWindows[window] = layoutEngines;
-		}
-
+		WindowFloatingStates[window.Handle] = WindowFloatingState.Floating;
 		_context.Store.Dispatch(new MoveWindowToPointTransform(window.Handle, windowPosition.LastWindowRectangle));
 	}
 
 	/// <inheritdoc />
-	public void MarkWindowAsDockedInLayoutEngine(IWindow window, LayoutEngineIdentity layoutEngineIdentity)
+	public void MarkWindowAsDocked(IWindow? window = null)
 	{
-		if (_floatingWindows.TryGetValue(window, out ISet<LayoutEngineIdentity>? layoutEngines))
-		{
-			layoutEngines.Remove(layoutEngineIdentity);
+		window ??= _context.Store.Pick(Pickers.PickLastFocusedWindow()).ValueOrDefault;
 
-			if (layoutEngines.Count == 0)
-			{
-				_floatingWindows.Remove(window);
-			}
+		if (window == null)
+		{
+			Logger.Error("No window to mark as docked");
+			return;
+		}
+
+		if (!_context.Store.Pick(Pickers.PickWindowPosition(window.Handle)).TryGet(out WindowPosition windowPosition))
+		{
+			Logger.Error($"Could not obtain position for docked window {window}");
+			return;
+		}
+
+		if (WindowFloatingStates.Remove(window.Handle))
+		{
+			_context.Store.Dispatch(new MoveWindowToPointTransform(window.Handle, windowPosition.LastWindowRectangle));
 		}
 	}
-
-	/// <inheritdoc />
-	public void MarkWindowAsFloating(IWindow? window = null) => UpdateWindow(window, true);
-
-	/// <inheritdoc />
-	public void MarkWindowAsDocked(IWindow? window = null) => UpdateWindow(window, false);
 
 	/// <inheritdoc />
 	public void ToggleWindowFloating(IWindow? window = null)
@@ -129,11 +115,14 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin, IIn
 
 		if (window == null)
 		{
-			Logger.Error("Could not find window");
+			Logger.Error("No window to toggle floating");
 			return;
 		}
 
-		if (FloatingWindows.ContainsKey(window))
+		if (
+			WindowFloatingStates.TryGetValue(window.Handle, out WindowFloatingState state)
+			&& state == WindowFloatingState.Floating
+		)
 		{
 			MarkWindowAsDocked(window);
 		}

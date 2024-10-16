@@ -74,10 +74,30 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <inheritdoc />
 	public override ILayoutEngine AddWindow(IWindow window)
 	{
-		// If the window is already tracked by this layout engine, or is a new floating window,
-		// update the rectangle and return.
+		if (IsWindowFloatingInLayoutEngine(window))
+		{
+			bool shouldDock = !_plugin.WindowFloatingStates.ContainsKey(window.Handle);
+
+			if (shouldDock)
+			{
+				ILayoutEngine newInnerLayoutEngine = InnerLayoutEngine.AddWindow(window);
+				return new ProxyFloatingLayoutEngine(
+					this,
+					newInnerLayoutEngine,
+					FloatingWindowRects.Remove(window),
+					MinimizedWindows.Remove(window)
+				);
+			}
+		}
+
+		if (_plugin.IsWindowPossiblyRemoved(window.Handle))
+		{
+			_plugin.WindowFloatingStates[window.Handle] = WindowFloatingState.Floating;
+		}
+
 		if (IsWindowFloating(window))
 		{
+			// If the window is floating, update the rectangle and return.
 			(ProxyFloatingLayoutEngine newEngine, bool error) = UpdateWindowRectangle(window);
 			if (!error)
 			{
@@ -99,23 +119,32 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 			return this;
 		}
 
-		_plugin.MarkWindowAsDockedInLayoutEngine(window, Identity);
+		_plugin.MarkWindowAsPossiblyRemoved(window.Handle);
 		return new ProxyFloatingLayoutEngine(this, InnerLayoutEngine, newFloatingWindowRects, newMinimizedWindows);
 	}
 
 	/// <inheritdoc />
 	public override ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point)
 	{
-		if (IsWindowFloatingInLayoutEngine(window) && !_plugin.FloatingWindows.ContainsKey(window))
+		if (IsWindowFloatingInLayoutEngine(window))
 		{
-			// The window is no longer floating.
-			ILayoutEngine newInnerLayoutEngine = InnerLayoutEngine.MoveWindowToPoint(window, point);
-			return new ProxyFloatingLayoutEngine(
-				this,
-				newInnerLayoutEngine,
-				FloatingWindowRects.Remove(window),
-				MinimizedWindows.Remove(window)
-			);
+			bool shouldDock = !_plugin.WindowFloatingStates.ContainsKey(window.Handle);
+
+			if (shouldDock)
+			{
+				ILayoutEngine newInnerLayoutEngine = InnerLayoutEngine.MoveWindowToPoint(window, point);
+				return new ProxyFloatingLayoutEngine(
+					this,
+					newInnerLayoutEngine,
+					FloatingWindowRects.Remove(window),
+					MinimizedWindows.Remove(window)
+				);
+			}
+		}
+
+		if (_plugin.IsWindowPossiblyRemoved(window.Handle))
+		{
+			_plugin.WindowFloatingStates[window.Handle] = WindowFloatingState.Floating;
 		}
 
 		if (IsWindowFloating(window))
@@ -147,8 +176,25 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 		return UpdateInner(InnerLayoutEngine.MoveWindowEdgesInDirection(edge, deltas, window), window);
 	}
 
-	private bool IsWindowFloating(IWindow? window) =>
-		window != null && (_plugin.FloatingWindows.ContainsKey(window) || IsWindowFloatingInLayoutEngine(window));
+	private bool IsWindowFloating(IWindow? window)
+	{
+		if (window == null)
+		{
+			return false;
+		}
+
+		if (IsWindowFloatingInLayoutEngine(window))
+		{
+			return true;
+		}
+
+		if (_plugin.WindowFloatingStates.TryGetValue(window.Handle, out WindowFloatingState state))
+		{
+			return state == WindowFloatingState.Floating;
+		}
+
+		return false;
+	}
 
 	private bool IsWindowFloatingInLayoutEngine(IWindow window) =>
 		FloatingWindowRects.ContainsKey(window) || MinimizedWindows.ContainsKey(window);
