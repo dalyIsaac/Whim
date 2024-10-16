@@ -11,10 +11,11 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 {
 	private readonly IContext _context;
 	private readonly IInternalFloatingWindowPlugin _plugin;
-	private readonly ImmutableDictionary<IWindow, IRectangle<double>> _floatingWindowRects;
+	public ImmutableDictionary<IWindow, IRectangle<double>> FloatingWindowRects { get; }
+	public ImmutableDictionary<IWindow, IRectangle<double>> MinimizedWindows { get; }
 
 	/// <inheritdoc />
-	public override int Count => InnerLayoutEngine.Count + _floatingWindowRects.Count;
+	public override int Count => InnerLayoutEngine.Count + FloatingWindowRects.Count;
 
 	/// <summary>
 	/// Creates a new instance of the proxy layout engine <see cref="ProxyFloatingLayoutEngine"/>.
@@ -31,25 +32,22 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 	{
 		_context = context;
 		_plugin = plugin;
-		_floatingWindowRects = ImmutableDictionary<IWindow, IRectangle<double>>.Empty;
-	}
-
-	private ProxyFloatingLayoutEngine(ProxyFloatingLayoutEngine oldEngine, ILayoutEngine newInnerLayoutEngine)
-		: base(newInnerLayoutEngine)
-	{
-		_context = oldEngine._context;
-		_plugin = oldEngine._plugin;
-		_floatingWindowRects = oldEngine._floatingWindowRects;
+		FloatingWindowRects = ImmutableDictionary<IWindow, IRectangle<double>>.Empty;
+		MinimizedWindows = ImmutableDictionary<IWindow, IRectangle<double>>.Empty;
 	}
 
 	private ProxyFloatingLayoutEngine(
 		ProxyFloatingLayoutEngine oldEngine,
 		ILayoutEngine newInnerLayoutEngine,
-		ImmutableDictionary<IWindow, IRectangle<double>> floatingWindowRects
+		ImmutableDictionary<IWindow, IRectangle<double>> floatingWindowRects,
+		ImmutableDictionary<IWindow, IRectangle<double>> minimizedWindows
 	)
-		: this(oldEngine, newInnerLayoutEngine)
+		: base(newInnerLayoutEngine)
 	{
-		_floatingWindowRects = floatingWindowRects;
+		_context = oldEngine._context;
+		_plugin = oldEngine._plugin;
+		FloatingWindowRects = floatingWindowRects;
+		MinimizedWindows = minimizedWindows;
 	}
 
 	/// <summary>
@@ -66,11 +64,11 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 	private ProxyFloatingLayoutEngine UpdateInner(ILayoutEngine newInnerLayoutEngine, IWindow? gcWindow)
 	{
 		ImmutableDictionary<IWindow, IRectangle<double>> newFloatingWindowRects =
-			gcWindow != null ? _floatingWindowRects.Remove(gcWindow) : _floatingWindowRects;
+			gcWindow != null ? FloatingWindowRects.Remove(gcWindow) : FloatingWindowRects;
 
-		return InnerLayoutEngine == newInnerLayoutEngine && _floatingWindowRects == newFloatingWindowRects
+		return InnerLayoutEngine == newInnerLayoutEngine && FloatingWindowRects == newFloatingWindowRects
 			? this
-			: new ProxyFloatingLayoutEngine(this, newInnerLayoutEngine, newFloatingWindowRects);
+			: new ProxyFloatingLayoutEngine(this, newInnerLayoutEngine, newFloatingWindowRects, MinimizedWindows);
 	}
 
 	/// <inheritdoc />
@@ -93,22 +91,16 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <inheritdoc />
 	public override ILayoutEngine RemoveWindow(IWindow window)
 	{
-		bool isFloating = IsWindowFloating(window);
+		ImmutableDictionary<IWindow, IRectangle<double>> newFloatingWindowRects = FloatingWindowRects.Remove(window);
+		ImmutableDictionary<IWindow, IRectangle<double>> newMinimizedWindows = MinimizedWindows.Remove(window);
 
-		// If tracked by this layout engine, remove it.
-		// Otherwise, pass to the inner layout engine.
-		if (_floatingWindowRects.ContainsKey(window))
+		if (newFloatingWindowRects == FloatingWindowRects && newMinimizedWindows == MinimizedWindows)
 		{
-			_plugin.MarkWindowAsDockedInLayoutEngine(window, InnerLayoutEngine.Identity);
-
-			// If the window was not supposed to be floating, remove it from the inner layout engine.
-			if (isFloating)
-			{
-				return new ProxyFloatingLayoutEngine(this, InnerLayoutEngine, _floatingWindowRects.Remove(window));
-			}
+			return this;
 		}
 
-		return UpdateInner(InnerLayoutEngine.RemoveWindow(window), window);
+		_plugin.MarkWindowAsDockedInLayoutEngine(window, Identity);
+		return new ProxyFloatingLayoutEngine(this, InnerLayoutEngine, newFloatingWindowRects, newMinimizedWindows);
 	}
 
 	/// <inheritdoc />
@@ -144,15 +136,13 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 	}
 
 	private bool IsWindowFloating(IWindow? window) =>
-		window != null
-		&& _plugin.FloatingWindows.TryGetValue(window, out ISet<LayoutEngineIdentity>? layoutEngines)
-		&& layoutEngines.Contains(InnerLayoutEngine.Identity);
+		window != null && (_plugin.FloatingWindows.ContainsKey(window) || FloatingWindowRects.ContainsKey(window));
 
 	private (ProxyFloatingLayoutEngine, bool error) UpdateWindowRectangle(IWindow window)
 	{
 		ImmutableDictionary<IWindow, IRectangle<double>>? newDict = FloatingUtils.UpdateWindowRectangle(
 			_context,
-			_floatingWindowRects,
+			FloatingWindowRects,
 			window
 		);
 
@@ -161,26 +151,35 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 			return (this, true);
 		}
 
-		if (newDict == _floatingWindowRects)
+		if (newDict == FloatingWindowRects)
 		{
 			return (this, false);
 		}
 
 		ILayoutEngine innerLayoutEngine = InnerLayoutEngine.RemoveWindow(window);
-		return (new ProxyFloatingLayoutEngine(this, innerLayoutEngine, newDict), false);
+		return (new ProxyFloatingLayoutEngine(this, innerLayoutEngine, newDict, MinimizedWindows), false);
 	}
 
 	/// <inheritdoc />
 	public override IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor)
 	{
-		// Iterate over all windows in _floatingWindowRects.
-		foreach ((IWindow window, IRectangle<double> loc) in _floatingWindowRects)
+		foreach ((IWindow window, IRectangle<double> loc) in FloatingWindowRects)
 		{
 			yield return new WindowState()
 			{
 				Window = window,
 				Rectangle = rectangle.ToMonitor(loc),
 				WindowSize = WindowSize.Normal,
+			};
+		}
+
+		foreach ((IWindow window, IRectangle<double> loc) in MinimizedWindows)
+		{
+			yield return new WindowState()
+			{
+				Window = window,
+				Rectangle = rectangle.ToMonitor(loc),
+				WindowSize = WindowSize.Minimized,
 			};
 		}
 
@@ -193,7 +192,9 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 
 	/// <inheritdoc />
 	public override IWindow? GetFirstWindow() =>
-		InnerLayoutEngine.GetFirstWindow() ?? _floatingWindowRects.Keys.FirstOrDefault();
+		InnerLayoutEngine.GetFirstWindow()
+		?? FloatingWindowRects.Keys.FirstOrDefault()
+		?? MinimizedWindows.Keys.FirstOrDefault();
 
 	/// <inheritdoc />
 	public override ILayoutEngine FocusWindowInDirection(Direction direction, IWindow window)
@@ -226,15 +227,49 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 
 	/// <inheritdoc />
 	public override bool ContainsWindow(IWindow window) =>
-		_floatingWindowRects.ContainsKey(window) || InnerLayoutEngine.ContainsWindow(window);
+		FloatingWindowRects.ContainsKey(window) || InnerLayoutEngine.ContainsWindow(window);
 
 	/// <inheritdoc />
-	public override ILayoutEngine MinimizeWindowStart(IWindow window) =>
-		UpdateInner(InnerLayoutEngine.MinimizeWindowStart(window), window);
+	public override ILayoutEngine MinimizeWindowStart(IWindow window)
+	{
+		if (MinimizedWindows.ContainsKey(window))
+		{
+			return this;
+		}
+
+		if (FloatingWindowRects.TryGetValue(window, out IRectangle<double>? oldPosition))
+		{
+			return new ProxyFloatingLayoutEngine(
+				this,
+				InnerLayoutEngine,
+				FloatingWindowRects.Remove(window),
+				MinimizedWindows.Add(window, oldPosition)
+			);
+		}
+
+		return UpdateInner(InnerLayoutEngine.MinimizeWindowStart(window), window);
+	}
 
 	/// <inheritdoc />
-	public override ILayoutEngine MinimizeWindowEnd(IWindow window) =>
-		UpdateInner(InnerLayoutEngine.MinimizeWindowEnd(window), window);
+	public override ILayoutEngine MinimizeWindowEnd(IWindow window)
+	{
+		if (!MinimizedWindows.ContainsKey(window))
+		{
+			return this;
+		}
+
+		if (MinimizedWindows.TryGetValue(window, out IRectangle<double>? oldPosition))
+		{
+			return new ProxyFloatingLayoutEngine(
+				this,
+				InnerLayoutEngine,
+				FloatingWindowRects.Add(window, oldPosition),
+				MinimizedWindows.Remove(window)
+			);
+		}
+
+		return UpdateInner(InnerLayoutEngine.MinimizeWindowEnd(window), window);
+	}
 
 	/// <inheritdoc />
 	public override ILayoutEngine PerformCustomAction<T>(LayoutEngineCustomAction<T> action)
