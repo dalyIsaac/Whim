@@ -26,7 +26,7 @@ internal record MinimizeWindowEndTransform(WorkspaceId WorkspaceId, HWND WindowH
 	)
 	{
 		ILayoutEngine layoutEngine = workspace.GetActiveLayoutEngine();
-		ILayoutEngine newLayoutEngine = workspace.GetActiveLayoutEngine().MinimizeWindowEnd(window);
+		ILayoutEngine newLayoutEngine = layoutEngine.MinimizeWindowEnd(window);
 
 		return (newLayoutEngine == layoutEngine)
 			? workspace
