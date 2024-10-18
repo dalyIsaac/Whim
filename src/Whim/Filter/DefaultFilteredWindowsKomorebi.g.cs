@@ -247,6 +247,15 @@ internal static class DefaultFilteredWindowsKomorebi
 		// TranslucentTB
 		filterManager.AddProcessFileNameFilter("TranslucentTB.exe");
 
+		// WeChat
+		filterManager.AddWindowClassFilter("WeChatLoginWndForPC");
+		filterManager.AddWindowClassFilter("FileListMgrWnd");
+		filterManager.AddWindowClassFilter("CWebviewControlHostWnd");
+		filterManager.AddWindowClassFilter("ChatWnd");
+		filterManager.AddWindowClassFilter("EmotionTipWnd");
+		filterManager.AddWindowClassFilter("ChatContactMenu");
+		filterManager.AddProcessFileNameFilter("WeChatAppEx.exe");
+
 		// WebStorm
 		// filterManager.AddWindowClassFilter("SunAwtDialog");  // duplicate rule
 
@@ -275,6 +284,10 @@ internal static class DefaultFilteredWindowsKomorebi
 		// Zebar
 		filterManager.AddProcessFileNameFilter("zebar.exe");
 
+		// Zen Browser
+		// filterManager.Add((window) => (window.WindowClass.StartsWith("MozillaTaskbarPreviewClass") || window.WindowClass.EndsWith("MozillaTaskbarPreviewClass")));  // duplicate rule
+		filterManager.Add((window) => window.Title.Equals("Picture-in-Picture") && window.ProcessFileName.Equals("zen.exe"));
+
 		// Zoom
 		filterManager.AddProcessFileNameFilter("Zoom.exe");
 
@@ -293,9 +306,5 @@ internal static class DefaultFilteredWindowsKomorebi
 		// visio
 		filterManager.AddWindowClassFilter("VISIOS");
 		filterManager.AddWindowClassFilter("VISIOQ");
-
-		// Zen Browser
-		// filterManager.Add((window) => (window.WindowClass.StartsWith("MozillaTaskbarPreviewClass") || window.WindowClass.EndsWith("MozillaTaskbarPreviewClass")));  // duplicate rule
-		filterManager.Add((window) => window.Title.Equals("Picture-in-Picture") && window.ProcessFileName.Equals("zen.exe"));
 	}
 }
