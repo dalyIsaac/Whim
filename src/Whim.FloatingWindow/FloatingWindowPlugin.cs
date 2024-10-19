@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Windows.Win32.Foundation;
 
 namespace Whim.FloatingWindow;
@@ -11,7 +9,7 @@ namespace Whim.FloatingWindow;
 /// Creates a new instance of the floating window plugin.
 /// </summary>
 /// <param name="context"></param>
-public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin, IInternalFloatingWindowPlugin
+public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin
 {
 	private readonly IContext _context = context;
 
@@ -20,8 +18,10 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin, IIn
 	/// </summary>
 	public string Name => "whim.floating_window";
 
+	private readonly HashSet<HWND> _floatingWindows = [];
+
 	/// <inheritdoc />
-	public Dictionary<HWND, WindowFloatingState> WindowFloatingStates { get; } = [];
+	public IReadOnlySet<HWND> FloatingWindows => _floatingWindows;
 
 	/// <inheritdoc />
 	public void PreInitialize()
@@ -39,30 +39,7 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin, IIn
 	public IPluginCommands PluginCommands => new FloatingWindowCommands(this);
 
 	private void WindowEvents_WindowRemoved(object? sender, WindowEventArgs e) =>
-		WindowFloatingStates.Remove(e.Window.Handle);
-
-	/// <inheritdoc />
-	public void MarkWindowAsPossiblyRemoved(HWND hwnd)
-	{
-		WindowFloatingStates[hwnd] = WindowFloatingState.PossiblyRemoved;
-
-		Task.Run(() =>
-		{
-			Thread.Sleep(1000);
-			if (
-				WindowFloatingStates.TryGetValue(hwnd, out WindowFloatingState state)
-				&& state == WindowFloatingState.PossiblyRemoved
-			)
-			{
-				WindowFloatingStates.Remove(hwnd);
-			}
-		});
-	}
-
-	/// <inheritdoc />
-	public bool IsWindowPossiblyRemoved(HWND hwnd) =>
-		WindowFloatingStates.TryGetValue(hwnd, out WindowFloatingState state)
-		&& state == WindowFloatingState.PossiblyRemoved;
+		_floatingWindows.Remove(e.Window.Handle);
 
 	/// <inheritdoc />
 	public void MarkWindowAsFloating(IWindow? window = null)
@@ -81,7 +58,7 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin, IIn
 			return;
 		}
 
-		WindowFloatingStates[window.Handle] = WindowFloatingState.Floating;
+		_floatingWindows.Add(window.Handle);
 		_context.Store.Dispatch(new MoveWindowToPointTransform(window.Handle, windowPosition.LastWindowRectangle));
 	}
 
@@ -102,7 +79,7 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin, IIn
 			return;
 		}
 
-		if (WindowFloatingStates.Remove(window.Handle))
+		if (_floatingWindows.Remove(window.Handle))
 		{
 			_context.Store.Dispatch(new MoveWindowToPointTransform(window.Handle, windowPosition.LastWindowRectangle));
 		}
@@ -119,10 +96,7 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin, IIn
 			return;
 		}
 
-		if (
-			WindowFloatingStates.TryGetValue(window.Handle, out WindowFloatingState state)
-			&& state == WindowFloatingState.Floating
-		)
+		if (_floatingWindows.Contains(window.Handle))
 		{
 			MarkWindowAsDocked(window);
 		}

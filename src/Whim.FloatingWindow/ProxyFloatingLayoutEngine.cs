@@ -10,7 +10,7 @@ namespace Whim.FloatingWindow;
 internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 {
 	private readonly IContext _context;
-	private readonly IInternalFloatingWindowPlugin _plugin;
+	private readonly IFloatingWindowPlugin _plugin;
 	public ImmutableDictionary<IWindow, IRectangle<double>> FloatingWindowRects { get; }
 	public ImmutableDictionary<IWindow, IRectangle<double>> MinimizedWindows { get; }
 
@@ -23,11 +23,7 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <param name="context"></param>
 	/// <param name="plugin"></param>
 	/// <param name="innerLayoutEngine"></param>
-	public ProxyFloatingLayoutEngine(
-		IContext context,
-		IInternalFloatingWindowPlugin plugin,
-		ILayoutEngine innerLayoutEngine
-	)
+	public ProxyFloatingLayoutEngine(IContext context, IFloatingWindowPlugin plugin, ILayoutEngine innerLayoutEngine)
 		: base(innerLayoutEngine)
 	{
 		_context = context;
@@ -76,7 +72,7 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 	{
 		if (IsWindowFloatingInLayoutEngine(window))
 		{
-			bool shouldDock = !_plugin.WindowFloatingStates.ContainsKey(window.Handle);
+			bool shouldDock = !_plugin.FloatingWindows.Contains(window.Handle);
 
 			if (shouldDock)
 			{
@@ -88,11 +84,6 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 					MinimizedWindows.Remove(window)
 				);
 			}
-		}
-
-		if (_plugin.IsWindowPossiblyRemoved(window.Handle))
-		{
-			_plugin.WindowFloatingStates[window.Handle] = WindowFloatingState.Floating;
 		}
 
 		if (IsWindowFloating(window))
@@ -113,14 +104,18 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 	{
 		ImmutableDictionary<IWindow, IRectangle<double>> newFloatingWindowRects = FloatingWindowRects.Remove(window);
 		ImmutableDictionary<IWindow, IRectangle<double>> newMinimizedWindows = MinimizedWindows.Remove(window);
+		ILayoutEngine newInnerLayoutEngine = InnerLayoutEngine.RemoveWindow(window);
 
-		if (newFloatingWindowRects == FloatingWindowRects && newMinimizedWindows == MinimizedWindows)
+		if (
+			newFloatingWindowRects == FloatingWindowRects
+			&& newMinimizedWindows == MinimizedWindows
+			&& newInnerLayoutEngine == InnerLayoutEngine
+		)
 		{
 			return this;
 		}
 
-		_plugin.MarkWindowAsPossiblyRemoved(window.Handle);
-		return new ProxyFloatingLayoutEngine(this, InnerLayoutEngine, newFloatingWindowRects, newMinimizedWindows);
+		return new ProxyFloatingLayoutEngine(this, newInnerLayoutEngine, newFloatingWindowRects, newMinimizedWindows);
 	}
 
 	/// <inheritdoc />
@@ -128,7 +123,7 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 	{
 		if (IsWindowFloatingInLayoutEngine(window))
 		{
-			bool shouldDock = !_plugin.WindowFloatingStates.ContainsKey(window.Handle);
+			bool shouldDock = !_plugin.FloatingWindows.Contains(window.Handle);
 
 			if (shouldDock)
 			{
@@ -140,11 +135,6 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 					MinimizedWindows.Remove(window)
 				);
 			}
-		}
-
-		if (_plugin.IsWindowPossiblyRemoved(window.Handle))
-		{
-			_plugin.WindowFloatingStates[window.Handle] = WindowFloatingState.Floating;
 		}
 
 		if (IsWindowFloating(window))
@@ -188,12 +178,7 @@ internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 			return true;
 		}
 
-		if (_plugin.WindowFloatingStates.TryGetValue(window.Handle, out WindowFloatingState state))
-		{
-			return state == WindowFloatingState.Floating;
-		}
-
-		return false;
+		return _plugin.FloatingWindows.Contains(window.Handle);
 	}
 
 	private bool IsWindowFloatingInLayoutEngine(IWindow window) =>

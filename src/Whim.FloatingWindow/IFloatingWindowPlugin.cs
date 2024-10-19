@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using Windows.Win32.Foundation;
+
 namespace Whim.FloatingWindow;
 
 /// <summary>
@@ -6,20 +9,25 @@ namespace Whim.FloatingWindow;
 public interface IFloatingWindowPlugin : IPlugin
 {
 	/// <summary>
+	/// The floating windows.
+	/// </summary>
+	IReadOnlySet<HWND> FloatingWindows { get; }
+
+	/// <summary>
 	/// Mark the given <paramref name="window"/> as a floating window
 	/// </summary>
 	/// <param name="window"></param>
-	public void MarkWindowAsFloating(IWindow? window = null);
+	void MarkWindowAsFloating(IWindow? window = null);
 
 	/// <summary>
 	/// Mark the given <paramref name="window"/> as a docked window
 	/// </summary>
 	/// <param name="window"></param>
-	public void MarkWindowAsDocked(IWindow? window = null);
+	void MarkWindowAsDocked(IWindow? window = null);
 
 	/// <summary>
 	/// Toggle the floating state of the given <paramref name="window"/>.
 	/// </summary>
 	/// <param name="window"></param>
-	public void ToggleWindowFloating(IWindow? window = null);
+	void ToggleWindowFloating(IWindow? window = null);
 }
