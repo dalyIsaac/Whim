@@ -7,11 +7,19 @@ namespace Whim.FloatingWindow;
 /// <summary>
 /// A proxy layout engine to allow windows to be free-floating within another layout.
 /// </summary>
-internal record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
+public record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 {
 	private readonly IContext _context;
 	private readonly IFloatingWindowPlugin _plugin;
+
+	/// <summary>
+	/// The positions of the floating windows.
+	/// </summary>
 	public ImmutableDictionary<IWindow, IRectangle<double>> FloatingWindowRects { get; }
+
+	/// <summary>
+	/// The former positions of the minimized windows.
+	/// </summary>
 	public ImmutableDictionary<IWindow, IRectangle<double>> MinimizedWindows { get; }
 
 	/// <inheritdoc />

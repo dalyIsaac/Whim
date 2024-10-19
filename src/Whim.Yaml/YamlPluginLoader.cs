@@ -25,10 +25,8 @@ internal static class YamlPluginLoader
 {
 	public static void LoadPlugins(IContext ctx, Schema schema)
 	{
-		// NOTE: FloatingWindowPlugin must be loaded prior to GapsPlugin. Otherwise, moving floating
-		// windows will cause shifting.
-		LoadFloatingWindowPlugin(ctx, schema);
 		LoadGapsPlugin(ctx, schema);
+		LoadFloatingWindowPlugin(ctx, schema);
 		LoadCommandPalettePlugin(ctx, schema);
 		LoadFocusIndicatorPlugin(ctx, schema);
 		LoadLayoutPreviewPlugin(ctx, schema);

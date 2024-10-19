@@ -43,7 +43,11 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 	/// <inheritdoc />
 	public override IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor)
 	{
-		if (InnerLayoutEngine.GetLayoutEngine<FloatingLayoutEngine>() is not null)
+		// If the inner layout engine is a floating layout engine, then we don't apply gaps.
+		if (
+			InnerLayoutEngine.GetLayoutEngine<FloatingLayoutEngine>() is not null
+			|| InnerLayoutEngine.GetLayoutEngine<ProxyFloatingWindowLayoutEngine>() is not null
+		)
 		{
 			foreach (IWindowState windowState in InnerLayoutEngine.DoLayout(rectangle, monitor))
 			{
