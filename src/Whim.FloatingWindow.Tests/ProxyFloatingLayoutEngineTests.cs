@@ -9,21 +9,12 @@ namespace Whim.FloatingWindow.Tests;
 public class ProxyFloatingLayoutEngineTests
 {
 	private ProxyFloatingLayoutEngineTests MarkWindowAsFloating(
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		IWindow window,
 		ILayoutEngine innerLayoutEngine
 	)
 	{
-		IReadOnlyDictionary<IWindow, ISet<LayoutEngineIdentity>> floatingWindows = new Dictionary<
-			IWindow,
-			ISet<LayoutEngineIdentity>
-		>
-		{
-			{
-				window,
-				new HashSet<LayoutEngineIdentity> { innerLayoutEngine.Identity }
-			},
-		};
+		HashSet<HWND> floatingWindows = [window.Handle];
 		plugin.FloatingWindows.Returns(floatingWindows);
 		return this;
 	}
@@ -54,7 +45,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void AddWindow_UseInner(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -73,7 +64,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void AddWindow_UseInner_SameInner(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -94,7 +85,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void AddWindow_FloatingInPlugin_Succeed(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -114,7 +105,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void AddWindow_FloatingInPlugin_FailOnNoRectangle(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -136,7 +127,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void AddWindow_FloatingInPlugin_FailOnSameRectangle(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -161,7 +152,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void AddWindow_FloatingInPlugin_RemoveFromInner(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -188,7 +179,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void RemoveWindow_UseInner(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -207,7 +198,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void RemoveWindow_UseInner_SameInner(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -227,7 +218,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void RemoveWindow_FloatingInPlugin(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -257,7 +248,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void MoveWindowToPoint_UseInner(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -277,7 +268,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void MoveWindowToPoint_UseInner_SameInner(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -299,7 +290,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void MoveWindowToPoint_FloatingInPlugin_WindowIsNew(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -321,7 +312,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void MoveWindowToPoint_FloatingInPlugin_WindowIsNotNew_SameRectangle(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -347,7 +338,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void MoveWindowToPoint_FloatingInPlugin_WindowIsNotNew_DifferentRectangle(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -373,7 +364,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void MoveWindowToPoint_FloatingInPlugin_CannotGetDwmRectangle(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -404,7 +395,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void MoveWindowEdgesInDirection_UseInner(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -426,7 +417,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void MoveWindowEdgesInDirection_UseInner_SameInner(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -450,7 +441,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void MoveWindowEdgesInDirection_FloatingInPlugin_WindowIsNew(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -473,7 +464,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void MoveWindowEdgesInDirection_FloatingInPlugin_WindowIsNotNew_SameRectangle(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -500,7 +491,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void MoveWindowEdgesInDirection_FloatingInPlugin_WindowIsNotNew_DifferentRectangle(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -527,7 +518,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void MoveWindowEdgesInDirection_FloatingInPlugin_CannotGetDwmRectangle(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -560,7 +551,7 @@ public class ProxyFloatingLayoutEngineTests
 	internal void DoLayout(
 		IContext context,
 		MutableRootSector root,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		ILayoutEngine newInnerLayoutEngine,
 		IMonitor monitor
@@ -654,7 +645,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void GetFirstWindow_NoInnerFirstWindow(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine
 	)
 	{
@@ -672,7 +663,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void GetFirstWindow_InnerFirstWindow(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -691,7 +682,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void GetFirstWindow_FloatingFirstWindow(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -717,7 +708,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void FocusWindowInDirection_UseInner(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -741,7 +732,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void FocusWindowInDirection_FloatingWindow_NullFirstWindow(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -772,7 +763,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void FocusWindowInDirection_FloatingWindow_DefinedFirstWindow(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -807,7 +798,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void SwapWindowInDirection_UseInner(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -828,7 +819,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void SwapWindowInDirection_UseInner_SameInner(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -851,7 +842,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void SwapWindowInDirection_FloatingWindow(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -878,7 +869,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void ContainsWindow_UseInner(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -897,7 +888,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void ContainsWindow_UseInner_SameInner(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -917,7 +908,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void ContainsWindow_FloatingWindow(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -941,7 +932,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void WindowWasFloating_AddWindow(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -956,7 +947,7 @@ public class ProxyFloatingLayoutEngineTests
 		ILayoutEngine newEngine = engine.AddWindow(window);
 
 		// ...marked as docked...
-		plugin.FloatingWindows.Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
+		plugin.FloatingWindows.Returns(new HashSet<HWND>());
 
 		// ... and then added
 		ILayoutEngine newEngine2 = newEngine.AddWindow(window);
@@ -970,7 +961,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void WindowWasFloating_MoveWindowToPoint(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -985,7 +976,7 @@ public class ProxyFloatingLayoutEngineTests
 		ILayoutEngine newEngine = engine.AddWindow(window);
 
 		// ...marked as docked...
-		plugin.FloatingWindows.Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
+		plugin.FloatingWindows.Returns(new HashSet<HWND>());
 
 		// ... and then moved
 		ILayoutEngine newEngine2 = newEngine.MoveWindowToPoint(window, new Rectangle<double>());
@@ -999,7 +990,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void WindowWasFloating_RemoveWindow(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -1014,7 +1005,7 @@ public class ProxyFloatingLayoutEngineTests
 		ILayoutEngine newEngine = engine.AddWindow(window);
 
 		// ...marked as docked...
-		plugin.FloatingWindows.Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
+		plugin.FloatingWindows.Returns(new HashSet<HWND>());
 
 		// ... and then removed
 		ILayoutEngine newEngine2 = newEngine.RemoveWindow(window);
@@ -1028,7 +1019,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void WindowWasFloating_MoveWindowEdgesInDirection(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -1045,7 +1036,7 @@ public class ProxyFloatingLayoutEngineTests
 		ILayoutEngine newEngine = engine.AddWindow(window);
 
 		// ...marked as docked...
-		plugin.FloatingWindows.Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
+		plugin.FloatingWindows.Returns(new HashSet<HWND>());
 
 		// ... and then the edges are moved
 		ILayoutEngine newEngine2 = newEngine.MoveWindowEdgesInDirection(Direction.Left, deltas, window);
@@ -1059,7 +1050,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void WindowWasFloating_SwapWindowInDirection(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window,
 		ILayoutEngine newInnerLayoutEngine
@@ -1074,7 +1065,7 @@ public class ProxyFloatingLayoutEngineTests
 		ILayoutEngine newEngine = engine.AddWindow(window);
 
 		// ...marked as docked...
-		plugin.FloatingWindows.Returns(new Dictionary<IWindow, ISet<LayoutEngineIdentity>>());
+		plugin.FloatingWindows.Returns(new HashSet<HWND>());
 
 		// ... and then window is swapped in a direction
 		ILayoutEngine newEngine2 = newEngine.SwapWindowInDirection(Direction.Left, window);
@@ -1090,7 +1081,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void PerformCustomAction_UseInner(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine
 	)
 	{
@@ -1115,7 +1106,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void PerformCustomAction_UseInner_WindowIsDefined(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine
 	)
 	{
@@ -1142,7 +1133,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
 	internal void PerformCustomAction_FloatingWindow(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -1174,7 +1165,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData]
 	internal void MinimizeWindowStart_NotSame(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -1192,7 +1183,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData]
 	internal void MinimizeWindowStart_Same(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -1211,7 +1202,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData]
 	internal void MinimizeWindowEnd_NotSame(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)
@@ -1229,7 +1220,7 @@ public class ProxyFloatingLayoutEngineTests
 	[Theory, AutoSubstituteData]
 	internal void MinimizeWindowEnd_Same(
 		IContext context,
-		IInternalFloatingWindowPlugin plugin,
+		IFloatingWindowPlugin plugin,
 		ILayoutEngine innerLayoutEngine,
 		IWindow window
 	)

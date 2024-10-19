@@ -230,7 +230,7 @@ public class FloatingWindowPluginTests
 
 		// Then
 		Assert.Single(plugin.FloatingWindows);
-		Assert.Equal(window, plugin.FloatingWindows.Keys.First());
+		Assert.True(plugin.FloatingWindows.Contains(window.Handle));
 		activeWorkspace.Received(1).MoveWindowToPoint(window, Arg.Any<IPoint<double>>());
 	}
 	#endregion
@@ -316,7 +316,7 @@ public class FloatingWindowPluginTests
 
 		// Then
 		Assert.Single(plugin.FloatingWindows);
-		Assert.Equal(window, plugin.FloatingWindows.Keys.First());
+		Assert.True(plugin.FloatingWindows.Contains(window.Handle));
 	}
 
 	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
@@ -372,114 +372,4 @@ public class FloatingWindowPluginTests
 		// Then nothing
 		Assert.Empty(plugin.FloatingWindows);
 	}
-
-	#region MarkWindowAsDockedInLayoutEngine
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
-	public void MarkWindowAsDockedInLayoutEngine_WindowIsNotFloating(
-		IContext context,
-		IWindow window,
-		IWorkspace activeWorkspace
-	)
-	{
-		// Given
-		ILayoutEngine layoutEngine = activeWorkspace.ActiveLayoutEngine;
-		FloatingWindowPlugin plugin = CreateSut(context);
-
-		Assert.Empty(plugin.FloatingWindows);
-
-		// When
-		plugin.MarkWindowAsDockedInLayoutEngine(window, layoutEngine.Identity);
-
-		// Then
-		Assert.Empty(plugin.FloatingWindows);
-	}
-
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
-	public void MarkWindowAsDockedInLayoutEngine_WindowIsFloating(
-		IContext context,
-		IWindow window,
-		IWorkspace activeWorkspace
-	)
-	{
-		// Given
-		ILayoutEngine layoutEngine = activeWorkspace.ActiveLayoutEngine;
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(activeWorkspace);
-		activeWorkspace
-			.TryGetWindowState(window)
-			.Returns(
-				new WindowState()
-				{
-					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
-					Window = window,
-					WindowSize = WindowSize.Normal,
-				}
-			);
-
-		FloatingWindowPlugin plugin = CreateSut(context);
-		plugin.MarkWindowAsFloating(window);
-
-		AssertFloatingWindowsEqual(
-			new Dictionary<IWindow, ISet<LayoutEngineIdentity>>()
-			{
-				{
-					window,
-					new HashSet<LayoutEngineIdentity>() { layoutEngine.Identity }
-				},
-			},
-			plugin.FloatingWindows
-		);
-
-		// When
-		plugin.MarkWindowAsDockedInLayoutEngine(window, layoutEngine.Identity);
-
-		// Then
-		Assert.Empty(plugin.FloatingWindows);
-	}
-
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
-	public void MarkWindowAsDocked_WindowIsFloatingInMultipleLayoutEngines(
-		IContext context,
-		IWindow window,
-		ILayoutEngine layoutEngine2,
-		IWorkspace activeWorkspace
-	)
-	{
-		// Given
-		ILayoutEngine layoutEngine = activeWorkspace.ActiveLayoutEngine;
-		layoutEngine2.Identity.Returns(new LayoutEngineIdentity());
-
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(activeWorkspace);
-		activeWorkspace
-			.TryGetWindowState(window)
-			.Returns(
-				new WindowState()
-				{
-					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
-					Window = window,
-					WindowSize = WindowSize.Normal,
-				}
-			);
-
-		// When
-		FloatingWindowPlugin plugin = CreateSut(context);
-		plugin.MarkWindowAsFloating(window);
-
-		activeWorkspace.ActiveLayoutEngine.Returns(layoutEngine2);
-		plugin.MarkWindowAsFloating(window);
-
-		plugin.MarkWindowAsDockedInLayoutEngine(window, layoutEngine.Identity);
-
-		// Then
-		AssertFloatingWindowsEqual(
-			new Dictionary<IWindow, ISet<LayoutEngineIdentity>>()
-			{
-				{
-					window,
-					new HashSet<LayoutEngineIdentity>() { layoutEngine2.Identity }
-				},
-			},
-			plugin.FloatingWindows
-		);
-	}
-	#endregion
 }
