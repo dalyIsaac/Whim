@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Corvus.Json;
 using Microsoft.UI.Xaml.Media;
 using Whim.CommandPalette;
+using Whim.FloatingWindow;
 using Whim.FocusIndicator;
 using Whim.Gaps;
 using Whim.LayoutPreview;
@@ -24,6 +25,9 @@ internal static class YamlPluginLoader
 {
 	public static void LoadPlugins(IContext ctx, Schema schema)
 	{
+		// NOTE: FloatingWindowPlugin must be loaded prior to GapsPlugin. Otherwise, moving floating
+		// windows will cause shifting.
+		LoadFloatingWindowPlugin(ctx, schema);
 		LoadGapsPlugin(ctx, schema);
 		LoadCommandPalettePlugin(ctx, schema);
 		LoadFocusIndicatorPlugin(ctx, schema);
@@ -116,6 +120,23 @@ internal static class YamlPluginLoader
 		}
 
 		ctx.PluginManager.AddPlugin(new CommandPalettePlugin(ctx, config));
+	}
+
+	private static void LoadFloatingWindowPlugin(IContext ctx, Schema schema)
+	{
+		if (!schema.Plugins.FloatingWindow.IsValid())
+		{
+			Logger.Debug("FloatingWindow plugin is not valid.");
+			return;
+		}
+
+		if (schema.Plugins.FloatingWindow.IsEnabled.AsOptional() is { } isEnabled && !isEnabled)
+		{
+			Logger.Debug("FloatingWindow plugin is not enabled.");
+			return;
+		}
+
+		ctx.PluginManager.AddPlugin(new FloatingWindowPlugin(ctx));
 	}
 
 	private static void LoadFocusIndicatorPlugin(IContext ctx, Schema schema)

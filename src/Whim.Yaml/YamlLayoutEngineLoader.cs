@@ -1,4 +1,5 @@
 using Corvus.Json;
+using Whim.FloatingWindow;
 using Whim.SliceLayout;
 using Whim.TreeLayout;
 
@@ -37,6 +38,11 @@ internal static class YamlLayoutEngineLoader
 		foreach (var engine in layoutEngines)
 		{
 			engine.Match<object?>(
+				(in Schema.DefsRequiredType floatingWindow) =>
+				{
+					CreateFloatingLayoutEngineCreator(ctx, leafLayoutEngineCreators);
+					return null;
+				},
 				(in Schema.ALayoutEngineThatDisplaysOneWindowAtATime focusLayoutEngine) =>
 				{
 					CreateFocusLayoutEngineCreator(ctx, leafLayoutEngineCreators, focusLayoutEngine);
@@ -52,13 +58,20 @@ internal static class YamlLayoutEngineLoader
 					CreateTreeLayoutEngineCreator(ctx, leafLayoutEngineCreators, treeLayoutEngine);
 					return null;
 				},
-				// TODO: Throw an error for an unmatched type.
-				// NOTE: This match means that validation isn't necessary.
-				(in Schema.RequiredType _) => null
+				(in Schema.RequiredType fallback) => null
 			);
 		}
 
 		return leafLayoutEngineCreators.Count == 0 ? null : [.. leafLayoutEngineCreators];
+	}
+
+	private static void CreateFloatingLayoutEngineCreator(
+		IContext ctx,
+		List<CreateLeafLayoutEngine> leafLayoutEngineCreators
+	)
+	{
+		// The floating layout leaf engine doesn't require the FloatingWindowPlugin.
+		leafLayoutEngineCreators.Add((id) => new FloatingLayoutEngine(ctx, id));
 	}
 
 	private static void CreateFocusLayoutEngineCreator(
