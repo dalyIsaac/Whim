@@ -160,7 +160,7 @@ public class YamlLoader_LoadFloatingWindowPluginTests
 	{
 		// Given a floating window and gap plugin configuration
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
-		
+
 		// When loading the config
 		YamlLoader.Load(ctx);
 
