@@ -16,6 +16,7 @@ items:
   - href: plugins/overview.md
   - href: plugins/bar.md
   - href: plugins/command-palette.md
+  - href: plugins/floating-window.md
   - href: plugins/focus-indicator.md
   - href: plugins/gaps.md
   - href: plugins/layout-preview.md
