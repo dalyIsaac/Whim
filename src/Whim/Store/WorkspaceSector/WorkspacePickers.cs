@@ -139,11 +139,7 @@ public static partial class Pickers
 	/// </returns>
 	public static PurePicker<Result<ILayoutEngine>> PickActiveLayoutEngine(WorkspaceId workspaceId) =>
 		(IRootSector rootSector) =>
-			BaseWorkspacePicker(
-				workspaceId,
-				rootSector,
-				static workspace => workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex]
-			);
+			BaseWorkspacePicker(workspaceId, rootSector, static workspace => workspace.GetActiveLayoutEngine());
 
 	/// <summary>
 	/// Get the active layout engine in the active workspace.
@@ -259,6 +255,19 @@ public static partial class Pickers
 					);
 				}
 			);
+
+	// TODO: Test and document
+	public static PurePicker<Result<WindowPosition>> PickWindowPosition(HWND windowHandle) =>
+		(IRootSector rootSector) =>
+		{
+			Result<IWorkspace> workspaceResult = PickWorkspaceByWindow(windowHandle)(rootSector);
+			if (workspaceResult.TryGet(out IWorkspace workspace))
+			{
+				return PickWindowPosition(workspace.Id, windowHandle)(rootSector);
+			}
+
+			return Result.FromException<WindowPosition>(workspaceResult.Error!);
+		};
 
 	/// <summary>
 	/// Picks the function used to create the default layout engines to add to a workspace.

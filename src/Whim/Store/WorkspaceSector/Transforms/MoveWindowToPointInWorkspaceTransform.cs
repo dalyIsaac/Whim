@@ -24,7 +24,7 @@ internal record MoveWindowToPointInWorkspaceTransform(WorkspaceId WorkspaceId, H
 			{
 				LayoutEngines = workspace.LayoutEngines.SetItem(
 					workspace.ActiveLayoutEngineIndex,
-					workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex].MoveWindowToPoint(window, Point)
+					workspace.GetActiveLayoutEngine().MoveWindowToPoint(window, Point)
 				),
 			};
 		}

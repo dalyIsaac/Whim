@@ -1,8 +1,11 @@
 namespace Whim;
 
-internal static class WorkspaceUtils
+/// <summary>
+/// Utilities for working with the updated <see cref="IWorkspace"/> immutable type.
+/// </summary>
+public static class WorkspaceUtils
 {
-	public static WorkspaceId OrActiveWorkspace(this WorkspaceId WorkspaceId, IContext ctx) =>
+	internal static WorkspaceId OrActiveWorkspace(this WorkspaceId WorkspaceId, IContext ctx) =>
 		WorkspaceId == default ? ctx.Store.Pick(PickActiveWorkspaceId()) : WorkspaceId;
 
 	/// <summary>
@@ -12,7 +15,7 @@ internal static class WorkspaceUtils
 	/// <param name="sector"></param>
 	/// <param name="workspace"></param>
 	/// <param name="layoutEngineIdx"></param>
-	public static Workspace SetActiveLayoutEngine(WorkspaceSector sector, Workspace workspace, int layoutEngineIdx)
+	internal static Workspace SetActiveLayoutEngine(WorkspaceSector sector, Workspace workspace, int layoutEngineIdx)
 	{
 		int previousLayoutEngineIdx = workspace.ActiveLayoutEngineIndex;
 		if (previousLayoutEngineIdx == layoutEngineIdx)
@@ -50,7 +53,7 @@ internal static class WorkspaceUtils
 	/// When <see langword="true"/>, the window must be in the workspace.
 	/// </param>
 	/// <returns></returns>
-	public static Result<IWindow> GetValidWorkspaceWindow(
+	internal static Result<IWindow> GetValidWorkspaceWindow(
 		IContext ctx,
 		Workspace workspace,
 		HWND windowHandle,
@@ -80,4 +83,12 @@ internal static class WorkspaceUtils
 
 		return ctx.Store.Pick(PickWindowByHandle(windowHandle));
 	}
+
+	/// <summary>
+	/// Get the active layout engine in the workspace.
+	/// </summary>
+	/// <param name="workspace"></param>
+	/// <returns></returns>
+	public static ILayoutEngine GetActiveLayoutEngine(this IWorkspace workspace) =>
+		workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex];
 }

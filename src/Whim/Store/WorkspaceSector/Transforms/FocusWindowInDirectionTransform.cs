@@ -49,7 +49,7 @@ public record FocusWindowInDirectionTransform(
 		IWindow window
 	)
 	{
-		ILayoutEngine layoutEngine = workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex];
+		ILayoutEngine layoutEngine = workspace.GetActiveLayoutEngine();
 		ILayoutEngine newLayoutEngine = layoutEngine.FocusWindowInDirection(Direction, window);
 
 		return newLayoutEngine == layoutEngine
