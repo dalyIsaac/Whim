@@ -44,10 +44,9 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 	public override IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor)
 	{
 		int nonProxiedCount = 0;
-		if (InnerLayoutEngine is ProxyFloatingLayoutEngine proxyFloatingLayoutEngine)
+		if (InnerLayoutEngine is ProxyFloatingLayoutEngine proxy)
 		{
-			nonProxiedCount =
-				proxyFloatingLayoutEngine.FloatingWindowRects.Count + proxyFloatingLayoutEngine.MinimizedWindows.Count;
+			nonProxiedCount = proxy.FloatingWindowRects.Count + proxy.MinimizedWindowRects.Count;
 
 			// The InnerLayoutEngine will use the default rectangle for nonProxiedCount.
 			// The InnerLayoutEngine will use the proxied rectangle for the remaining windows.

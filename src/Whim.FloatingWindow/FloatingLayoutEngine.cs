@@ -103,6 +103,7 @@ public record FloatingLayoutEngine : ILayoutEngine
 	/// <inheritdoc/>
 	public ILayoutEngine MoveWindowToPoint(IWindow window, IPoint<double> point) => UpdateWindowRectangle(window);
 
+	// TODO: Coverage
 	/// <inheritdoc/>
 	public ILayoutEngine MoveWindowEdgesInDirection(Direction edges, IPoint<double> deltas, IWindow window) =>
 		UpdateWindowRectangle(window);
