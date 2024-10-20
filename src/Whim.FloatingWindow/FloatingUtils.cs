@@ -21,11 +21,6 @@ internal static class FloatingUtils
 		IWindow window
 	)
 	{
-		// Try get the old rectangle.
-		IRectangle<double>? oldRectangle = dict.TryGetValue(window, out IRectangle<double>? rectangle)
-			? rectangle
-			: null;
-
 		// Since the window is floating, we update the rectangle, and return.
 		IRectangle<int>? newActualRectangle = context.NativeManager.DwmGetWindowRectangle(window.Handle);
 		if (newActualRectangle == null)
@@ -40,6 +35,11 @@ internal static class FloatingUtils
 			Logger.Error($"Could not obtain monitor for floating window {window}");
 			return null;
 		}
+
+		// Try get the old rectangle.
+		IRectangle<double>? oldRectangle = dict.TryGetValue(window, out IRectangle<double>? rectangle)
+			? rectangle
+			: null;
 
 		IRectangle<double> newUnitSquareRectangle = newMonitor.WorkingArea.NormalizeRectangle(newActualRectangle);
 		if (newUnitSquareRectangle.Equals(oldRectangle))
