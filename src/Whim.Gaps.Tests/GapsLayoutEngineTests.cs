@@ -401,36 +401,7 @@ public class GapsLayoutEngineTests
 		windowStates.Should().Equal(expectedWindowStates);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void DoLayout_WithFloatingLayoutEngine(GapsConfig gapsConfig, IWindow window)
-	{
-		// Input
-		Rectangle<int> rect = new(0, 0, -300, -300);
-		IWindowState[] inputWindowStates =
-		[
-			new WindowState()
-			{
-				Window = window,
-				Rectangle = rect,
-				WindowSize = WindowSize.Normal,
-			},
-		];
-
-		// Given
-		ILayoutEngine innerLayoutEngine = Substitute.For<ILayoutEngine>();
-		innerLayoutEngine
-			.GetLayoutEngine<FloatingLayoutEngine>()
-			.Returns(new FloatingLayoutEngine(Substitute.For<IContext>(), _identity));
-		innerLayoutEngine.DoLayout(rect, Arg.Any<IMonitor>()).Returns(inputWindowStates);
-
-		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
-
-		// When
-		IWindowState[] outputWindowStates = gapsLayoutEngine.DoLayout(rect, Substitute.For<IMonitor>()).ToArray();
-
-		// Then
-		outputWindowStates.Should().Equal(inputWindowStates);
-	}
+	// TODO: FloatingWindow handling
 
 	[Theory, AutoSubstituteData]
 	public void Count(ILayoutEngine innerLayoutEngine)

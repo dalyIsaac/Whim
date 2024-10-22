@@ -25,10 +25,6 @@ internal static class YamlPluginLoader
 {
 	public static void LoadPlugins(IContext ctx, Schema schema)
 	{
-		// NOTE: FloatingWindowPlugin must be loaded prior to GapsPlugin. Otherwise, moving floating
-		// windows will cause shifting.
-		LoadFloatingWindowPlugin(ctx, schema);
-		LoadGapsPlugin(ctx, schema);
 		LoadCommandPalettePlugin(ctx, schema);
 		LoadFocusIndicatorPlugin(ctx, schema);
 		LoadLayoutPreviewPlugin(ctx, schema);
@@ -36,8 +32,14 @@ internal static class YamlPluginLoader
 		LoadSliceLayoutPlugin(ctx, schema);
 		LoadTreeLayoutPlugin(ctx, schema);
 
-		// Load the bar plugin last, since it has dependencies on the TreeLayout plugin.
+		// Load the bar plugin after the TreeLayoutPlugin, as it has dependencies on the TreeLayout plugin.
 		YamlBarPluginLoader.LoadBarPlugin(ctx, schema);
+
+		// It's important for FloatingWindowPlugin to immediately precede GapsPlugin in the plugin loading order.
+		// This ensures that the GapsLayoutEngine will immediately contain the ProxyFloatingLayoutEngine, which
+		// is required for preventing gaps for floating windows.
+		LoadFloatingWindowPlugin(ctx, schema);
+		LoadGapsPlugin(ctx, schema);
 	}
 
 	private static void LoadGapsPlugin(IContext ctx, Schema schema)

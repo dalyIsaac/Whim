@@ -29,7 +29,7 @@ internal record MinimizeWindowStartTransform(Guid WorkspaceId, HWND WindowHandle
 		// If it isn't, then we assume it was provided during startup and minimize it in all layouts.
 		if (workspace.WindowPositions.ContainsKey(window.Handle))
 		{
-			ILayoutEngine activeLayoutEngine = workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex];
+			ILayoutEngine activeLayoutEngine = workspace.GetActiveLayoutEngine();
 			return workspace with
 			{
 				LayoutEngines = workspace.LayoutEngines.SetItem(

@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 
 // The general justification for these suppression messages is that this project contains tests, and it's
 // a bit excessive to have these particular rules for tests.
+[assembly: SuppressMessage("Design", "CA1002:Do not expose generic lists")]
 [assembly: SuppressMessage("Design", "CA1014:Mark assemblies with CLSCompliantAttribute")]
 [assembly: SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
 [assembly: SuppressMessage("Naming", "CA1707:Identifiers should not contain underscores")]
