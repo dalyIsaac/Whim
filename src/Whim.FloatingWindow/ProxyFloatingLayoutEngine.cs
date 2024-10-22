@@ -56,22 +56,24 @@ public record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 
 	/// <summary>
 	/// Returns a new instance of <see cref="ProxyFloatingLayoutEngine"/> with the given inner layout engine,
-	/// if the inner layout engine has changed, or the <paramref name="gcWindow"/> was floating.
+	/// if the inner layout engine has changed, or the <paramref name="windowToRemoveFromProxy"/> was floating.
 	/// </summary>
 	/// <param name="newInnerLayoutEngine">The new inner layout engine.</param>
-	/// <param name="gcWindow">
+	/// <param name="windowToRemoveFromProxy">
 	/// The <see cref="IWindow"/> which triggered the update. If a window has triggered an inner
 	/// layout engine update, the window is no longer floating (apart from that one case where we
 	/// couldn't get the window's rectangle).
 	/// </param>
 	/// <returns></returns>
-	private ProxyFloatingLayoutEngine UpdateInner(ILayoutEngine newInnerLayoutEngine, IWindow? gcWindow)
+	private ProxyFloatingLayoutEngine UpdateInner(ILayoutEngine newInnerLayoutEngine, IWindow? windowToRemoveFromProxy)
 	{
 		ImmutableDictionary<IWindow, IRectangle<double>> newFloatingWindowRects =
-			gcWindow != null ? FloatingWindowRects.Remove(gcWindow) : FloatingWindowRects;
+			windowToRemoveFromProxy != null ? FloatingWindowRects.Remove(windowToRemoveFromProxy) : FloatingWindowRects;
 
 		ImmutableDictionary<IWindow, IRectangle<double>> newMinimizedWindows =
-			gcWindow != null ? MinimizedWindowRects.Remove(gcWindow) : MinimizedWindowRects;
+			windowToRemoveFromProxy != null
+				? MinimizedWindowRects.Remove(windowToRemoveFromProxy)
+				: MinimizedWindowRects;
 
 		return
 			InnerLayoutEngine == newInnerLayoutEngine
