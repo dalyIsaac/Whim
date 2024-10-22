@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
@@ -22,6 +23,7 @@ internal static class ProxyFloatingLayoutEngineUtils
 	}
 }
 
+[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class ProxyFloatingLayoutEngine_AddWindowTests
 {
 	private static (IMonitor, Workspace, IWindow) Create(IContext ctx)
@@ -35,14 +37,14 @@ public class ProxyFloatingLayoutEngine_AddWindowTests
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void AddNewWindow_PassToInner(IContext ctx, IFloatingWindowPlugin plugin, ILayoutEngine innerLayoutEngine)
 	{
-		// Given a new window
+		// GIVEN a new window
 		IWindow window = StoreTestUtils.CreateWindow((HWND)1);
 		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
 
-		// When adding the window
+		// WHEN adding the window
 		ILayoutEngine result = sut.AddWindow(window);
 
-		// Then the inner layout engine should have the window
+		// THEN the inner layout engine should have the window
 		ProxyFloatingLayoutEngine proxy = Assert.IsType<ProxyFloatingLayoutEngine>(result);
 		Assert.NotSame(proxy, sut);
 		Assert.Empty(proxy.FloatingWindowRects);
@@ -52,7 +54,7 @@ public class ProxyFloatingLayoutEngine_AddWindowTests
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void AddNewWindow_FailUpdate(IContext ctx, IFloatingWindowPlugin plugin, ILayoutEngine innerLayoutEngine)
 	{
-		// Given an existing window which is marked as floating in the plugin
+		// GIVEN an existing window which is marked as floating in the plugin
 		(IMonitor monitor, Workspace workspace, IWindow window) = Create(ctx);
 		plugin.FloatingWindows.Returns(_ => new HashSet<HWND> { window.Handle });
 
@@ -61,10 +63,10 @@ public class ProxyFloatingLayoutEngine_AddWindowTests
 
 		Rectangle<int> rect = new(0, 0, 10, 10);
 
-		// When adding the window again
+		// WHEN adding the window again
 		ProxyFloatingLayoutEngine result = (proxy.AddWindow(window) as ProxyFloatingLayoutEngine)!;
 
-		// Then the window should remain floating
+		// THEN the window should remain floating
 		Assert.NotSame(proxy, result);
 		Assert.NotSame(sut, result);
 
@@ -73,21 +75,39 @@ public class ProxyFloatingLayoutEngine_AddWindowTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void AddExistingWindow_Dock(IContext ctx, IFloatingWindowPlugin plugin, ILayoutEngine innerLayoutEngine)
+	internal void AddExistingWindow_Dock(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		MutableRootSector root,
+		ILayoutEngine innerLayoutEngine
+	)
 	{
-		// Given an existing window
+		// GIVEN an existing window which we add to the engine
 		IWindow window = StoreTestUtils.CreateWindow((HWND)1);
+		IMonitor monitor = StoreTestUtils.CreateMonitor();
+		Workspace workspace = StoreTestUtils.CreateWorkspace(ctx);
+
+		ProxyFloatingLayoutEngineUtils.SetupUpdate(ctx, root, monitor, workspace, window, new());
+
 		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+		innerLayoutEngine.AddWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+		innerLayoutEngine.RemoveWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+
+		// Mark the window as floating.
+		HashSet<HWND> floatingWindows = [window.Handle];
+		plugin.FloatingWindows.Returns(_ => floatingWindows);
+
 		ProxyFloatingLayoutEngine proxy = (sut.AddWindow(window) as ProxyFloatingLayoutEngine)!;
 
-		// When adding the window again
-		ILayoutEngine result = proxy.AddWindow(window);
+		// WHEN adding the window again, but the window is no longer marked as floating
+		floatingWindows.Clear();
+		ProxyFloatingLayoutEngine result = (proxy.AddWindow(window) as ProxyFloatingLayoutEngine)!;
 
-		// Then the window should be docked
+		// THEN the window should be docked
 		Assert.NotSame(proxy, result);
 		Assert.NotSame(sut, result);
 
-		Assert.Empty(proxy.FloatingWindowRects);
+		Assert.Empty(result.FloatingWindowRects);
 		innerLayoutEngine.Received(1).AddWindow(window);
 	}
 
@@ -99,7 +119,7 @@ public class ProxyFloatingLayoutEngine_AddWindowTests
 		ILayoutEngine innerLayoutEngine
 	)
 	{
-		// Given an existing window which is marked as floating in the plugin
+		// GIVEN an existing window which is marked as floating in the plugin
 		(IMonitor monitor, Workspace workspace, IWindow window) = Create(ctx);
 		plugin.FloatingWindows.Returns(_ => new HashSet<HWND> { window.Handle });
 		ProxyFloatingLayoutEngineUtils.SetupUpdate(ctx, root, monitor, workspace, window, new());
@@ -109,11 +129,11 @@ public class ProxyFloatingLayoutEngine_AddWindowTests
 
 		Rectangle<int> rect = new(0, 0, 10, 10);
 
-		// When adding the window again
+		// WHEN adding the window again
 		ProxyFloatingLayoutEngineUtils.SetupUpdate(ctx, root, monitor, workspace, window, rect);
 		ProxyFloatingLayoutEngine result = (proxy.AddWindow(window) as ProxyFloatingLayoutEngine)!;
 
-		// Then the window should remain floating
+		// THEN the window should remain floating
 		Assert.NotSame(proxy, result);
 		Assert.NotSame(sut, result);
 
