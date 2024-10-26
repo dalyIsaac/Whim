@@ -311,3 +311,66 @@ public class ProxyFloatingLayoutEngine_MoveWindowToPointTests
 		innerLayoutEngine.Received(1).MoveWindowToPoint(window, new Rectangle<double>(0, 0, 0.1, 0.1));
 	}
 }
+
+public class ProxyFloatingLayoutEngine_MoveWindowEdgesInDirectionTests
+{
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MoveWindowEdgesInDirection_MoveInnerLayoutEngine(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is not floating
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+
+		// (set up the inner layout engine)
+		innerLayoutEngine.AddWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+		innerLayoutEngine.RemoveWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window);
+
+		// WHEN moving the window
+		ILayoutEngine result = proxy.MoveWindowEdgesInDirection(Direction.Up, new Point<double>(0, 0), window);
+
+		// THEN the window should be moved in the inner layout engine.
+		Assert.NotSame(proxy, result);
+		innerLayoutEngine.Received(1).MoveWindowEdgesInDirection(Direction.Up, new Point<double>(0, 0), window);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MoveWindowEdgesInDirection_MoveFloatingWindow(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is floating
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+
+		// (mark the window as floating)
+		plugin.FloatingWindows.Returns(_ => new HashSet<HWND> { window.Handle });
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window);
+
+		ctx.NativeManager.DwmGetWindowRectangle(window.Handle).Returns(new Rectangle<int>(0, 1, 2, 3));
+
+		// WHEN moving the window
+		ProxyFloatingLayoutEngine result = (ProxyFloatingLayoutEngine)
+			proxy.MoveWindowEdgesInDirection(Direction.Up, new Point<double>(1, 1), window);
+
+		// THEN the window should be moved in the proxy (we don't yet support window edges being moved)
+		Assert.NotSame(proxy, result);
+		Assert.Single(result.FloatingWindowRects);
+
+		innerLayoutEngine
+			.DidNotReceive()
+			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow>());
+	}
+}
