@@ -922,7 +922,7 @@ public class ProxyFloatingLayoutEngine_GetFirstWindowTests
 		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
 
 		// WHEN getting the first window
-		IWindow result = sut.GetFirstWindow();
+		IWindow? result = sut.GetFirstWindow();
 
 		// THEN the first window should be returned from the inner layout engine.
 		Assert.Same(window, result);
