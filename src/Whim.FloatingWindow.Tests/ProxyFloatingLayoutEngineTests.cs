@@ -569,12 +569,11 @@ public class ProxyFloatingLayoutEngine_MinimizeWindowEndTests
 		MutableRootSector root
 	)
 	{
-		// GIVEN a window which is not floating
+		// GIVEN a window which is floating
 		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
 
-		// (set up the inner layout engine)
-		innerLayoutEngine.AddWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
-		innerLayoutEngine.RemoveWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+		// (mark the window as floating)
+		plugin.FloatingWindows.Returns(_ => new HashSet<HWND> { window.Handle });
 
 		// (set up the sut)
 		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
@@ -586,7 +585,7 @@ public class ProxyFloatingLayoutEngine_MinimizeWindowEndTests
 		// THEN the window should not be minimized.
 		Assert.Same(proxy, result);
 
-		Assert.Empty(result.FloatingWindowRects);
+		Assert.Single(result.FloatingWindowRects);
 		Assert.Empty(result.MinimizedWindowRects);
 
 		innerLayoutEngine.DidNotReceive().MinimizeWindowEnd(window);
