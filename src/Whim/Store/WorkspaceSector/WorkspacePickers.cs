@@ -256,7 +256,16 @@ public static partial class Pickers
 				}
 			);
 
-	// TODO: Test and document
+	/// <summary>
+	/// Get the window position for the given <paramref name="windowHandle"/>.
+	/// </summary>
+	/// <param name="windowHandle">
+	/// The window handle to get the position for.
+	/// </param>
+	/// <returns>
+	/// The window position for the given <paramref name="windowHandle"/>, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// If the window is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// </returns>
 	public static PurePicker<Result<WindowPosition>> PickWindowPosition(HWND windowHandle) =>
 		(IRootSector rootSector) =>
 		{

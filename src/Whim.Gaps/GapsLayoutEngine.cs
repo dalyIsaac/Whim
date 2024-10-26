@@ -50,6 +50,7 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 
 			// The InnerLayoutEngine will use the default rectangle for nonProxiedCount.
 			// The InnerLayoutEngine will use the proxied rectangle for the remaining windows.
+			// This is brittle and relies on the order of the windows in the ProxyFloatingLayoutEngine.
 
 			IEnumerable<IWindowState> windows = InnerLayoutEngine.DoLayout(rectangle, monitor);
 			using IEnumerator<IWindowState> enumerator = windows.GetEnumerator();

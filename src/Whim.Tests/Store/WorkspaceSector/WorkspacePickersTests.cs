@@ -384,6 +384,38 @@ public class WorkspacePickersTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickWindowPositionHandle_WorkspaceNotFound(IContext ctx, MutableRootSector root)
+	{
+		// Given the workspaces and windows exist, but the workspace to search for doesn't exist
+		Workspace workspace = CreateWorkspace(ctx);
+		IWindow window = Setup_WindowPosition(ctx, root, workspace);
+
+		Guid workspaceToSearchFor = Guid.NewGuid();
+
+		// When we get the window position handle
+		Result<WindowPosition> result = ctx.Store.Pick(Pickers.PickWindowPosition(workspaceToSearchFor, window.Handle));
+
+		// Then we get an error
+		Assert.False(result.IsSuccessful);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickWindowPositionHandle_WindowNotFound(IContext ctx, MutableRootSector root)
+	{
+		// Given the workspaces and windows exist, but the window to search for doesn't exist
+		Workspace workspace = CreateWorkspace(ctx);
+		IWindow window = Setup_WindowPosition(ctx, root, workspace);
+
+		HWND hwndToSearchFor = (HWND)987;
+
+		// When we get the window position handle
+		Result<WindowPosition> result = ctx.Store.Pick(Pickers.PickWindowPosition(workspace.Id, hwndToSearchFor));
+
+		// Then we get an error
+		Assert.False(result.IsSuccessful);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void PickCreateLeafLayoutEngines(IContext ctx, MutableRootSector root)
 	{
 		// Given the workspaces and windows
