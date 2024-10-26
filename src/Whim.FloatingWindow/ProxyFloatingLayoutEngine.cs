@@ -296,11 +296,6 @@ public record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 	/// <inheritdoc />
 	public override ILayoutEngine MinimizeWindowEnd(IWindow window)
 	{
-		if (!MinimizedWindowRects.ContainsKey(window))
-		{
-			return this;
-		}
-
 		if (MinimizedWindowRects.TryGetValue(window, out IRectangle<double>? oldPosition))
 		{
 			return new ProxyFloatingLayoutEngine(

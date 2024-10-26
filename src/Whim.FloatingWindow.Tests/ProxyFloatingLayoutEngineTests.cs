@@ -374,3 +374,291 @@ public class ProxyFloatingLayoutEngine_MoveWindowEdgesInDirectionTests
 			.MoveWindowEdgesInDirection(Arg.Any<Direction>(), Arg.Any<IPoint<double>>(), Arg.Any<IWindow>());
 	}
 }
+
+public class ProxyFloatingLayoutEngine_DoLayoutTests
+{
+	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
+	internal void DoLayout(
+		IContext context,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN windows have been added to the layout engine
+		IWindow window1 = StoreTestUtils.CreateWindow((HWND)1);
+		IWindow window2 = StoreTestUtils.CreateWindow((HWND)2);
+		IWindow window3 = StoreTestUtils.CreateWindow((HWND)3);
+
+		// (set up the inner layout engine)
+		IMonitor monitor = StoreTestUtils.CreateMonitor();
+		Workspace workspace = StoreTestUtils.CreateWorkspace(context);
+		ProxyFloatingLayoutEngineUtils.SetupUpdate(
+			context,
+			root,
+			monitor,
+			workspace,
+			window1,
+			new Rectangle<int>(0, 0, 10, 10)
+		);
+
+		// (set up the layout for the third window in the inner layout engine)
+		innerLayoutEngine.AddWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+		innerLayoutEngine.RemoveWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+		innerLayoutEngine
+			.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
+			.Returns(_ =>
+				[
+					new WindowState
+					{
+						Window = window3,
+						Rectangle = new Rectangle<int>(0, 0, 10, 10),
+						WindowSize = WindowSize.Normal,
+					},
+				]
+			);
+
+		ProxyFloatingLayoutEngine sut = new(context, plugin, innerLayoutEngine);
+
+		// (mark the first and second windows as floating)
+		plugin.FloatingWindows.Returns(_ => (HashSet<HWND>)([window1.Handle, window2.Handle]));
+
+		// (add the windows)
+		sut = (ProxyFloatingLayoutEngine)sut.AddWindow(window1);
+		sut = (ProxyFloatingLayoutEngine)sut.AddWindow(window2);
+		sut = (ProxyFloatingLayoutEngine)sut.AddWindow(window3);
+
+		// (minimize the second window)
+		sut = (ProxyFloatingLayoutEngine)sut.MinimizeWindowStart(window2);
+
+		// WHEN laying out the windows
+		IWindowState[] result = sut.DoLayout(new Rectangle<int>(0, 0, 100, 100), monitor).ToArray();
+
+		// THEN the windows should be laid out
+		Assert.Equal(3, result.Length);
+
+		// (window 1 should be laid out by the inner layout engine)
+		Assert.Equal(window1.Handle, result[0].Window.Handle);
+		Assert.Equal(new Rectangle<int>(0, 0, 10, 10), result[0].Rectangle);
+
+		// (window 2 should be laid out by the proxy, and minimized)
+		Assert.Equal(window2.Handle, result[1].Window.Handle);
+		Assert.Equal(new Rectangle<int>(0, 0, 10, 10), result[1].Rectangle);
+		Assert.Equal(WindowSize.Minimized, result[1].WindowSize);
+
+		// (window 3 should be laid out by the proxy)
+		Assert.Equal(window3.Handle, result[2].Window.Handle);
+		Assert.Equal(new Rectangle<int>(0, 0, 10, 10), result[2].Rectangle);
+	}
+}
+
+public class ProxyFloatingLayoutEngine_MinimizeWindowStartTests
+{
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MinimizeWindowStart_MinimizeFloatingWindow(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is floating
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+
+		// (set up the inner layout engine)
+
+		// (mark the window as floating)
+		plugin.FloatingWindows.Returns(_ => new HashSet<HWND> { window.Handle });
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window);
+
+		// WHEN minimizing the window
+		ProxyFloatingLayoutEngine result = (ProxyFloatingLayoutEngine)proxy.MinimizeWindowStart(window);
+
+		// THEN the window should be minimized in the proxy.
+		Assert.NotSame(sut, proxy);
+		Assert.NotSame(proxy, result);
+
+		Assert.Single(proxy.FloatingWindowRects);
+		Assert.Empty(proxy.MinimizedWindowRects);
+
+		Assert.Empty(result.FloatingWindowRects);
+		Assert.Single(result.MinimizedWindowRects);
+
+		innerLayoutEngine.DidNotReceive().MinimizeWindowStart(window);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MinimizeWindowStart_WindowAlreadyMinimized(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is floating
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+
+		// (set up the inner layout engine)
+
+		// (mark the window as floating)
+		plugin.FloatingWindows.Returns(_ => new HashSet<HWND> { window.Handle });
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window);
+
+		// (minimize the window)
+		proxy = (ProxyFloatingLayoutEngine)proxy.MinimizeWindowStart(window);
+
+		// WHEN minimizing the window again
+		ProxyFloatingLayoutEngine result = (ProxyFloatingLayoutEngine)proxy.MinimizeWindowStart(window);
+
+		// THEN the window should remain minimized.
+		Assert.NotSame(sut, proxy);
+		Assert.Same(proxy, result);
+
+		Assert.Empty(result.FloatingWindowRects);
+		Assert.Single(result.MinimizedWindowRects);
+
+		innerLayoutEngine.DidNotReceive().MinimizeWindowStart(window);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MinimizeWindowStart_MinimizeInInnerLayoutEngine(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is not floating
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+
+		// (set up the inner layout engine)
+		innerLayoutEngine.AddWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+		innerLayoutEngine.RemoveWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window);
+
+		// WHEN minimizing the window
+		ProxyFloatingLayoutEngine result = (ProxyFloatingLayoutEngine)proxy.MinimizeWindowStart(window);
+
+		// THEN the window should be minimized in the inner layout engine.
+		Assert.NotSame(proxy, result);
+
+		Assert.Empty(result.FloatingWindowRects);
+		Assert.Empty(result.MinimizedWindowRects);
+
+		innerLayoutEngine.Received(1).MinimizeWindowStart(window);
+	}
+}
+
+public class ProxyFloatingLayoutEngine_MinimizeWindowEndTests
+{
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MinimizeWindowEnd_WindowIsNotMinimized(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is not floating
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+
+		// (set up the inner layout engine)
+		innerLayoutEngine.AddWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+		innerLayoutEngine.RemoveWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window);
+
+		// WHEN ending the minimization
+		ProxyFloatingLayoutEngine result = (ProxyFloatingLayoutEngine)proxy.MinimizeWindowEnd(window);
+
+		// THEN the window should not be minimized.
+		Assert.Same(proxy, result);
+
+		Assert.Empty(result.FloatingWindowRects);
+		Assert.Empty(result.MinimizedWindowRects);
+
+		innerLayoutEngine.DidNotReceive().MinimizeWindowEnd(window);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MinimizeWindowEnd_FloatingWindow(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is floating
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+
+		// (mark the window as floating)
+		plugin.FloatingWindows.Returns(_ => new HashSet<HWND> { window.Handle });
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window);
+
+		// (minimize the window)
+		proxy = (ProxyFloatingLayoutEngine)proxy.MinimizeWindowStart(window);
+
+		// WHEN ending the minimization
+		ProxyFloatingLayoutEngine result = (ProxyFloatingLayoutEngine)proxy.MinimizeWindowEnd(window);
+
+		// THEN the window should no longer be minimized.
+		Assert.NotSame(sut, proxy);
+		Assert.NotSame(proxy, result);
+
+		Assert.Single(result.FloatingWindowRects);
+		Assert.Empty(result.MinimizedWindowRects);
+
+		innerLayoutEngine.DidNotReceive().MinimizeWindowEnd(window);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MinimizeWindowEnd_InnerLayoutEngine(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		ILayoutEngine resultLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is not floating
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+
+		// (set up the inner layout engine)
+		innerLayoutEngine.AddWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+		innerLayoutEngine.RemoveWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+		innerLayoutEngine.MinimizeWindowStart(Arg.Any<IWindow>()).Returns(resultLayoutEngine);
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window);
+
+		// (minimize the window)
+		proxy = (ProxyFloatingLayoutEngine)proxy.MinimizeWindowStart(window);
+
+		// WHEN ending the minimization
+		ProxyFloatingLayoutEngine result = (ProxyFloatingLayoutEngine)proxy.MinimizeWindowEnd(window);
+
+		// THEN the window should no longer be minimized.
+		Assert.NotSame(proxy, result);
+
+		Assert.Empty(result.FloatingWindowRects);
+		Assert.Empty(result.MinimizedWindowRects);
+
+		resultLayoutEngine.Received(1).MinimizeWindowEnd(window);
+	}
+}
