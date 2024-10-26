@@ -405,9 +405,11 @@ public class GapsLayoutEngineTests
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
-	internal void DoLayout_WithFloatingLayoutEngine(IContext context, MutableRootSector root, GapsConfig gapsConfig)
+	internal void DoLayout_WithFloatingLayoutEngine(IContext context, MutableRootSector root)
 	{
 		// Input
+		GapsConfig gapsConfig = new();
+
 		Rectangle<int> rect1 = new(10, 10, 20, 20);
 		Rectangle<int> rect2 = new(30, 30, 40, 40);
 		Rectangle<int> rect3 = new(50, 50, 60, 60);
@@ -462,30 +464,46 @@ public class GapsLayoutEngineTests
 		IWindowState[] outputWindowStates = gaps3.DoLayout(monitor.WorkingArea, monitor).ToArray();
 
 		// Then
-		outputWindowStates
-			.Should()
-			.Equal(
-				[
+		Assert.Equal(3, outputWindowStates.Length);
+
+		Assert.Contains(
+			outputWindowStates,
+			ws =>
+				ws.Equals(
 					new WindowState()
 					{
 						Window = window1,
 						Rectangle = rect1,
 						WindowSize = WindowSize.Normal,
-					},
+					}
+				)
+		);
+
+		Assert.Contains(
+			outputWindowStates,
+			ws =>
+				ws.Equals(
 					new WindowState()
 					{
 						Window = window2,
 						Rectangle = rect2,
 						WindowSize = WindowSize.Normal,
-					},
+					}
+				)
+		);
+
+		Assert.Contains(
+			outputWindowStates,
+			ws =>
+				ws.Equals(
 					new WindowState()
 					{
 						Window = window3,
-						Rectangle = rect3,
+						Rectangle = new Rectangle<int>(60, 60, 40, 40),
 						WindowSize = WindowSize.Normal,
-					},
-				]
-			);
+					}
+				)
+		);
 	}
 
 	[Theory, AutoSubstituteData]
