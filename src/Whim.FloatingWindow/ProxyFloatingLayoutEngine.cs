@@ -168,12 +168,12 @@ public record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 			return false;
 		}
 
-		if (IsWindowFloatingInLayoutEngine(window))
+		if (_plugin.FloatingWindows.Contains(window.Handle))
 		{
 			return true;
 		}
 
-		return _plugin.FloatingWindows.Contains(window.Handle);
+		return IsWindowFloatingInLayoutEngine(window);
 	}
 
 	private bool IsWindowFloatingInLayoutEngine(IWindow window) =>

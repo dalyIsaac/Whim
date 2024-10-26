@@ -36,7 +36,7 @@ internal static class ProxyFloatingLayoutEngineUtils
 	/// <param name="ctx"></param>
 	/// <param name="root"></param>
 	/// <returns></returns>
-	public static IWindow SetupUpdate(IContext ctx, MutableRootSector root)
+	public static IWindow SetupUpdateInner(IContext ctx, MutableRootSector root)
 	{
 		(IMonitor monitor, Workspace workspace, IWindow window) = Create(ctx);
 		SetupUpdate(ctx, root, monitor, workspace, window, new Rectangle<int>(0, 0, 10, 10));
@@ -80,10 +80,10 @@ public class ProxyFloatingLayoutEngine_AddWindowTests
 		plugin.FloatingWindows.Returns(_ => new HashSet<HWND> { window.Handle });
 
 		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
-		ProxyFloatingLayoutEngine proxy = (sut.AddWindow(window) as ProxyFloatingLayoutEngine)!;
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window);
 
 		// WHEN adding the window again
-		ProxyFloatingLayoutEngine result = (proxy.AddWindow(window) as ProxyFloatingLayoutEngine)!;
+		ProxyFloatingLayoutEngine result = (ProxyFloatingLayoutEngine)proxy.AddWindow(window);
 
 		// THEN the window should remain floating.
 		Assert.NotSame(proxy, result);
@@ -102,7 +102,7 @@ public class ProxyFloatingLayoutEngine_AddWindowTests
 	)
 	{
 		// GIVEN a floating window which we add to the engine
-		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdate(ctx, root);
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
 
 		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
 		innerLayoutEngine.AddWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
@@ -112,11 +112,11 @@ public class ProxyFloatingLayoutEngine_AddWindowTests
 		HashSet<HWND> floatingWindows = [window.Handle];
 		plugin.FloatingWindows.Returns(_ => floatingWindows);
 
-		ProxyFloatingLayoutEngine proxy = (sut.AddWindow(window) as ProxyFloatingLayoutEngine)!;
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window);
 
 		// WHEN adding the window again, but the window is no longer marked as floating
 		floatingWindows.Clear();
-		ProxyFloatingLayoutEngine result = (proxy.AddWindow(window) as ProxyFloatingLayoutEngine)!;
+		ProxyFloatingLayoutEngine result = (ProxyFloatingLayoutEngine)proxy.AddWindow(window);
 
 		// THEN the window should be docked.
 		Assert.NotSame(proxy, result);
@@ -141,14 +141,14 @@ public class ProxyFloatingLayoutEngine_AddWindowTests
 		ProxyFloatingLayoutEngineUtils.SetupUpdate(ctx, root, monitor, workspace, window, new());
 
 		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
-		ProxyFloatingLayoutEngine proxy = (sut.AddWindow(window) as ProxyFloatingLayoutEngine)!;
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window);
 
 		// (update the window's position)
 		Rectangle<int> rect = new(0, 0, 10, 10);
 		ProxyFloatingLayoutEngineUtils.SetupUpdate(ctx, root, monitor, workspace, window, rect);
 
 		// WHEN adding the window again
-		ProxyFloatingLayoutEngine result = (proxy.AddWindow(window) as ProxyFloatingLayoutEngine)!;
+		ProxyFloatingLayoutEngine result = (ProxyFloatingLayoutEngine)proxy.AddWindow(window);
 
 		// THEN the window should remain floating.
 		Assert.NotSame(proxy, result);
@@ -175,13 +175,13 @@ public class ProxyFloatingLayoutEngine_RemoveWindowTests
 	)
 	{
 		// GIVEN a window which is not floating
-		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdate(ctx, root);
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
 
 		innerLayoutEngine.AddWindow(window).Returns(resultLayoutEngine);
 		resultLayoutEngine.RemoveWindow(window).Returns(innerLayoutEngine);
 
 		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
-		ProxyFloatingLayoutEngine proxy = (sut.AddWindow(window) as ProxyFloatingLayoutEngine)!;
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window);
 
 		// WHEN removing the window
 		ILayoutEngine result = proxy.RemoveWindow(window);
@@ -201,16 +201,16 @@ public class ProxyFloatingLayoutEngine_RemoveWindowTests
 	)
 	{
 		// GIVEN a window which is floating
-		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdate(ctx, root);
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
 
 		// (mark the window as floating)
 		plugin.FloatingWindows.Returns(_ => new HashSet<HWND> { window.Handle });
 
 		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
-		ProxyFloatingLayoutEngine proxy = (sut.AddWindow(window) as ProxyFloatingLayoutEngine)!;
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window);
 
 		// WHEN removing the window
-		ProxyFloatingLayoutEngine result = (proxy.RemoveWindow(window) as ProxyFloatingLayoutEngine)!;
+		ProxyFloatingLayoutEngine result = (ProxyFloatingLayoutEngine)proxy.RemoveWindow(window);
 
 		// THEN the window should be removed from the proxy and the inner layout engine.
 		Assert.NotSame(proxy, result);
@@ -220,5 +220,94 @@ public class ProxyFloatingLayoutEngine_RemoveWindowTests
 
 		innerLayoutEngine.DidNotReceive().AddWindow(window);
 		innerLayoutEngine.Received(1).RemoveWindow(window);
+	}
+}
+
+public class ProxyFloatingLayoutEngine_MoveWindowToPointTests
+{
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MoveWindowToPoint_AddToInner(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is not floating
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+
+		// WHEN moving the window
+		sut.MoveWindowToPoint(window, new Rectangle<double>(0, 0, 0.1, 0.1));
+
+		// THEN the window should be moved in the inner layout engine.
+		innerLayoutEngine.Received(1).MoveWindowToPoint(window, new Rectangle<double>(0, 0, 0.1, 0.1));
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MoveWindowToPoint_AddFloatingWindow(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is floating
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+
+		// (mark the window as floating)
+		plugin.FloatingWindows.Returns(_ => new HashSet<HWND> { window.Handle });
+
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+
+		// WHEN moving the window
+		ProxyFloatingLayoutEngine result = (ProxyFloatingLayoutEngine)
+			sut.MoveWindowToPoint(window, new Rectangle<double>(0, 0, 0.1, 0.1));
+
+		// THEN the window should be moved in the proxy.
+		Assert.NotSame(sut, result);
+		Assert.Single(result.FloatingWindowRects);
+		Assert.Equal(new Rectangle<double>(0, 0, 0.1, 0.1), result.FloatingWindowRects[window]);
+
+		innerLayoutEngine.DidNotReceive().MoveWindowToPoint(window, Arg.Any<Rectangle<double>>());
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MoveWindowToPoint_DockFloatingWindow(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is floating
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+
+		// (mark the window as floating)
+		HashSet<HWND> floatingWindows = [window.Handle];
+		plugin.FloatingWindows.Returns(_ => floatingWindows);
+
+		// (set up the inner layout engine)
+		innerLayoutEngine.AddWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+		innerLayoutEngine.RemoveWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)
+			sut.MoveWindowToPoint(window, new Point<double>(0, 0));
+
+		// WHEN moving the window
+		// (mark the window as docked)
+		floatingWindows.Clear();
+		ProxyFloatingLayoutEngine result = (ProxyFloatingLayoutEngine)
+			proxy.MoveWindowToPoint(window, new Rectangle<double>(0, 0, 0.1, 0.1));
+
+		// THEN the window should be docked.
+		Assert.NotSame(proxy, result);
+		Assert.NotSame(sut, result);
+
+		Assert.Empty(result.FloatingWindowRects);
+		innerLayoutEngine.Received(1).MoveWindowToPoint(window, new Rectangle<double>(0, 0, 0.1, 0.1));
 	}
 }
