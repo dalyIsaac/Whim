@@ -245,7 +245,7 @@ public record ProxyFloatingLayoutEngine : BaseProxyLayoutEngine
 			// At this stage, we don't have a way to get the window in a child layout engine at
 			// a given point.
 			// As a workaround, we just focus the first window.
-			InnerLayoutEngine.GetFirstWindow()?.Focus();
+			GetFirstWindow()?.Focus();
 			return this;
 		}
 

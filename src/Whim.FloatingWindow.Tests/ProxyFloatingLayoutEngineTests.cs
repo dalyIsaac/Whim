@@ -661,3 +661,349 @@ public class ProxyFloatingLayoutEngine_MinimizeWindowEndTests
 		resultLayoutEngine.Received(1).MinimizeWindowEnd(window);
 	}
 }
+
+public class ProxyFloatingLayoutEngine_ContainsWindowTests
+{
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void ContainsWindow_InnerLayoutEngine(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is not floating
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+
+		// (set up the inner layout engine)
+		innerLayoutEngine.AddWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+		innerLayoutEngine.RemoveWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+		innerLayoutEngine.ContainsWindow(window).Returns(true);
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window);
+
+		// WHEN checking if the window is contained
+		bool result = proxy.ContainsWindow(window);
+
+		// THEN the window should be contained in the inner layout engine.
+		Assert.True(result);
+		innerLayoutEngine.Received(1).ContainsWindow(window);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void ContainsWindow_MinimizedFloatingWindow(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is floating
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+
+		// (mark the window as floating)
+		plugin.FloatingWindows.Returns(_ => new HashSet<HWND> { window.Handle });
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window);
+
+		// (minimize the window)
+		proxy = (ProxyFloatingLayoutEngine)proxy.MinimizeWindowStart(window);
+
+		// WHEN checking if the window is contained
+		bool result = proxy.ContainsWindow(window);
+
+		// THEN the window should be contained in the proxy.
+		Assert.True(result);
+
+		innerLayoutEngine.DidNotReceive().ContainsWindow(window);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void ContainsWindow_FloatingWindow(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is floating
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+
+		// (mark the window as floating)
+		plugin.FloatingWindows.Returns(_ => new HashSet<HWND> { window.Handle });
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window);
+
+		// WHEN checking if the window is contained
+		bool result = proxy.ContainsWindow(window);
+
+		// THEN the window should be contained in the proxy.
+		Assert.True(result);
+
+		innerLayoutEngine.DidNotReceive().ContainsWindow(window);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void ContainsWindow_NotContained(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is not floating
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+
+		// (set up the inner layout engine)
+		innerLayoutEngine.ContainsWindow(window).Returns(false);
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+
+		// WHEN checking if the window is contained
+		bool result = sut.ContainsWindow(window);
+
+		// THEN the window should not be contained in the inner layout engine.
+		Assert.False(result);
+		innerLayoutEngine.Received(1).ContainsWindow(window);
+	}
+}
+
+public class ProxyFloatingLayoutEngine_FocusWindowInDirectionTests
+{
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void FocusWindowInDirection_InnerLayoutEngine(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is not floating
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+
+		// (set up the inner layout engine)
+		innerLayoutEngine.AddWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+		innerLayoutEngine.RemoveWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window);
+
+		// WHEN focusing the window
+		ILayoutEngine result = proxy.FocusWindowInDirection(Direction.Up, window);
+
+		// THEN the window should be focused in the inner layout engine.
+		Assert.NotSame(proxy, result);
+		innerLayoutEngine.Received(1).FocusWindowInDirection(Direction.Up, window);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void FocusWindowInDirection_FloatingWindow(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is floating
+		IWindow window1 = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+		IWindow window2 = StoreTestUtils.CreateWindow((HWND)2);
+
+		// (set up the inner layout engine)
+		innerLayoutEngine.GetFirstWindow().Returns((IWindow?)null);
+		innerLayoutEngine.RemoveWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+
+		// (mark the window as floating)
+		plugin.FloatingWindows.Returns(_ => new HashSet<HWND> { window1.Handle, window2.Handle });
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window1);
+		ProxyFloatingLayoutEngine proxy2 = (ProxyFloatingLayoutEngine)proxy.AddWindow(window2);
+
+		// WHEN focusing the window
+		ILayoutEngine result = proxy.FocusWindowInDirection(Direction.Up, window2);
+
+		// THEN the window should be focused in the proxy.
+		Assert.NotSame(sut, proxy);
+		Assert.NotSame(proxy, proxy2);
+		Assert.NotSame(proxy2, result);
+
+		innerLayoutEngine.DidNotReceive().FocusWindowInDirection(Direction.Up, window1);
+		window1.Received(1).Focus();
+	}
+}
+
+public class ProxyFloatingLayoutEngine_SwapWindowInDirectionTests
+{
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void SwapWindowInDirection_InnerLayoutEngine(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is not floating
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+
+		// (set up the inner layout engine)
+		innerLayoutEngine.AddWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+		innerLayoutEngine.RemoveWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window);
+
+		// WHEN swapping the window
+		ILayoutEngine result = proxy.SwapWindowInDirection(Direction.Up, window);
+
+		// THEN the window should be swapped in the inner layout engine.
+		Assert.NotSame(proxy, result);
+		innerLayoutEngine.Received(1).SwapWindowInDirection(Direction.Up, window);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void SwapWindowInDirection_FloatingWindow(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is floating
+		IWindow window1 = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+		IWindow window2 = StoreTestUtils.CreateWindow((HWND)2);
+
+		// (mark the window as floating)
+		plugin.FloatingWindows.Returns(_ => new HashSet<HWND> { window1.Handle, window2.Handle });
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window1);
+		ProxyFloatingLayoutEngine proxy2 = (ProxyFloatingLayoutEngine)proxy.AddWindow(window2);
+
+		// WHEN swapping the window
+		ILayoutEngine result = proxy.SwapWindowInDirection(Direction.Up, window2);
+
+		// THEN the window should be swapped in the proxy.
+		Assert.NotSame(sut, proxy);
+		Assert.NotSame(proxy, proxy2);
+		Assert.Same(proxy, result);
+
+		innerLayoutEngine.DidNotReceive().SwapWindowInDirection(Direction.Up, window1);
+	}
+}
+
+public class ProxyFloatingLayoutEngine_GetFirstWindowTests
+{
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void GetFirstWindow_InnerLayoutEngine(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is not floating
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+
+		// (set up the inner layout engine)
+		innerLayoutEngine.GetFirstWindow().Returns(window);
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+
+		// WHEN getting the first window
+		IWindow result = sut.GetFirstWindow();
+
+		// THEN the first window should be returned from the inner layout engine.
+		Assert.Same(window, result);
+		innerLayoutEngine.Received(1).GetFirstWindow();
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void GetFirstWindow_FloatingWindow(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is floating
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+
+		// (set up the inner layout engine)
+		innerLayoutEngine.RemoveWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+		innerLayoutEngine.GetFirstWindow().Returns((IWindow?)null);
+
+		// (mark the window as floating)
+		plugin.FloatingWindows.Returns(_ => new HashSet<HWND> { window.Handle });
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window);
+
+		// WHEN getting the first window
+		IWindow? result = proxy.GetFirstWindow();
+
+		// THEN the first window should be returned from the proxy.
+		Assert.Same(window, result);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void GetFirstWindow_MinimizedFloatingWindow(
+		IContext ctx,
+		IFloatingWindowPlugin plugin,
+		ILayoutEngine innerLayoutEngine,
+		MutableRootSector root
+	)
+	{
+		// GIVEN a window which is floating
+		IWindow window = ProxyFloatingLayoutEngineUtils.SetupUpdateInner(ctx, root);
+
+		// (set up the inner layout engine)
+		innerLayoutEngine.RemoveWindow(Arg.Any<IWindow>()).Returns(innerLayoutEngine);
+		innerLayoutEngine.GetFirstWindow().Returns((IWindow?)null);
+
+		// (mark the window as floating)
+		plugin.FloatingWindows.Returns(_ => new HashSet<HWND> { window.Handle });
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+		ProxyFloatingLayoutEngine proxy = (ProxyFloatingLayoutEngine)sut.AddWindow(window);
+
+		// (minimize the window)
+		proxy = (ProxyFloatingLayoutEngine)proxy.MinimizeWindowStart(window);
+
+		// WHEN getting the first window
+		IWindow? result = proxy.GetFirstWindow();
+
+		// THEN the first window should be returned from the proxy.
+		Assert.Same(window, result);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void GetFirstWindow_NoWindows(IContext ctx, IFloatingWindowPlugin plugin, ILayoutEngine innerLayoutEngine)
+	{
+		// GIVEN no windows
+		innerLayoutEngine.GetFirstWindow().Returns((IWindow?)null);
+
+		// (set up the sut)
+		ProxyFloatingLayoutEngine sut = new(ctx, plugin, innerLayoutEngine);
+
+		// WHEN getting the first window
+		IWindow? result = sut.GetFirstWindow();
+
+		// THEN null should be returned.
+		Assert.Null(result);
+		innerLayoutEngine.Received(1).GetFirstWindow();
+	}
+}
