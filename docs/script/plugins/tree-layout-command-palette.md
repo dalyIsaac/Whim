@@ -33,6 +33,4 @@ void DoConfig(IContext context)
 return DoConfig;
 ```
 
-## Commands
-
 [!INCLUDE [Commands](../../_includes/plugins/tree-layout-command-palette.md)]
