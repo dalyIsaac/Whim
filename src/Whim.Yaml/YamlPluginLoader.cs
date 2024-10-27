@@ -129,12 +129,15 @@ internal static class YamlPluginLoader
 
 		// Load the TreeLayoutCommandPalettePlugin if the TreeLayoutPlugin is loaded.
 		if (
-			ctx.PluginManager.LoadedPlugins.FirstOrDefault(p => p.Name == "whim.tree_layout") is TreeLayoutPlugin treeLayoutPlugin
+			ctx.PluginManager.LoadedPlugins.FirstOrDefault(p => p.Name == "whim.tree_layout")
+				is TreeLayoutPlugin treeLayoutPlugin
 			&& ctx.PluginManager.LoadedPlugins.FirstOrDefault(p => p.Name == "whim.whim.tree_layout.command_palette")
 				is null
 		)
 		{
-			ctx.PluginManager.AddPlugin(new TreeLayoutCommandPalettePlugin(ctx, treeLayoutPlugin, commandPalettePlugin));
+			ctx.PluginManager.AddPlugin(
+				new TreeLayoutCommandPalettePlugin(ctx, treeLayoutPlugin, commandPalettePlugin)
+			);
 		}
 	}
 
