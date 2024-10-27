@@ -1,6 +1,8 @@
 using NSubstitute;
 using Whim.CommandPalette;
 using Whim.TestUtils;
+using Whim.TreeLayout;
+using Whim.TreeLayout.CommandPalette;
 using Xunit;
 
 namespace Whim.Yaml.Tests;
@@ -448,5 +450,54 @@ public class YamlPluginLoader_LoadCommandPalettePluginTests
 		// Then the result is true, and the command palette plugin is not set
 		Assert.True(result);
 		ctx.PluginManager.DidNotReceive().AddPlugin(Arg.Any<CommandPalettePlugin>());
+	}
+
+	public static TheoryData<string, bool> TreeLayoutCommandPaletteConfig =>
+		new()
+		{
+			// YAML
+			{
+				"""
+					plugins:
+					  command_palette: {}
+					  tree_layout: {}
+					""",
+				true
+			},
+			// JSON
+			{
+				"""
+					{
+						"plugins": {
+							"command_palette": {},
+							"tree_layout": {}
+						}
+					}
+					""",
+				false
+			},
+		};
+
+	[Theory]
+	[MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(TreeLayoutCommandPaletteConfig))]
+	public void LoadCommandPalettePlugin_TreeLayoutPluginIsLoaded_TreeLayoutCommandPalettePluginIsLoaded(
+		string schema,
+		bool isYaml,
+		IContext ctx,
+		TreeLayoutPlugin treeLayoutPlugin
+	)
+	{
+		// Given a valid config with the command palette and tree layout plugins
+		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
+		ctx.PluginManager.LoadedPlugins.Returns([treeLayoutPlugin]);
+
+		// When loading the config
+		bool result = YamlLoader.Load(ctx);
+
+		// Then the result is true, and the tree layout command palette plugin is set
+		Assert.True(result);
+		ctx.PluginManager.Received(1).AddPlugin(Arg.Any<TreeLayoutCommandPalettePlugin>());
+		ctx.PluginManager.Received(1).AddPlugin(Arg.Any<TreeLayoutPlugin>());
+		ctx.PluginManager.Received(1).AddPlugin(Arg.Any<CommandPalettePlugin>());
 	}
 }
