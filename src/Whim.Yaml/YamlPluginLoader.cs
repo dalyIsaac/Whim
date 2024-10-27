@@ -8,6 +8,7 @@ using Whim.Gaps;
 using Whim.LayoutPreview;
 using Whim.SliceLayout;
 using Whim.TreeLayout;
+using Whim.TreeLayout.CommandPalette;
 using Whim.Updater;
 
 namespace Whim.Yaml;
@@ -25,12 +26,14 @@ internal static class YamlPluginLoader
 {
 	public static void LoadPlugins(IContext ctx, Schema schema)
 	{
-		LoadCommandPalettePlugin(ctx, schema);
 		LoadFocusIndicatorPlugin(ctx, schema);
 		LoadLayoutPreviewPlugin(ctx, schema);
 		LoadUpdaterPlugin(ctx, schema);
 		LoadSliceLayoutPlugin(ctx, schema);
 		LoadTreeLayoutPlugin(ctx, schema);
+
+		// Load the command palette after the TreeLayoutPlugin, as it has dependencies on the TreeLayout plugin.
+		LoadCommandPalettePlugin(ctx, schema);
 
 		// Load the bar plugin after the TreeLayoutPlugin, as it has dependencies on the TreeLayout plugin.
 		YamlBarPluginLoader.LoadBarPlugin(ctx, schema);
@@ -121,7 +124,21 @@ internal static class YamlPluginLoader
 			config.Backdrop = YamlLoaderUtils.ParseWindowBackdropConfig(backdrop);
 		}
 
-		ctx.PluginManager.AddPlugin(new CommandPalettePlugin(ctx, config));
+		CommandPalettePlugin commandPalettePlugin = new(ctx, config);
+		ctx.PluginManager.AddPlugin(commandPalettePlugin);
+
+		// Load the TreeLayoutCommandPalettePlugin if the TreeLayoutPlugin is loaded.
+		if (
+			ctx.PluginManager.LoadedPlugins.FirstOrDefault(p => p.Name == "whim.tree_layout")
+				is TreeLayoutPlugin treeLayoutPlugin
+			&& ctx.PluginManager.LoadedPlugins.FirstOrDefault(p => p.Name == "whim.whim.tree_layout.command_palette")
+				is null
+		)
+		{
+			ctx.PluginManager.AddPlugin(
+				new TreeLayoutCommandPalettePlugin(ctx, treeLayoutPlugin, commandPalettePlugin)
+			);
+		}
 	}
 
 	private static void LoadFloatingWindowPlugin(IContext ctx, Schema schema)

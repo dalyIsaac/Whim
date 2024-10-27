@@ -26,6 +26,4 @@ plugins:
 
 [!INCLUDE [Commands](../../_includes/plugins/command-palette.md)]
 
-## Tree Layout
-
-👷🏗️🚧
+[!INCLUDE [Tree Layout Commands](../../_includes/plugins/tree-layout-command-palette.md)]
