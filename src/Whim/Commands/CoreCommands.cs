@@ -244,7 +244,7 @@ internal class CoreCommands : PluginCommands
 				callback: () =>
 				{
 					IWorkspace workspace = _context.Store.Pick(PickActiveWorkspace());
-					ILayoutEngine activeLayoutEngine = workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex];
+					ILayoutEngine activeLayoutEngine = workspace.GetActiveLayoutEngine();
 
 					if (
 						activeLayoutEngine.GetLayoutEngine<FocusLayoutEngine>()

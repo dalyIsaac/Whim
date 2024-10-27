@@ -221,7 +221,7 @@ public class FloatingLayoutEngineTests
 		IRectangle<double> rect = new Rectangle<double>();
 
 		// When
-		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, rect);
+		ILayoutEngine newEngine = engine.MoveWindowEdgesInDirection(Direction.Up, rect, window);
 
 		// Then
 		Assert.Equal(engine, newEngine);

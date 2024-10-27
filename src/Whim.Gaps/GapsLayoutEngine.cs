@@ -43,14 +43,27 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 	/// <inheritdoc />
 	public override IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor)
 	{
-		if (InnerLayoutEngine.GetLayoutEngine<FloatingLayoutEngine>() is not null)
+		int nonProxiedCount = 0;
+		if (InnerLayoutEngine is ProxyFloatingLayoutEngine proxy)
 		{
-			foreach (IWindowState windowState in InnerLayoutEngine.DoLayout(rectangle, monitor))
-			{
-				yield return windowState;
-			}
+			nonProxiedCount = proxy.FloatingWindowRects.Count + proxy.MinimizedWindowRects.Count;
 
-			yield break;
+			// The InnerLayoutEngine will use the default rectangle for nonProxiedCount.
+			// The InnerLayoutEngine will use the proxied rectangle for the remaining windows.
+			// This is brittle and relies on the order of the windows in the ProxyFloatingLayoutEngine.
+
+			IEnumerable<IWindowState> windows = InnerLayoutEngine.DoLayout(rectangle, monitor);
+			using IEnumerator<IWindowState> enumerator = windows.GetEnumerator();
+
+			for (int i = 0; i < nonProxiedCount; i++)
+			{
+				if (!enumerator.MoveNext())
+				{
+					yield break;
+				}
+
+				yield return enumerator.Current;
+			}
 		}
 
 		double scaleFactor = monitor.ScaleFactor;
@@ -71,8 +84,15 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 				Height = rectangle.Height - doubleOuterGap,
 			};
 
+		int idx = 0;
 		foreach (IWindowState windowState in InnerLayoutEngine.DoLayout(proxiedRect, monitor))
 		{
+			if (idx < nonProxiedCount)
+			{
+				idx++;
+				continue;
+			}
+
 			int x = windowState.Rectangle.X + innerGap;
 			int y = windowState.Rectangle.Y + innerGap;
 			int width = windowState.Rectangle.Width - doubleInnerGap;

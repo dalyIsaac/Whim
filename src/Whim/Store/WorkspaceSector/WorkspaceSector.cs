@@ -188,7 +188,7 @@ internal class WorkspaceSector(IContext ctx, IInternalContext internalCtx)
 
 		using DeferWindowPosHandle handle = _ctx.NativeManager.DeferWindowPos();
 
-		foreach (IWindowState loc in workspace.ActiveLayoutEngine.DoLayout(monitor.WorkingArea, monitor))
+		foreach (IWindowState loc in workspace.GetActiveLayoutEngine().DoLayout(monitor.WorkingArea, monitor))
 		{
 			HWND hwnd = loc.Window.Handle;
 			IRectangle<int> rect = loc.Rectangle;

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.Json;
+using Windows.Win32.Foundation;
 
 namespace Whim.FloatingWindow;
 
@@ -8,7 +9,7 @@ namespace Whim.FloatingWindow;
 /// Creates a new instance of the floating window plugin.
 /// </summary>
 /// <param name="context"></param>
-public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin, IInternalFloatingWindowPlugin
+public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin
 {
 	private readonly IContext _context = context;
 
@@ -17,16 +18,18 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin, IIn
 	/// </summary>
 	public string Name => "whim.floating_window";
 
-	private readonly Dictionary<IWindow, ISet<LayoutEngineIdentity>> _floatingWindows = [];
+	private readonly HashSet<HWND> _floatingWindows = [];
 
-	/// <inheritdoc/>
-	public IReadOnlyDictionary<IWindow, ISet<LayoutEngineIdentity>> FloatingWindows => _floatingWindows;
+	/// <inheritdoc />
+	public IReadOnlySet<HWND> FloatingWindows => _floatingWindows;
 
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
-		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new ProxyFloatingLayoutEngine(_context, this, layout));
-		_context.WindowManager.WindowRemoved += WindowManager_WindowRemoved;
+		_context.Store.Dispatch(
+			new AddProxyLayoutEngineTransform(layout => new ProxyFloatingLayoutEngine(_context, this, layout))
+		);
+		_context.Store.WindowEvents.WindowRemoved += WindowEvents_WindowRemoved;
 	}
 
 	/// <inheritdoc />
@@ -35,102 +38,65 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin, IIn
 	/// <inheritdoc />
 	public IPluginCommands PluginCommands => new FloatingWindowCommands(this);
 
-	private void WindowManager_WindowRemoved(object? sender, WindowEventArgs e) => _floatingWindows.Remove(e.Window);
+	private void WindowEvents_WindowRemoved(object? sender, WindowEventArgs e) =>
+		_floatingWindows.Remove(e.Window.Handle);
 
-	private void UpdateWindow(IWindow? window, bool markAsFloating)
+	/// <inheritdoc />
+	public void MarkWindowAsFloating(IWindow? window = null)
 	{
-		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+		window ??= _context.Store.Pick(Pickers.PickLastFocusedWindow()).ValueOrDefault;
 
 		if (window == null)
 		{
-			Logger.Error("Could not find window");
+			Logger.Error("No window to mark as floating");
 			return;
 		}
 
-		if (!markAsFloating && !FloatingWindows.ContainsKey(window))
+		if (!_context.Store.Pick(Pickers.PickWindowPosition(window.Handle)).TryGet(out WindowPosition windowPosition))
 		{
-			Logger.Debug($"Window {window} is not floating");
+			Logger.Error($"Could not obtain position for floating window {window}");
 			return;
 		}
 
-		if (_context.Butler.Pantry.GetWorkspaceForWindow(window) is not IWorkspace workspace)
-		{
-			Logger.Error($"Window {window} is not in a workspace");
-			return;
-		}
-
-		if (workspace.TryGetWindowState(window) is not IWindowState windowState)
-		{
-			Logger.Error($"Could not get window state for window {window}");
-			return;
-		}
-
-		LayoutEngineIdentity layoutEngineIdentity = workspace.ActiveLayoutEngine.Identity;
-		ISet<LayoutEngineIdentity> layoutEngines = FloatingWindows.TryGetValue(
-			window,
-			out ISet<LayoutEngineIdentity>? existingLayoutEngines
-		)
-			? existingLayoutEngines
-			: new HashSet<LayoutEngineIdentity>();
-
-		if (markAsFloating)
-		{
-			Logger.Debug($"Marking window {window} as floating");
-			layoutEngines.Add(layoutEngineIdentity);
-		}
-		else
-		{
-			Logger.Debug($"Marking window {window} as docked");
-			layoutEngines.Remove(layoutEngineIdentity);
-		}
-
-		if (layoutEngines.Count == 0)
-		{
-			_floatingWindows.Remove(window);
-		}
-		else
-		{
-			_floatingWindows[window] = layoutEngines;
-		}
-
-		// Convert the rectangle to a unit square rectangle.
-		IMonitor monitor = _context.MonitorManager.GetMonitorAtPoint(windowState.Rectangle);
-		IRectangle<double> unitSquareRect = monitor.WorkingArea.NormalizeRectangle(windowState.Rectangle);
-
-		workspace.MoveWindowToPoint(window, unitSquareRect);
+		_floatingWindows.Add(window.Handle);
+		_context.Store.Dispatch(new MoveWindowToPointTransform(window.Handle, windowPosition.LastWindowRectangle));
 	}
 
 	/// <inheritdoc />
-	public void MarkWindowAsDockedInLayoutEngine(IWindow window, LayoutEngineIdentity layoutEngineIdentity)
+	public void MarkWindowAsDocked(IWindow? window = null)
 	{
-		if (_floatingWindows.TryGetValue(window, out ISet<LayoutEngineIdentity>? layoutEngines))
-		{
-			layoutEngines.Remove(layoutEngineIdentity);
+		window ??= _context.Store.Pick(Pickers.PickLastFocusedWindow()).ValueOrDefault;
 
-			if (layoutEngines.Count == 0)
-			{
-				_floatingWindows.Remove(window);
-			}
+		if (window == null)
+		{
+			Logger.Error("No window to mark as docked");
+			return;
+		}
+
+		if (!_context.Store.Pick(Pickers.PickWindowPosition(window.Handle)).TryGet(out WindowPosition windowPosition))
+		{
+			Logger.Error($"Could not obtain position for docked window {window}");
+			return;
+		}
+
+		if (_floatingWindows.Remove(window.Handle))
+		{
+			_context.Store.Dispatch(new MoveWindowToPointTransform(window.Handle, windowPosition.LastWindowRectangle));
 		}
 	}
-
-	/// <inheritdoc />
-	public void MarkWindowAsFloating(IWindow? window = null) => UpdateWindow(window, true);
-
-	/// <inheritdoc />
-	public void MarkWindowAsDocked(IWindow? window = null) => UpdateWindow(window, false);
 
 	/// <inheritdoc />
 	public void ToggleWindowFloating(IWindow? window = null)
 	{
-		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
+		window ??= _context.Store.Pick(Pickers.PickLastFocusedWindow()).ValueOrDefault;
+
 		if (window == null)
 		{
-			Logger.Error("Could not find window");
+			Logger.Error("No window to toggle floating");
 			return;
 		}
 
-		if (FloatingWindows.ContainsKey(window))
+		if (_floatingWindows.Contains(window.Handle))
 		{
 			MarkWindowAsDocked(window);
 		}

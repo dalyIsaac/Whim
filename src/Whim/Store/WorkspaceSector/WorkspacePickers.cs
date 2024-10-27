@@ -139,11 +139,7 @@ public static partial class Pickers
 	/// </returns>
 	public static PurePicker<Result<ILayoutEngine>> PickActiveLayoutEngine(WorkspaceId workspaceId) =>
 		(IRootSector rootSector) =>
-			BaseWorkspacePicker(
-				workspaceId,
-				rootSector,
-				static workspace => workspace.LayoutEngines[workspace.ActiveLayoutEngineIndex]
-			);
+			BaseWorkspacePicker(workspaceId, rootSector, static workspace => workspace.GetActiveLayoutEngine());
 
 	/// <summary>
 	/// Get the active layout engine in the active workspace.
@@ -259,6 +255,28 @@ public static partial class Pickers
 					);
 				}
 			);
+
+	/// <summary>
+	/// Get the window position for the given <paramref name="windowHandle"/>.
+	/// </summary>
+	/// <param name="windowHandle">
+	/// The window handle to get the position for.
+	/// </param>
+	/// <returns>
+	/// The window position for the given <paramref name="windowHandle"/>, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// If the window is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// </returns>
+	public static PurePicker<Result<WindowPosition>> PickWindowPosition(HWND windowHandle) =>
+		(IRootSector rootSector) =>
+		{
+			Result<IWorkspace> workspaceResult = PickWorkspaceByWindow(windowHandle)(rootSector);
+			if (workspaceResult.TryGet(out IWorkspace workspace))
+			{
+				return PickWindowPosition(workspace.Id, windowHandle)(rootSector);
+			}
+
+			return Result.FromException<WindowPosition>(workspaceResult.Error!);
+		};
 
 	/// <summary>
 	/// Picks the function used to create the default layout engines to add to a workspace.

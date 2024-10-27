@@ -50,11 +50,11 @@ public record MoveWindowToPointTransform(HWND WindowHandle, IPoint<int> Point) :
 				WindowHandle,
 				targetWorkspace.Id
 			);
-			oldWorkspace.RemoveWindow(window: window);
-			oldWorkspace.DoLayout();
+
+			ctx.Store.Dispatch(new RemoveWindowFromWorkspaceTransform(oldWorkspace.Id, window));
 		}
 
-		targetWorkspace.MoveWindowToPoint(window, normalized, deferLayout: false);
+		ctx.Store.Dispatch(new MoveWindowToPointInWorkspaceTransform(targetWorkspace.Id, WindowHandle, normalized));
 
 		rootSector.WorkspaceSector.WindowHandleToFocus = window.Handle;
 

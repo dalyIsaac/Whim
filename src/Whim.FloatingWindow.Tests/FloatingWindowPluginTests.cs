@@ -1,64 +1,17 @@
+using System.Collections.Immutable;
 using System.Text.Json;
-using AutoFixture;
-using NSubstitute;
 using Whim.TestUtils;
+using Windows.Win32.Foundation;
 using Xunit;
 
 namespace Whim.FloatingWindow.Tests;
 
-public class FloatingWindowPluginCustomization : ICustomization
-{
-	public void Customize(IFixture fixture)
-	{
-		IContext context = fixture.Freeze<IContext>();
-		IWorkspace workspace = fixture.Freeze<IWorkspace>();
-
-		IMonitor monitor = fixture.Freeze<IMonitor>();
-		monitor.WorkingArea.Returns(
-			new Rectangle<int>()
-			{
-				X = 0,
-				Y = 0,
-				Width = 3,
-				Height = 3,
-			}
-		);
-
-		// The workspace will have a null last focused window
-		workspace.LastFocusedWindow.Returns((IWindow?)null);
-
-		// The workspace manager should have a single workspace
-		context.WorkspaceManager.GetEnumerator().Returns((_) => new List<IWorkspace>() { workspace }.GetEnumerator());
-		context.WorkspaceManager.ActiveWorkspace.Returns(workspace);
-
-		// Monitor manager will return the monitor at the point (1, 2).
-		context.MonitorManager.GetMonitorAtPoint(Arg.Is<IPoint<int>>(p => p.X == 1 && p.Y == 2)).Returns(monitor);
-
-		fixture.Inject(context);
-		fixture.Inject(workspace);
-		fixture.Inject(monitor);
-	}
-}
-
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class FloatingWindowPluginTests
 {
 	private static FloatingWindowPlugin CreateSut(IContext context) => new(context);
 
-	private static void AssertFloatingWindowsEqual(
-		IReadOnlyDictionary<IWindow, ISet<LayoutEngineIdentity>> expected,
-		IReadOnlyDictionary<IWindow, ISet<LayoutEngineIdentity>> actual
-	)
-	{
-		Assert.Equal(expected.Count, actual.Count);
-
-		foreach (KeyValuePair<IWindow, ISet<LayoutEngineIdentity>> expectedWindow in expected)
-		{
-			Assert.Contains(expectedWindow.Key, actual.Keys);
-			Assert.Equal(expectedWindow.Value, actual[expectedWindow.Key]);
-		}
-	}
-
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	public void Name(IContext context)
 	{
 		// Given
@@ -71,7 +24,7 @@ public class FloatingWindowPluginTests
 		Assert.Equal("whim.floating_window", name);
 	}
 
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	public void PluginCommands(IContext context)
 	{
 		// Given
@@ -84,8 +37,8 @@ public class FloatingWindowPluginTests
 		Assert.NotEmpty(commands.Commands);
 	}
 
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
-	public void PreInitialize(IContext context)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	public void PreInitialize(IContext context, List<object> transforms, ILayoutEngine layoutEngine)
 	{
 		// Given
 		FloatingWindowPlugin plugin = CreateSut(context);
@@ -94,11 +47,14 @@ public class FloatingWindowPluginTests
 		plugin.PreInitialize();
 
 		// Then
-		context.WorkspaceManager.Received(1).AddProxyLayoutEngine(Arg.Any<ProxyLayoutEngineCreator>());
+		Assert.IsType<AddProxyLayoutEngineTransform>(transforms[0]);
+		ProxyLayoutEngineCreator creator = ((AddProxyLayoutEngineTransform)transforms[0]).ProxyLayoutEngineCreator;
+		ILayoutEngine result = creator(layoutEngine);
+		Assert.IsType<ProxyFloatingLayoutEngine>(result);
 	}
 
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
-	public void PostInitialize(IContext context)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	public void PostInitialize(IContext context, List<object> transforms)
 	{
 		// Given
 		FloatingWindowPlugin plugin = CreateSut(context);
@@ -107,247 +63,31 @@ public class FloatingWindowPluginTests
 		plugin.PostInitialize();
 
 		// Then
-		context.WorkspaceManager.DidNotReceive().AddProxyLayoutEngine(Arg.Any<ProxyLayoutEngineCreator>());
+		Assert.Empty(transforms);
 	}
 
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
-	public void WindowManager_WindowRemoved(
-		IContext context,
-		IWindow window,
-		IMonitor monitor,
-		IWorkspace activeWorkspace
-	)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WindowManager_WindowRemoved(IContext ctx, MutableRootSector root, IWindow window)
 	{
 		// Given
-		Rectangle<int> rect = new();
-		WindowState windowState =
-			new()
-			{
-				Window = window,
-				Rectangle = rect,
-				WindowSize = WindowSize.Normal,
-			};
+		Workspace activeWorkspace = StoreTestUtils.CreateWorkspace(ctx);
+		StoreTestUtils.PopulateWindowWorkspaceMap(ctx, root, window, activeWorkspace);
 
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(activeWorkspace);
-		activeWorkspace.TryGetWindowState(window).Returns(windowState);
-		context.MonitorManager.GetMonitorAtPoint(rect).Returns(monitor);
-
-		FloatingWindowPlugin plugin = CreateSut(context);
+		FloatingWindowPlugin plugin = CreateSut(ctx);
 
 		// When
 		plugin.PreInitialize();
 		plugin.MarkWindowAsFloating(window);
-		context.WindowManager.WindowRemoved += Raise.EventWith(new WindowRemovedEventArgs() { Window = window });
+		Assert.Single(plugin.FloatingWindows);
+
+		root.WindowSector.QueueEvent(new WindowRemovedEventArgs() { Window = window });
+		root.WindowSector.DispatchEvents();
 
 		// Then nothing
 		Assert.Empty(plugin.FloatingWindows);
 	}
 
-	#region MarkWindowAsFloating
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
-	public void MarkWindowAsFloating_NoWindow(IContext context)
-	{
-		// Given
-		FloatingWindowPlugin plugin = CreateSut(context);
-
-		// When
-		plugin.MarkWindowAsFloating(null);
-
-		// Then
-		Assert.Empty(plugin.FloatingWindows);
-	}
-
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
-	public void MarkWindowAsFloating_NoWorkspaceForWindow(IContext context, IWindow window)
-	{
-		// Given
-		FloatingWindowPlugin plugin = CreateSut(context);
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns((IWorkspace?)null);
-
-		// When
-		plugin.MarkWindowAsFloating(window);
-
-		// Then
-		Assert.Empty(plugin.FloatingWindows);
-	}
-
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
-	public void MarkWindowAsFloating_NoWorkspaceForWindow_LastFocusedWindow(
-		IContext context,
-		IWindow window,
-		IWorkspace activeWorkspace
-	)
-	{
-		// Given
-		FloatingWindowPlugin plugin = CreateSut(context);
-
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns((IWorkspace?)null);
-		activeWorkspace.LastFocusedWindow.Returns(window);
-
-		// When
-		plugin.MarkWindowAsFloating();
-
-		// Then
-		Assert.Empty(plugin.FloatingWindows);
-	}
-
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
-	public void MarkWindowAsFloating_NoWindowState(IContext context, IWindow window, IWorkspace activeWorkspace)
-	{
-		// Given
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(activeWorkspace);
-		activeWorkspace.TryGetWindowState(window).Returns((IWindowState?)null);
-
-		FloatingWindowPlugin plugin = CreateSut(context);
-
-		// When
-		plugin.MarkWindowAsFloating(window);
-
-		// Then
-		Assert.Empty(plugin.FloatingWindows);
-	}
-
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
-	public void MarkWindowAsFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
-	{
-		// Given
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(activeWorkspace);
-		activeWorkspace
-			.TryGetWindowState(window)
-			.Returns(
-				new WindowState()
-				{
-					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
-					Window = window,
-					WindowSize = WindowSize.Normal,
-				}
-			);
-
-		FloatingWindowPlugin plugin = CreateSut(context);
-
-		// When
-		plugin.MarkWindowAsFloating(window);
-
-		// Then
-		Assert.Single(plugin.FloatingWindows);
-		Assert.Equal(window, plugin.FloatingWindows.Keys.First());
-		activeWorkspace.Received(1).MoveWindowToPoint(window, Arg.Any<IPoint<double>>());
-	}
-	#endregion
-
-	#region MarkWindowAsDocked
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
-	public void MarkWindowAsDocked_WindowIsNotFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
-	{
-		// Given
-		FloatingWindowPlugin plugin = CreateSut(context);
-
-		// When
-		plugin.MarkWindowAsDocked(window);
-
-		// Then
-		Assert.Empty(plugin.FloatingWindows);
-		activeWorkspace.DidNotReceive().MoveWindowToPoint(window, Arg.Any<IPoint<double>>());
-		activeWorkspace.DidNotReceive().DoLayout();
-	}
-
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
-	public void MarkWindowAsDocked_WindowIsFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
-	{
-		// Given
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(activeWorkspace);
-		activeWorkspace
-			.TryGetWindowState(window)
-			.Returns(
-				new WindowState()
-				{
-					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
-					Window = window,
-					WindowSize = WindowSize.Normal,
-				}
-			);
-
-		FloatingWindowPlugin plugin = CreateSut(context);
-		plugin.MarkWindowAsFloating(window);
-
-		// When
-		plugin.MarkWindowAsDocked(window);
-
-		// Then
-		Assert.Empty(plugin.FloatingWindows);
-		activeWorkspace.Received(2).MoveWindowToPoint(window, Arg.Any<IPoint<double>>());
-	}
-	#endregion
-
-	#region ToggleWindowFloating
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
-	public void ToggleWindowFloating_NoWindow(IContext context)
-	{
-		// Given
-		FloatingWindowPlugin plugin = CreateSut(context);
-
-		// When
-		plugin.ToggleWindowFloating(null);
-
-		// Then
-		Assert.Empty(plugin.FloatingWindows);
-	}
-
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
-	public void ToggleWindowFloating_ToFloating(IContext context, IWindow window, IWorkspace activeWorkspace)
-	{
-		// Given
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(activeWorkspace);
-		activeWorkspace
-			.TryGetWindowState(window)
-			.Returns(
-				new WindowState()
-				{
-					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
-					Window = window,
-					WindowSize = WindowSize.Normal,
-				}
-			);
-
-		FloatingWindowPlugin plugin = CreateSut(context);
-
-		// When
-		plugin.ToggleWindowFloating(window);
-
-		// Then
-		Assert.Single(plugin.FloatingWindows);
-		Assert.Equal(window, plugin.FloatingWindows.Keys.First());
-	}
-
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
-	public void ToggleWindowFloating_ToDocked(IContext context, IWindow window, IWorkspace activeWorkspace)
-	{
-		// Given
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(activeWorkspace);
-		activeWorkspace
-			.TryGetWindowState(window)
-			.Returns(
-				new WindowState()
-				{
-					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
-					Window = window,
-					WindowSize = WindowSize.Normal,
-				}
-			);
-
-		FloatingWindowPlugin plugin = CreateSut(context);
-
-		plugin.MarkWindowAsFloating(window);
-
-		// When
-		plugin.ToggleWindowFloating(window);
-
-		// Then
-		Assert.Empty(plugin.FloatingWindows);
-	}
-	#endregion
-
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	public void SaveState(IContext context)
 	{
 		// Given
@@ -360,7 +100,7 @@ public class FloatingWindowPluginTests
 		Assert.Null(json);
 	}
 
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	public void LoadState(IContext context)
 	{
 		// Given
@@ -372,114 +112,201 @@ public class FloatingWindowPluginTests
 		// Then nothing
 		Assert.Empty(plugin.FloatingWindows);
 	}
+}
 
-	#region MarkWindowAsDockedInLayoutEngine
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
-	public void MarkWindowAsDockedInLayoutEngine_WindowIsNotFloating(
-		IContext context,
-		IWindow window,
-		IWorkspace activeWorkspace
-	)
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
+public class FloatingWindowPlugin_MarkWindowAsFloatingTests
+{
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MarkWindowAsFloating_NoWindow(IContext context, MutableRootSector root)
 	{
 		// Given
-		ILayoutEngine layoutEngine = activeWorkspace.ActiveLayoutEngine;
-		FloatingWindowPlugin plugin = CreateSut(context);
-
-		Assert.Empty(plugin.FloatingWindows);
+		FloatingWindowPlugin plugin = new(context);
+		StoreTestUtils.AddActiveWorkspace(context, root, StoreTestUtils.CreateWorkspace(context));
 
 		// When
-		plugin.MarkWindowAsDockedInLayoutEngine(window, layoutEngine.Identity);
+		plugin.MarkWindowAsFloating();
 
 		// Then
 		Assert.Empty(plugin.FloatingWindows);
 	}
 
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
-	public void MarkWindowAsDockedInLayoutEngine_WindowIsFloating(
-		IContext context,
-		IWindow window,
-		IWorkspace activeWorkspace
-	)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	public void MarkWindowAsFloating_NoWindowPosition(IContext context, IWindow window)
 	{
 		// Given
-		ILayoutEngine layoutEngine = activeWorkspace.ActiveLayoutEngine;
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(activeWorkspace);
-		activeWorkspace
-			.TryGetWindowState(window)
-			.Returns(
-				new WindowState()
-				{
-					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
-					Window = window,
-					WindowSize = WindowSize.Normal,
-				}
-			);
-
-		FloatingWindowPlugin plugin = CreateSut(context);
-		plugin.MarkWindowAsFloating(window);
-
-		AssertFloatingWindowsEqual(
-			new Dictionary<IWindow, ISet<LayoutEngineIdentity>>()
-			{
-				{
-					window,
-					new HashSet<LayoutEngineIdentity>() { layoutEngine.Identity }
-				},
-			},
-			plugin.FloatingWindows
-		);
+		FloatingWindowPlugin plugin = new(context);
 
 		// When
-		plugin.MarkWindowAsDockedInLayoutEngine(window, layoutEngine.Identity);
+		plugin.MarkWindowAsFloating(window);
 
 		// Then
 		Assert.Empty(plugin.FloatingWindows);
 	}
 
-	[Theory, AutoSubstituteData<FloatingWindowPluginCustomization>]
-	public void MarkWindowAsDocked_WindowIsFloatingInMultipleLayoutEngines(
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MarkWindowAsFloating(
 		IContext context,
+		MutableRootSector root,
 		IWindow window,
-		ILayoutEngine layoutEngine2,
-		IWorkspace activeWorkspace
+		List<object> transforms
 	)
 	{
 		// Given
-		ILayoutEngine layoutEngine = activeWorkspace.ActiveLayoutEngine;
-		layoutEngine2.Identity.Returns(new LayoutEngineIdentity());
-
-		context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(activeWorkspace);
-		activeWorkspace
-			.TryGetWindowState(window)
-			.Returns(
-				new WindowState()
-				{
-					Rectangle = new Rectangle<int>() { X = 1, Y = 2 },
-					Window = window,
-					WindowSize = WindowSize.Normal,
-				}
-			);
+		FloatingWindowPlugin plugin = new(context);
+		Workspace activeWorkspace = StoreTestUtils.CreateWorkspace(context) with
+		{
+			WindowPositions = new Dictionary<HWND, WindowPosition>()
+			{
+				{ window.Handle, new WindowPosition(WindowSize.Normal, new Rectangle<int>(0, 0, 100, 100)) },
+			}.ToImmutableDictionary(),
+		};
+		StoreTestUtils.PopulateWindowWorkspaceMap(context, root, window, activeWorkspace);
 
 		// When
-		FloatingWindowPlugin plugin = CreateSut(context);
 		plugin.MarkWindowAsFloating(window);
-
-		activeWorkspace.ActiveLayoutEngine.Returns(layoutEngine2);
-		plugin.MarkWindowAsFloating(window);
-
-		plugin.MarkWindowAsDockedInLayoutEngine(window, layoutEngine.Identity);
 
 		// Then
-		AssertFloatingWindowsEqual(
-			new Dictionary<IWindow, ISet<LayoutEngineIdentity>>()
-			{
-				{
-					window,
-					new HashSet<LayoutEngineIdentity>() { layoutEngine2.Identity }
-				},
-			},
-			plugin.FloatingWindows
+		Assert.Single(plugin.FloatingWindows);
+		Assert.Contains(
+			transforms,
+			t => t.Equals(new MoveWindowToPointTransform(window.Handle, new Rectangle<int>(0, 0, 100, 100)))
 		);
 	}
-	#endregion
+}
+
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
+public class FloatingWindowPlugin_MarkWindowAsDockedTests
+{
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MarkWindowAsDocked_NoWindow(IContext context, MutableRootSector root)
+	{
+		// Given
+		FloatingWindowPlugin plugin = new(context);
+		StoreTestUtils.AddActiveWorkspace(context, root, StoreTestUtils.CreateWorkspace(context));
+
+		// When
+		plugin.MarkWindowAsDocked();
+
+		// Then
+		Assert.Empty(plugin.FloatingWindows);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MarkWindowAsDocked_NoWindowPosition(IContext context, IWindow window)
+	{
+		// Given
+		FloatingWindowPlugin plugin = new(context);
+
+		// When
+		plugin.MarkWindowAsDocked(window);
+
+		// Then
+		Assert.Empty(plugin.FloatingWindows);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MarkWindowAsDocked(IContext context, MutableRootSector root, IWindow window, List<object> transforms)
+	{
+		// Given
+		FloatingWindowPlugin plugin = new(context);
+		Workspace activeWorkspace = StoreTestUtils.CreateWorkspace(context) with
+		{
+			WindowPositions = new Dictionary<HWND, WindowPosition>()
+			{
+				{ window.Handle, new WindowPosition(WindowSize.Normal, new Rectangle<int>(0, 0, 100, 100)) },
+			}.ToImmutableDictionary(),
+		};
+		StoreTestUtils.PopulateWindowWorkspaceMap(context, root, window, activeWorkspace);
+		plugin.MarkWindowAsFloating(window);
+
+		// When
+		plugin.MarkWindowAsDocked(window);
+
+		// Then
+		Assert.Empty(plugin.FloatingWindows);
+		Assert.Contains(
+			transforms,
+			t => t.Equals(new MoveWindowToPointTransform(window.Handle, new Rectangle<int>(0, 0, 100, 100)))
+		);
+	}
+}
+
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
+public class FloatingWindowPlugin_ToggleWindowFloatingTests
+{
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void ToggleWindowFloating_NoWindow(IContext context, MutableRootSector root)
+	{
+		// Given
+		FloatingWindowPlugin plugin = new(context);
+		StoreTestUtils.AddActiveWorkspace(context, root, StoreTestUtils.CreateWorkspace(context));
+
+		// When
+		plugin.ToggleWindowFloating();
+
+		// Then
+		Assert.Empty(plugin.FloatingWindows);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void ToggleWindowFloating_FloatWindow(
+		IContext context,
+		MutableRootSector root,
+		IWindow window,
+		List<object> transforms
+	)
+	{
+		// Given
+		FloatingWindowPlugin plugin = new(context);
+		Workspace activeWorkspace = StoreTestUtils.CreateWorkspace(context) with
+		{
+			WindowPositions = new Dictionary<HWND, WindowPosition>()
+			{
+				{ window.Handle, new WindowPosition(WindowSize.Normal, new Rectangle<int>(0, 0, 100, 100)) },
+			}.ToImmutableDictionary(),
+		};
+		StoreTestUtils.PopulateWindowWorkspaceMap(context, root, window, activeWorkspace);
+
+		// When
+		plugin.ToggleWindowFloating(window);
+
+		// Then
+		Assert.Single(plugin.FloatingWindows);
+		Assert.Contains(
+			transforms,
+			t => t.Equals(new MoveWindowToPointTransform(window.Handle, new Rectangle<int>(0, 0, 100, 100)))
+		);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void ToggleWindowFloating_DockWindow(
+		IContext context,
+		MutableRootSector root,
+		IWindow window,
+		List<object> transforms
+	)
+	{
+		// Given
+		FloatingWindowPlugin plugin = new(context);
+		Workspace activeWorkspace = StoreTestUtils.CreateWorkspace(context) with
+		{
+			WindowPositions = new Dictionary<HWND, WindowPosition>()
+			{
+				{ window.Handle, new WindowPosition(WindowSize.Normal, new Rectangle<int>(0, 0, 100, 100)) },
+			}.ToImmutableDictionary(),
+		};
+		StoreTestUtils.PopulateWindowWorkspaceMap(context, root, window, activeWorkspace);
+		plugin.MarkWindowAsFloating(window);
+
+		// When
+		plugin.ToggleWindowFloating(window);
+
+		// Then
+		Assert.Empty(plugin.FloatingWindows);
+		Assert.Contains(
+			transforms,
+			t => t.Equals(new MoveWindowToPointTransform(window.Handle, new Rectangle<int>(0, 0, 100, 100)))
+		);
+	}
 }

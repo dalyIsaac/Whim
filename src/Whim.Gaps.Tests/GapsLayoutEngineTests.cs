@@ -2,6 +2,8 @@ using FluentAssertions;
 using NSubstitute;
 using Whim.FloatingWindow;
 using Whim.TestUtils;
+using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
 using Xunit;
 
 namespace Whim.Gaps.Tests;
@@ -401,35 +403,107 @@ public class GapsLayoutEngineTests
 		windowStates.Should().Equal(expectedWindowStates);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void DoLayout_WithFloatingLayoutEngine(GapsConfig gapsConfig, IWindow window)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
+	internal void DoLayout_WithFloatingLayoutEngine(IContext context, MutableRootSector root)
 	{
 		// Input
-		Rectangle<int> rect = new(0, 0, -300, -300);
-		IWindowState[] inputWindowStates =
-		[
-			new WindowState()
-			{
-				Window = window,
-				Rectangle = rect,
-				WindowSize = WindowSize.Normal,
-			},
-		];
+		GapsConfig gapsConfig = new();
+
+		Rectangle<int> rect1 = new(10, 10, 20, 20);
+		Rectangle<int> rect2 = new(30, 30, 40, 40);
+		Rectangle<int> rect3 = new(50, 50, 60, 60);
+
+		IMonitor monitor = StoreTestUtils.CreateMonitor((HMONITOR)1);
+		monitor.WorkingArea.Returns(new Rectangle<int>(0, 0, 100, 100));
+
+		IWindow window1 = StoreTestUtils.CreateWindow((HWND)1);
+		IWindow window2 = StoreTestUtils.CreateWindow((HWND)2);
+		IWindow window3 = StoreTestUtils.CreateWindow((HWND)3);
+
+		Workspace workspace = StoreTestUtils.CreateWorkspace(context);
+		StoreTestUtils.PopulateThreeWayMap(context, root, monitor, workspace, window1);
+		StoreTestUtils.PopulateWindowWorkspaceMap(context, root, window2, workspace);
+		StoreTestUtils.PopulateWindowWorkspaceMap(context, root, window3, workspace);
+
+		IFloatingWindowPlugin floatingWindowPlugin = Substitute.For<IFloatingWindowPlugin>();
+		floatingWindowPlugin.FloatingWindows.Returns(_ => new HashSet<HWND>() { window1.Handle, window2.Handle });
+
+		ILayoutEngine inner1 = Substitute.For<ILayoutEngine>();
+		ILayoutEngine inner2 = Substitute.For<ILayoutEngine>();
+
+		inner1.AddWindow(Arg.Any<IWindow>()).Returns(inner2);
+		inner1.RemoveWindow(Arg.Any<IWindow>()).Returns(inner1);
+		inner2.Count.Returns(1);
+		inner2
+			.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
+			.Returns(
+				[
+					new WindowState()
+					{
+						Rectangle = rect3,
+						Window = window3,
+						WindowSize = WindowSize.Normal,
+					},
+				]
+			);
+
+		context.NativeManager.DwmGetWindowRectangle(window1.Handle).Returns(rect1);
+		context.NativeManager.DwmGetWindowRectangle(window2.Handle).Returns(rect2);
+
+		ProxyFloatingLayoutEngine floatingLayoutEngine = new(context, floatingWindowPlugin, inner1);
 
 		// Given
-		ILayoutEngine innerLayoutEngine = Substitute.For<ILayoutEngine>();
-		innerLayoutEngine
-			.GetLayoutEngine<FloatingLayoutEngine>()
-			.Returns(new FloatingLayoutEngine(Substitute.For<IContext>(), _identity));
-		innerLayoutEngine.DoLayout(rect, Arg.Any<IMonitor>()).Returns(inputWindowStates);
-
-		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
+		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, floatingLayoutEngine);
 
 		// When
-		IWindowState[] outputWindowStates = gapsLayoutEngine.DoLayout(rect, Substitute.For<IMonitor>()).ToArray();
+		GapsLayoutEngine gaps1 = (GapsLayoutEngine)gapsLayoutEngine.AddWindow(window1);
+		GapsLayoutEngine gaps2 = (GapsLayoutEngine)gaps1.AddWindow(window2);
+		GapsLayoutEngine gaps3 = (GapsLayoutEngine)gaps2.AddWindow(window3);
+
+		IWindowState[] outputWindowStates = gaps3.DoLayout(monitor.WorkingArea, monitor).ToArray();
 
 		// Then
-		outputWindowStates.Should().Equal(inputWindowStates);
+		Assert.Equal(3, outputWindowStates.Length);
+
+		Assert.Contains(
+			outputWindowStates,
+			ws =>
+				ws.Equals(
+					new WindowState()
+					{
+						Window = window1,
+						Rectangle = rect1,
+						WindowSize = WindowSize.Normal,
+					}
+				)
+		);
+
+		Assert.Contains(
+			outputWindowStates,
+			ws =>
+				ws.Equals(
+					new WindowState()
+					{
+						Window = window2,
+						Rectangle = rect2,
+						WindowSize = WindowSize.Normal,
+					}
+				)
+		);
+
+		Assert.Contains(
+			outputWindowStates,
+			ws =>
+				ws.Equals(
+					new WindowState()
+					{
+						Window = window3,
+						Rectangle = new Rectangle<int>(60, 60, 40, 40),
+						WindowSize = WindowSize.Normal,
+					}
+				)
+		);
 	}
 
 	[Theory, AutoSubstituteData]
