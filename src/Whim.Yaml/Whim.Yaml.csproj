@@ -28,7 +28,6 @@
 		<UseWinUI>true</UseWinUI>
 		<Version>0.7.0</Version>
 	</PropertyGroup>
-
 	<ItemGroup>
 		<ProjectReference Include="..\Whim.Bar\Whim.Bar.csproj" />
 		<ProjectReference Include="..\Whim.CommandPalette\Whim.CommandPalette.csproj" />
@@ -53,6 +52,16 @@
 		<PackageReference Include="Corvus.Json.ExtendedTypes" />
 		<PackageReference Include="Yaml2JsonNode" />
 		<PackageReference Include="YamlDotNet" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Remove="ErrorWindow.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Page Update="ErrorWindow.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
 	</ItemGroup>
 
 	<Target Name="GenerateSchema" BeforeTargets="BeforeCompile">

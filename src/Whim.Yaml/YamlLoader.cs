@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Corvus.Json;
@@ -27,6 +28,8 @@ public static class YamlLoader
 		{
 			return false;
 		}
+
+		ValidateConfig(ctx, schema);
 
 		UpdateWorkspaces(ctx, schema);
 
@@ -67,6 +70,25 @@ public static class YamlLoader
 
 		Logger.Debug("No configuration file found.");
 		return null;
+	}
+
+	private static void ValidateConfig(IContext ctx, Schema schema)
+	{
+		ValidationContext result = schema.Validate(ValidationContext.ValidContext, ValidationLevel.Detailed);
+		if (result.IsValid)
+		{
+			return;
+		}
+
+		StringBuilder sb = new();
+		foreach (ValidationResult error in result.Results)
+		{
+			sb.AppendLine(error.Message);
+		}
+		string errors = sb.ToString();
+
+		using ErrorWindow window = new(ctx, errors);
+		window.Activate();
 	}
 
 	private static void UpdateWorkspaces(IContext ctx, Schema schema)

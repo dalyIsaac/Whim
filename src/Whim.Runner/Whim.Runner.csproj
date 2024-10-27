@@ -131,6 +131,7 @@
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
 		<Manifest Include="$(ApplicationManifest)" />
 	</ItemGroup>
+
 	<!-- Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
 		Tools extension to be activated for this project even if the Windows App SDK Nuget
 		package has not yet been restored -->
@@ -160,7 +161,8 @@
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
 	</ItemGroup>
-	<!--Whim.Bar-->
+
+	<!-- Whim.Bar -->
 	<Target Name="CopyBarAfterBuild" AfterTargets="Build;Publish">
 		<ItemGroup>
 			<BarSourceFile Include="$(SolutionDir)\src\Whim.Bar\$(OutDir)\Whim.Bar\**\*" />
@@ -172,7 +174,8 @@
 		<Copy SourceFiles="$(SolutionDir)src\Whim.Bar\$(OutDir)Whim.Bar.dll"
 			DestinationFolder="$(TargetDir)plugins\Whim.Bar\" SkipUnchangedFiles="true" />
 	</Target>
-	<!--Whim.CommandPalette-->
+
+	<!-- Whim.CommandPalette -->
 	<Target Name="CopyCommandPaletteAfterBuild" AfterTargets="Build;Publish">
 		<ItemGroup>
 			<CommandPaletteSourceFile
@@ -185,12 +188,14 @@
 		<Copy SourceFiles="$(SolutionDir)src\Whim.CommandPalette\$(OutDir)Whim.CommandPalette.dll"
 			DestinationFolder="$(TargetDir)plugins\Whim.CommandPalette\" SkipUnchangedFiles="true" />
 	</Target>
-	<!--Whim.FloatingWindow-->
+
+	<!-- Whim.FloatingWindow -->
 	<Target Name="CopyFloatingWindowAfterBuild" AfterTargets="Build;Publish">
 		<Copy SourceFiles="$(SolutionDir)src\Whim.FloatingWindow\$(OutDir)Whim.FloatingWindow.dll"
 			DestinationFolder="$(TargetDir)plugins\Whim.FloatingWindow\" SkipUnchangedFiles="true" />
 	</Target>
-	<!--Whim.FocusIndicator-->
+
+	<!-- Whim.FocusIndicator -->
 	<Target Name="CopyFocusIndicatorAfterBuild" AfterTargets="Build;Publish">
 		<ItemGroup>
 			<FocusIndicatorSourceFile
@@ -203,12 +208,14 @@
 		<Copy SourceFiles="$(SolutionDir)src\Whim.FocusIndicator\$(OutDir)Whim.FocusIndicator.dll"
 			DestinationFolder="$(TargetDir)plugins\Whim.FocusIndicator\" SkipUnchangedFiles="true" />
 	</Target>
-	<!--Whim.Gaps-->
+
+	<!-- Whim.Gaps -->
 	<Target Name="CopyGapsAfterBuild" AfterTargets="Build;Publish">
 		<Copy SourceFiles="$(SolutionDir)src\Whim.Gaps\$(OutDir)Whim.Gaps.dll"
 			DestinationFolder="$(TargetDir)plugins\Whim.Gaps\" SkipUnchangedFiles="true" />
 	</Target>
-	<!--Whim.LayoutPreview-->
+
+	<!-- Whim.LayoutPreview -->
 	<Target Name="CopyLayoutPreviewAfterBuild" AfterTargets="Build;Publish">
 		<ItemGroup>
 			<LayoutPreviewSourceFile
@@ -221,17 +228,20 @@
 		<Copy SourceFiles="$(SolutionDir)src\Whim.LayoutPreview\$(OutDir)Whim.LayoutPreview.dll"
 			DestinationFolder="$(TargetDir)plugins\Whim.LayoutPreview\" SkipUnchangedFiles="true" />
 	</Target>
-	<!--Whim.SliceLayout-->
+
+	<!-- Whim.SliceLayout -->
 	<Target Name="CopySliceLayoutAfterBuild" AfterTargets="Build;Publish">
 		<Copy SourceFiles="$(SolutionDir)src\Whim.SliceLayout\$(OutDir)Whim.SliceLayout.dll"
 			DestinationFolder="$(TargetDir)plugins\Whim.SliceLayout\" SkipUnchangedFiles="true" />
 	</Target>
-	<!--Whim.TreeLayout-->
+
+	<!-- Whim.TreeLayout -->
 	<Target Name="CopyTreeLayoutAfterBuild" AfterTargets="Build;Publish">
 		<Copy SourceFiles="$(SolutionDir)src\Whim.TreeLayout\$(OutDir)Whim.TreeLayout.dll"
 			DestinationFolder="$(TargetDir)plugins\Whim.TreeLayout\" SkipUnchangedFiles="true" />
 	</Target>
-	<!--Whim.TreeLayout.Bar-->
+
+	<!-- Whim.TreeLayout.Bar -->
 	<Target Name="CopyTreeLayoutBarAfterBuild"
 		AfterTargets="Build;Publish;CopyBarAfterBuild;CopyTreeLayoutAfterBuild">
 		<ItemGroup>
@@ -245,7 +255,8 @@
 		<Copy SourceFiles="$(SolutionDir)src\Whim.TreeLayout.Bar\$(OutDir)Whim.TreeLayout.Bar.dll"
 			DestinationFolder="$(TargetDir)plugins\Whim.TreeLayout.Bar\" SkipUnchangedFiles="true" />
 	</Target>
-	<!--Whim.TreeLayout.CommandPalette-->
+
+	<!-- Whim.TreeLayout.CommandPalette -->
 	<Target Name="CopyTreeLayoutCommandPaletteAfterBuild"
 		AfterTargets="Build;Publish;CopyCommandPaletteAfterBuild;CopyTreeLayoutAfterBuild">
 		<Copy
@@ -253,6 +264,7 @@
 			DestinationFolder="$(TargetDir)plugins\Whim.TreeLayout.CommandPalette\"
 			SkipUnchangedFiles="true" />
 	</Target>
+
 	<!-- Whim.Updater -->
 	<Target Name="CopyUpdaterAfterBuild" AfterTargets="Build;Publish">
 		<ItemGroup>
@@ -265,15 +277,24 @@
 		<Copy SourceFiles="$(SolutionDir)src\Whim.Updater\$(OutDir)Whim.Updater.dll"
 			DestinationFolder="$(TargetDir)plugins\Whim.Updater\" SkipUnchangedFiles="true" />
 	</Target>
+
 	<!-- Whim.Yaml -->
 	<Target Name="CopyYamlAfterBuild" AfterTargets="Build;Publish">
 		<ItemGroup>
-			<YamlSourceFile Include="$(SolutionDir)\src\Whim.Yaml\schema.json" />
-			<YamlDestinationFile
-				Include="@(YamlSourceFile->'$(TargetDir)plugins\Whim.Yaml\%(Filename)%(Extension)')" />
+			<YamlSchemaSourceFile Include="$(SolutionDir)\src\Whim.Yaml\schema.json" />
+			<YamlSchemaDestinationFile
+				Include="@(YamlSchemaSourceFile->'$(TargetDir)plugins\Whim.Yaml\%(Filename)%(Extension)')" />
 		</ItemGroup>
-		<Copy SourceFiles="@(YamlSourceFile)" DestinationFiles="@(YamlDestinationFile)"
+		<ItemGroup>
+			<YamlSourceFile
+				Include="$(SolutionDir)\src\Whim.Yaml\$(OutDir)\Whim.Yaml\**\*" />
+			<YamlDestinationFile
+				Include="@(YamlSourceFile->'$(TargetDir)plugins\Whim.Yaml\%(RecursiveDir)%(Filename)%(Extension)')" />
+		</ItemGroup>
+		<Copy SourceFiles="@(YamlSchemaSourceFile)" DestinationFiles="@(YamlSchemaDestinationFile)"
 			SkipUnchangedFiles="true" />
+		<Copy SourceFiles="@(YamlSourceFile)"
+			DestinationFiles="@(YamlDestinationFile)" SkipUnchangedFiles="true" />
 		<Copy SourceFiles="$(SolutionDir)src\Whim.Yaml\$(OutDir)Whim.Yaml.dll"
 			DestinationFolder="$(TargetDir)plugins\Whim.Yaml\" SkipUnchangedFiles="true" />
 	</Target>
