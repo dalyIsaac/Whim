@@ -53,7 +53,7 @@ public class YamlLoader_LoadBarPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the bar plugin is loaded
 		Assert.True(result);
@@ -94,7 +94,7 @@ public class YamlLoader_LoadBarPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the bar plugin is not loaded
 		Assert.True(result);
@@ -135,7 +135,7 @@ public class YamlLoader_LoadBarPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is false, and the bar plugin is not loaded
 		Assert.True(result);
@@ -176,7 +176,7 @@ public class YamlLoader_LoadBarPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the bar plugin has the height
 		Assert.True(result);
@@ -225,7 +225,7 @@ public class YamlLoader_LoadBarPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the bar plugin has the active layout widget
 		Assert.True(result);
@@ -277,7 +277,7 @@ public class YamlLoader_LoadBarPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the bar plugin has the battery widget
 		Assert.True(result);
@@ -379,7 +379,7 @@ public class YamlLoader_LoadBarPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the bar plugin has the date and time widget
 		Assert.True(result);
@@ -481,7 +481,7 @@ public class YamlLoader_LoadBarPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the bar plugin has the focused window widget
 		Assert.True(result);
@@ -544,7 +544,7 @@ public class YamlLoader_LoadBarPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the bar plugin has the workspace widget
 		Assert.True(result);
@@ -596,7 +596,7 @@ public class YamlLoader_LoadBarPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the bar plugin has the tree layout engine widget
 		Assert.True(result);
@@ -676,7 +676,7 @@ public class YamlLoader_LoadBarPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the bar plugin has the multiple components
 		Assert.True(result);

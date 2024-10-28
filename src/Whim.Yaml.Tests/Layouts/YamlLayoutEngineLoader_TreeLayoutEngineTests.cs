@@ -154,7 +154,7 @@ public class YamlLayoutEngineLoader_TreeLayoutEngineTests
 		ctx.PluginManager.AddPlugin(Arg.Do<TreeLayoutPlugin>(t => plugin = t));
 
 		// When loading the layout engine
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the tree layout engine should be updated
 		Assert.True(result);

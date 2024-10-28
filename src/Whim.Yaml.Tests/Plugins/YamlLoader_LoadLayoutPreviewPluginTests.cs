@@ -64,7 +64,7 @@ public class YamlLoader_LoadLayoutPreviewPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, yaml, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the layout preview plugin is set
 		Assert.True(result);
@@ -105,7 +105,7 @@ public class YamlLoader_LoadLayoutPreviewPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the layout preview plugin is not set
 		Assert.True(result);

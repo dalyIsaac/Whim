@@ -173,7 +173,7 @@ public class YamlLoader_LoadFocusIndicatorPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the focus indicator configuration is loaded
 		Assert.True(result);
@@ -221,7 +221,7 @@ public class YamlLoader_LoadFocusIndicatorPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the focus indicator configuration is not loaded
 		Assert.True(result);

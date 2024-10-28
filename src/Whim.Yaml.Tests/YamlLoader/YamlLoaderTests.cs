@@ -39,7 +39,7 @@ public class YamlLoaderTests
 	{
 		// Given no config file exists
 		// When
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then
 		Assert.False(result);
@@ -55,7 +55,7 @@ public class YamlLoaderTests
 		ctx.FileManager.ReadAllText(Arg.Any<string>()).Returns(yaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and no keybinds are set
 		Assert.True(result);
@@ -71,7 +71,7 @@ public class YamlLoaderTests
 		ctx.FileManager.ReadAllText(Arg.Any<string>()).Returns(json);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and no keybinds are set
 		Assert.True(result);
@@ -87,7 +87,7 @@ public class YamlLoaderTests
 		ctx.FileManager.ReadAllText(Arg.Any<string>()).Returns(yaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is false, and no keybinds are set
 		Assert.False(result);

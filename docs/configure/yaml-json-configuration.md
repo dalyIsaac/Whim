@@ -27,7 +27,7 @@ using Whim.Yaml;
 void DoConfig(IContext context)
 {
     // Make sure to place this at the top of your config
-    YamlLoader.Load(context);
+    YamlLoader.Load(context, showErrorWindow: false);
 }
 ```
 
@@ -51,3 +51,7 @@ To use the schema in your JSON file, add the following line at the top of your f
   ...
 }
 ```
+
+## Errors
+
+Your YAML/JSON file will be validated against the schema. If there are any errors, your text editor should show them. Whim will also open a window with any errors.

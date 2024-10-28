@@ -69,7 +69,7 @@ public class YamlLoader_LoadWorkspacesTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the workspaces
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the workspaces are loaded
 		Assert.True(result);
@@ -141,7 +141,7 @@ public class YamlLoader_LoadWorkspacesTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the workspaces
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the workspaces are loaded
 		Assert.True(result);

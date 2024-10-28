@@ -55,7 +55,7 @@ public class YamlLoader_LoadKeybindsTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and keybinds are set
 		Assert.True(result);
@@ -157,7 +157,7 @@ public class YamlLoader_LoadKeybindsTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and no keybinds are set
 		Assert.True(result);
@@ -210,7 +210,7 @@ public class YamlLoader_LoadKeybindsTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and unifyKeyModifiers is set
 		Assert.True(result);

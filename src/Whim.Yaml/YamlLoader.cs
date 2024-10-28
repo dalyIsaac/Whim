@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Corvus.Json;
@@ -18,14 +19,20 @@ public static class YamlLoader
 	/// Loads and applies the declarative configuration from a JSON or YAML file.
 	/// </summary>
 	/// <param name="ctx">The <see cref="IContext"/> to operate on.</param>
+	/// <param name="showErrorWindow">Whether to show an error window if the configuration is invalid.</param>
 	/// <returns>
 	/// <see langword="true"/> if the configuration was parsed successfully; otherwise, <see langword="false"/>.
 	/// </returns>
-	public static bool Load(IContext ctx)
+	public static bool Load(IContext ctx, bool showErrorWindow = true)
 	{
 		if (Parse(ctx) is not Schema schema)
 		{
 			return false;
+		}
+
+		if (showErrorWindow)
+		{
+			ValidateConfig(ctx, schema);
 		}
 
 		UpdateWorkspaces(ctx, schema);
@@ -67,6 +74,40 @@ public static class YamlLoader
 
 		Logger.Debug("No configuration file found.");
 		return null;
+	}
+
+	private static void ValidateConfig(IContext ctx, Schema schema)
+	{
+		ValidationContext result = schema.Validate(ValidationContext.ValidContext, ValidationLevel.Detailed);
+		if (result.IsValid)
+		{
+			return;
+		}
+
+		StringBuilder sb = new();
+		int idx = 0;
+		foreach (ValidationResult error in result.Results)
+		{
+			if (error.Valid)
+			{
+				continue;
+			}
+
+			sb.AppendFormat("Error {0}:\n", idx + 1);
+			sb.AppendLine(error.Message);
+			sb.AppendFormat(
+				"Violated {0}\n",
+				error.Location.TryGetValue(out var location) ? location.ValidationLocation.ToString() : "unknown schema"
+			);
+			idx += 1;
+		}
+		string errors = sb.ToString();
+
+		Logger.Error("Configuration file is not valid.");
+		Logger.Error(errors);
+
+		using ErrorWindow window = new(ctx, errors);
+		window.Activate();
 	}
 
 	private static void UpdateWorkspaces(IContext ctx, Schema schema)
