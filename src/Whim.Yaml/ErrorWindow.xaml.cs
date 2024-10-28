@@ -28,15 +28,22 @@ public sealed partial class ErrorWindow : Microsoft.UI.Xaml.Window, IDisposable
 		_ctx = ctx;
 
 		Title = "Whim YAML/JSON error";
+
+		ctx.FilterManager.AddTitleFilter(this.Title);
 		Message = errors;
 
 		_backdropController = new(this, new WindowBackdropConfig(BackdropType.Mica, AlwaysShowBackdrop: false));
 	}
 
+	private void Ignore_Click(object sender, RoutedEventArgs e)
+	{
+		Close();
+	}
+
 	private void Quit_Click(object sender, RoutedEventArgs e)
 	{
 		Close();
-		_ctx.Exit(new ExitEventArgs() { Reason = ExitReason.Error, Message = Message });
+		_ctx.Exit(new ExitEventArgs() { Reason = ExitReason.User, Message = Message });
 	}
 
 	/// <inheritdoc/>

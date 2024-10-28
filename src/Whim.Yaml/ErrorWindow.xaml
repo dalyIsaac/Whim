@@ -13,24 +13,25 @@
 			VerticalAlignment="Center"
 			Spacing="12">
 
-			<TextBlock FontSize="20"
-					Text="Whim encountered errors while parsing the YAML/JSON config:"/>
+			<TextBlock FontSize="20" Text="Whim encountered and ignored errors with the YAML/JSON config:" />
 
 			<!--  Text block  -->
-			<StackPanel Padding="20"
-					CornerRadius="8">
+			<StackPanel Padding="20" CornerRadius="8">
 				<TextBlock
 					FontFamily="Cascadia Code"
 					IsTextSelectionEnabled="True"
 					LineHeight="20"
 					Text="{x:Bind Message}"
-					TextWrapping="WrapWholeWords"/>
+					TextWrapping="WrapWholeWords" />
 			</StackPanel>
 
 			<!--  Quit button  -->
-			<StackPanel HorizontalAlignment="Right">
-				<Button x:Name="Quit"
-						Click="Quit_Click">Quit</Button>
+			<StackPanel
+				HorizontalAlignment="Right"
+				Orientation="Horizontal"
+				Spacing="2">
+				<Button x:Name="Ignore" Click="Ignore_Click">Ignore</Button>
+				<Button x:Name="Quit" Click="Quit_Click">Quit</Button>
 			</StackPanel>
 
 		</StackPanel>

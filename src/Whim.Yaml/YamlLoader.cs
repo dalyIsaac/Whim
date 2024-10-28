@@ -81,9 +81,18 @@ public static class YamlLoader
 		}
 
 		StringBuilder sb = new();
+		int idx = 0;
 		foreach (ValidationResult error in result.Results)
 		{
+			if (error.Valid)
+			{
+				continue;
+			}
+
+			sb.AppendFormat("Error {0}:\n", idx + 1);
 			sb.AppendLine(error.Message);
+			sb.AppendFormat("Violated {0}\n", error.Location.TryGetValue(out var location) ? location.ValidationLocation.ToString() : "unknown schema");
+			idx += 1;
 		}
 		string errors = sb.ToString();
 
