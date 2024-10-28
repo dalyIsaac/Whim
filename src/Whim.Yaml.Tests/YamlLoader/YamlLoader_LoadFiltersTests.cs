@@ -60,7 +60,7 @@ public class YamlLoader_LoadFiltersTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the filters should be updated
 		Assert.True(result);
@@ -124,7 +124,7 @@ public class YamlLoader_LoadFiltersTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the filters should not be updated
 		Assert.True(result);

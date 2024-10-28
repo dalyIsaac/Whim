@@ -78,7 +78,7 @@ public class YamlLoader_LoadUpdaterPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the updater plugin is loaded
 		Assert.True(result);
@@ -168,7 +168,7 @@ public class YamlLoader_LoadUpdaterPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the updater plugin is not loaded
 		Assert.True(result);

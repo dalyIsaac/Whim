@@ -124,7 +124,7 @@ public class YamlPluginLoader_LoadCommandPalettePluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the command palette plugin is set
 		Assert.True(result);
@@ -333,7 +333,7 @@ public class YamlPluginLoader_LoadCommandPalettePluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the command palette plugin is set
 		Assert.True(result);
@@ -381,7 +381,7 @@ public class YamlPluginLoader_LoadCommandPalettePluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the command palette plugin is not set
 		Assert.True(result);
@@ -445,7 +445,7 @@ public class YamlPluginLoader_LoadCommandPalettePluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the command palette plugin is not set
 		Assert.True(result);
@@ -492,7 +492,7 @@ public class YamlPluginLoader_LoadCommandPalettePluginTests
 		ctx.PluginManager.LoadedPlugins.Returns([treeLayoutPlugin]);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the tree layout command palette plugin is set
 		Assert.True(result);

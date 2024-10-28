@@ -27,7 +27,7 @@ using Whim.Yaml;
 void DoConfig(IContext context)
 {
     // Make sure to place this at the top of your config
-    YamlLoader.Load(context);
+    YamlLoader.Load(context, showErrorWindow: false);
 }
 ```
 

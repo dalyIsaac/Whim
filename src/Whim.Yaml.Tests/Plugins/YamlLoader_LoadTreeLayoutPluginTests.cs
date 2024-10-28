@@ -60,7 +60,7 @@ public class YamlPluginLoader_TreeLayoutPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the tree layout plugin is set
 		Assert.True(result);
@@ -101,7 +101,7 @@ public class YamlPluginLoader_TreeLayoutPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the tree layout plugin is not set
 		Assert.True(result);
@@ -142,7 +142,7 @@ public class YamlPluginLoader_TreeLayoutPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, schema, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is false, and the tree layout plugin is not set
 		Assert.True(result);

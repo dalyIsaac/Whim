@@ -41,7 +41,7 @@ public class YamlLoader_LoadFloatingWindowPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the floating window plugin is added
 		Assert.True(result);
@@ -104,7 +104,7 @@ public class YamlLoader_LoadFloatingWindowPluginTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the result is true, and the floating window plugin is not added
 		Assert.True(result);

@@ -19,17 +19,21 @@ public static class YamlLoader
 	/// Loads and applies the declarative configuration from a JSON or YAML file.
 	/// </summary>
 	/// <param name="ctx">The <see cref="IContext"/> to operate on.</param>
+	/// <param name="showErrorWindow">Whether to show an error window if the configuration is invalid.</param>
 	/// <returns>
 	/// <see langword="true"/> if the configuration was parsed successfully; otherwise, <see langword="false"/>.
 	/// </returns>
-	public static bool Load(IContext ctx)
+	public static bool Load(IContext ctx, bool showErrorWindow = true)
 	{
 		if (Parse(ctx) is not Schema schema)
 		{
 			return false;
 		}
 
-		ValidateConfig(ctx, schema);
+		if (showErrorWindow)
+		{
+			ValidateConfig(ctx, schema);
+		}
 
 		UpdateWorkspaces(ctx, schema);
 

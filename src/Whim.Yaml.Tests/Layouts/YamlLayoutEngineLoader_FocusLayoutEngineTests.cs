@@ -96,7 +96,7 @@ public class YamlLoader_LoadFocusLayoutEngineTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the layout engine
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the layout engine is loaded
 		Assert.True(result);
@@ -143,7 +143,7 @@ public class YamlLoader_LoadFocusLayoutEngineTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the layout engine
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the layout engine is not loaded
 		Assert.True(result);

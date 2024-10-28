@@ -68,7 +68,7 @@ public class YamlLoader_LoadRoutersTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the routers are updated
 		Assert.True(result);
@@ -116,7 +116,7 @@ public class YamlLoader_LoadRoutersTests
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the routers are not updated
 		Assert.True(result);
@@ -147,7 +147,7 @@ public class YamlLoader_LoadRoutersTests
 		ctx.FileManager.ReadAllText(Arg.Any<string>()).Returns(config);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the router option is updated
 		Assert.True(result);
@@ -166,7 +166,7 @@ public class YamlLoader_LoadRoutersTests
 		ctx.FileManager.ReadAllText(Arg.Any<string>()).Returns(config);
 
 		// When loading the config
-		bool result = YamlLoader.Load(ctx);
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
 
 		// Then the router option is not updated
 		Assert.True(result);
