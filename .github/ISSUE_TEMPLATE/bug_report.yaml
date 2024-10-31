@@ -41,6 +41,27 @@ body:
 
   - type: textarea
     attributes:
+      label: Config
+      description: A `whim.config.yaml` that can be used to reproduce the issue.
+      placeholder: |
+        # yaml-language-server: $schema=WHIM_PATH\plugins\Whim.Yaml\schema.json
+        workspaces:
+          entries:
+            - name: Workspace 1
+            - name: Workspace 2
+            - name: Workspace 3
+            - name: Workspace 4
+
+        layout_engines:
+          entries:
+            - type: tree
+              initial_direction: right
+      render: yaml
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
       label: Environment
       description: |
         examples:

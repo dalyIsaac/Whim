@@ -1,0 +1,110 @@
+# yaml-language-server: $schema=WHIM_PATH\plugins\Whim.Yaml\schema.json
+workspaces:
+  entries:
+    - name: Workspace 1
+    - name: Workspace 2
+    - name: Workspace 3
+    - name: Workspace 4
+
+layout_engines:
+  entries:
+    - type: tree
+      initial_direction: right
+
+    - type: slice
+      variant:
+        type: row
+
+    - type: slice
+      variant:
+        type: column
+
+    - type: slice
+      variant:
+        type: primary_stack
+
+    - type: slice
+      variant:
+        type: secondary_primary_stack
+
+    - type: slice
+      variant:
+        type: multi_column_stack
+        columns: [2, 1, 0]
+
+    - type: slice
+      variant:
+        type: secondary_primary_stack
+        primary_capacity: 1
+        secondary_capacity: 2
+
+    - type: focus
+      maximize: false
+
+    - type: floating
+
+keybinds:
+  entries:
+    - command: whim.core.focus_next_monitor
+      keybind: LCtrl+LShift+LAlt+K
+
+    - command: whim.core.focus_previous_monitor
+      keybind: LCtrl+LShift+LAlt+J
+
+  unify_key_modifiers: true
+
+filters:
+  entries: []
+
+routers:
+  routing_behavior: route_to_launched_workspace
+
+plugins:
+  bar:
+    left_components:
+      entries:
+        - type: workspace_widget
+
+    center_components:
+      entries:
+        - type: focused_window_widget
+          shorten_title: true
+
+    right_components:
+      entries:
+        - type: battery_widget
+        - type: active_layout_widget
+        - type: date_time_widget
+          format: HH:mm:ss, dd MMM yyyy
+        - type: tree_layout_widget
+
+  floating_window:
+    is_enabled: true
+
+  gaps:
+    is_enabled: true
+    outer_gap: 10
+    inner_gap: 10
+    default_outer_delta: 2
+    default_inner_delta: 2
+
+  command_palette:
+    is_enabled: true
+    max_height_percent: 40
+    max_width_pixels: 800
+    y_position_percent: 20
+
+  focus_indicator:
+    is_enabled: true
+    border_size: 2
+    is_fade_enabled: true
+    fade_timeout: 2
+    color: red
+
+  layout_preview:
+    is_enabled: true
+
+  updater:
+    is_enabled: true
+    release_channel: alpha
+    update_frequency: monthly
