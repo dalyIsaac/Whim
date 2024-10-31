@@ -1,7 +1,5 @@
 # Styling
 
-[!INCLUDE [Styling](../../_includes/core/styling.md)]
-
 ## Backdrops
 
 Different Whim windows can support custom backdrops. They will generally be associated with a `backdrop` key in the YAML/JSON configuration. The following backdrops are available:
@@ -24,3 +22,7 @@ Different Whim windows can support custom backdrops. They will generally be asso
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `type`                 | The type of backdrop to use.                                                                                                                                                 |
 | `always_show_backdrop` | By default, WinUI will disable the backdrop when the window loses focus. Whim overrides this setting. Set this to false to disable the backdrop when the window loses focus. |
+
+## XAML Styling
+
+Loading XAML styles via YAML/JSON is being tracked in [this GitHub issue](https://github.com/dalyIsaac/Whim/issues/1064). In the meantime, it is available [via C# scripting](../../script/core/styling.md).

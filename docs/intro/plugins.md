@@ -1,12 +1,8 @@
 # Plugins
 
-Whim is build around plugins. Plugins are referenced using `#r` and `using` statements at the top of the config file. Each plugin generally has a `Config` class, and a `Plugin` class, and needs to be added to the <xref:Whim.IPluginManager>. For example:
+Whim is built around plugins. They provide additional functionality to Whim, such as a bar, floating windows, or a command palette.
 
-```csharp
-BarConfig barConfig = new(leftComponents, centerComponents, rightComponents);
-BarPlugin barPlugin = new(context, barConfig);
-context.PluginManager.AddPlugin(barPlugin);
-```
+Plugins can be customized via both YAML/JSON configuration and C# scripting. Plugins are loaded as required by Whim based on the configuration. If a plugin was loaded by the YAML/JSON configuration, it will be loaded automatically and does not need to be added to the `PluginManager` - see [YAML/JSON and C# Integration](../script/snippets.md#yamljson-and-c-integration).
 
 | Plugin                      | TL;DR                                                                                                       | YAML JSON Docs                                                                            | Docs                                                                                |
 | --------------------------- | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
@@ -20,4 +16,4 @@ context.PluginManager.AddPlugin(barPlugin);
 | Tree Layout                 | Plugin for the [`TreeLayoutEngine`](../configure/core/layout-engines.md#tree)                               | [`plugins.tree_layout`](../configure/plugins/tree-layout.md)                              | [`Whim.TreeLayout`](../script/plugins/tree-layout.md)                               |
 | Tree Layout Bar             | Provides a widget for the [Bar](../configure/plugins/bar.md), for the `TreeLayoutEngine`                    | [`plugins.bar`](../configure/plugins/bar.md#tree-layout-widget)                           | [`Whim.TreeLayoutBar`](../script/plugins/tree-layout-bar.md)                        |
 | Tree Layout Command Palette | Adds `TreeLayoutEngine`-specific commands to the [Command Palette](../configure/plugins/command-palette.md) | [`plugins.command_palette`](../configure/plugins/command-palette.md#tree-layout-commands) | [`Whim.TreeLayoutCommandPalette`](../script/plugins/tree-layout-command-palette.md) |
-| Updater                     | Plugin to automatically update Whim                                                                         | [`plugins.updater`](../configure/plugins/updater.md)                                      | [`Whim.Updater`](../script/plugins/updater.md)                                      |
+| Updater                     | Plugin to automatically check for updates                                                                   | [`plugins.updater`](../configure/plugins/updater.md)                                      | [`Whim.Updater`](../script/plugins/updater.md)                                      |

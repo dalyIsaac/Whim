@@ -1,8 +1,6 @@
 # YAML/JSON Configuration
 
-Whim can be configured using YAML or JSON. The configuration file should be named `whim.config.yaml` or `whim.config.json` and should be placed in the root of your `.whim` directory.
-
-Configuration options can be found in the pages to the left.
+Whim can be configured using YAML. During installation, Whim will install [this template](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Template/whim.config.yaml) to your `.whim` directory. JSON is also supported, in the form of [`whim.config.json`](https://github.com/dalyIsaac/Whim/blob/main/src/Whim/Template/whim.config.csx).
 
 Integration with C# scripting is also possible - see [YAML/JSON and C# integration](../script/snippets.md#yamljson-and-c-integration).
 
