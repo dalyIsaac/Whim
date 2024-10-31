@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Template\whim.config.csx" />
+    <EmbeddedResource Include="Template\whim.config.yaml" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Resources\Defaults.xaml">
