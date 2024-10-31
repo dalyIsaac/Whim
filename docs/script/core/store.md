@@ -39,7 +39,7 @@ context.CommandManager.Add(
 );
 ```
 
-For examples on how to interact with the store, see the [Snippets](snippets.md) page.
+For examples on how to interact with the store, see the [Snippets](../snippets.md) page.
 
 ## Handles and IDs
 

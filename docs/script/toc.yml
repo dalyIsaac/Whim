@@ -1,5 +1,6 @@
 items:
   - href: scripting.md
+  - href: snippets.md
 
   - name: Core
   - href: core/store.md
@@ -12,7 +13,6 @@ items:
   - href: core/filtering.md
   - href: core/styling.md
   - href: core/logging.md
-  - href: core/snippets.md
 
   - name: Plugins
   - href: plugins/overview.md

@@ -1,4 +1,4 @@
-## Tree Layout Commands <!-- markdownlint-disable-line MD041 -->
+## Tree Layout Commands<!-- markdownlint-disable-line MD041 -->
 
 | Identifier                                       | Title                                                                               | Keybind            |
 | ------------------------------------------------ | ----------------------------------------------------------------------------------- | ------------------ |

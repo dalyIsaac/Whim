@@ -1,57 +1,38 @@
-# YAML/JSON Configuration (WIP)
+# YAML/JSON Configuration
 
-Whim is in the process of adding YAML configuration support - this is being tracked in [#1009](https://github.com/dalyIsaac/Whim/issues/1009).
+Whim can be configured using YAML or JSON. The configuration file should be named `whim.config.yaml` or `whim.config.json` and should be placed in the root of your `.whim` directory.
 
-This has been implemented in the `Whim.Yaml` plugin, and may have breaking changes for the lifetime of the GitHub issue.
+Configuration options can be found in the pages to the left.
 
-In the meantime, Whim can be configured fully in C# - see [Scripting](../script/scripting.md) for more information.
-
-## Setup
-
-The YAML/JSON configuration is not yet included in the default Whim configuration.
-
-Add to your `whim.config.csx`:
-
-```csharp
-// ...previous references
-
-// NOTE: Replace WHIM_PATH with the path to your Whim installation
-#r "WHIM_PATH\plugins\Whim.Yaml\Whim.Yaml.dll"
-
-using System;
-// ...usings...
-using Whim.Yaml;
-
-// ...
-
-void DoConfig(IContext context)
-{
-    // Make sure to place this at the top of your config
-    YamlLoader.Load(context, showErrorWindow: false);
-}
-```
-
-Whim will then look for a `whim.config.yaml` or `whim.config.json` file in the root of your `.whim` directory. If it finds one, it will use that file to configure Whim.
+Integration with C# scripting is also possible - see [YAML/JSON and C# integration](../script/snippets.md#yamljson-and-c-integration).
 
 ## Schema
 
-The schema for the YAML and JSON configuration is available [here](https://raw.githubusercontent.com/dalyIsaac/Whim/main/src/Whim.Yaml/schema.json). This schema will eventually be bundled with the Whim installation.
+Whim's YAML and JSON configuration is validated using a JSON schema, which provides autocompletion and validation in supported text editors, like Visual Studio Code.
+
+![Screenshot of YAML validation in Visual Studio Code](../images/yaml-validation.png)
+
+The schema can be found in your Whim installation at `WHIM_PATH/plugins/Whim.Yaml/schema.json` (replace `WHIM_PATH` with the path to your Whim installation). The latest schema is available [here](https://raw.githubusercontent.com/dalyIsaac/Whim/main/src/Whim.Yaml/schema.json).
 
 To use the schema in your YAML file, add the following line at the top of your file:
 
 ```yaml
-# yaml-language-server: $schema=https://raw.githubusercontent.com/dalyIsaac/Whim/main/src/Whim.Yaml/schema.json
+# yaml-language-server: $schema=WHIM_PATH/plugins/Whim.Yaml/schema.json
 ```
 
 To use the schema in your JSON file, add the following line at the top of your file:
 
 ```json
 {
-  "$schema": "https://raw.githubusercontent.com/dalyIsaac/Whim/main/src/Whim.Yaml/schema.json",
+  "$schema": "WHIM_PATH/plugins/Whim.Yaml/schema.json",
   ...
 }
 ```
 
 ## Errors
 
-Your YAML/JSON file will be validated against the schema. If there are any errors, your text editor should show them. Whim will also open a window with any errors.
+Whim will make a best effort to load the parts of the configuration that are valid, even if there are errors in other parts of the configuration. Errors will be shown in:
+
+- your text editor (provided your text editor supports YAML/JSON validation)
+- a window that opens when Whim starts
+- log files in your `.whim` directory

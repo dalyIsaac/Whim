@@ -4,6 +4,39 @@ Potentially useful code snippets.
 
 Each of these snippets (apart from the `using` statements) should be added inside the `DoConfig` function in your `whim.config.csx` file.
 
+## YAML/JSON and C# integration
+
+Add to your `whim.config.csx`:
+
+```csharp
+// ...previous references
+
+// NOTE: Replace WHIM_PATH with the path to your Whim installation
+#r "WHIM_PATH\plugins\Whim.Yaml\Whim.Yaml.dll"
+
+using System;
+using System.Linq;
+// ...usings...
+using Whim.Yaml;
+
+// ...
+
+void DoConfig(IContext context)
+{
+    // Make sure to place this at the top of your config
+    YamlLoader.Load(context, showErrorWindow: false);
+
+    // Get the loaded plugins.
+    CommandPalettePlugin commandPalettePlugin = (CommandPalettePlugin)context.PluginManager.LoadedPlugins.First(p => p.Name == "whim.command_palette");
+    TreeLayoutPlugin treeLayoutPlugin = (TreeLayoutPlugin)context.PluginManager.LoadedPlugins.First(p => p.Name == "whim.tree_layout");
+    FloatingWindowPlugin floatingWindowPlugin = (FloatingWindowPlugin)context.PluginManager.LoadedPlugins.First(p => p.Name == "whim.floating_window");
+}
+```
+
+Whim will then look for a `whim.config.yaml` or `whim.config.json` file in the root of your `.whim` directory. If it finds one, it will use that file to configure Whim.
+
+The names of each plugin can be found in the API documentation. For example, `whim.command_palette` is the <xref:Whim.CommandPalette.CommandPalettePlugin.Name> of the Command Palette plugin.
+
 ## Minimize a specific window
 
 ```csharp
