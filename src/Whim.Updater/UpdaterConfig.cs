@@ -1,6 +1,3 @@
-using System;
-using System.Timers;
-
 namespace Whim.Updater;
 
 /// <summary>
@@ -32,44 +29,22 @@ public enum UpdateFrequency
 	/// <summary>
 	/// Check for updates daily.
 	/// </summary>
-	Daily,
+	Daily = 1,
 
 	/// <summary>
 	/// Check for updates weekly.
 	/// </summary>
-	Weekly,
+	Weekly = 7,
 
 	/// <summary>
 	/// Check for updates monthly.
 	/// </summary>
-	Monthly,
+	Monthly = 28,
 
 	/// <summary>
 	/// Never check for updates.
 	/// </summary>
-	Never,
-}
-
-/// <summary>
-/// Extensions for <see cref="UpdateFrequency"/>.
-/// </summary>
-public static class UpdateFrequencyExtensions
-{
-	/// <summary>
-	/// Gets a <see cref="double"/> value <see cref="Timer.Interval"/> for the given
-	/// <see cref="UpdateFrequency"/>.
-	/// </summary>
-	/// <param name="frequency"></param>
-	/// <returns></returns>
-	public static double? GetInterval(this UpdateFrequency frequency) =>
-		frequency switch
-		{
-			UpdateFrequency.Daily => TimeSpan.FromDays(1).TotalMilliseconds,
-			UpdateFrequency.Weekly => TimeSpan.FromDays(7).TotalMilliseconds,
-			UpdateFrequency.Monthly => TimeSpan.FromDays(30).TotalMilliseconds,
-			UpdateFrequency.Never => null,
-			_ => null,
-		};
+	Never = 0,
 }
 
 /// <summary>

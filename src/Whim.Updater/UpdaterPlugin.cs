@@ -62,14 +62,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 		Config = config;
 		_releaseManager = new ReleaseManager(context, this);
 
-		if (config.UpdateFrequency.GetInterval() is double interval)
-		{
-			_timer.Interval = interval;
-		}
-		else
-		{
-			_timer.Enabled = false;
-		}
+		_timer.Interval = TimeSpan.FromDays(1).TotalMilliseconds;
 	}
 
 	/// <inheritdoc />
@@ -94,16 +87,25 @@ public class UpdaterPlugin : IUpdaterPlugin
 	/// <inheritdoc />
 	public void PostInitialize()
 	{
-#if !DEBUG
-		CheckForUpdates(false).ConfigureAwait(true);
-#endif
-
 		_timer.Elapsed += Timer_Elapsed;
 		_timer.Start();
 	}
 
-	private async void Timer_Elapsed(object? sender, ElapsedEventArgs e) =>
-		await CheckForUpdates().ConfigureAwait(true);
+	private async void Timer_Elapsed(object? sender, ElapsedEventArgs e)
+	{
+		int updateFrequency = (int)Config.UpdateFrequency;
+		if (updateFrequency <= 0)
+		{
+			Logger.Error($"Invalid update frequency: {Config.UpdateFrequency}");
+			return;
+		}
+
+		DateTime nextCheckDate = LastCheckedForUpdates?.AddDays(updateFrequency) ?? DateTime.Today;
+		if (DateTime.Today >= nextCheckDate)
+		{
+			await CheckForUpdates().ConfigureAwait(true);
+		}
+	}
 
 	/// <inheritdoc />
 	public void SkipRelease(string? tagName = null)
