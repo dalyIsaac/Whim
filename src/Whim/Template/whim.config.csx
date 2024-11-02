@@ -17,6 +17,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.UI;
+using Microsoft.UI.Xaml.Markup;
+using Microsoft.UI.Xaml.Media;
 using Whim;
 using Whim.Bar;
 using Whim.CommandPalette;
@@ -31,9 +34,6 @@ using Whim.TreeLayout.CommandPalette;
 using Whim.Updater;
 using Whim.Yaml;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
-using Microsoft.UI;
-using Microsoft.UI.Xaml.Markup;
-using Microsoft.UI.Xaml.Media;
 
 /// <summary>
 /// This is what's called when Whim is loaded.
