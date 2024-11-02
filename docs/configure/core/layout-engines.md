@@ -167,9 +167,12 @@ Commands for the `tree` layout engine can be found on the [Tree Layout](../plugi
 
 ## `FloatingLayoutEngine`
 
-> [!WARNING]
-> This is not yet supported by the YAML/JSON configuration.
-
 <xref:Whim.FloatingWindow.FloatingLayoutEngine> is a layout that has all windows being free-floating. To have specific windows float within a different layout, see the [Floating Window Plugin](../plugins/floating-window.md).
 
 ![FloatingLayoutEngine demo](../../images/floating-layout-demo.gif)
+
+```yaml
+layout_engines:
+  entries:
+    - type: floating
+```
