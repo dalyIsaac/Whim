@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.UI;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Markup;
 using Whim;
 using Whim.Bar;
 using Whim.CommandPalette;
