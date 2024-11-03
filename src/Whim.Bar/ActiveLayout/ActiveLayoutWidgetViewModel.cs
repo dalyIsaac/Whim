@@ -1,5 +1,5 @@
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
@@ -22,28 +22,50 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 	/// <summary>
 	/// The name of the active layout engine.
 	/// </summary>
-	public ObservableCollection<string> LayoutEngines =>
-		new(
-			_context
-				.Butler.Pantry.GetWorkspaceForMonitor(Monitor)
-				?.LayoutEngines.Select(layoutEngine => layoutEngine.Name)
-				.ToArray() ?? []
-		);
+	public List<string> LayoutEngines = [];
 
 	/// <summary>
 	/// The name of the active layout engine.
 	/// </summary>
 	public string ActiveLayoutEngine
 	{
-		get => _context.Butler.Pantry.GetWorkspaceForMonitor(Monitor)?.ActiveLayoutEngine.Name ?? "";
-		set
+		get
 		{
+			if (!_context.Store.Pick(Pickers.PickWorkspaceByMonitor(Monitor.Handle)).TryGet(out IWorkspace workspace))
+			{
+				return "";
+			}
+
 			if (
-				_context.Butler.Pantry.GetWorkspaceForMonitor(Monitor) is IWorkspace workspace
-				&& workspace.ActiveLayoutEngine.Name != value
-				&& workspace.TrySetLayoutEngineFromName(value)
+				!_context
+					.Store.Pick(Pickers.PickActiveLayoutEngine(workspace.Id))
+					.TryGet(out ILayoutEngine layoutEngine)
 			)
 			{
+				return "";
+			}
+
+			return layoutEngine.Name;
+		}
+		set
+		{
+			if (!_context.Store.Pick(Pickers.PickWorkspaceByMonitor(Monitor.Handle)).TryGet(out IWorkspace workspace))
+			{
+				return;
+			}
+
+			if (
+				!_context
+					.Store.Pick(Pickers.PickActiveLayoutEngine(workspace.Id))
+					.TryGet(out ILayoutEngine layoutEngine)
+			)
+			{
+				return;
+			}
+
+			if (layoutEngine.Name != value)
+			{
+				_context.Store.Dispatch(new SetLayoutEngineFromNameTransform(workspace.Id, value));
 				OnPropertyChanged(nameof(ActiveLayoutEngine));
 			}
 		}
@@ -51,6 +73,9 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 
 	private bool _isDropDownOpen;
 
+	/// <summary>
+	/// Whether the combobox's drop down is open.
+	/// </summary>
 	public bool IsDropDownOpen
 	{
 		get => _isDropDownOpen;
@@ -62,7 +87,7 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 	}
 
 	/// <summary>
-	///
+	/// Creates a new instance of the <see cref="ActiveLayoutWidgetViewModel"/> class.
 	/// </summary>
 	/// <param name="context"></param>
 	/// <param name="monitor"></param>
@@ -71,24 +96,34 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 		_context = context;
 		Monitor = monitor;
 
-		// TODO: Update
-		_context.WorkspaceManager.ActiveLayoutEngineChanged += WorkspaceManager_ActiveLayoutEngineChanged;
-		_context.Butler.MonitorWorkspaceChanged += Butler_MonitorWorkspaceChanged;
+		_context.Store.WorkspaceEvents.ActiveLayoutEngineChanged += Store_ActiveLayoutEngineChanged;
+		_context.Store.MapEvents.MonitorWorkspaceChanged += Store_MonitorWorkspaceChanged;
 		_context.Store.WindowEvents.WindowFocused += WindowEvents_WindowFocused;
 	}
 
-	private void WorkspaceManager_ActiveLayoutEngineChanged(object? sender, EventArgs e) =>
-		OnPropertyChanged(nameof(ActiveLayoutEngine));
-
-	private void Butler_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e)
+	private void Store_ActiveLayoutEngineChanged(object? sender, EventArgs e)
 	{
-		if (e.Monitor.Handle == Monitor.Handle)
-		{
-			OnPropertyChanged(nameof(ActiveLayoutEngine));
-		}
+		OnPropertyChanged(nameof(ActiveLayoutEngine));
 	}
 
-	private void WindowEvents_WindowFocused(object? sender, WindowFocusedEventArgs e) => IsDropDownOpen = false;
+	private void Store_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e)
+	{
+		if (e.Monitor.Handle != Monitor.Handle)
+		{
+			return;
+		}
+
+		LayoutEngines.Clear();
+		LayoutEngines.AddRange(e.CurrentWorkspace.LayoutEngines.Select(engine => engine.Name));
+
+		OnPropertyChanged(nameof(LayoutEngines));
+		OnPropertyChanged(nameof(ActiveLayoutEngine));
+	}
+
+	private void WindowEvents_WindowFocused(object? sender, WindowFocusedEventArgs e)
+	{
+		IsDropDownOpen = false;
+	}
 
 	/// <inheritdoc/>
 	public event PropertyChangedEventHandler? PropertyChanged;
@@ -105,8 +140,9 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_context.WorkspaceManager.ActiveLayoutEngineChanged -= WorkspaceManager_ActiveLayoutEngineChanged;
-				_context.Butler.MonitorWorkspaceChanged -= Butler_MonitorWorkspaceChanged;
+				_context.Store.WorkspaceEvents.ActiveLayoutEngineChanged -= Store_ActiveLayoutEngineChanged;
+				_context.Store.MapEvents.MonitorWorkspaceChanged -= Store_MonitorWorkspaceChanged;
+				_context.Store.WindowEvents.WindowFocused -= WindowEvents_WindowFocused;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

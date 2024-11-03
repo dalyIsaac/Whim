@@ -8,7 +8,7 @@
 	d:DesignWidth="800"
 	mc:Ignorable="d">
 	<ComboBox
-		ItemsSource="{x:Bind Path=ViewModel.LayoutEngines}"
+		ItemsSource="{x:Bind Path=ViewModel.LayoutEngines, Mode=OneWay}"
 		SelectedItem="{x:Bind Path=ViewModel.ActiveLayoutEngine, Mode=TwoWay}"
 		Style="{StaticResource bar:active_layout:combo_box}"
 		IsDropDownOpen="{x:Bind Path=ViewModel.IsDropDownOpen, Mode=TwoWay}"
