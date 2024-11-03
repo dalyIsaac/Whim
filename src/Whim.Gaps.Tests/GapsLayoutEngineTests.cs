@@ -1,6 +1,7 @@
 using FluentAssertions;
 using NSubstitute;
 using Whim.FloatingWindow;
+using Whim.SliceLayout;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -99,11 +100,18 @@ public class GapsLayoutEngineTests
 	}
 
 	[Theory]
-	[MemberData(nameof(DoLayout_Data))]
-	public void DoLayout(GapsConfig gapsConfig, IWindow[] windows, int scale, IWindowState[] expectedWindowStates)
+	[MemberAutoSubstituteData(nameof(DoLayout_Data))]
+	public void DoLayout(
+		GapsConfig gapsConfig,
+		IWindow[] windows,
+		int scale,
+		IWindowState[] expectedWindowStates,
+		ISliceLayoutPlugin sliceLayoutPlugin,
+		IContext ctx
+	)
 	{
 		// Given
-		ILayoutEngine innerLayoutEngine = new ColumnLayoutEngine(_identity);
+		ILayoutEngine innerLayoutEngine = SliceLayouts.CreateRowLayout(ctx, sliceLayoutPlugin, _identity);
 
 		foreach (IWindow w in windows)
 		{

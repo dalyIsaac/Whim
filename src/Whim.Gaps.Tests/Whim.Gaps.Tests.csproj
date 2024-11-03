@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Whim.Gaps\Whim.Gaps.csproj" />
+    <ProjectReference Include="..\Whim.SliceLayout\Whim.SliceLayout.csproj" />
     <ProjectReference Include="..\Whim.TestUtils\Whim.TestUtils.csproj" />
   </ItemGroup>
 </Project>
