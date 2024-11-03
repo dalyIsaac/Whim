@@ -43,8 +43,19 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 	/// <inheritdoc />
 	public override IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor)
 	{
+		// If the inner layout engine is a floating layout engine, then we don't apply gaps.
+		if (InnerLayoutEngine.GetLayoutEngine<FloatingLayoutEngine>() is not null)
+		{
+			foreach (IWindowState windowState in InnerLayoutEngine.DoLayout(rectangle, monitor))
+			{
+				yield return windowState;
+			}
+			yield break;
+		}
+
+		// If the inner layout engine is a proxy floating layout engine, then we apply gaps for the non-floating windows.
 		int nonProxiedCount = 0;
-		if (InnerLayoutEngine is ProxyFloatingLayoutEngine proxy)
+		if (InnerLayoutEngine.GetLayoutEngine<ProxyFloatingLayoutEngine>() is ProxyFloatingLayoutEngine proxy)
 		{
 			nonProxiedCount = proxy.FloatingWindowRects.Count + proxy.MinimizedWindowRects.Count;
 
@@ -52,7 +63,7 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 			// The InnerLayoutEngine will use the proxied rectangle for the remaining windows.
 			// This is brittle and relies on the order of the windows in the ProxyFloatingLayoutEngine.
 
-			IEnumerable<IWindowState> windows = InnerLayoutEngine.DoLayout(rectangle, monitor);
+			IEnumerable<IWindowState> windows = proxy.DoLayout(rectangle, monitor);
 			using IEnumerator<IWindowState> enumerator = windows.GetEnumerator();
 
 			for (int i = 0; i < nonProxiedCount; i++)
