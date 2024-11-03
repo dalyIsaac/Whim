@@ -207,6 +207,7 @@ public class TreeLayoutPluginTests
 	public void SetAddWindowDirection_DirectionNotSet(IContext ctx, IMonitor monitor, IWorkspace workspace)
 	{
 		// Given
+		NativeManagerUtils.SetupTryEnqueue(ctx);
 		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
 
 		TreeLayoutPlugin plugin = new(ctx);
@@ -236,6 +237,7 @@ public class TreeLayoutPluginTests
 	public void SetAddWindowDirection_DirectionAlreadySet(IContext ctx, IMonitor monitor, IWorkspace workspace)
 	{
 		// Given
+		NativeManagerUtils.SetupTryEnqueue(ctx);
 		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
 
 		TreeLayoutPlugin plugin = new(ctx);
