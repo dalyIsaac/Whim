@@ -2,11 +2,12 @@
 
 ## Available layout engines
 
-| Engine                                    | TL;DR                                                                    |
-| ----------------------------------------- | ------------------------------------------------------------------------ |
-| [`FocusLayoutEngine`](#focuslayoutengine) | One window at a time                                                     |
-| [`SliceLayoutEngine`](#slicelayoutengine) | `Awesome`/`dwm`-style dynamic tiling (primary/stack, multi-column, etc.) |
-| [`TreeLayoutEngine`](#treelayoutengine)   | `i3`-style dynamic tiling (arbitrary grids)                              |
+| Engine                                          | TL;DR                                                                    |
+| ----------------------------------------------- | ------------------------------------------------------------------------ |
+| [`FocusLayoutEngine`](#focuslayoutengine)       | One window at a time                                                     |
+| [`SliceLayoutEngine`](#slicelayoutengine)       | `Awesome`/`dwm`-style dynamic tiling (primary/stack, multi-column, etc.) |
+| [`TreeLayoutEngine`](#treelayoutengine)         | `i3`-style dynamic tiling (arbitrary grids)                              |
+| [`FloatingLayoutEngine`](#floatinglayoutengine) | All windows are free-floating                                            |
 
 ### `FocusLayoutEngine`
 
@@ -18,7 +19,7 @@ To reorder windows, calling <xref:Whim.ILayoutEngine.SwapWindowInDirection(Whim.
 
 Windows which are not focused are minimized to the taskbar.
 
-![FocusLayoutEngine demo](../../images/focus-layout-demo.gif)
+![FocusLayoutEngine demo](../../images/layout-engines/focus.gif)
 
 ### `SliceLayoutEngine`
 
@@ -38,7 +39,9 @@ Internally, `SliceLayoutEngine` stores a list of <xref:Whim.IWindow>s. Each `IAr
 The <xref:Whim.SliceLayout.SliceLayouts> static class contains methods to create a few common layouts:
 
 - primary/stack (master/stack)
-- multi-column layout
+- column layout
+- row layout
+- multi-column layout, with arbitrary numbers of windows in each column
 - three-column layout, with the middle column being the primary
 
 ```csharp
@@ -83,8 +86,6 @@ SliceLayoutPlugin sliceLayoutPlugin = new(context);
 context.PluginManager.AddPlugin(sliceLayoutPlugin);
 ```
 
-![SliceLayoutEngine demo](../../images/slice-layout-demo.gif)
-
 ### `TreeLayoutEngine`
 
 <xref:Whim.TreeLayout.TreeLayoutEngine> is a layout that allows users to create arbitrary grid layouts, similar to `i3`. Unlike [`SliceLayoutEngine`](#slicelayoutengine), windows can can be added in any location at runtime.
@@ -96,10 +97,10 @@ TreeLayoutPlugin treeLayoutPlugin = new(context);
 context.PluginManager.AddPlugin(treeLayoutPlugin);
 ```
 
-![TreeLayoutEngine demo](../../images/tree-layout-demo.gif)
+![TreeLayoutEngine demo](../../images/layout-engines/tree.gif)
 
 ### `FloatingLayoutEngine`
 
 <xref:Whim.FloatingWindow.FloatingLayoutEngine> is a layout that has all windows being free-floating. To have specific windows float within a different layout, see the [Floating Window Plugin](../plugins/floating-window.md).
 
-![FloatingLayoutEngine demo](../../images/floating-layout-demo.gif)
+![FloatingLayoutEngine demo](../../images/layout-engines/floating.gif)

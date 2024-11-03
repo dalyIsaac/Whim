@@ -2,7 +2,19 @@
 
 Whim uses the [Microsoft.CodeAnalysis.CSharp](https://learn.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.csharp) scripting engine to run your `.whim/whim.config.csx` file.
 
-Various snippets can be found on the [Snippets](core/snippets.md) page.
+Various snippets can be found on the [Snippets](snippets.md) page.
+
+## Tooling
+
+If you plan to customize your Whim configuration using C#, it's recommended to install dedicated C# tooling.
+
+To get code completion, it's recommended to install the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) for Windows. Whim will install a self-contained .NET 8 instance as part of the installation process, but installing the SDK will give you access to the full .NET ecosystem.
+
+The following editors can be used to write C# scripts:
+
+- [Visual Studio Code](https://code.visualstudio.com/download) with the [C# Dev Kit](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit) extension
+- [Visual Studio](https://visualstudio.microsoft.com/downloads/)
+- [Rider](https://www.jetbrains.com/rider/)
 
 ## Directives
 
@@ -41,7 +53,3 @@ return DoConfig;
 `DoConfig` is the entry point for your config. Prior to calling this function, Whim will set up the <xref:Whim.IContext> and its constituent parts. After `DoConfig` is called, Whim will initialize the various managers and plugins and start the main loop.
 
 The `DoConfig` function is returned at the end of the script so Whim can call it when it loads.
-
-### Examples
-
-The rest of this _Customize_ section documents popular configuration options. A few more elaborate examples can be found in [Snippets](core/snippets.md).

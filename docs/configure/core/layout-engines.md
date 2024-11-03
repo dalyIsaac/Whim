@@ -4,11 +4,12 @@ A "layout engine" or <xref:Whim.ILayoutEngine> in Whim is responsible for arrang
 
 ## Available layout engines
 
-| Engine            | TL;DR                                                                    |
-| ----------------- | ------------------------------------------------------------------------ |
-| [`focus`](#focus) | One window at a time                                                     |
-| [`slice`](#slice) | `Awesome`/`dwm`-style dynamic tiling (primary/stack, multi-column, etc.) |
-| [`tree`](#tree)   | `i3`-style dynamic tiling (arbitrary grids)                              |
+| Engine                  | TL;DR                                                                    |
+| ----------------------- | ------------------------------------------------------------------------ |
+| [`focus`](#focus)       | One window at a time                                                     |
+| [`slice`](#slice)       | `Awesome`/`dwm`-style dynamic tiling (primary/stack, multi-column, etc.) |
+| [`tree`](#tree)         | `i3`-style dynamic tiling (arbitrary grids)                              |
+| [`floating`](#floating) | All windows are free-floating                                            |
 
 ## Example Usage
 
@@ -66,7 +67,7 @@ To reorder windows, calling `whim.core.swap_window_in_direction.(left|right|up|d
 
 Windows which are not focused are minimized to the taskbar.
 
-![Focus demo](../../images/focus-layout-demo.gif)
+![Focus demo](../../images/layout-engines/focus.gif)
 
 ## `slice`
 
@@ -90,6 +91,8 @@ Commands for the `slice` layout engine can be found on the [Slice Layout](../plu
         variant: column
   ```
 
+![Column layout demo](../../images/layout-engines/column.gif)
+
 #### Row Layout
 
 - **Description**: Creates a row layout, where windows are stacked horizontally.
@@ -102,6 +105,8 @@ Commands for the `slice` layout engine can be found on the [Slice Layout](../plu
         variant: row
   ```
 
+![Row layout demo](../../images/layout-engines/row.gif)
+
 #### Primary Stack Layout
 
 - **Description**: Creates a primary stack layout, where the first window takes up half the screen, and the remaining windows are stacked vertically on the other half.
@@ -113,6 +118,8 @@ Commands for the `slice` layout engine can be found on the [Slice Layout](../plu
       - type: slice
         variant: primary_stack
   ```
+
+![Primary stack layout demo](../../images/layout-engines/primary-stack.gif)
 
 #### Multi-Column Stack Layout
 
@@ -128,6 +135,8 @@ Commands for the `slice` layout engine can be found on the [Slice Layout](../plu
         variant: multi_column_stack
         columns: [2, 1, 0]
   ```
+
+![Multi-column stack layout demo](../../images/layout-engines/multi-column-stack.gif)
 
 #### Secondary Primary Stack Layout
 
@@ -146,7 +155,7 @@ Commands for the `slice` layout engine can be found on the [Slice Layout](../plu
         secondary_capacity: 2
   ```
 
-![Slice demo](../../images/slice-layout-demo.gif)
+![Secondary primary stack demo](../../images/layout-engines/secondary-primary-stack.gif)
 
 ## `tree`
 
@@ -161,15 +170,18 @@ layout_engines:
       initial_direction: right
 ```
 
-![Tree demo](../../images/tree-layout-demo.gif)
+![Tree demo](../../images/layout-engines/tree.gif)
 
 Commands for the `tree` layout engine can be found on the [Tree Layout](../plugins/tree-layout.md#commands) plugin page.
 
-## `FloatingLayoutEngine`
+## `floating`
 
-> [!WARNING]
-> This is not yet supported by the YAML/JSON configuration.
+The `floating` layout engine is a layout that has all windows being free-floating. To have specific windows float within a different layout, see the [Floating Window Plugin](../plugins/floating-window.md).
 
-<xref:Whim.FloatingWindow.FloatingLayoutEngine> is a layout that has all windows being free-floating. To have specific windows float within a different layout, see the [Floating Window Plugin](../plugins/floating-window.md).
+```yaml
+layout_engines:
+  entries:
+    - type: floating
+```
 
-![FloatingLayoutEngine demo](../../images/floating-layout-demo.gif)
+![Floating layout demo](../../images/layout-engines/floating.gif)
