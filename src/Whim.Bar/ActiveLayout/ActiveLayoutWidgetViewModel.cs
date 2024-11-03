@@ -49,6 +49,18 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 		}
 	}
 
+	private bool _isDropDownOpen;
+
+	public bool IsDropDownOpen
+	{
+		get => _isDropDownOpen;
+		set
+		{
+			_isDropDownOpen = value;
+			OnPropertyChanged(nameof(IsDropDownOpen));
+		}
+	}
+
 	/// <summary>
 	///
 	/// </summary>
@@ -59,8 +71,10 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 		_context = context;
 		Monitor = monitor;
 
+		// TODO: Update
 		_context.WorkspaceManager.ActiveLayoutEngineChanged += WorkspaceManager_ActiveLayoutEngineChanged;
 		_context.Butler.MonitorWorkspaceChanged += Butler_MonitorWorkspaceChanged;
+		_context.Store.WindowEvents.WindowFocused += WindowEvents_WindowFocused;
 	}
 
 	private void WorkspaceManager_ActiveLayoutEngineChanged(object? sender, EventArgs e) =>
@@ -73,6 +87,8 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 			OnPropertyChanged(nameof(ActiveLayoutEngine));
 		}
 	}
+
+	private void WindowEvents_WindowFocused(object? sender, WindowFocusedEventArgs e) => IsDropDownOpen = false;
 
 	/// <inheritdoc/>
 	public event PropertyChangedEventHandler? PropertyChanged;

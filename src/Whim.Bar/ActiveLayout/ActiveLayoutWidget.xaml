@@ -10,5 +10,7 @@
 	<ComboBox
 		ItemsSource="{x:Bind Path=ViewModel.LayoutEngines}"
 		SelectedItem="{x:Bind Path=ViewModel.ActiveLayoutEngine, Mode=TwoWay}"
-		Style="{StaticResource bar:active_layout:combo_box}" />
+		Style="{StaticResource bar:active_layout:combo_box}"
+		IsDropDownOpen="{x:Bind Path=ViewModel.IsDropDownOpen, Mode=TwoWay}"
+		/>
 </UserControl>
