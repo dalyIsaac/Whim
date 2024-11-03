@@ -16,7 +16,7 @@ Whim lets you easily layout your windows in a way that suits your workflow via [
 
 > All the power to the user!
 
-![Whim demo](docs/images/demo.gif)
+![Whim demo](docs/images/readme.gif)
 
 ## Installation 🛠️
 
