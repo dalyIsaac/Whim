@@ -5,7 +5,6 @@ Write-Host "Generating source from schema..."
 $schemaPath = ".\src\Whim.Yaml\schema.json"
 $outputPath = ".\src\Whim.Yaml\Generated"
 $metadataPath = "$outputPath\metadata.json"
-$now = Get-Date
 
 $paths = @(
     ".\src\Whim.Yaml\Whim.Yaml.csproj",
@@ -35,12 +34,8 @@ function Test-Regenerate {
     $metadata = Get-Content $metadataPath | ConvertFrom-Json
     if ($metadata.yamlCodeHash -ne $yamlCodeHash) {
         Write-Host "YAML schema has changed since last generation, regenerating..."
-        return $true
-    }
-
-    $schemaLastWriteTime = (Get-Item $schemaPath).LastWriteTime
-    if ($metadata.lastWriteTime -lt $schemaLastWriteTime) {
-        Write-Host "Schema has changed since last generation time, regenerating..."
+        Write-Host "Old hash: $($metadata.yamlCodeHash)"
+        Write-Host "New hash: $yamlCodeHash"
         return $true
     }
 
@@ -62,5 +57,5 @@ dotnet tool run generatejsonschematypes `
 # If not in CI, write metadata file
 if ($LASTEXITCODE -eq 0 -and $null -eq $env:CI) {
     Write-Host "Writing metadata file..."
-    @{ yamlCodeHash = $yamlCodeHash; lastWriteTime = $now } | ConvertTo-Json | Set-Content $metadataPath
+    @{ yamlCodeHash = $yamlCodeHash } | ConvertTo-Json | Set-Content $metadataPath
 }
