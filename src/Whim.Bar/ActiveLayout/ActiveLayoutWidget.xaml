@@ -9,14 +9,8 @@
 	d:DesignWidth="800"
 	mc:Ignorable="d">
 
-	<StackPanel Orientation="Horizontal">
-		<ComboBox
-			IsDropDownOpen="{x:Bind Path=ViewModel.IsDropDownOpen, Mode=TwoWay}"
-			ItemsSource="{x:Bind Path=ViewModel.LayoutEngines, Mode=OneWay}"
-			SelectedItem="{x:Bind Path=ViewModel.ActiveLayoutEngine, Mode=TwoWay}"
-			Style="{StaticResource bar:active_layout:combo_box}" />
 
-		<bar:DropDown ItemsSource="{x:Bind Path=ViewModel.LayoutEngines, Mode=OneWay}" SelectedItem="{x:Bind Path=ViewModel.ActiveLayoutEngine, Mode=TwoWay}" />
-	</StackPanel>
+	<bar:DropDown ItemsSource="{x:Bind Path=ViewModel.LayoutEngines, Mode=OneWay}" SelectedItem="{x:Bind Path=ViewModel.ActiveLayoutEngine, Mode=TwoWay}" />
+
 
 </UserControl>

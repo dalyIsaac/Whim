@@ -1,21 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Whim;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 
 namespace Whim.Bar;
 
@@ -29,15 +16,7 @@ public sealed partial class DropDown : UserControl
 	public string SelectedItem
 	{
 		get => (string)GetValue(SelectedItemProperty);
-		set
-		{
-			SetValue(SelectedItemProperty, value);
-
-			foreach (RadioMenuFlyoutItem item in MenuFlyout.Items.Cast<RadioMenuFlyoutItem>())
-			{
-				item.IsChecked = item.Text == value;
-			}
-		}
+		set => SetValue(SelectedItemProperty, value);
 	}
 
 	public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(
@@ -60,20 +39,23 @@ public sealed partial class DropDown : UserControl
 		new PropertyMetadata(null)
 	);
 
-	// TODO: Indicate selection
 	public DropDown()
 	{
 		UIElementExtensions.InitializeComponent(this, "Whim.Bar", "DropDown");
-		RegisterPropertyChangedCallback(ItemsSourceProperty, OnItemsSourceChanged);
+
+		RegisterPropertyChangedCallback(ItemsSourceProperty, OnPropertyChanged);
+		RegisterPropertyChangedCallback(SelectedItemProperty, OnPropertyChanged);
+
+		// Lazy way to ensure that the selected item is always checked.
+		// Sometimes, on first load the selected item would not be checked.
+		GettingFocus += DropDown_GettingFocus;
 	}
 
-	private void OnItemsSourceChanged(DependencyObject d, DependencyProperty dp)
-	{
-		if (d is not DropDown || dp != ItemsSourceProperty)
-		{
-			return;
-		}
+	private void DropDown_GettingFocus(UIElement sender, GettingFocusEventArgs args) =>
+		OnPropertyChanged(this, ItemsSourceProperty);
 
+	private void OnPropertyChanged(DependencyObject sender, DependencyProperty dp)
+	{
 		if (ItemsSource is not IEnumerable<string> items)
 		{
 			return;

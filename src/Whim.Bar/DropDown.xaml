@@ -8,11 +8,14 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 
+	<!--  We need the grid surrounding the stackpanel to fix the FlowDirection set in a parent.  -->
 	<Grid>
-		<DropDownButton Content="{x:Bind Path=SelectedItem, Mode=TwoWay}">
-			<DropDownButton.Flyout>
-				<MenuFlyout x:Name="MenuFlyout" Placement="Bottom" />
-			</DropDownButton.Flyout>
-		</DropDownButton>
+		<StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
+			<DropDownButton HorizontalAlignment="Left" Content="{x:Bind Path=SelectedItem, Mode=TwoWay}">
+				<DropDownButton.Flyout>
+					<MenuFlyout x:Name="MenuFlyout" Placement="Bottom" />
+				</DropDownButton.Flyout>
+			</DropDownButton>
+		</StackPanel>
 	</Grid>
 </UserControl>
