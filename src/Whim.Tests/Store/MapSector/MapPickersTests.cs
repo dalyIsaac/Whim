@@ -284,7 +284,7 @@ public class MapPickersTests
 	{
 		// Given we have a monitor with an active layout engine
 		IMonitor monitor = CreateMonitor((HMONITOR)1);
-		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [ layoutEngine ] };
+		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [layoutEngine] };
 
 		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
 
