@@ -63,7 +63,3 @@ jobs:
 
       - name: Run docfx
         run: dotnet docfx .\docs\docfx.json
-        continue-on-error: true
-
-      - name: Run docfx (backup)
-        run: dotnet docfx .\docs\docfx.json
