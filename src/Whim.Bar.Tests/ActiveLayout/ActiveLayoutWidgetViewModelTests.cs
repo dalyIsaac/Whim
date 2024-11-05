@@ -107,7 +107,7 @@ public class ActiveLayoutWidgetViewModelTests
 		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
 
 		ActiveLayoutWidgetViewModel sut = CreateSut(ctx, monitor);
-		bool propertyChangedNames = new List<string>();
+		List<string> propertyChangedNames = [];
 		sut.PropertyChanged += (s, e) => propertyChangedNames.Add(e.PropertyName ?? string.Empty);
 
 		// WHEN
@@ -149,7 +149,7 @@ public class ActiveLayoutWidgetViewModelTests
 		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, differentMonitor, workspace);
 
 		ActiveLayoutWidgetViewModel sut = CreateSut(ctx, widgetMonitor);
-		bool propertyChangedNames = new List<string>();
+		List<string> propertyChangedNames = [];
 		sut.PropertyChanged += (s, e) => propertyChangedNames.Add(e.PropertyName ?? string.Empty);
 
 		// WHEN

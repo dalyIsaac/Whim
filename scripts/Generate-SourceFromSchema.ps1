@@ -6,11 +6,16 @@ $schemaPath = ".\src\Whim.Yaml\schema.json"
 $outputPath = ".\src\Whim.Yaml\Generated"
 $metadataPath = "$outputPath\metadata.json"
 
-$paths = @(
-    ".\src\Whim.Yaml\Whim.Yaml.csproj",
-    ".\src\Whim.Yaml\schema.json"
-)
-$yamlCodeHash = $paths | ForEach-Object { Get-FileHash $_ } | Out-String
+function Get-YamlCodeHash {
+    $paths = @(
+        ".\src\Whim.Yaml\Whim.Yaml.csproj",
+        ".\src\Whim.Yaml\schema.json"
+    )
+
+    return $paths | ForEach-Object { (Get-FileHash $_).Hash } | Join-String $_
+}
+
+$yamlCodeHash = Get-YamlCodeHash
 
 function Test-Regenerate {
     param (
@@ -57,5 +62,6 @@ dotnet tool run generatejsonschematypes `
 # If not in CI, write metadata file
 if ($LASTEXITCODE -eq 0 -and $null -eq $env:CI) {
     Write-Host "Writing metadata file..."
+    $yamlCodeHash = Get-YamlCodeHash
     @{ yamlCodeHash = $yamlCodeHash } | ConvertTo-Json | Set-Content $metadataPath
 }
