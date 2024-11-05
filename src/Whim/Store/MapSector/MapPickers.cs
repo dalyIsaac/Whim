@@ -150,4 +150,25 @@ public static partial class Pickers
 
 			return Result.FromException<IWorkspace>(new WhimException($"No adjacent workspace found to {workspaceId}"));
 		};
+
+	/// <summary>
+	/// Retrieves the active layout engine for the workspace on the given monitor.
+	/// </summary>
+	/// <param name="monitorHandle">
+	/// The handle of the monitor to get the active layout engine for.
+	/// </param>
+	/// <returns>
+	/// The active layout engine for the workspace on the monitor, otherwise <see cref="Result{T, TError}.Error"/>.
+	/// </returns>
+	public static PurePicker<Result<ILayoutEngine>> PickActiveLayoutEngineByMonitor(HMONITOR monitorHandle) =>
+		rootSector =>
+		{
+			Result<IWorkspace> workspaceResult = PickWorkspaceByMonitor(monitorHandle)(rootSector);
+			if (workspaceResult.TryGet(out IWorkspace workspace))
+			{
+				return Result.FromValue(WorkspaceUtils.GetActiveLayoutEngine(workspace));
+			}
+
+			return Result.FromException<ILayoutEngine>(workspaceResult.Error!);
+		};
 }

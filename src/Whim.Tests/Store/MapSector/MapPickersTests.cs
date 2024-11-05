@@ -247,4 +247,52 @@ public class MapPickersTests
 		Assert.True(result.IsSuccessful);
 		Assert.Equal(workspaceOrder[expected], result.Value.Id);
 	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickActiveLayoutEngineByMonitor_Failure(IContext ctx)
+	{
+		// Given we have an untracked monitor
+		IMonitor monitor = CreateMonitor((HMONITOR)1);
+
+		// When we get the layout engine
+		var result = ctx.Store.Pick(Pickers.PickActiveLayoutEngineByMonitor(monitor.Handle));
+
+		// Then we get an exception
+		Assert.False(result.IsSuccessful);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickActiveLayoutEngineByMonitor_NoWorkspaceForMonitor(IContext ctx, MutableRootSector root)
+	{
+		// Given we have a monitor with no workspace
+		IMonitor monitor = CreateMonitor((HMONITOR)1);
+		AddMonitorsToManager(ctx, root, monitor);
+
+		// When we get the layout engine
+		var result = ctx.Store.Pick(Pickers.PickActiveLayoutEngineByMonitor(monitor.Handle));
+
+		// Then we get an exception
+		Assert.False(result.IsSuccessful);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickActiveLayoutEngineByMonitor_Success(
+		IContext ctx,
+		MutableRootSector root,
+		ILayoutEngine layoutEngine
+	)
+	{
+		// Given we have a monitor with an active layout engine
+		IMonitor monitor = CreateMonitor((HMONITOR)1);
+		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [layoutEngine] };
+
+		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
+
+		// When we get the layout engine
+		var result = ctx.Store.Pick(Pickers.PickActiveLayoutEngineByMonitor(monitor.Handle));
+
+		// Then we get the layout engine
+		Assert.True(result.IsSuccessful);
+		Assert.Same(layoutEngine, result.Value);
+	}
 }

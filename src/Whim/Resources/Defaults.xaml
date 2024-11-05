@@ -59,7 +59,10 @@
 	</Style>
 
 	<!--  Active layout widget  -->
-	<StaticResource x:Key="bar:active_layout:button" ResourceKey="_base:button" />
+	<Style
+		x:Key="bar:active_layout:button"
+		BasedOn="{StaticResource _base:button}"
+		TargetType="DropDownButton" />
 
 	<!--  Tree layout engine widget  -->
 	<StaticResource x:Key="bar:tree_layout:button" ResourceKey="_base:button" />
