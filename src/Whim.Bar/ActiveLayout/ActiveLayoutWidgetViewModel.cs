@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Linq;
 
@@ -19,10 +20,12 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 
 	private bool _disposedValue;
 
+	private ImmutableList<string> _layoutEngines = ImmutableList<string>.Empty;
+
 	/// <summary>
-	/// The name of the active layout engine.
+	/// The available layout engines.
 	/// </summary>
-	public List<string> LayoutEngines = [];
+	public IReadOnlyList<string> LayoutEngines => _layoutEngines;
 
 	/// <summary>
 	/// The name of the active layout engine.
@@ -31,21 +34,16 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 	{
 		get
 		{
-			if (!_context.Store.Pick(Pickers.PickWorkspaceByMonitor(Monitor.Handle)).TryGet(out IWorkspace workspace))
-			{
-				return "";
-			}
-
 			if (
-				!_context
-					.Store.Pick(Pickers.PickActiveLayoutEngine(workspace.Id))
+				_context
+					.Store.Pick(Pickers.PickActiveLayoutEngineByMonitor(Monitor.Handle))
 					.TryGet(out ILayoutEngine layoutEngine)
 			)
 			{
-				return "";
+				return layoutEngine.Name;
 			}
 
-			return layoutEngine.Name;
+			return "";
 		}
 		set
 		{
@@ -54,14 +52,7 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 				return;
 			}
 
-			if (
-				!_context
-					.Store.Pick(Pickers.PickActiveLayoutEngine(workspace.Id))
-					.TryGet(out ILayoutEngine layoutEngine)
-			)
-			{
-				return;
-			}
+			ILayoutEngine layoutEngine = WorkspaceUtils.GetActiveLayoutEngine(workspace);
 
 			if (layoutEngine.Name != value)
 			{
@@ -101,7 +92,7 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 		_context.Store.WindowEvents.WindowFocused += WindowEvents_WindowFocused;
 	}
 
-	private void Store_ActiveLayoutEngineChanged(object? sender, EventArgs e)
+	private void Store_ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs e)
 	{
 		OnPropertyChanged(nameof(ActiveLayoutEngine));
 	}
@@ -113,8 +104,7 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 			return;
 		}
 
-		LayoutEngines.Clear();
-		LayoutEngines.AddRange(e.CurrentWorkspace.LayoutEngines.Select(engine => engine.Name));
+		_layoutEngines = e.CurrentWorkspace.LayoutEngines.Select(engine => engine.Name).ToImmutableList();
 
 		OnPropertyChanged(nameof(LayoutEngines));
 		OnPropertyChanged(nameof(ActiveLayoutEngine));
