@@ -57,3 +57,9 @@ context.CommandManager.Add(
 ```
 
 For more, see the [Store](./store.md) and [Commands](../../configure/core/commands.md) pages.
+
+## Sticky Workspaces
+
+Sticky workspaces are being worked on in [this GitHub issue](https://github.com/dalyIsaac/Whim/issues/660).
+
+👷🏗️🚧

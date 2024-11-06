@@ -24,3 +24,9 @@ workspaces:
     - name: Spotify
     - name: Other
 ```
+
+## Sticky Workspaces
+
+Sticky workspaces are being worked on in [this GitHub issue](https://github.com/dalyIsaac/Whim/issues/660).
+
+👷🏗️🚧
