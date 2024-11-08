@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace Whim;
 
 /// <summary>
@@ -170,5 +172,98 @@ public static partial class Pickers
 			}
 
 			return Result.FromException<ILayoutEngine>(workspaceResult.Error!);
+		};
+
+	/// <summary>
+	/// Retrieves the ids of the workspaces which can be shown on the given monitor.
+	/// </summary>
+	/// <param name="monitorHandle">
+	/// The handle of the monitor to get the sticky workspaces for.
+	/// </param>
+	/// <returns>
+	/// The ids of the workspaces which can be shown on the monitor, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// </returns>
+	public static PurePicker<Result<IEnumerable<WorkspaceId>>> PickStickyWorkspaceIdsByMonitor(
+		HMONITOR monitorHandle
+	) =>
+		rootSector =>
+		{
+			Result<int> monitorIndexResult = PickMonitorIndexByHandle(monitorHandle)(rootSector);
+			if (!monitorIndexResult.TryGet(out int monitorIndex))
+			{
+				return Result.FromException<IEnumerable<WorkspaceId>>(monitorIndexResult.Error!);
+			}
+
+			IMapSector mapSector = rootSector.MapSector;
+			List<WorkspaceId> workspaceIds = [];
+
+			// Get the sticky workspaces for the monitor.
+			foreach (
+				(
+					WorkspaceId workspaceId,
+					ImmutableArray<int> monitorIndices
+				) in mapSector.StickyWorkspaceMonitorIndexMap
+			)
+			{
+				if (monitorIndices.Contains(monitorIndex))
+				{
+					workspaceIds.Add(workspaceId);
+				}
+			}
+
+			// Get the workspaces which are not sticky for any monitor.
+			foreach (WorkspaceId workspaceId in mapSector.MonitorWorkspaceMap.Values)
+			{
+				if (!mapSector.StickyWorkspaceMonitorIndexMap.ContainsKey(workspaceId))
+				{
+					workspaceIds.Add(workspaceId);
+				}
+			}
+
+			return workspaceIds;
+		};
+
+	/// <summary>
+	/// Retrieves the handles of the monitors which can show the given workspace.
+	/// </summary>
+	/// <param name="workspaceId">
+	/// The ID of the workspace to get the monitors for.
+	/// </param>
+	/// <returns>
+	/// The handles of the monitors which can show the workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// If the workspace is not found or there are no monitors which can show the workspace, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// </returns>
+	public static PurePicker<Result<IEnumerable<HMONITOR>>> PickStickyMonitorsByWorkspace(WorkspaceId workspaceId) =>
+		rootSector =>
+		{
+			IMapSector mapSector = rootSector.MapSector;
+			IWorkspaceSector workspaceSector = rootSector.WorkspaceSector;
+			ImmutableArray<IMonitor> monitors = rootSector.MonitorSector.Monitors;
+
+			if (!workspaceSector.Workspaces.ContainsKey(workspaceId))
+			{
+				return Result.FromException<IEnumerable<HMONITOR>>(StoreExceptions.WorkspaceNotFound(workspaceId));
+			}
+
+			if (
+				mapSector.StickyWorkspaceMonitorIndexMap.TryGetValue(
+					workspaceId,
+					out ImmutableArray<int> monitorIndices
+				)
+			)
+			{
+				return monitors.Select(monitor => monitor.Handle).ToList();
+			}
+
+			List<HMONITOR> monitorHandles = [];
+			foreach (int monitorIndex in monitorIndices)
+			{
+				if (monitorIndex >= 0 && monitorIndex < monitors.Length)
+				{
+					monitorHandles.Add(monitors[monitorIndex].Handle);
+				}
+			}
+
+			return monitorHandles;
 		};
 }

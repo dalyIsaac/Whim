@@ -6,10 +6,12 @@ namespace Whim;
 /// <param name="WorkspaceId"></param>
 /// <param name="Name"></param>
 /// <param name="CreateLeafLayoutEngines"></param>
+/// <param name="MonitorIndices"></param>
 internal record WorkspaceToCreate(
 	WorkspaceId WorkspaceId,
 	string? Name,
-	IEnumerable<CreateLeafLayoutEngine>? CreateLeafLayoutEngines
+	IEnumerable<CreateLeafLayoutEngine>? CreateLeafLayoutEngines,
+	IEnumerable<int>? MonitorIndices
 );
 
 internal class WorkspaceSector(IContext ctx, IInternalContext internalCtx)

@@ -12,7 +12,8 @@ internal record SavedWindow(long Handle, Rectangle<double> Rectangle);
 /// </summary>
 /// <param name="Name"></param>
 /// <param name="Windows"></param>
-internal record SavedWorkspace(string Name, List<SavedWindow> Windows);
+/// <param name="MonitorIndices"></param>
+internal record SavedWorkspace(string Name, List<SavedWindow> Windows, int[]? MonitorIndices);
 
 /// <summary>
 /// The saved state for Whim's core.

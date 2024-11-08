@@ -87,6 +87,14 @@ internal record InitializeWorkspacesTransform : Transform
 
 				windowSector.QueueEvent(new WindowAddedEventArgs() { Window = window });
 			}
+
+			if (savedWorkspace.MonitorIndices != null)
+			{
+				mapSector.StickyWorkspaceMonitorIndexMap = mapSector.StickyWorkspaceMonitorIndexMap.Add(
+					workspace.Id,
+					[.. savedWorkspace.MonitorIndices]
+				);
+			}
 		}
 
 		// Activate the workspaces before we add the unprocessed windows to make sure we have a workspace for each monitor.
@@ -111,18 +119,40 @@ internal record InitializeWorkspacesTransform : Transform
 	{
 		WorkspaceSector workspaceSector = rootSector.WorkspaceSector;
 		MonitorSector monitorSector = rootSector.MonitorSector;
+		MapSector mapSector = rootSector.MapSector;
 
 		// Assign workspaces to monitors.
-		for (int idx = 0; idx < monitorSector.Monitors.Length; idx++)
+		List<HMONITOR> processedMonitors = [];
+		for (int idx = 0; idx < workspaceSector.WorkspaceOrder.Length; idx++)
 		{
-			IMonitor monitor = monitorSector.Monitors[idx];
+			WorkspaceId workspaceId = workspaceSector.WorkspaceOrder[idx];
 
-			if (idx >= workspaceSector.Workspaces.Count)
+			if (!ctx.Store.Pick(PickStickyMonitorsByWorkspace(workspaceId)).TryGet(out IEnumerable<HMONITOR> monitors))
 			{
-				ctx.Store.Dispatch(new AddWorkspaceTransform($"Workspace {idx + 1}"));
+				continue;
 			}
 
-			ctx.Store.Dispatch(new ActivateWorkspaceTransform(workspaceSector.WorkspaceOrder[idx], monitor.Handle));
+			foreach (HMONITOR monitor in monitors)
+			{
+				if (processedMonitors.Contains(monitor))
+				{
+					continue;
+				}
+
+				processedMonitors.Add(monitor);
+				ctx.Store.Dispatch(new ActivateWorkspaceTransform(workspaceId, monitor));
+			}
+		}
+
+		// If there are any monitors left, create workspaces for them.
+		IEnumerable<HMONITOR> unprocessedMonitors = monitorSector
+			.Monitors.Select(m => m.Handle)
+			.Except(processedMonitors);
+
+		foreach (HMONITOR monitor in unprocessedMonitors)
+		{
+			ctx.Store.Dispatch(new AddWorkspaceTransform($"Workspace {workspaceSector.Workspaces.Count + 1}"));
+			ctx.Store.Dispatch(new ActivateWorkspaceTransform(workspaceSector.WorkspaceOrder[^1], monitor));
 		}
 	}
 }
