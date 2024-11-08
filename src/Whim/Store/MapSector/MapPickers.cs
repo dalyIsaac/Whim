@@ -224,7 +224,9 @@ public static partial class Pickers
 		};
 
 	/// <summary>
-	/// Retrieves the handles of the monitors which can show the given workspace.
+	/// Retrieves the handles of the monitors which can show the given workspace. This includes workspaces
+	/// which explicitly state which monitors they can be shown on, and workspaces which can be shown on any monitor
+	/// (i.e., they don't specify any monitors).
 	/// </summary>
 	/// <param name="workspaceId">
 	/// The ID of the workspace to get the monitors for.
@@ -265,5 +267,38 @@ public static partial class Pickers
 			}
 
 			return monitorHandles;
+		};
+
+	/// <summary>
+	/// Retrieves the explicit indices of the monitors which can show the given workspace.
+	/// </summary>
+	/// <param name="workspaceId">
+	/// The ID of the workspace to get the monitor indices for.
+	/// </param>
+	/// <returns>
+	/// The explicit indices of the monitors which can show the workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// </returns>
+	public static PurePicker<Result<IEnumerable<int>>> PickStickyMonitorIndicesByWorkspace(WorkspaceId workspaceId) =>
+		rootSector =>
+		{
+			IMapSector mapSector = rootSector.MapSector;
+			IWorkspaceSector workspaceSector = rootSector.WorkspaceSector;
+
+			if (!workspaceSector.Workspaces.ContainsKey(workspaceId))
+			{
+				return Result.FromException<IEnumerable<int>>(StoreExceptions.WorkspaceNotFound(workspaceId));
+			}
+
+			if (
+				mapSector.StickyWorkspaceMonitorIndexMap.TryGetValue(
+					workspaceId,
+					out ImmutableArray<int> monitorIndices
+				)
+			)
+			{
+				return monitorIndices;
+			}
+
+			return Result.FromValue(Enumerable.Empty<int>());
 		};
 }
