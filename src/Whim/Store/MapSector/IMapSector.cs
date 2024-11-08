@@ -19,4 +19,9 @@ public interface IMapSector
 	/// The mappings of workspaces to the indices of the monitors they are allowed to be on.
 	/// </summary>
 	ImmutableDictionary<WorkspaceId, ImmutableArray<int>> StickyWorkspaceMonitorIndexMap { get; }
+
+	/// <summary>
+	/// The last monitor which the workspace was on.
+	/// </summary>
+	ImmutableDictionary<WorkspaceId, HMONITOR> LastMonitorWorkspaceMap { get; }
 }

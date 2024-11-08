@@ -27,9 +27,6 @@ public sealed partial record Workspace : IWorkspace
 	public ImmutableDictionary<HWND, WindowPosition> WindowPositions { get; internal set; } =
 		ImmutableDictionary<HWND, WindowPosition>.Empty;
 
-	/// <inheritdoc />
-	public int LastMonitorIndex { get; internal set; }
-
 	/// <summary>
 	/// Internal-only implementation of a copy constructor.
 	/// </summary>

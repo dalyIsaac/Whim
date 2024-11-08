@@ -28,6 +28,9 @@ internal static class StoreExceptions
 	public static Exception NoWorkspaceFoundForWindow(HWND windowHandle) =>
 		new WhimException($"No workspace found for window {windowHandle}.");
 
+	public static Exception NoValidMonitorForWorkspace(WorkspaceId workspaceId) =>
+		new WhimException($"No valid monitor found for workspace {workspaceId}.");
+
 	public static Exception NoValidWindow() => new WhimException("No valid window found.");
 
 	public static Exception InvalidMonitorIndex(int monitorIndex) =>
