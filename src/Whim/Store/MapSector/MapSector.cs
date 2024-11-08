@@ -11,6 +11,9 @@ internal class MapSector : SectorBase, IMapSector, IMapSectorEvents
 	public ImmutableDictionary<HMONITOR, WorkspaceId> MonitorWorkspaceMap { get; set; } =
 		ImmutableDictionary<HMONITOR, WorkspaceId>.Empty;
 
+	public ImmutableDictionary<WorkspaceId, ImmutableArray<int>> StickyWorkspaceMonitorIndexMap { get; set; } =
+		ImmutableDictionary<WorkspaceId, ImmutableArray<int>>.Empty;
+
 	public event EventHandler<RouteEventArgs>? WindowRouted;
 
 	public event EventHandler<MonitorWorkspaceChangedEventArgs>? MonitorWorkspaceChanged;
