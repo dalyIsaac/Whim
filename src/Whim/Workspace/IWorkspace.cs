@@ -50,6 +50,11 @@ public interface IWorkspace : IDisposable
 	ImmutableDictionary<HWND, WindowPosition> WindowPositions { get; }
 
 	/// <summary>
+	/// The index of the monitor which this workspace was activated on last.
+	/// </summary>
+	int LastMonitorIndex { get; }
+
+	/// <summary>
 	/// The name of the workspace. When the <c>Name</c> is set, the
 	/// <see cref="IWorkspaceManager.WorkspaceRenamed"/> event is triggered.
 	/// </summary>
