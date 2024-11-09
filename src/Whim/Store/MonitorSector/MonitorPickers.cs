@@ -135,30 +135,6 @@ public static partial class Pickers
 		};
 
 	/// <summary>
-	/// Get the monitor index by its <see cref="HMONITOR"/> handle.
-	/// </summary>
-	/// <param name="handle">
-	/// The handle of the monitor to get the index for.
-	/// </param>
-	/// <returns>
-	/// The index of the monitor with the given handle, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
-	/// </returns>
-	public static PurePicker<Result<int>> PickMonitorIndexByHandle(HMONITOR handle) =>
-		(rootSector) =>
-		{
-			ImmutableArray<IMonitor> monitors = rootSector.MonitorSector.Monitors;
-			for (int idx = 0; idx < monitors.Length; idx++)
-			{
-				if (monitors[idx].Handle == handle)
-				{
-					return Result.FromValue(idx);
-				}
-			}
-
-			return Result.FromException<int>(StoreExceptions.MonitorNotFound(handle));
-		};
-
-	/// <summary>
 	/// Get the monitor at the point <paramref name="point"/>
 	/// </summary>
 	/// <param name="point">
