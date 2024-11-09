@@ -240,11 +240,6 @@ public static partial class Pickers
 			IMapSector mapSector = rootSector.MapSector;
 			IWorkspaceSector workspaceSector = rootSector.WorkspaceSector;
 
-			if (!workspaceSector.Workspaces.ContainsKey(workspaceId))
-			{
-				return Result.FromException<IReadOnlyList<int>>(StoreExceptions.WorkspaceNotFound(workspaceId));
-			}
-
 			if (
 				mapSector.StickyWorkspaceMonitorIndexMap.TryGetValue(
 					workspaceId,

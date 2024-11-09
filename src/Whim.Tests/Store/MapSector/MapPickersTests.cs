@@ -1,4 +1,5 @@
 using System.Linq;
+using FluentAssertions;
 
 namespace Whim.Tests;
 
@@ -294,5 +295,131 @@ public class MapPickersTests
 		// Then we get the layout engine
 		Assert.True(result.IsSuccessful);
 		Assert.Same(layoutEngine, result.Value);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickStickyMonitorsByWorkspace_Failure(IContext ctx)
+	{
+		// Given we have an untracked workspace
+		var untrackedWorkspace = CreateWorkspace(ctx);
+
+		// When we get the monitors
+		var result = ctx.Store.Pick(Pickers.PickStickyMonitorsByWorkspace(untrackedWorkspace.Id));
+
+		// Then we get an exception
+		Assert.False(result.IsSuccessful);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickStickyMonitorsByWorkspace_StickyWorkspaceMonitorMapIsEmpty(IContext ctx, MutableRootSector root)
+	{
+		// Given we have a sticky workspace
+		var workspace = CreateWorkspace(ctx);
+		AddWorkspacesToManager(ctx, root, workspace);
+		AddMonitorsToManager(
+			ctx,
+			root,
+			CreateMonitor((HMONITOR)0),
+			CreateMonitor((HMONITOR)1),
+			CreateMonitor((HMONITOR)2)
+		);
+
+		root.MapSector.StickyWorkspaceMonitorIndexMap = root.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(
+			workspace.Id,
+			[0, 1]
+		);
+
+		// When we get the monitors
+		var result = ctx.Store.Pick(Pickers.PickStickyMonitorsByWorkspace(workspace.Id));
+
+		// Then we get the monitors
+		Assert.True(result.IsSuccessful);
+		Assert.Equal(2, result.Value.Count);
+		result.Value.Should().BeEquivalentTo([(HMONITOR)0, (HMONITOR)1]);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickStickyMonitorsByWorkspace_Success(IContext ctx, MutableRootSector root)
+	{
+		// Given we have workspace which isn't sticky
+		var workspace = CreateWorkspace(ctx);
+		AddWorkspacesToManager(ctx, root, workspace);
+		AddMonitorsToManager(
+			ctx,
+			root,
+			CreateMonitor((HMONITOR)0),
+			CreateMonitor((HMONITOR)1),
+			CreateMonitor((HMONITOR)2)
+		);
+
+		// When we get the monitors
+		var result = ctx.Store.Pick(Pickers.PickStickyMonitorsByWorkspace(workspace.Id));
+
+		// Then we get all the monitors
+		Assert.True(result.IsSuccessful);
+		Assert.Equal(3, result.Value.Count);
+		result.Value.Should().BeEquivalentTo([(HMONITOR)0, (HMONITOR)1, (HMONITOR)2]);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickStickyMonitorsByWorkspace_NoMonitors(IContext ctx, MutableRootSector root)
+	{
+		// Given we have workspace which is sticky, but is stuck to non-existent monitors
+		var workspace = CreateWorkspace(ctx);
+		AddWorkspacesToManager(ctx, root, workspace);
+		AddMonitorsToManager(
+			ctx,
+			root,
+			CreateMonitor((HMONITOR)0),
+			CreateMonitor((HMONITOR)1),
+			CreateMonitor((HMONITOR)2)
+		);
+
+		root.MapSector.StickyWorkspaceMonitorIndexMap = root.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(
+			workspace.Id,
+			[3, 4]
+		);
+
+		// When we get the monitors
+		var result = ctx.Store.Pick(Pickers.PickStickyMonitorsByWorkspace(workspace.Id));
+
+		// Then we get all the monitors
+		Assert.True(result.IsSuccessful);
+		Assert.Equal(3, result.Value.Count);
+		result.Value.Should().BeEquivalentTo([(HMONITOR)0, (HMONITOR)1, (HMONITOR)2]);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickExplicitStickyMonitorIndicesByWorkspace_Failure(IContext ctx)
+	{
+		// Given we have an untracked workspace
+		var untrackedWorkspace = CreateWorkspace(ctx);
+
+		// When we get the monitor indices
+		var result = ctx.Store.Pick(Pickers.PickExplicitStickyMonitorIndicesByWorkspace(untrackedWorkspace.Id));
+
+		// Then we get an exception
+		Assert.False(result.IsSuccessful);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickExplicitStickyMonitorIndicesByWorkspace_Success(IContext ctx, MutableRootSector root)
+	{
+		// Given we have workspace which isn't sticky
+		var workspace = CreateWorkspace(ctx);
+
+		AddMonitorsToManager(
+			ctx,
+			root,
+			CreateMonitor((HMONITOR)0),
+			CreateMonitor((HMONITOR)1),
+			CreateMonitor((HMONITOR)2)
+		);
+
+		// When we get the monitor indices
+		var result = ctx.Store.Pick(Pickers.PickExplicitStickyMonitorIndicesByWorkspace(workspace.Id));
+
+		// Then we get an exception
+		Assert.False(result.IsSuccessful);
 	}
 }
