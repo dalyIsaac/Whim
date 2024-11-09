@@ -70,33 +70,8 @@ internal record InitializeWorkspacesTransform : Transform
 				continue;
 			}
 
-			foreach (SavedWindow savedWindow in savedWorkspace.Windows)
-			{
-				HWND hwnd = (HWND)savedWindow.Handle;
-				processedWindows.Add(hwnd);
-				if (!ctx.CreateWindow(hwnd).TryGet(out IWindow window))
-				{
-					Logger.Information($"Could not find window with handle {savedWindow.Handle}");
-					continue;
-				}
-
-				mapSector.WindowWorkspaceMap = mapSector.WindowWorkspaceMap.SetItem(window.Handle, workspace.Id);
-				windowSector.Windows = windowSector.Windows.Add(window.Handle, window);
-
-				ctx.Store.Dispatch(
-					new MoveWindowToPointInWorkspaceTransform(workspace.Id, window.Handle, savedWindow.Rectangle.Center)
-				);
-
-				windowSector.QueueEvent(new WindowAddedEventArgs() { Window = window });
-			}
-
-			if (savedWorkspace.MonitorIndices != null)
-			{
-				mapSector.StickyWorkspaceMonitorIndexMap = mapSector.StickyWorkspaceMonitorIndexMap.Add(
-					workspace.Id,
-					[.. savedWorkspace.MonitorIndices]
-				);
-			}
+			PopulateSavedWindows(ctx, windowSector, mapSector, processedWindows, savedWorkspace, workspace);
+			PopulateSavedStickyMonitors(mapSector, savedWorkspace, workspace);
 		}
 
 		// Activate the workspaces before we add the unprocessed windows to make sure we have a workspace for each monitor.
@@ -114,6 +89,51 @@ internal record InitializeWorkspacesTransform : Transform
 			}
 
 			ctx.Store.Dispatch(new WindowAddedTransform(hwnd, RouterOptions.RouteToLaunchedWorkspace));
+		}
+	}
+
+	private static void PopulateSavedWindows(
+		IContext ctx,
+		WindowSector windowSector,
+		MapSector mapSector,
+		List<HWND> processedWindows,
+		SavedWorkspace savedWorkspace,
+		Workspace workspace
+	)
+	{
+		foreach (SavedWindow savedWindow in savedWorkspace.Windows)
+		{
+			HWND hwnd = (HWND)savedWindow.Handle;
+			processedWindows.Add(hwnd);
+			if (!ctx.CreateWindow(hwnd).TryGet(out IWindow window))
+			{
+				Logger.Information($"Could not find window with handle {savedWindow.Handle}");
+				continue;
+			}
+
+			mapSector.WindowWorkspaceMap = mapSector.WindowWorkspaceMap.SetItem(window.Handle, workspace.Id);
+			windowSector.Windows = windowSector.Windows.Add(window.Handle, window);
+
+			ctx.Store.Dispatch(
+				new MoveWindowToPointInWorkspaceTransform(workspace.Id, window.Handle, savedWindow.Rectangle.Center)
+			);
+
+			windowSector.QueueEvent(new WindowAddedEventArgs() { Window = window });
+		}
+	}
+
+	private static void PopulateSavedStickyMonitors(
+		MapSector mapSector,
+		SavedWorkspace savedWorkspace,
+		Workspace workspace
+	)
+	{
+		if (savedWorkspace.MonitorIndices != null)
+		{
+			mapSector.StickyWorkspaceMonitorIndexMap = mapSector.StickyWorkspaceMonitorIndexMap.Add(
+				workspace.Id,
+				[.. savedWorkspace.MonitorIndices]
+			);
 		}
 	}
 

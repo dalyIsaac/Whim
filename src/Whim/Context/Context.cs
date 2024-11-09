@@ -65,7 +65,7 @@ internal class Context : IContext
 
 		RouterManager = new RouterManager(this);
 		FilterManager = new FilterManager();
-		WindowManager = new WindowManager(this, _internalContext);
+		WindowManager = new WindowManager(this);
 		MonitorManager = new MonitorManager(this);
 
 		WorkspaceManager = new WorkspaceManager(this);

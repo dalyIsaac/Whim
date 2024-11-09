@@ -2,12 +2,9 @@ using System.Collections;
 
 namespace Whim;
 
-internal class WindowManager(IContext context, IInternalContext internalContext)
-	: IWindowManager,
-		IInternalWindowManager
+internal class WindowManager(IContext context) : IWindowManager, IInternalWindowManager
 {
 	private readonly IContext _context = context;
-	private readonly IInternalContext _internalContext = internalContext;
 
 	public event EventHandler<WindowAddedEventArgs>? WindowAdded;
 	public event EventHandler<WindowFocusedEventArgs>? WindowFocused;
