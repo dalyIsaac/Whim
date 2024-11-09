@@ -74,7 +74,7 @@ internal record InitializeWorkspacesTransform : Transform
 			{
 				HWND hwnd = (HWND)savedWindow.Handle;
 				processedWindows.Add(hwnd);
-				if (!ctx.WindowManager.CreateWindow(hwnd).TryGet(out IWindow window))
+				if (!ctx.CreateWindow(hwnd).TryGet(out IWindow window))
 				{
 					Logger.Information($"Could not find window with handle {savedWindow.Handle}");
 					continue;
@@ -129,7 +129,9 @@ internal record InitializeWorkspacesTransform : Transform
 		{
 			WorkspaceId workspaceId = workspaceSector.WorkspaceOrder[idx];
 
-			if (!ctx.Store.Pick(PickStickyMonitorsByWorkspace(workspaceId)).TryGet(out IReadOnlyList<HMONITOR> monitors))
+			if (
+				!ctx.Store.Pick(PickStickyMonitorsByWorkspace(workspaceId)).TryGet(out IReadOnlyList<HMONITOR> monitors)
+			)
 			{
 				continue;
 			}
