@@ -230,8 +230,11 @@ public static partial class Pickers
 	/// </param>
 	/// <returns>
 	/// The explicit indices of the monitors which can show the workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// If the workspace cannot be found, or if the workspace has no explicit mappings, then an error is returned.
 	/// </returns>
-	public static PurePicker<Result<IReadOnlyList<int>>> PickStickyMonitorIndicesByWorkspace(WorkspaceId workspaceId) =>
+	public static PurePicker<Result<IReadOnlyList<int>>> PickExplicitStickyMonitorIndicesByWorkspace(
+		WorkspaceId workspaceId
+	) =>
 		rootSector =>
 		{
 			IMapSector mapSector = rootSector.MapSector;
@@ -252,6 +255,8 @@ public static partial class Pickers
 				return monitorIndices;
 			}
 
-			return Result.FromValue<IReadOnlyList<int>>([]);
+			return Result.FromException<IReadOnlyList<int>>(
+				new WhimException($"No explicit monitor indices found for {workspaceId}")
+			);
 		};
 }

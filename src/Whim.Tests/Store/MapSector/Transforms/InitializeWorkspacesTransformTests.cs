@@ -60,7 +60,7 @@ public class InitializeWorkspacesTransformTests
 	internal void CouldNotFindWorkspace(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		// Given there are saved workspaces which don't exist in the workspace manager
-		SavedWorkspace workspace = new("test", new List<SavedWindow>());
+		SavedWorkspace workspace = new("test", new List<SavedWindow>(), null);
 		AddWorkspacesToSavedState(internalCtx, workspace);
 
 		InitializeWorkspacesTransform sut = new();
@@ -79,7 +79,7 @@ public class InitializeWorkspacesTransformTests
 		// Given there are saved workspaces which don't exist in the workspace manager
 		IWindow window = CreateWindow((HWND)10);
 		SavedWorkspace workspace =
-			new("test", new List<SavedWindow>() { new(window.Handle, Rectangle.UnitSquare<double>()) });
+			new("test", new List<SavedWindow>() { new(window.Handle, Rectangle.UnitSquare<double>()) }, null);
 		AddWorkspacesToSavedState(internalCtx, workspace);
 
 		ctx.WindowManager.CreateWindow(window.Handle).Returns(Result.FromException<IWindow>(new Exception("nope")));
@@ -112,7 +112,7 @@ public class InitializeWorkspacesTransformTests
 	{
 		root.WorkspaceSector.WorkspacesToCreate =
 		[
-			new WorkspaceToCreate(Guid.NewGuid(), BrowserWorkspaceName, null),
+			new WorkspaceToCreate(Guid.NewGuid(), BrowserWorkspaceName, null, null),
 			new WorkspaceToCreate(
 				Guid.NewGuid(),
 				CodeWorkspaceName,
@@ -120,7 +120,8 @@ public class InitializeWorkspacesTransformTests
 				{
 					(id) => new ImmutableTestLayoutEngine(),
 					(id) => new ImmutableTestLayoutEngine(),
-				}
+				},
+				null
 			),
 		];
 	}
@@ -133,9 +134,9 @@ public class InitializeWorkspacesTransformTests
 		SavedWindow discordWindow = new(DiscordHandle, Rectangle.UnitSquare<double>());
 
 		SavedWorkspace browserWorkspace =
-			new(BrowserWorkspaceName, new List<SavedWindow>() { browserWindow, brokenWindow });
+			new(BrowserWorkspaceName, new List<SavedWindow>() { browserWindow, brokenWindow }, null);
 		SavedWorkspace mediaWorkspace =
-			new(MediaWorkspaceName, new List<SavedWindow>() { spotifyWindow, discordWindow });
+			new(MediaWorkspaceName, new List<SavedWindow>() { spotifyWindow, discordWindow }, null);
 
 		AddWorkspacesToSavedState(internalCtx, browserWorkspace, mediaWorkspace);
 	}
@@ -147,11 +148,11 @@ public class InitializeWorkspacesTransformTests
 		IWindow spotifyWindow = CreateWindow(SpotifyHandle);
 		IWindow vscodeWindow = CreateWindow(VscodeHandle);
 
-		ctx.WindowManager.CreateWindow(BrowserHandle).Returns(Result.FromValue(browserWindow));
-		ctx.WindowManager.CreateWindow(DiscordHandle).Returns(Result.FromValue(discordWindow));
-		ctx.WindowManager.CreateWindow(SpotifyHandle).Returns(Result.FromValue(spotifyWindow));
-		ctx.WindowManager.CreateWindow(BrokenHandle).Returns(Result.FromException<IWindow>(new Exception("nope")));
-		ctx.WindowManager.CreateWindow(VscodeHandle).Returns(Result.FromValue(vscodeWindow));
+		ctx.CreateWindow(BrowserHandle).Returns(Result.FromValue(browserWindow));
+		ctx.CreateWindow(DiscordHandle).Returns(Result.FromValue(discordWindow));
+		ctx.CreateWindow(SpotifyHandle).Returns(Result.FromValue(spotifyWindow));
+		ctx.CreateWindow(BrokenHandle).Returns(Result.FromException<IWindow>(new Exception("nope")));
+		ctx.CreateWindow(VscodeHandle).Returns(Result.FromValue(vscodeWindow));
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]

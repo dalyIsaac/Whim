@@ -3,20 +3,10 @@ Write-Host "Generating source from schema..."
 $schemaPath = ".\src\Whim.Yaml\schema.json"
 $outputPath = ".\src\Whim.Yaml\Generated"
 $metadataPath = "$outputPath\metadata.json"
-$now = Get-Date
-if ($env:CI) {
-    $gitSha = $env:GITHUB_SHA
-}
-else {
-    $gitSha = (git rev-parse HEAD)
-}
+
+$schemaHash = (Get-FileHash $schemaPath -Algorithm SHA256).Hash
 
 function Test-Regenerate {
-    param (
-        [string]$schemaPath = ".\src\Whim.Yaml\schema.json",
-        [string]$outputPath = ".\src\Whim.Yaml\Generated"
-    )
-
     if (!(Test-Path $outputPath)) {
         Write-Host "Output directory does not exist, generating..."
         New-Item $outputPath -ItemType Directory
@@ -31,18 +21,13 @@ function Test-Regenerate {
     }
 
     $metadata = Get-Content $metadataPath | ConvertFrom-Json
-    if ($metadata.gitRef -ne $gitSha) {
-        Write-Host "Git ref has changed since last generation, regenerating..."
-        return $true
-    }
-
-    $schemaLastWriteTime = (Get-Item $schemaPath).LastWriteTime
-    if ($metadata.lastWriteTime -lt $schemaLastWriteTime) {
+    if ($metadata.schemaHash -ne $schemaHash) {
         Write-Host "Schema has changed since last generation, regenerating..."
+        Write-Host "Old hash: $($metadata.schemaHash)"
+        Write-Host "New hash: $schemaHash"
         return $true
     }
 
-    Write-Host "Schema has not changed since last generation, skipping..."
     return $false
 }
 
@@ -60,5 +45,5 @@ dotnet tool run generatejsonschematypes `
 # If not in CI, write metadata file
 if ($LASTEXITCODE -eq 0 -and $null -eq $env:CI) {
     Write-Host "Writing metadata file..."
-    @{ gitRef = $gitSha; lastWriteTime = $now } | ConvertTo-Json | Set-Content $metadataPath
+    @{ schemaHash = $schemaHash } | ConvertTo-Json | Set-Content $metadataPath
 }

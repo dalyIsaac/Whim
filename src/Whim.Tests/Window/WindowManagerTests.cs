@@ -12,15 +12,10 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowSector_WindowAdded(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector mutableRootSector,
-		IWindow window
-	)
+	internal void WindowSector_WindowAdded(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given
-		WindowManager sut = new(ctx, internalCtx);
+		WindowManager sut = new(ctx);
 
 		// When the WindowSector receives a WindowAddedTransform
 		sut.Initialize();
@@ -34,15 +29,10 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowSector_WindowFocused(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector mutableRootSector,
-		IWindow window
-	)
+	internal void WindowSector_WindowFocused(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given
-		WindowManager sut = new(ctx, internalCtx);
+		WindowManager sut = new(ctx);
 
 		// When the WindowSector receives a WindowFocusedTransform
 		sut.Initialize();
@@ -56,15 +46,10 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowSector_WindowRemoved(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector mutableRootSector,
-		IWindow window
-	)
+	internal void WindowSector_WindowRemoved(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given
-		WindowManager sut = new(ctx, internalCtx);
+		WindowManager sut = new(ctx);
 
 		// When the WindowSector receives a WindowRemovedTransform
 		sut.Initialize();
@@ -78,15 +63,10 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowSector_WindowMoveStarted(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector mutableRootSector,
-		IWindow window
-	)
+	internal void WindowSector_WindowMoveStarted(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given
-		WindowManager sut = new(ctx, internalCtx);
+		WindowManager sut = new(ctx);
 
 		// When the WindowSector receives a WindowMoveStartedTransform
 		sut.Initialize();
@@ -109,15 +89,10 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowSector_WindowMoved(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector mutableRootSector,
-		IWindow window
-	)
+	internal void WindowSector_WindowMoved(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given
-		WindowManager sut = new(ctx, internalCtx);
+		WindowManager sut = new(ctx);
 
 		// When the WindowSector receives a WindowMovedTransform
 		sut.Initialize();
@@ -140,15 +115,10 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowSector_WindowMoveEnd(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector mutableRootSector,
-		IWindow window
-	)
+	internal void WindowSector_WindowMoveEnd(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given
-		WindowManager sut = new(ctx, internalCtx);
+		WindowManager sut = new(ctx);
 
 		// When the WindowSector receives a WindowMoveEndTransform
 		sut.Initialize();
@@ -171,15 +141,10 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowSector_WindowMinimizeStarted(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector mutableRootSector,
-		IWindow window
-	)
+	internal void WindowSector_WindowMinimizeStarted(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given
-		WindowManager sut = new(ctx, internalCtx);
+		WindowManager sut = new(ctx);
 
 		// When the WindowSector receives a WindowMinimizeStartedTransform
 		sut.Initialize();
@@ -193,15 +158,10 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void WindowSector_WindowMinimizeEnded(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector mutableRootSector,
-		IWindow window
-	)
+	internal void WindowSector_WindowMinimizeEnded(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given
-		WindowManager sut = new(ctx, internalCtx);
+		WindowManager sut = new(ctx);
 
 		// When the WindowSector receives a WindowMinimizeEndedTransform
 		sut.Initialize();
@@ -215,11 +175,11 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void CreateWindow_Success(IContext ctx, IInternalContext internalCtx)
+	internal void CreateWindow_Success(IContext ctx)
 	{
 		// Given window creation succeeds
 		HWND hwnd = (HWND)1;
-		WindowManager sut = new(ctx, internalCtx);
+		WindowManager sut = new(ctx);
 
 		// When we try create a window
 		var result = sut.CreateWindow(hwnd);
@@ -229,19 +189,14 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void CreateWindow_RetrieveExisting(
-		IContext ctx,
-		IInternalContext internalCtx,
-		MutableRootSector mutableRootSector,
-		IWindow window
-	)
+	internal void CreateWindow_RetrieveExisting(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given the window already exists
 		HWND hwnd = (HWND)1;
 		window.Handle.Returns(hwnd);
 		mutableRootSector.WindowSector.Windows = mutableRootSector.WindowSector.Windows.Add(hwnd, window);
 
-		WindowManager sut = new(ctx, internalCtx);
+		WindowManager sut = new(ctx);
 
 		// When we try create a window
 		var result = sut.CreateWindow(hwnd);
@@ -251,10 +206,10 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void GetEnumerator(IContext ctx, IInternalContext internalCtx)
+	internal void GetEnumerator(IContext ctx)
 	{
 		// Given
-		WindowManager sut = new(ctx, internalCtx);
+		WindowManager sut = new(ctx);
 
 		// When
 		sut.GetEnumerator();
@@ -265,11 +220,11 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void AddWindow(IContext ctx, IInternalContext internalCtx)
+	internal void AddWindow(IContext ctx)
 	{
 		// Given
 		HWND hwnd = (HWND)2;
-		WindowManager sut = new(ctx, internalCtx);
+		WindowManager sut = new(ctx);
 
 		// When
 		sut.AddWindow(hwnd);
@@ -279,10 +234,10 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void OnWindowFocused(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void OnWindowFocused(IContext ctx, IWindow window)
 	{
 		// Given
-		WindowManager sut = new(ctx, internalCtx);
+		WindowManager sut = new(ctx);
 
 		// When
 		sut.OnWindowFocused(window);
@@ -292,10 +247,10 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void OnWindowRemoved(IContext ctx, IInternalContext internalCtx, IWindow window)
+	internal void OnWindowRemoved(IContext ctx, IWindow window)
 	{
 		// Given
-		WindowManager sut = new(ctx, internalCtx);
+		WindowManager sut = new(ctx);
 
 		// When
 		sut.OnWindowRemoved(window);
@@ -305,10 +260,10 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void Initialize_Dispose(IContext ctx, IInternalContext internalCtx)
+	internal void Initialize_Dispose(IContext ctx)
 	{
 		// Given
-		WindowManager sut = new(ctx, internalCtx);
+		WindowManager sut = new(ctx);
 
 		// When
 		sut.Initialize();

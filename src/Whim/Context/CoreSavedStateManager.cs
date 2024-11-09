@@ -1,5 +1,4 @@
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 
 namespace Whim;
@@ -84,25 +83,30 @@ internal class CoreSavedStateManager : ICoreSavedStateManager
 
 		foreach (IWorkspace workspace in _context.Store.Pick(PickWorkspaces()))
 		{
-			List<SavedWindow> savedWindows = [];
-
-			foreach (IWindowState windowState in workspace.GetActiveLayoutEngine().DoLayout(fakeMonitorRect, monitor))
-			{
-				Rectangle<double> scaled =
-					(Rectangle<double>)MonitorHelpers.NormalizeRectangle(fakeMonitorRect, windowState.Rectangle);
-				savedWindows.Add(new SavedWindow(windowState.Window.Handle, scaled));
-			}
-
-			int[]? stickyMonitorIndices = _context
-				.Store.Pick(PickStickyMonitorIndicesByWorkspace(workspace.Id))
-				.TryGet(out IReadOnlyList<int> indices)
-				? [.. indices]
-				: null;
-
-			savedWorkspaces.Add(new SavedWorkspace(workspace.BackingName, savedWindows, stickyMonitorIndices));
+			savedWorkspaces.Add(CreateSavedWorkspace(workspace, fakeMonitorRect, monitor));
 		}
 
 		CoreSavedState coreSavedState = new(savedWorkspaces);
 		_context.FileManager.WriteAllText(_savedStateFilePath, JsonSerializer.Serialize(coreSavedState));
+	}
+
+	private SavedWorkspace CreateSavedWorkspace(IWorkspace workspace, IRectangle<int> fakeMonitorRect, IMonitor monitor)
+	{
+		List<SavedWindow> savedWindows = [];
+
+		foreach (IWindowState windowState in workspace.GetActiveLayoutEngine().DoLayout(fakeMonitorRect, monitor))
+		{
+			Rectangle<double> scaled =
+				(Rectangle<double>)MonitorHelpers.NormalizeRectangle(fakeMonitorRect, windowState.Rectangle);
+			savedWindows.Add(new SavedWindow(windowState.Window.Handle, scaled));
+		}
+
+		int[]? stickyMonitorIndices = _context
+			.Store.Pick(PickExplicitStickyMonitorIndicesByWorkspace(workspace.Id))
+			.TryGet(out IReadOnlyList<int> indices)
+			? [.. indices]
+			: null;
+
+		return new SavedWorkspace(workspace.BackingName, savedWindows, stickyMonitorIndices);
 	}
 }

@@ -45,11 +45,13 @@ public class CoreSavedStateManagerTests
 			{
 				new(
 					"workspace1",
-					new() { new SavedWindow(1, new(0, 0, 100, 100)), new SavedWindow(2, new(100, 100, 100, 100)) }
+					new() { new SavedWindow(1, new(0, 0, 100, 100)), new SavedWindow(2, new(100, 100, 100, 100)) },
+					null
 				),
 				new(
 					"workspace2",
-					new() { new SavedWindow(3, new(200, 200, 100, 100)), new SavedWindow(4, new(300, 300, 100, 100)) }
+					new() { new SavedWindow(3, new(200, 200, 100, 100)), new SavedWindow(4, new(300, 300, 100, 100)) },
+					null
 				),
 			}
 		);
@@ -92,9 +94,12 @@ public class CoreSavedStateManagerTests
 		Assert.Null(sut.SavedState);
 	}
 
-	private static string Setup_ContextState(IContext ctx)
+	private static string Setup_ContextState(IContext ctx, MutableRootSector root)
 	{
-		ctx.MonitorManager.PrimaryMonitor.WorkingArea.Returns(new Rectangle<int>(0, 0, 1000, 1000));
+		IMonitor monitor = CreateMonitor((HMONITOR)123);
+		monitor.WorkingArea.Returns(new Rectangle<int>(0, 0, 1000, 1000));
+		AddMonitorsToManager(ctx, root, monitor);
+		root.MonitorSector.PrimaryMonitorHandle = monitor.Handle;
 
 		// Create four windows.
 		IWindow[] windows = new IWindow[4];
@@ -105,10 +110,10 @@ public class CoreSavedStateManagerTests
 		}
 
 		// Create two workspaces with two windows each
-		IWorkspace workspace1 = Substitute.For<IWorkspace>();
-		workspace1.Name.Returns("workspace1");
-		workspace1
-			.ActiveLayoutEngine.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
+		ILayoutEngine engine1 = Substitute.For<ILayoutEngine>();
+		Workspace workspace1 = CreateWorkspace(ctx) with { BackingName = "workspace1", LayoutEngines = [engine1] };
+		engine1
+			.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
 			.Returns(
 				new List<IWindowState>()
 				{
@@ -127,10 +132,10 @@ public class CoreSavedStateManagerTests
 				}
 			);
 
-		IWorkspace workspace2 = Substitute.For<IWorkspace>();
-		workspace2.Name.Returns("workspace2");
-		workspace2
-			.ActiveLayoutEngine.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
+		ILayoutEngine engine2 = Substitute.For<ILayoutEngine>();
+		Workspace workspace2 = CreateWorkspace(ctx) with { BackingName = "workspace2", LayoutEngines = [engine2] };
+		engine2
+			.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
 			.Returns(
 				new List<IWindowState>()
 				{
@@ -150,8 +155,7 @@ public class CoreSavedStateManagerTests
 			);
 
 		// Load the workspaces into the context.
-		ctx.WorkspaceManager.GetEnumerator()
-			.Returns(new List<IWorkspace>() { workspace1, workspace2 }.GetEnumerator());
+		AddWorkspacesToManager(ctx, root, workspace1, workspace2);
 
 		// Create the expected JSON.
 		return JsonSerializer.Serialize(
@@ -160,7 +164,8 @@ public class CoreSavedStateManagerTests
 				{
 					new(
 						"workspace1",
-						new() { new SavedWindow(1, new(0, 0, 0.1, 0.1)), new SavedWindow(2, new(0.1, 0.1, 0.1, 0.1)) }
+						new() { new SavedWindow(1, new(0, 0, 0.1, 0.1)), new SavedWindow(2, new(0.1, 0.1, 0.1, 0.1)) },
+						null
 					),
 					new(
 						"workspace2",
@@ -168,18 +173,19 @@ public class CoreSavedStateManagerTests
 						{
 							new SavedWindow(3, new(0.2, 0.2, 0.1, 0.1)),
 							new SavedWindow(4, new(0.3, 0.3, 0.1, 0.1)),
-						}
+						},
+						null
 					),
 				}
 			)
 		);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void Dispose_SavesState(IContext ctx)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void Dispose_SavesState(IContext ctx, MutableRootSector root)
 	{
 		// Given
-		string expectedJson = Setup_ContextState(ctx);
+		string expectedJson = Setup_ContextState(ctx, root);
 		ctx.FileManager.SavedStateDir.Returns("savedStateDir");
 
 		CoreSavedStateManager sut = new(ctx);
