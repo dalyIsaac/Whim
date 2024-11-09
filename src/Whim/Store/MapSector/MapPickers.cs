@@ -233,7 +233,8 @@ public static partial class Pickers
 	/// </param>
 	/// <returns>
 	/// The handles of the monitors which can show the workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
-	/// If the workspace is not found or there are no monitors which can show the workspace, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// If there are no explicit monitors which can show the workspace, then all monitors will be returned.
+	/// If the workspace is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
 	/// </returns>
 	public static PurePicker<Result<IReadOnlyList<HMONITOR>>> PickStickyMonitorsByWorkspace(WorkspaceId workspaceId) =>
 		rootSector =>
@@ -247,26 +248,27 @@ public static partial class Pickers
 				return Result.FromException<IReadOnlyList<HMONITOR>>(StoreExceptions.WorkspaceNotFound(workspaceId));
 			}
 
+			// If the workspace is sticky, try get the associated monitors.
 			if (
-				!mapSector.StickyWorkspaceMonitorIndexMap.TryGetValue(
+				mapSector.StickyWorkspaceMonitorIndexMap.TryGetValue(
 					workspaceId,
 					out ImmutableArray<int> monitorIndices
 				)
 			)
 			{
-				return monitors.Select(monitor => monitor.Handle).ToList();
-			}
+				List<HMONITOR> monitorHandles = monitorIndices
+					.Where(monitorIndex => monitorIndex >= 0 && monitorIndex < monitors.Length)
+					.Select(monitorIndex => monitors[monitorIndex].Handle)
+					.ToList();
 
-			List<HMONITOR> monitorHandles = [];
-			foreach (int monitorIndex in monitorIndices)
-			{
-				if (monitorIndex >= 0 && monitorIndex < monitors.Length)
+				if (monitorHandles.Count != 0)
 				{
-					monitorHandles.Add(monitors[monitorIndex].Handle);
+					return monitorHandles;
 				}
 			}
 
-			return monitorHandles;
+			// If the workspace isn't sticky, or there are no longer any valid monitors for it, allow it on all monitors.
+			return monitors.Select(monitor => monitor.Handle).ToList();
 		};
 
 	/// <summary>
