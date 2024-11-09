@@ -37,7 +37,7 @@ public record ActivateWorkspaceTransform(
 		{
 			return Result.FromException<Unit>(targetMonitorHandleResult.Error!);
 		}
-		mapSector.LastMonitorWorkspaceMap = mapSector.LastMonitorWorkspaceMap.SetItem(
+		mapSector.WorkspaceLastMonitorMap = mapSector.WorkspaceLastMonitorMap.SetItem(
 			workspace.Id,
 			targetMonitorHandle
 		);
@@ -150,7 +150,7 @@ public record ActivateWorkspaceTransform(
 		);
 
 		// If the monitor is not valid, try activate on the last monitor.
-		if (rootSector.MapSector.LastMonitorWorkspaceMap.TryGetValue(workspace.Id, out HMONITOR lastMonitorHandle))
+		if (rootSector.MapSector.WorkspaceLastMonitorMap.TryGetValue(workspace.Id, out HMONITOR lastMonitorHandle))
 		{
 			if (validMonitors.Contains(lastMonitorHandle))
 			{

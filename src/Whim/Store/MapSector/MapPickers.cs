@@ -175,55 +175,6 @@ public static partial class Pickers
 		};
 
 	/// <summary>
-	/// Retrieves the ids of the workspaces which can be shown on the given monitor.
-	/// </summary>
-	/// <param name="monitorHandle">
-	/// The handle of the monitor to get the sticky workspaces for.
-	/// </param>
-	/// <returns>
-	/// The ids of the workspaces which can be shown on the monitor, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
-	/// </returns>
-	public static PurePicker<Result<IEnumerable<WorkspaceId>>> PickStickyWorkspaceIdsByMonitor(
-		HMONITOR monitorHandle
-	) =>
-		rootSector =>
-		{
-			Result<int> monitorIndexResult = PickMonitorIndexByHandle(monitorHandle)(rootSector);
-			if (!monitorIndexResult.TryGet(out int monitorIndex))
-			{
-				return Result.FromException<IEnumerable<WorkspaceId>>(monitorIndexResult.Error!);
-			}
-
-			IMapSector mapSector = rootSector.MapSector;
-			List<WorkspaceId> workspaceIds = [];
-
-			// Get the sticky workspaces for the monitor.
-			foreach (
-				(
-					WorkspaceId workspaceId,
-					ImmutableArray<int> monitorIndices
-				) in mapSector.StickyWorkspaceMonitorIndexMap
-			)
-			{
-				if (monitorIndices.Contains(monitorIndex))
-				{
-					workspaceIds.Add(workspaceId);
-				}
-			}
-
-			// Get the workspaces which are not sticky for any monitor.
-			foreach (WorkspaceId workspaceId in mapSector.MonitorWorkspaceMap.Values)
-			{
-				if (!mapSector.StickyWorkspaceMonitorIndexMap.ContainsKey(workspaceId))
-				{
-					workspaceIds.Add(workspaceId);
-				}
-			}
-
-			return workspaceIds;
-		};
-
-	/// <summary>
 	/// Retrieves the handles of the monitors which can show the given workspace. This includes workspaces
 	/// which explicitly state which monitors they can be shown on, and workspaces which can be shown on any monitor
 	/// (i.e., they don't specify any monitors).

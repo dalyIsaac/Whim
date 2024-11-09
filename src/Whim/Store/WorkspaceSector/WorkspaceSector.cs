@@ -1,7 +1,7 @@
 namespace Whim;
 
 /// <summary>
-/// A workspace's name and layout engines.
+/// A workspace's name, layout engines, and monitor indices.
 /// </summary>
 /// <param name="WorkspaceId"></param>
 /// <param name="Name"></param>

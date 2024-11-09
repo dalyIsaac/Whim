@@ -79,6 +79,7 @@ public record AddWorkspaceTransform(
 		sector.WorkspaceOrder = sector.WorkspaceOrder.Add(workspace.Id);
 		sector.QueueEvent(new WorkspaceAddedEventArgs() { Workspace = workspace });
 
+		// If the monitor indices are provided, add them to the sticky workspace monitor index map.
 		if (MonitorIndices != null)
 		{
 			mutableRootSector.MapSector.StickyWorkspaceMonitorIndexMap =

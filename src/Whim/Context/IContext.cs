@@ -102,7 +102,7 @@ public interface IContext
 	/// This will try reuse existing <see cref="IWindow"/>s if possible.
 	/// </summary>
 	/// <remarks>
-	/// This does not add the window to the <see cref="IWindowManager"/> or to the <see cref="IWorkspaceManager"/>.
+	/// This method will mainly be used to add existing windows to Whim.
 	/// </remarks>
 	/// <param name="hWnd">The window handle.</param>
 	/// <returns></returns>
