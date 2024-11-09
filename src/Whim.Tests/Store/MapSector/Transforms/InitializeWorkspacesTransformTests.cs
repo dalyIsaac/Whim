@@ -78,11 +78,10 @@ public class InitializeWorkspacesTransformTests
 	{
 		// Given there are saved workspaces which don't exist in the workspace manager
 		IWindow window = CreateWindow((HWND)10);
-		SavedWorkspace workspace =
-			new("test", new List<SavedWindow>() { new(window.Handle, Rectangle.UnitSquare<double>()) }, null);
+		SavedWorkspace workspace = new("test", [new SavedWindow(window.Handle, Rectangle.UnitSquare<double>())], null);
 		AddWorkspacesToSavedState(internalCtx, workspace);
 
-		ctx.WindowManager.CreateWindow(window.Handle).Returns(Result.FromException<IWindow>(new Exception("nope")));
+		ctx.CreateWindow(window.Handle).Returns(Result.FromException<IWindow>(new Exception("nope")));
 
 		InitializeWorkspacesTransform sut = new();
 
@@ -103,6 +102,8 @@ public class InitializeWorkspacesTransformTests
 	private static string BrowserWorkspaceName => "Browser";
 	private static string MediaWorkspaceName => "Media";
 	private static string CodeWorkspaceName => "Code";
+	private static string StickyWorkspaceName => "Sticky";
+	private static string SavedStickyWorkspaceName => "SavedSticky";
 
 	private static HMONITOR BrowserMonitor => (HMONITOR)1;
 	private static HMONITOR CodeMonitor => (HMONITOR)2;
@@ -116,13 +117,10 @@ public class InitializeWorkspacesTransformTests
 			new WorkspaceToCreate(
 				Guid.NewGuid(),
 				CodeWorkspaceName,
-				new List<CreateLeafLayoutEngine>()
-				{
-					(id) => new ImmutableTestLayoutEngine(),
-					(id) => new ImmutableTestLayoutEngine(),
-				},
+				[(id) => new ImmutableTestLayoutEngine(), (id) => new ImmutableTestLayoutEngine()],
 				null
 			),
+			new WorkspaceToCreate(Guid.NewGuid(), StickyWorkspaceName, null, [0, 1]),
 		];
 	}
 
@@ -133,12 +131,11 @@ public class InitializeWorkspacesTransformTests
 		SavedWindow brokenWindow = new(BrokenHandle, Rectangle.UnitSquare<double>());
 		SavedWindow discordWindow = new(DiscordHandle, Rectangle.UnitSquare<double>());
 
-		SavedWorkspace browserWorkspace =
-			new(BrowserWorkspaceName, new List<SavedWindow>() { browserWindow, brokenWindow }, null);
-		SavedWorkspace mediaWorkspace =
-			new(MediaWorkspaceName, new List<SavedWindow>() { spotifyWindow, discordWindow }, null);
+		SavedWorkspace browserWorkspace = new(BrowserWorkspaceName, [browserWindow, brokenWindow], null);
+		SavedWorkspace mediaWorkspace = new(MediaWorkspaceName, [spotifyWindow, discordWindow], null);
+		SavedWorkspace savedStickyWorkspace = new(SavedStickyWorkspaceName, [], [1, 2]);
 
-		AddWorkspacesToSavedState(internalCtx, browserWorkspace, mediaWorkspace);
+		AddWorkspacesToSavedState(internalCtx, browserWorkspace, mediaWorkspace, savedStickyWorkspace);
 	}
 
 	private static void Setup_CreateWindow(IContext ctx)
@@ -159,12 +156,13 @@ public class InitializeWorkspacesTransformTests
 	internal void PopulateSavedWorkspaces(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		// Given:
-		// - the user has created the "Browser" and "Code" workspaces
+		// - the user has created the "Browser", "Code", and "Sticky" workspaces
 		Setup_UserCreatedWorkspaces(rootSector);
 
-		// - the user has saved the "Browser" and "Media" workspaces
+		// - the user has saved the "Browser", "Media", and "SavedSticky" workspaces
 		//   - "Browser" has a browser window, a Spotify window, and a broken window
 		//   - "Media" has a saved Discord window
+		//   - "SavedSticky" has no windows
 		Setup_SavedState(internalCtx);
 
 		// - the Broken window fails to create
@@ -218,8 +216,8 @@ public class InitializeWorkspacesTransformTests
 		Assert.Equal(4, rootSector.WindowSector.Windows.Count);
 		Assert.Equal(4, rootSector.MapSector.WindowWorkspaceMap.Count);
 
-		// - there are 3 workspaces
-		Assert.Equal(3, rootSector.WorkspaceSector.Workspaces.Count);
+		// - there are 554orkspaces
+		Assert.Equal(4, rootSector.WorkspaceSector.Workspaces.Count);
 
 		// - the "Browser" workspace has been added with the "Browser", "Spotify", and "Discord"  windows
 		Workspace browserWorkspace = rootSector.WorkspaceSector.Workspaces.Values.FirstOrDefault(w =>
@@ -239,9 +237,19 @@ public class InitializeWorkspacesTransformTests
 
 		Assert.Equal(2, codeWorkspace.LayoutEngines.Count);
 
+		// - the "Sticky" workspace has been added with no windows
+		Workspace stickyWorkspace = rootSector.WorkspaceSector.Workspaces.Values.FirstOrDefault(w =>
+			w.BackingName == StickyWorkspaceName
+		)!;
+		Assert.Empty(stickyWorkspace.WindowPositions);
+
+		Assert.Single(stickyWorkspace.LayoutEngines);
+		Assert.Single(rootSector.MapSector.StickyWorkspaceMonitorIndexMap);
+		rootSector.MapSector.StickyWorkspaceMonitorIndexMap[stickyWorkspace.Id].Should().BeEquivalentTo(new[] { 0, 1 });
+
 		// - the automatically created workspace has the "Spotify" and "Discord" windows
 		Workspace autoWorkspace = rootSector.WorkspaceSector.Workspaces.Values.FirstOrDefault(w =>
-			w.BackingName == "Workspace 3"
+			w.BackingName == "Workspace 4"
 		)!;
 		Assert.Equal(2, autoWorkspace.WindowPositions.Count);
 		Assert.Contains(SpotifyHandle, autoWorkspace.WindowPositions);
