@@ -129,6 +129,10 @@ public record ActivateWorkspaceTransform(
 		IWorkspace workspace
 	)
 	{
+		// Get the valid monitors for the workspace.
+		IReadOnlyList<HMONITOR> validMonitors =
+			ctx.Store.Pick(PickStickyMonitorsByWorkspace(workspace.Id)).ValueOrDefault ?? [];
+
 		// Try activate on the current monitor.
 		HMONITOR targetMonitorHandle = MonitorHandle;
 		if (targetMonitorHandle == default)
@@ -136,59 +140,37 @@ public record ActivateWorkspaceTransform(
 			targetMonitorHandle = rootSector.MonitorSector.ActiveMonitorHandle;
 		}
 
-		if (IsMonitorValidForWorkspace(ctx, workspace, targetMonitorHandle))
+		if (validMonitors.Contains(targetMonitorHandle))
 		{
 			return targetMonitorHandle;
 		}
 
-		Logger.Error(
+		Logger.Debug(
 			$"Monitor {targetMonitorHandle} is not valid for workspace {workspace.Id}, falling back to the last monitor the workspace was activated on"
 		);
 
 		// If the monitor is not valid, try activate on the last monitor.
 		if (rootSector.MapSector.LastMonitorWorkspaceMap.TryGetValue(workspace.Id, out HMONITOR lastMonitorHandle))
 		{
-			if (IsMonitorValidForWorkspace(ctx, workspace, lastMonitorHandle))
+			if (validMonitors.Contains(lastMonitorHandle))
 			{
-				return lastMonitorHandle;
+				return targetMonitorHandle;
 			}
 		}
 
-		if (IsMonitorValidForWorkspace(ctx, workspace, targetMonitorHandle))
-		{
-			return targetMonitorHandle;
-		}
-
-		Logger.Error(
-			$"Monitor {targetMonitorHandle} is not valid for workspace {workspace.Id}, falling back to first monitor available"
+		Logger.Debug(
+			$"Monitor {lastMonitorHandle} is not valid for workspace {workspace.Id}, falling back to first monitor available"
 		);
 
 		// Activate on the first available monitor.
 		foreach (IMonitor monitor in rootSector.MonitorSector.Monitors)
 		{
-			if (IsMonitorValidForWorkspace(ctx, workspace, monitor.Handle))
+			if (validMonitors.Contains(monitor.Handle))
 			{
 				return monitor.Handle;
 			}
 		}
 
 		return Result.FromException<HMONITOR>(StoreExceptions.NoValidMonitorForWorkspace(workspace.Id));
-	}
-
-	/// <summary>
-	/// Checks if the given monitor is valid for the given workspace.
-	/// </summary>
-	/// <param name="ctx"></param>
-	/// <param name="workspace"></param>
-	/// <param name="monitorHandle"></param>
-	/// <returns></returns>
-	private static bool IsMonitorValidForWorkspace(IContext ctx, IWorkspace workspace, HMONITOR monitorHandle)
-	{
-		if (ctx.Store.Pick(PickStickyMonitorsByWorkspace(workspace.Id)).TryGet(out IEnumerable<HMONITOR> monitors))
-		{
-			return monitors.Contains(monitorHandle);
-		}
-
-		return false;
 	}
 }

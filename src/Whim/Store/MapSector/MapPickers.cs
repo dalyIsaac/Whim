@@ -235,7 +235,7 @@ public static partial class Pickers
 	/// The handles of the monitors which can show the workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
 	/// If the workspace is not found or there are no monitors which can show the workspace, then <see cref="Result{T, TError}.Error"/> will be returned.
 	/// </returns>
-	public static PurePicker<Result<IEnumerable<HMONITOR>>> PickStickyMonitorsByWorkspace(WorkspaceId workspaceId) =>
+	public static PurePicker<Result<IReadOnlyList<HMONITOR>>> PickStickyMonitorsByWorkspace(WorkspaceId workspaceId) =>
 		rootSector =>
 		{
 			IMapSector mapSector = rootSector.MapSector;
@@ -244,7 +244,7 @@ public static partial class Pickers
 
 			if (!workspaceSector.Workspaces.ContainsKey(workspaceId))
 			{
-				return Result.FromException<IEnumerable<HMONITOR>>(StoreExceptions.WorkspaceNotFound(workspaceId));
+				return Result.FromException<IReadOnlyList<HMONITOR>>(StoreExceptions.WorkspaceNotFound(workspaceId));
 			}
 
 			if (
@@ -278,7 +278,7 @@ public static partial class Pickers
 	/// <returns>
 	/// The explicit indices of the monitors which can show the workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
 	/// </returns>
-	public static PurePicker<Result<IEnumerable<int>>> PickStickyMonitorIndicesByWorkspace(WorkspaceId workspaceId) =>
+	public static PurePicker<Result<IReadOnlyList<int>>> PickStickyMonitorIndicesByWorkspace(WorkspaceId workspaceId) =>
 		rootSector =>
 		{
 			IMapSector mapSector = rootSector.MapSector;
@@ -286,7 +286,7 @@ public static partial class Pickers
 
 			if (!workspaceSector.Workspaces.ContainsKey(workspaceId))
 			{
-				return Result.FromException<IEnumerable<int>>(StoreExceptions.WorkspaceNotFound(workspaceId));
+				return Result.FromException<IReadOnlyList<int>>(StoreExceptions.WorkspaceNotFound(workspaceId));
 			}
 
 			if (
@@ -299,6 +299,6 @@ public static partial class Pickers
 				return monitorIndices;
 			}
 
-			return Result.FromValue(Enumerable.Empty<int>());
+			return Result.FromValue<IReadOnlyList<int>>([]);
 		};
 }

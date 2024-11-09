@@ -95,8 +95,8 @@ internal class CoreSavedStateManager : ICoreSavedStateManager
 
 			int[]? stickyMonitorIndices = _context
 				.Store.Pick(PickStickyMonitorIndicesByWorkspace(workspace.Id))
-				.TryGet(out IEnumerable<int> indices)
-				? indices.ToArray()
+				.TryGet(out IReadOnlyList<int> indices)
+				? [.. indices]
 				: null;
 
 			savedWorkspaces.Add(new SavedWorkspace(workspace.BackingName, savedWindows, stickyMonitorIndices));

@@ -129,7 +129,7 @@ internal record InitializeWorkspacesTransform : Transform
 		{
 			WorkspaceId workspaceId = workspaceSector.WorkspaceOrder[idx];
 
-			if (!ctx.Store.Pick(PickStickyMonitorsByWorkspace(workspaceId)).TryGet(out IEnumerable<HMONITOR> monitors))
+			if (!ctx.Store.Pick(PickStickyMonitorsByWorkspace(workspaceId)).TryGet(out IReadOnlyList<HMONITOR> monitors))
 			{
 				continue;
 			}
