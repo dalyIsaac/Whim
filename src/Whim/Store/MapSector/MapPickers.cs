@@ -248,7 +248,7 @@ public static partial class Pickers
 			}
 
 			if (
-				mapSector.StickyWorkspaceMonitorIndexMap.TryGetValue(
+				!mapSector.StickyWorkspaceMonitorIndexMap.TryGetValue(
 					workspaceId,
 					out ImmutableArray<int> monitorIndices
 				)

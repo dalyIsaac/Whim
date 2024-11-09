@@ -27,7 +27,9 @@ internal record InitializeWorkspacesTransform : Transform
 		workspaceSector.HasInitialized = true;
 		foreach (WorkspaceToCreate w in workspaceSector.WorkspacesToCreate)
 		{
-			ctx.Store.Dispatch(new AddWorkspaceTransform(w.Name, w.CreateLeafLayoutEngines, w.WorkspaceId));
+			ctx.Store.Dispatch(
+				new AddWorkspaceTransform(w.Name, w.CreateLeafLayoutEngines, w.WorkspaceId, w.MonitorIndices)
+			);
 		}
 
 		workspaceSector.WorkspacesToCreate = workspaceSector.WorkspacesToCreate.Clear();
@@ -134,13 +136,12 @@ internal record InitializeWorkspacesTransform : Transform
 
 			foreach (HMONITOR monitor in monitors)
 			{
-				if (processedMonitors.Contains(monitor))
+				if (!processedMonitors.Contains(monitor))
 				{
-					continue;
+					processedMonitors.Add(monitor);
+					ctx.Store.Dispatch(new ActivateWorkspaceTransform(workspaceId, monitor));
+					break;
 				}
-
-				processedMonitors.Add(monitor);
-				ctx.Store.Dispatch(new ActivateWorkspaceTransform(workspaceId, monitor));
 			}
 		}
 
