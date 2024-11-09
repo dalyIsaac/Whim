@@ -405,21 +405,19 @@ public class MapPickersTests
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void PickExplicitStickyMonitorIndicesByWorkspace_Success(IContext ctx, MutableRootSector root)
 	{
-		// Given we have workspace which isn't sticky
+		// Given we have workspace which is sticky
 		var workspace = CreateWorkspace(ctx);
-
-		AddMonitorsToManager(
-			ctx,
-			root,
-			CreateMonitor((HMONITOR)0),
-			CreateMonitor((HMONITOR)1),
-			CreateMonitor((HMONITOR)2)
+		root.MapSector.StickyWorkspaceMonitorIndexMap = root.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(
+			workspace.Id,
+			[0, 1]
 		);
 
 		// When we get the monitor indices
 		var result = ctx.Store.Pick(Pickers.PickExplicitStickyMonitorIndicesByWorkspace(workspace.Id));
 
-		// Then we get an exception
-		Assert.False(result.IsSuccessful);
+		// Then we get the monitor indices
+		Assert.True(result.IsSuccessful);
+		Assert.Equal(2, result.Value.Count);
+		result.Value.Should().BeEquivalentTo([0, 1]);
 	}
 }
