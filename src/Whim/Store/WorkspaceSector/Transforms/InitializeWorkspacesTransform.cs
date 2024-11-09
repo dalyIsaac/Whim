@@ -71,7 +71,6 @@ internal record InitializeWorkspacesTransform : Transform
 			}
 
 			PopulateSavedWindows(ctx, windowSector, mapSector, processedWindows, savedWorkspace, workspace);
-			PopulateSavedStickyMonitors(mapSector, savedWorkspace, workspace);
 		}
 
 		// Activate the workspaces before we add the unprocessed windows to make sure we have a workspace for each monitor.
@@ -119,21 +118,6 @@ internal record InitializeWorkspacesTransform : Transform
 			);
 
 			windowSector.QueueEvent(new WindowAddedEventArgs() { Window = window });
-		}
-	}
-
-	private static void PopulateSavedStickyMonitors(
-		MapSector mapSector,
-		SavedWorkspace savedWorkspace,
-		Workspace workspace
-	)
-	{
-		if (savedWorkspace.MonitorIndices != null)
-		{
-			mapSector.StickyWorkspaceMonitorIndexMap = mapSector.StickyWorkspaceMonitorIndexMap.Add(
-				workspace.Id,
-				[.. savedWorkspace.MonitorIndices]
-			);
 		}
 	}
 

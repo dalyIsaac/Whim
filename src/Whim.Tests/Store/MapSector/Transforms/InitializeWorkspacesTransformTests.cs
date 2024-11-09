@@ -216,7 +216,7 @@ public class InitializeWorkspacesTransformTests
 		Assert.Equal(4, rootSector.WindowSector.Windows.Count);
 		Assert.Equal(4, rootSector.MapSector.WindowWorkspaceMap.Count);
 
-		// - there are 554orkspaces
+		// - there are 4 workspaces
 		Assert.Equal(4, rootSector.WorkspaceSector.Workspaces.Count);
 
 		// - the "Browser" workspace has been added with the "Browser", "Spotify", and "Discord"  windows
