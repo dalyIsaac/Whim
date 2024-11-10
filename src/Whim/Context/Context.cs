@@ -120,18 +120,7 @@ internal class Context : IContext
 		Logger.Debug("Completed initialization");
 	}
 
-	public Result<IWindow> CreateWindow(HWND hwnd)
-	{
-		Logger.Verbose($"Adding window {hwnd}");
-
-		Result<IWindow> res = Store.Pick(PickWindowByHandle(hwnd));
-		if (res.IsSuccessful)
-		{
-			return res;
-		}
-
-		return Window.CreateWindow(this, _internalContext, hwnd);
-	}
+	public Result<IWindow> CreateWindow(HWND hwnd) => Window.GetOrCreateWindow(this, _internalContext, hwnd);
 
 	public void HandleUncaughtException(string procName, Exception exception)
 	{
