@@ -30,25 +30,42 @@ public record ActivateWorkspaceTransform(
 			return Result.FromException<Unit>(workspaceResult.Error!);
 		}
 
-		HMONITOR targetMonitorHandle = MonitorHandle;
-		if (targetMonitorHandle == default)
+		Result<HMONITOR> targetMonitorHandleResult = ctx.Store.Pick(
+			PickValidMonitorForWorkspace(workspace.Id, MonitorHandle)
+		);
+		if (!targetMonitorHandleResult.TryGet(out HMONITOR targetMonitorHandle))
 		{
-			targetMonitorHandle = rootSector.MonitorSector.ActiveMonitorHandle;
+			return Result.FromException<Unit>(targetMonitorHandleResult.Error!);
 		}
 
 		Result<IMonitor> targetMonitorResult = ctx.Store.Pick(PickMonitorByHandle(targetMonitorHandle));
 		if (!targetMonitorResult.TryGet(out IMonitor targetMonitor))
 		{
-			return Result.FromException<Unit>(targetMonitorResult.Error!);
+			return Result.FromException<Unit>(targetMonitorHandleResult.Error!);
 		}
 
+		return ActivateWorkspaceOnTargetMonitor(ctx, mapSector, workspace, targetMonitor);
+	}
+
+	private Result<Unit> ActivateWorkspaceOnTargetMonitor(
+		IContext ctx,
+		MapSector mapSector,
+		IWorkspace workspace,
+		IMonitor targetMonitor
+	)
+	{
+		mapSector.WorkspaceLastMonitorMap = mapSector.WorkspaceLastMonitorMap.SetItem(
+			workspace.Id,
+			targetMonitor.Handle
+		);
+
 		// Get the old workspace for the event.
-		IWorkspace? oldWorkspace = ctx.Store.Pick(PickWorkspaceByMonitor(targetMonitorHandle)).ValueOrDefault;
+		IWorkspace? oldWorkspace = ctx.Store.Pick(PickWorkspaceByMonitor(targetMonitor.Handle)).ValueOrDefault;
 
 		// Find the monitor which just lost `workspace`.
 		IMonitor? loserMonitor = ctx.Store.Pick(PickMonitorByWorkspace(WorkspaceId)).ValueOrDefault;
 
-		if (targetMonitorHandle == loserMonitor?.Handle)
+		if (targetMonitor.Handle == loserMonitor?.Handle)
 		{
 			Logger.Debug("Workspace is already activated");
 			return Unit.Result;
@@ -57,9 +74,9 @@ public record ActivateWorkspaceTransform(
 		// Update the active monitor. Having this line before the old workspace is deactivated
 		// is important, as WindowManager.OnWindowHidden() checks to see if a window is in a
 		// visible workspace when it receives the EVENT_OBJECT_HIDE event.
-		mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(targetMonitorHandle, WorkspaceId);
+		mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(targetMonitor.Handle, WorkspaceId);
 
-		if (loserMonitor != null && oldWorkspace != null && loserMonitor.Handle != targetMonitorHandle)
+		if (loserMonitor != null && oldWorkspace != null && loserMonitor.Handle != targetMonitor.Handle)
 		{
 			Logger.Debug($"Layouting workspace {oldWorkspace} in loser monitor {loserMonitor}");
 			mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(loserMonitor.Handle, oldWorkspace.Id);
@@ -82,7 +99,7 @@ public record ActivateWorkspaceTransform(
 			}
 
 			// Temporarily focus the monitor's desktop HWND, to prevent another window from being focused.
-			ctx.Store.Dispatch(new FocusMonitorDesktopTransform(targetMonitorHandle));
+			ctx.Store.Dispatch(new FocusMonitorDesktopTransform(targetMonitor.Handle));
 		}
 
 		// Layout the new workspace.

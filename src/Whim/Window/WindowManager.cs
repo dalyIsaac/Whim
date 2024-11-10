@@ -2,12 +2,9 @@ using System.Collections;
 
 namespace Whim;
 
-internal class WindowManager(IContext context, IInternalContext internalContext)
-	: IWindowManager,
-		IInternalWindowManager
+internal class WindowManager(IContext context) : IWindowManager, IInternalWindowManager
 {
 	private readonly IContext _context = context;
-	private readonly IInternalContext _internalContext = internalContext;
 
 	public event EventHandler<WindowAddedEventArgs>? WindowAdded;
 	public event EventHandler<WindowFocusedEventArgs>? WindowFocused;
@@ -57,19 +54,7 @@ internal class WindowManager(IContext context, IInternalContext internalContext)
 	private void WindowSector_WindowMinimizeEnded(object? sender, WindowMinimizeEndedEventArgs ev) =>
 		WindowMinimizeEnd?.Invoke(sender, ev);
 
-	public Result<IWindow> CreateWindow(HWND hwnd)
-	{
-		Logger.Verbose($"Adding window {hwnd}");
-
-		Result<IWindow> res = _context.Store.Pick(PickWindowByHandle(hwnd));
-		if (res.IsSuccessful)
-		{
-			Logger.Debug($"Window {hwnd} already exists");
-			return res;
-		}
-
-		return Window.CreateWindow(_context, _internalContext, hwnd);
-	}
+	public Result<IWindow> CreateWindow(HWND hwnd) => _context.CreateWindow(hwnd);
 
 	public IWindow? AddWindow(HWND hwnd) => _context.Store.Dispatch(new WindowAddedTransform(hwnd)).ValueOrDefault;
 

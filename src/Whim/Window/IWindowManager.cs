@@ -21,7 +21,7 @@ public interface IWindowManager : IEnumerable<IWindow>, IDisposable
 	/// </remarks>
 	/// <param name="hWnd">The window handle.</param>
 	/// <returns></returns>
-	[Obsolete("Use PickWindowByHandle and Window.CreateWindow instead.")]
+	[Obsolete("Use IContext.CreateWindow instead.")]
 	Result<IWindow> CreateWindow(HWND hWnd);
 
 	/// <summary>

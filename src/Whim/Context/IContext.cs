@@ -98,6 +98,17 @@ public interface IContext
 	void HandleUncaughtException(string procName, Exception exception);
 
 	/// <summary>
+	/// Creates a new window. If the window cannot be created, <see langword="null"/> is returned.
+	/// This will try reuse existing <see cref="IWindow"/>s if possible.
+	/// </summary>
+	/// <remarks>
+	/// This method will mainly be used to add existing windows to Whim.
+	/// </remarks>
+	/// <param name="hWnd">The window handle.</param>
+	/// <returns></returns>
+	Result<IWindow> CreateWindow(HWND hWnd);
+
+	/// <summary>
 	/// This event is fired when the context is shutting down.
 	/// </summary>
 	event EventHandler<ExitEventArgs>? Exiting;

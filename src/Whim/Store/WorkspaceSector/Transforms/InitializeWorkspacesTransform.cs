@@ -27,7 +27,9 @@ internal record InitializeWorkspacesTransform : Transform
 		workspaceSector.HasInitialized = true;
 		foreach (WorkspaceToCreate w in workspaceSector.WorkspacesToCreate)
 		{
-			ctx.Store.Dispatch(new AddWorkspaceTransform(w.Name, w.CreateLeafLayoutEngines, w.WorkspaceId));
+			ctx.Store.Dispatch(
+				new AddWorkspaceTransform(w.Name, w.CreateLeafLayoutEngines, w.WorkspaceId, w.MonitorIndices)
+			);
 		}
 
 		workspaceSector.WorkspacesToCreate = workspaceSector.WorkspacesToCreate.Clear();
@@ -68,25 +70,7 @@ internal record InitializeWorkspacesTransform : Transform
 				continue;
 			}
 
-			foreach (SavedWindow savedWindow in savedWorkspace.Windows)
-			{
-				HWND hwnd = (HWND)savedWindow.Handle;
-				processedWindows.Add(hwnd);
-				if (!ctx.WindowManager.CreateWindow(hwnd).TryGet(out IWindow window))
-				{
-					Logger.Information($"Could not find window with handle {savedWindow.Handle}");
-					continue;
-				}
-
-				mapSector.WindowWorkspaceMap = mapSector.WindowWorkspaceMap.SetItem(window.Handle, workspace.Id);
-				windowSector.Windows = windowSector.Windows.Add(window.Handle, window);
-
-				ctx.Store.Dispatch(
-					new MoveWindowToPointInWorkspaceTransform(workspace.Id, window.Handle, savedWindow.Rectangle.Center)
-				);
-
-				windowSector.QueueEvent(new WindowAddedEventArgs() { Window = window });
-			}
+			PopulateSavedWindows(ctx, windowSector, mapSector, processedWindows, savedWorkspace, workspace);
 		}
 
 		// Activate the workspaces before we add the unprocessed windows to make sure we have a workspace for each monitor.
@@ -107,22 +91,75 @@ internal record InitializeWorkspacesTransform : Transform
 		}
 	}
 
+	private static void PopulateSavedWindows(
+		IContext ctx,
+		WindowSector windowSector,
+		MapSector mapSector,
+		List<HWND> processedWindows,
+		SavedWorkspace savedWorkspace,
+		Workspace workspace
+	)
+	{
+		foreach (SavedWindow savedWindow in savedWorkspace.Windows)
+		{
+			HWND hwnd = (HWND)savedWindow.Handle;
+			processedWindows.Add(hwnd);
+			if (!ctx.CreateWindow(hwnd).TryGet(out IWindow window))
+			{
+				Logger.Information($"Could not find window with handle {savedWindow.Handle}");
+				continue;
+			}
+
+			mapSector.WindowWorkspaceMap = mapSector.WindowWorkspaceMap.SetItem(window.Handle, workspace.Id);
+			windowSector.Windows = windowSector.Windows.Add(window.Handle, window);
+
+			ctx.Store.Dispatch(
+				new MoveWindowToPointInWorkspaceTransform(workspace.Id, window.Handle, savedWindow.Rectangle.Center)
+			);
+
+			windowSector.QueueEvent(new WindowAddedEventArgs() { Window = window });
+		}
+	}
+
 	private static void ActivateWorkspaces(IContext ctx, MutableRootSector rootSector)
 	{
 		WorkspaceSector workspaceSector = rootSector.WorkspaceSector;
 		MonitorSector monitorSector = rootSector.MonitorSector;
+		MapSector mapSector = rootSector.MapSector;
 
 		// Assign workspaces to monitors.
-		for (int idx = 0; idx < monitorSector.Monitors.Length; idx++)
+		List<HMONITOR> processedMonitors = [];
+		for (int idx = 0; idx < workspaceSector.WorkspaceOrder.Length; idx++)
 		{
-			IMonitor monitor = monitorSector.Monitors[idx];
+			WorkspaceId workspaceId = workspaceSector.WorkspaceOrder[idx];
 
-			if (idx >= workspaceSector.Workspaces.Count)
+			if (
+				!ctx.Store.Pick(PickStickyMonitorsByWorkspace(workspaceId)).TryGet(out IReadOnlyList<HMONITOR> monitors)
+			)
 			{
-				ctx.Store.Dispatch(new AddWorkspaceTransform($"Workspace {idx + 1}"));
+				continue;
 			}
 
-			ctx.Store.Dispatch(new ActivateWorkspaceTransform(workspaceSector.WorkspaceOrder[idx], monitor.Handle));
+			foreach (HMONITOR monitor in monitors)
+			{
+				if (!processedMonitors.Contains(monitor))
+				{
+					processedMonitors.Add(monitor);
+					ctx.Store.Dispatch(new ActivateWorkspaceTransform(workspaceId, monitor));
+					break;
+				}
+			}
+		}
+
+		// If there are any monitors left, create workspaces for them.
+		IEnumerable<HMONITOR> unprocessedMonitors = monitorSector
+			.Monitors.Select(m => m.Handle)
+			.Except(processedMonitors);
+
+		foreach (HMONITOR monitor in unprocessedMonitors)
+		{
+			ctx.Store.Dispatch(new AddWorkspaceTransform($"Workspace {workspaceSector.Workspaces.Count + 1}"));
+			ctx.Store.Dispatch(new ActivateWorkspaceTransform(workspaceSector.WorkspaceOrder[^1], monitor));
 		}
 	}
 }

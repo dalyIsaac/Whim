@@ -1,5 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Whim;
 
 /// <summary>
@@ -65,7 +63,7 @@ internal class Context : IContext
 
 		RouterManager = new RouterManager(this);
 		FilterManager = new FilterManager();
-		WindowManager = new WindowManager(this, _internalContext);
+		WindowManager = new WindowManager(this);
 		MonitorManager = new MonitorManager(this);
 
 		WorkspaceManager = new WorkspaceManager(this);
@@ -121,6 +119,8 @@ internal class Context : IContext
 
 		Logger.Debug("Completed initialization");
 	}
+
+	public Result<IWindow> CreateWindow(HWND hwnd) => Window.GetOrCreateWindow(this, _internalContext, hwnd);
 
 	public void HandleUncaughtException(string procName, Exception exception)
 	{

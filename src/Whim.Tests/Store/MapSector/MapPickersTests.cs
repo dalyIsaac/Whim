@@ -1,4 +1,5 @@
 using System.Linq;
+using FluentAssertions;
 
 namespace Whim.Tests;
 
@@ -294,5 +295,260 @@ public class MapPickersTests
 		// Then we get the layout engine
 		Assert.True(result.IsSuccessful);
 		Assert.Same(layoutEngine, result.Value);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickStickyMonitorsByWorkspace_Failure(IContext ctx)
+	{
+		// Given we have an untracked workspace
+		var untrackedWorkspace = CreateWorkspace(ctx);
+
+		// When we get the monitors
+		var result = ctx.Store.Pick(Pickers.PickStickyMonitorsByWorkspace(untrackedWorkspace.Id));
+
+		// Then we get an exception
+		Assert.False(result.IsSuccessful);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickStickyMonitorsByWorkspace_StickyWorkspaceMonitorMapIsEmpty(IContext ctx, MutableRootSector root)
+	{
+		// Given we have a sticky workspace
+		var workspace = CreateWorkspace(ctx);
+		AddWorkspacesToManager(ctx, root, workspace);
+		AddMonitorsToManager(
+			ctx,
+			root,
+			CreateMonitor((HMONITOR)0),
+			CreateMonitor((HMONITOR)1),
+			CreateMonitor((HMONITOR)2)
+		);
+
+		root.MapSector.StickyWorkspaceMonitorIndexMap = root.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(
+			workspace.Id,
+			[0, 1]
+		);
+
+		// When we get the monitors
+		var result = ctx.Store.Pick(Pickers.PickStickyMonitorsByWorkspace(workspace.Id));
+
+		// Then we get the monitors
+		Assert.True(result.IsSuccessful);
+		Assert.Equal(2, result.Value.Count);
+		result.Value.Should().BeEquivalentTo([(HMONITOR)0, (HMONITOR)1]);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickStickyMonitorsByWorkspace_Success(IContext ctx, MutableRootSector root)
+	{
+		// Given we have workspace which isn't sticky
+		var workspace = CreateWorkspace(ctx);
+		AddWorkspacesToManager(ctx, root, workspace);
+		AddMonitorsToManager(
+			ctx,
+			root,
+			CreateMonitor((HMONITOR)0),
+			CreateMonitor((HMONITOR)1),
+			CreateMonitor((HMONITOR)2)
+		);
+
+		// When we get the monitors
+		var result = ctx.Store.Pick(Pickers.PickStickyMonitorsByWorkspace(workspace.Id));
+
+		// Then we get all the monitors
+		Assert.True(result.IsSuccessful);
+		Assert.Equal(3, result.Value.Count);
+		result.Value.Should().BeEquivalentTo([(HMONITOR)0, (HMONITOR)1, (HMONITOR)2]);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickStickyMonitorsByWorkspace_NoMonitors(IContext ctx, MutableRootSector root)
+	{
+		// Given we have workspace which is sticky, but is stuck to non-existent monitors
+		var workspace = CreateWorkspace(ctx);
+		AddWorkspacesToManager(ctx, root, workspace);
+		AddMonitorsToManager(
+			ctx,
+			root,
+			CreateMonitor((HMONITOR)0),
+			CreateMonitor((HMONITOR)1),
+			CreateMonitor((HMONITOR)2)
+		);
+
+		root.MapSector.StickyWorkspaceMonitorIndexMap = root.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(
+			workspace.Id,
+			[3, 4]
+		);
+
+		// When we get the monitors
+		var result = ctx.Store.Pick(Pickers.PickStickyMonitorsByWorkspace(workspace.Id));
+
+		// Then we get all the monitors
+		Assert.True(result.IsSuccessful);
+		Assert.Equal(3, result.Value.Count);
+		result.Value.Should().BeEquivalentTo([(HMONITOR)0, (HMONITOR)1, (HMONITOR)2]);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickExplicitStickyMonitorIndicesByWorkspace_Failure(IContext ctx)
+	{
+		// Given we have an untracked workspace
+		var untrackedWorkspace = CreateWorkspace(ctx);
+
+		// When we get the monitor indices
+		var result = ctx.Store.Pick(Pickers.PickExplicitStickyMonitorIndicesByWorkspace(untrackedWorkspace.Id));
+
+		// Then we get an exception
+		Assert.False(result.IsSuccessful);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void PickExplicitStickyMonitorIndicesByWorkspace_Success(IContext ctx, MutableRootSector root)
+	{
+		// Given we have workspace which is sticky
+		var workspace = CreateWorkspace(ctx);
+		root.MapSector.StickyWorkspaceMonitorIndexMap = root.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(
+			workspace.Id,
+			[0, 1]
+		);
+
+		// When we get the monitor indices
+		var result = ctx.Store.Pick(Pickers.PickExplicitStickyMonitorIndicesByWorkspace(workspace.Id));
+
+		// Then we get the monitor indices
+		Assert.True(result.IsSuccessful);
+		Assert.Equal(2, result.Value.Count);
+		result.Value.Should().BeEquivalentTo([0, 1]);
+	}
+}
+
+public class PickValidMonitorForWorkspaceTests
+{
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void TargetMonitorIsValid(IContext ctx, MutableRootSector root)
+	{
+		// Given we have a workspace and target monitor that is valid for it
+		var workspace = CreateWorkspace(ctx);
+		AddWorkspacesToManager(ctx, root, workspace);
+		AddMonitorsToManager(ctx, root, CreateMonitor((HMONITOR)1), CreateMonitor((HMONITOR)2));
+
+		root.MapSector.StickyWorkspaceMonitorIndexMap = root.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(
+			workspace.Id,
+			[0, 1]
+		);
+
+		// When we get the monitor
+		var result = ctx.Store.Pick(Pickers.PickValidMonitorForWorkspace(workspace.Id, (HMONITOR)1));
+
+		// Then we get the target monitor
+		Assert.True(result.IsSuccessful);
+		Assert.Equal((HMONITOR)1, result.Value);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void FallbackToLastMonitor(IContext ctx, MutableRootSector root)
+	{
+		// Given we have a workspace with an invalid target monitor but valid last monitor
+		var workspace = CreateWorkspace(ctx);
+		AddWorkspacesToManager(ctx, root, workspace);
+		AddMonitorsToManager(ctx, root, CreateMonitor((HMONITOR)1), CreateMonitor((HMONITOR)2));
+
+		root.MapSector.StickyWorkspaceMonitorIndexMap = root.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(
+			workspace.Id,
+			[1] // Only monitor 2 is valid
+		);
+
+		root.MapSector.WorkspaceLastMonitorMap = root.MapSector.WorkspaceLastMonitorMap.SetItem(
+			workspace.Id,
+			(HMONITOR)2
+		);
+
+		// When we try to use monitor 1
+		var result = ctx.Store.Pick(Pickers.PickValidMonitorForWorkspace(workspace.Id, (HMONITOR)1));
+
+		// Then we get monitor 2 since it's the last valid monitor used
+		Assert.True(result.IsSuccessful);
+		Assert.Equal((HMONITOR)2, result.Value);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void FallbackToFirstAvailableMonitor(IContext ctx, MutableRootSector root)
+	{
+		// Given we have a workspace with invalid target and last monitors
+		var workspace = CreateWorkspace(ctx);
+		AddWorkspacesToManager(ctx, root, workspace);
+		AddMonitorsToManager(ctx, root, CreateMonitor((HMONITOR)1), CreateMonitor((HMONITOR)2));
+
+		root.MapSector.StickyWorkspaceMonitorIndexMap = root.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(
+			workspace.Id,
+			[0] // Only monitor 1 is valid
+		);
+
+		root.MapSector.WorkspaceLastMonitorMap = root.MapSector.WorkspaceLastMonitorMap.SetItem(
+			workspace.Id,
+			(HMONITOR)2 // Last monitor was 2 (invalid)
+		);
+
+		// When we try to use monitor 2
+		var result = ctx.Store.Pick(Pickers.PickValidMonitorForWorkspace(workspace.Id, (HMONITOR)2));
+
+		// Then we get monitor 1 as it's the first valid monitor
+		Assert.True(result.IsSuccessful);
+		Assert.Equal((HMONITOR)1, result.Value);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void NoValidMonitors(IContext ctx, MutableRootSector root)
+	{
+		// Given we have a workspace with no valid monitors and no fallback monitors
+		var workspace = CreateWorkspace(ctx);
+		AddWorkspacesToManager(ctx, root, workspace);
+
+		// We don't add any monitors to the system
+		// This ensures there are no fallback monitors available
+
+		root.MapSector.StickyWorkspaceMonitorIndexMap = root.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(
+			workspace.Id,
+			[1] // Only monitor index 1 is valid, but no monitors exist
+		);
+
+		// When we try to get a valid monitor
+		var result = ctx.Store.Pick(Pickers.PickValidMonitorForWorkspace(workspace.Id));
+
+		// Then we get an error since there are no valid monitors and no fallback monitors
+		Assert.False(result.IsSuccessful);
+		Assert.Contains("No valid monitor found", result.Error!.Message);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void UseActiveMonitorWhenNoTargetSpecified(IContext ctx, MutableRootSector root)
+	{
+		// Given we have a workspace and an active monitor
+		var workspace = CreateWorkspace(ctx);
+		AddWorkspacesToManager(ctx, root, workspace);
+		AddMonitorsToManager(ctx, root, CreateMonitor((HMONITOR)1), CreateMonitor((HMONITOR)2));
+
+		root.MonitorSector.ActiveMonitorHandle = (HMONITOR)2;
+
+		// When we don't specify a target monitor
+		var result = ctx.Store.Pick(Pickers.PickValidMonitorForWorkspace(workspace.Id));
+
+		// Then we get the active monitor
+		Assert.True(result.IsSuccessful);
+		Assert.Equal((HMONITOR)2, result.Value);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WorkspaceDoesNotExist(IContext ctx)
+	{
+		// Given we have a non-existent workspace ID
+		Guid nonExistentWorkspaceId = Guid.NewGuid();
+
+		// When we try to get a valid monitor
+		var result = ctx.Store.Pick(Pickers.PickValidMonitorForWorkspace(nonExistentWorkspaceId));
+
+		// Then we get an error
+		Assert.False(result.IsSuccessful);
+		Assert.Contains("not found", result.Error!.Message);
 	}
 }

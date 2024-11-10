@@ -109,8 +109,28 @@ internal class Window : IWindow
 	}
 
 	/// <summary>
+	/// Tries to get an existing <see cref="IWindow"/> with the given <paramref name="hwnd"/> if one exists.
+	/// Otherwise, tries to create a new <see cref="IWindow"/> with the given <paramref name="hwnd"/>.
+	/// </summary>
+	/// <param name="context"></param>
+	/// <param name="internalContext"></param>
+	/// <param name="hwnd">The handle of the window.</param>
+	/// <returns></returns>
+	public static Result<IWindow> GetOrCreateWindow(IContext context, IInternalContext internalContext, HWND hwnd)
+	{
+		Logger.Verbose($"Adding window {hwnd}");
+
+		Result<IWindow> res = context.Store.Pick(PickWindowByHandle(hwnd));
+		if (res.IsSuccessful)
+		{
+			return res;
+		}
+
+		return CreateWindow(context, internalContext, hwnd);
+	}
+
+	/// <summary>
 	/// Tries to create a new <see cref="IWindow"/> with the given <paramref name="hwnd"/>.
-	/// Otherwise, returns <see langword="null"/>.
 	/// </summary>
 	/// <param name="context"></param>
 	/// <param name="internalContext"></param>

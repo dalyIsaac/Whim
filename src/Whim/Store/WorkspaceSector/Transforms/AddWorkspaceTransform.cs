@@ -18,10 +18,15 @@ namespace Whim;
 /// <param name="WorkspaceId">
 /// The ID of the workspace. Defaults to <see cref="WorkspaceId.NewGuid"/>.
 /// </param>
+/// <param name="MonitorIndices">
+/// The indices of the monitors the workspace is allowed to be on. Defaults to <see langword="null"/>,
+/// which will allow the workspace to be on all monitors.
+/// </param>
 public record AddWorkspaceTransform(
 	string? Name = null,
 	IEnumerable<CreateLeafLayoutEngine>? CreateLeafLayoutEngines = null,
-	WorkspaceId WorkspaceId = default
+	WorkspaceId WorkspaceId = default,
+	IEnumerable<int>? MonitorIndices = null
 ) : Transform<WorkspaceId>
 {
 	internal override Result<WorkspaceId> Execute(
@@ -35,7 +40,9 @@ public record AddWorkspaceTransform(
 
 		if (!sector.HasInitialized)
 		{
-			sector.WorkspacesToCreate = sector.WorkspacesToCreate.Add(new(id, Name, CreateLeafLayoutEngines));
+			sector.WorkspacesToCreate = sector.WorkspacesToCreate.Add(
+				new(id, Name, CreateLeafLayoutEngines, MonitorIndices)
+			);
 			return id;
 		}
 
@@ -71,6 +78,16 @@ public record AddWorkspaceTransform(
 		sector.Workspaces = sector.Workspaces.Add(workspace.Id, workspace);
 		sector.WorkspaceOrder = sector.WorkspaceOrder.Add(workspace.Id);
 		sector.QueueEvent(new WorkspaceAddedEventArgs() { Workspace = workspace });
+
+		// If the monitor indices are provided, add them to the sticky workspace monitor index map.
+		if (MonitorIndices != null)
+		{
+			mutableRootSector.MapSector.StickyWorkspaceMonitorIndexMap =
+				mutableRootSector.MapSector.StickyWorkspaceMonitorIndexMap.Add(
+					workspace.Id,
+					MonitorIndices.ToImmutableArray()
+				);
+		}
 
 		return id;
 	}

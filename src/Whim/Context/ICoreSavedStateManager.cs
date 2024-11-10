@@ -8,11 +8,12 @@ namespace Whim;
 internal record SavedWindow(long Handle, Rectangle<double> Rectangle);
 
 /// <summary>
-/// A workspace's name, and the windows it contains.
+/// A workspace's name, the windows it contains, and the sticky monitors it can reside on.
 /// </summary>
 /// <param name="Name"></param>
 /// <param name="Windows"></param>
-internal record SavedWorkspace(string Name, List<SavedWindow> Windows);
+/// <param name="MonitorIndices"></param>
+internal record SavedWorkspace(string Name, List<SavedWindow> Windows, int[]? MonitorIndices);
 
 /// <summary>
 /// The saved state for Whim's core.
