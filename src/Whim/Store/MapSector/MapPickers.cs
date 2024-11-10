@@ -300,10 +300,17 @@ public static partial class Pickers
 	/// </item>
 	/// </list>
 	/// </summary>
-	/// <param name="workspaceId"></param>
-	/// <param name="monitorHandle"></param>
-	/// <returns></returns>
-	public static PurePicker<Result<HMONITOR>> PickValidMonitorForWorkspace(
+	/// <param name="workspaceId">
+	/// The ID of the workspace to get the monitor for.
+	/// </param>
+	/// <param name="monitorHandle">
+	/// The preferred monitor to use. If not provided, the last monitor the workspace was activated on will next be tried.
+	/// </param>
+	/// <returns>
+	/// The first valid monitor for the workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// If the workspace can't be found, then an error is returned.
+	/// </returns>
+	public static PurePicker<Result<HMONITOR>> PickValidMonitorByWorkspace(
 		WorkspaceId workspaceId,
 		HMONITOR monitorHandle = default
 	) =>
@@ -358,5 +365,81 @@ public static partial class Pickers
 			}
 
 			return Result.FromException<HMONITOR>(StoreExceptions.NoValidMonitorForWorkspace(workspaceId));
+		};
+
+	/// <summary>
+	/// Retrieves the workspaces which can be shown on the given monitor.
+	/// </summary>
+	/// <param name="monitorHandle">
+	/// The handle of the monitor to get the workspaces for.
+	/// </param>
+	/// <returns>
+	/// The workspaces which can be shown on the monitor, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// If the monitor can't be found, then an error is returned.
+	/// </returns>
+	public static PurePicker<Result<IReadOnlyList<IWorkspace>>> PickStickyWorkspacesByMonitor(HMONITOR monitorHandle) =>
+		rootSector =>
+		{
+			IMapSector mapSector = rootSector.MapSector;
+			IWorkspaceSector workspaceSector = rootSector.WorkspaceSector;
+			IMonitorSector monitorSector = rootSector.MonitorSector;
+
+			// Verify the monitor exists.
+			Result<IMonitor> monitorResult = PickMonitorByHandle(monitorHandle)(rootSector);
+			if (!monitorResult.IsSuccessful)
+			{
+				return Result.FromException<IReadOnlyList<IWorkspace>>(monitorResult.Error!);
+			}
+
+			// Get the index of the monitor.
+			IMonitor monitor = monitorResult.Value;
+			ImmutableArray<IMonitor> monitors = monitorSector.Monitors;
+			int monitorIndex = monitors.IndexOf(monitor);
+
+			// Get the workspaces which can be shown on the monitor.
+			List<WorkspaceId> processedWorkspaces = [];
+			List<WorkspaceId> unsortedWorkspaces = [];
+
+			foreach (
+				(
+					WorkspaceId workspaceId,
+					ImmutableArray<int> monitorIndices
+				) in mapSector.StickyWorkspaceMonitorIndexMap
+			)
+			{
+				// If the workspace is sticky to the monitor, or it's orphaned.
+				if (
+					monitorIndices.Contains(monitorIndex)
+					|| monitorIndices.All(index => index < 0 || index >= monitors.Length)
+				)
+				{
+					unsortedWorkspaces.Add(workspaceId);
+				}
+
+				processedWorkspaces.Add(workspaceId);
+			}
+
+			// Get the workspaces which can be shown on any monitor.
+			foreach (WorkspaceId workspaceId in workspaceSector.Workspaces.Keys)
+			{
+				if (processedWorkspaces.Contains(workspaceId))
+				{
+					continue;
+				}
+
+				unsortedWorkspaces.Add(workspaceId);
+			}
+
+			// Crude sorting.
+			List<IWorkspace> sortedWorkspaces = [];
+			foreach (WorkspaceId workspaceId in workspaceSector.WorkspaceOrder)
+			{
+				if (unsortedWorkspaces.Contains(workspaceId))
+				{
+					sortedWorkspaces.Add(workspaceSector.Workspaces[workspaceId]);
+				}
+			}
+
+			return sortedWorkspaces;
 		};
 }

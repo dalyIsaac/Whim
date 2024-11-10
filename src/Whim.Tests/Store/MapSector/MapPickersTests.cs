@@ -422,7 +422,7 @@ public class MapPickersTests
 	}
 }
 
-public class PickValidMonitorForWorkspaceTests
+public class PickValidMonitorByWorkspaceTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void TargetMonitorIsValid(IContext ctx, MutableRootSector root)
@@ -438,7 +438,7 @@ public class PickValidMonitorForWorkspaceTests
 		);
 
 		// When we get the monitor
-		var result = ctx.Store.Pick(Pickers.PickValidMonitorForWorkspace(workspace.Id, (HMONITOR)1));
+		var result = ctx.Store.Pick(Pickers.PickValidMonitorByWorkspace(workspace.Id, (HMONITOR)1));
 
 		// Then we get the target monitor
 		Assert.True(result.IsSuccessful);
@@ -464,7 +464,7 @@ public class PickValidMonitorForWorkspaceTests
 		);
 
 		// When we try to use monitor 1
-		var result = ctx.Store.Pick(Pickers.PickValidMonitorForWorkspace(workspace.Id, (HMONITOR)1));
+		var result = ctx.Store.Pick(Pickers.PickValidMonitorByWorkspace(workspace.Id, (HMONITOR)1));
 
 		// Then we get monitor 2 since it's the last valid monitor used
 		Assert.True(result.IsSuccessful);
@@ -490,7 +490,7 @@ public class PickValidMonitorForWorkspaceTests
 		);
 
 		// When we try to use monitor 2
-		var result = ctx.Store.Pick(Pickers.PickValidMonitorForWorkspace(workspace.Id, (HMONITOR)2));
+		var result = ctx.Store.Pick(Pickers.PickValidMonitorByWorkspace(workspace.Id, (HMONITOR)2));
 
 		// Then we get monitor 1 as it's the first valid monitor
 		Assert.True(result.IsSuccessful);
@@ -513,7 +513,7 @@ public class PickValidMonitorForWorkspaceTests
 		);
 
 		// When we try to get a valid monitor
-		var result = ctx.Store.Pick(Pickers.PickValidMonitorForWorkspace(workspace.Id));
+		var result = ctx.Store.Pick(Pickers.PickValidMonitorByWorkspace(workspace.Id));
 
 		// Then we get an error since there are no valid monitors and no fallback monitors
 		Assert.False(result.IsSuccessful);
@@ -531,7 +531,7 @@ public class PickValidMonitorForWorkspaceTests
 		root.MonitorSector.ActiveMonitorHandle = (HMONITOR)2;
 
 		// When we don't specify a target monitor
-		var result = ctx.Store.Pick(Pickers.PickValidMonitorForWorkspace(workspace.Id));
+		var result = ctx.Store.Pick(Pickers.PickValidMonitorByWorkspace(workspace.Id));
 
 		// Then we get the active monitor
 		Assert.True(result.IsSuccessful);
@@ -545,7 +545,7 @@ public class PickValidMonitorForWorkspaceTests
 		Guid nonExistentWorkspaceId = Guid.NewGuid();
 
 		// When we try to get a valid monitor
-		var result = ctx.Store.Pick(Pickers.PickValidMonitorForWorkspace(nonExistentWorkspaceId));
+		var result = ctx.Store.Pick(Pickers.PickValidMonitorByWorkspace(nonExistentWorkspaceId));
 
 		// Then we get an error
 		Assert.False(result.IsSuccessful);

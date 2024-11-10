@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Whim.Bar;
 
@@ -36,41 +38,33 @@ internal class WorkspaceWidgetViewModel : IDisposable
 		_context.Store.MapEvents.MonitorWorkspaceChanged += MapEvents_MonitorWorkspaceChanged;
 		_context.Store.WorkspaceEvents.WorkspaceRenamed += WorkspaceEvents_WorkspaceRenamed;
 
-		// Populate the list of workspaces
-		foreach (IWorkspace workspace in _context.Store.Pick(Pickers.PickWorkspaces()))
+		UpdateWorkspacesCollection();
+	}
+
+	private void UpdateWorkspacesCollection()
+	{
+		Workspaces.Clear();
+
+		IReadOnlyList<IWorkspace> workspaces =
+			_context.Store.Pick(Pickers.PickStickyWorkspacesByMonitor(Monitor.Handle)).ValueOrDefault ?? [];
+
+		foreach (IWorkspace workspace in workspaces)
 		{
 			IMonitor? monitorForWorkspace = _context
 				.Store.Pick(Pickers.PickMonitorByWorkspace(workspace.Id))
 				.ValueOrDefault;
-			Workspaces.Add(new WorkspaceModel(context, this, workspace, Monitor.Handle == monitorForWorkspace?.Handle));
+
+			Workspaces.Add(
+				new WorkspaceModel(_context, this, workspace, Monitor.Handle == monitorForWorkspace?.Handle)
+			);
 		}
 	}
 
-	private void WorkspaceEvents_WorkspaceAdded(object? sender, WorkspaceEventArgs args)
-	{
-		if (Workspaces.Any(model => model.Workspace.Id == args.Workspace.Id))
-		{
-			return;
-		}
+	private void WorkspaceEvents_WorkspaceAdded(object? sender, WorkspaceEventArgs args) =>
+		UpdateWorkspacesCollection();
 
-		IMonitor? monitorForWorkspace = _context
-			.Store.Pick(Pickers.PickMonitorByWorkspace(args.Workspace.Id))
-			.ValueOrDefault;
-		Workspaces.Add(
-			new WorkspaceModel(_context, this, args.Workspace, Monitor.Handle == monitorForWorkspace?.Handle)
-		);
-	}
-
-	private void WorkspaceEvents_WorkspaceRemoved(object? sender, WorkspaceEventArgs args)
-	{
-		WorkspaceModel? workspaceModel = Workspaces.FirstOrDefault(model => model.Workspace.Id == args.Workspace.Id);
-		if (workspaceModel == null)
-		{
-			return;
-		}
-
-		Workspaces.Remove(workspaceModel);
-	}
+	private void WorkspaceEvents_WorkspaceRemoved(object? sender, WorkspaceEventArgs args) =>
+		UpdateWorkspacesCollection();
 
 	private void MapEvents_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs args)
 	{
