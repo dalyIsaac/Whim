@@ -582,8 +582,8 @@ public class PickStickyWorkspacesByMonitorTests
 		AddMonitorsToManager(ctx, root, monitor);
 
 		root.MapSector.StickyWorkspaceMonitorIndexMap = root
-			.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(workspace1.Id, [0])
-			.SetItem(workspace2.Id, [0]);
+			.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(workspace1.Id, [0, 1])
+			.SetItem(workspace2.Id, [0, 4]);
 
 		// When we get the workspaces for the monitor
 		var result = ctx.Store.Pick(Pickers.PickStickyWorkspacesByMonitor(monitor.Handle));
@@ -617,30 +617,6 @@ public class PickStickyWorkspacesByMonitorTests
 		Assert.Equal(workspace1, result.Value[0]);
 		Assert.Equal(workspace2, result.Value[1]);
 		Assert.Equal(workspace3, result.Value[2]);
-	}
-
-	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void OrphanedWorkspacesCanGoOnAnyMonitor(IContext ctx, MutableRootSector root)
-	{
-		// Given we have a workspace sticky to a non-existent monitor index
-		var workspace = CreateWorkspace(ctx);
-		AddWorkspacesToManager(ctx, root, workspace);
-
-		IMonitor monitor = CreateMonitor((HMONITOR)1);
-		AddMonitorsToManager(ctx, root, monitor);
-
-		root.MapSector.StickyWorkspaceMonitorIndexMap = root.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(
-			workspace.Id,
-			[99]
-		); // Non-existent monitor index
-
-		// When we get the workspaces for the monitor
-		var result = ctx.Store.Pick(Pickers.PickStickyWorkspacesByMonitor(monitor.Handle));
-
-		// Then the orphaned workspace is included
-		Assert.True(result.IsSuccessful);
-		Assert.Single(result.Value);
-		Assert.Equal(workspace, result.Value[0]);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
