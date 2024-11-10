@@ -254,4 +254,109 @@ public static partial class Pickers
 				new WhimException($"No explicit monitor indices found for {workspaceId}")
 			);
 		};
+
+	/// <summary>
+	/// Retrieves the first suitable monitor for a workspace, if one is not provided. A monitor is suitable for a workspace if:
+	///
+	/// <list type="bullet">
+	/// <item>
+	/// <description>
+	/// If the workspace lists the monitor's index as one of its sticky monitors
+	/// </description>
+	/// </item>
+	///
+	/// <item>
+	/// <description>
+	/// If the workspace does not list any sticky monitors
+	/// </description>
+	/// </item>
+	///
+	/// <item>
+	/// <description>
+	/// If the workspace lists all non-existent monitors as sticky monitors
+	/// </description>
+	/// </item>
+	/// </list>
+	///
+	/// The order of suitability is:
+	///
+	/// <list type="number">
+	/// <item>
+	/// <description>
+	/// The provided <paramref name="monitorHandle"/>
+	/// </description>
+	/// </item>
+	///
+	/// <item>
+	/// <description>
+	/// The last monitor the workspace was activated on
+	/// </description>
+	/// </item>
+	///
+	/// <item>
+	/// <description>
+	/// The first available monitor
+	/// </description>
+	/// </item>
+	/// </list>
+	/// </summary>
+	/// <param name="workspaceId"></param>
+	/// <param name="monitorHandle"></param>
+	/// <returns></returns>
+	public static PurePicker<Result<HMONITOR>> PickValidMonitorForWorkspace(
+		WorkspaceId workspaceId,
+		HMONITOR monitorHandle = default
+	) =>
+		rootSector =>
+		{
+			// Verify the workspace exists.
+			if (!rootSector.WorkspaceSector.Workspaces.ContainsKey(workspaceId))
+			{
+				return Result.FromException<HMONITOR>(StoreExceptions.WorkspaceNotFound(workspaceId));
+			}
+
+			// Get the valid monitors for the workspace.
+			IReadOnlyList<HMONITOR> validMonitors =
+				PickStickyMonitorsByWorkspace(workspaceId)(rootSector).ValueOrDefault ?? [];
+
+			// Try activate on the current monitor.
+			HMONITOR targetMonitorHandle = monitorHandle;
+			if (targetMonitorHandle == default)
+			{
+				targetMonitorHandle = rootSector.MonitorSector.ActiveMonitorHandle;
+			}
+
+			if (validMonitors.Contains(targetMonitorHandle))
+			{
+				return targetMonitorHandle;
+			}
+
+			Logger.Debug(
+				$"Monitor {targetMonitorHandle} is not valid for workspace {workspaceId}, falling back to the last monitor the workspace was activated on"
+			);
+
+			// If the monitor is not valid, try activate on the last monitor.
+			if (rootSector.MapSector.WorkspaceLastMonitorMap.TryGetValue(workspaceId, out HMONITOR lastMonitorHandle))
+			{
+				if (validMonitors.Contains(lastMonitorHandle))
+				{
+					return lastMonitorHandle;
+				}
+			}
+
+			Logger.Debug(
+				$"Monitor {lastMonitorHandle} is not valid for workspace {workspaceId}, falling back to first monitor available"
+			);
+
+			// Activate on the first available monitor.
+			foreach (IMonitor monitor in rootSector.MonitorSector.Monitors)
+			{
+				if (validMonitors.Contains(monitor.Handle))
+				{
+					return monitor.Handle;
+				}
+			}
+
+			return Result.FromException<HMONITOR>(StoreExceptions.NoValidMonitorForWorkspace(workspaceId));
+		};
 }
