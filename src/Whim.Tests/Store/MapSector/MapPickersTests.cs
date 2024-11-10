@@ -552,3 +552,127 @@ public class PickValidMonitorByWorkspaceTests
 		Assert.Contains("not found", result.Error!.Message);
 	}
 }
+
+public class PickStickyWorkspacesByMonitorTests
+{
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MonitorNotFound(IContext ctx)
+	{
+		// Given we have a monitor that doesn't exist
+		HMONITOR nonExistentHandle = (HMONITOR)999;
+
+		// When we try to get workspaces for the monitor
+		var result = ctx.Store.Pick(Pickers.PickStickyWorkspacesByMonitor(nonExistentHandle));
+
+		// Then we get an error
+		Assert.False(result.IsSuccessful);
+		Assert.Contains("not found", result.Error!.Message);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void GetStickyWorkspaces(IContext ctx, MutableRootSector root)
+	{
+		// Given we have three workspaces, two sticky to monitor 1
+		var workspace1 = CreateWorkspace(ctx);
+		var workspace2 = CreateWorkspace(ctx);
+		var workspace3 = CreateWorkspace(ctx);
+		AddWorkspacesToManager(ctx, root, workspace1, workspace2, workspace3);
+
+		IMonitor monitor = CreateMonitor((HMONITOR)1);
+		AddMonitorsToManager(ctx, root, monitor);
+
+		root.MapSector.StickyWorkspaceMonitorIndexMap = root
+			.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(workspace1.Id, [0])
+			.SetItem(workspace2.Id, [0]);
+
+		// When we get the workspaces for the monitor
+		var result = ctx.Store.Pick(Pickers.PickStickyWorkspacesByMonitor(monitor.Handle));
+
+		// Then we get the sticky workspaces in workspace order
+		Assert.True(result.IsSuccessful);
+		Assert.Equal(3, result.Value.Count); // All workspaces (2 sticky + 1 non-sticky)
+		Assert.Equal(workspace1, result.Value[0]); // First in workspace order
+		Assert.Equal(workspace2, result.Value[1]); // Second in workspace order
+		Assert.Equal(workspace3, result.Value[2]); // Non-sticky workspace
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void GetAllWorkspacesWhenNoneSticky(IContext ctx, MutableRootSector root)
+	{
+		// Given we have three workspaces but none are sticky
+		var workspace1 = CreateWorkspace(ctx);
+		var workspace2 = CreateWorkspace(ctx);
+		var workspace3 = CreateWorkspace(ctx);
+		AddWorkspacesToManager(ctx, root, workspace1, workspace2, workspace3);
+
+		IMonitor monitor = CreateMonitor((HMONITOR)1);
+		AddMonitorsToManager(ctx, root, monitor);
+
+		// When we get the workspaces for the monitor
+		var result = ctx.Store.Pick(Pickers.PickStickyWorkspacesByMonitor(monitor.Handle));
+
+		// Then we get all workspaces in workspace order
+		Assert.True(result.IsSuccessful);
+		Assert.Equal(3, result.Value.Count);
+		Assert.Equal(workspace1, result.Value[0]);
+		Assert.Equal(workspace2, result.Value[1]);
+		Assert.Equal(workspace3, result.Value[2]);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void OrphanedWorkspacesCanGoOnAnyMonitor(IContext ctx, MutableRootSector root)
+	{
+		// Given we have a workspace sticky to a non-existent monitor index
+		var workspace = CreateWorkspace(ctx);
+		AddWorkspacesToManager(ctx, root, workspace);
+
+		IMonitor monitor = CreateMonitor((HMONITOR)1);
+		AddMonitorsToManager(ctx, root, monitor);
+
+		root.MapSector.StickyWorkspaceMonitorIndexMap = root.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(
+			workspace.Id,
+			[99]
+		); // Non-existent monitor index
+
+		// When we get the workspaces for the monitor
+		var result = ctx.Store.Pick(Pickers.PickStickyWorkspacesByMonitor(monitor.Handle));
+
+		// Then the orphaned workspace is included
+		Assert.True(result.IsSuccessful);
+		Assert.Single(result.Value);
+		Assert.Equal(workspace, result.Value[0]);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void InvalidMonitorIndicesAreIgnored(IContext ctx, MutableRootSector root)
+	{
+		// Given we have a workspace with both valid and invalid monitor indices
+		var workspace = CreateWorkspace(ctx);
+		AddWorkspacesToManager(ctx, root, workspace);
+
+		IMonitor monitor1 = CreateMonitor((HMONITOR)1);
+		IMonitor monitor2 = CreateMonitor((HMONITOR)2);
+		AddMonitorsToManager(ctx, root, monitor1, monitor2); // Only indices 0 and 1 are valid
+
+		root.MapSector.StickyWorkspaceMonitorIndexMap = root.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(
+			workspace.Id,
+			[-1, 0, 1, 2] // Invalid indices: -1 and 2
+		);
+
+		// When we get the workspaces for monitor1 (index 0)
+		var result = ctx.Store.Pick(Pickers.PickStickyWorkspacesByMonitor(monitor1.Handle));
+
+		// Then the workspace is included because index 0 is valid, ignoring invalid indices
+		Assert.True(result.IsSuccessful);
+		Assert.Single(result.Value);
+		Assert.Equal(workspace, result.Value[0]);
+
+		// And when we get workspaces for monitor2 (index 1)
+		result = ctx.Store.Pick(Pickers.PickStickyWorkspacesByMonitor(monitor2.Handle));
+
+		// Then the workspace is included because index 1 is valid, ignoring invalid indices
+		Assert.True(result.IsSuccessful);
+		Assert.Single(result.Value);
+		Assert.Equal(workspace, result.Value[0]);
+	}
+}
