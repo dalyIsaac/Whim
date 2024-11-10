@@ -79,7 +79,10 @@ The `FocusedWindowWidget` displays the title of the focused window.
 
 ### Workspace Widget
 
-The `WorkspaceWidget` displays the name of the current workspace.
+The `WorkspaceWidget` displays:
+
+- the active workspace on the bar's monitor
+- the workspaces which can be opened on the monitor - i.e., [sticky workspaces for the monitor](../core/workspaces.md#sticky-workspaces) and non-sticky workspaces
 
 ### Tree Layout Widget
 

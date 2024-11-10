@@ -34,6 +34,8 @@ List<BarComponent> rightComponents = new()
 - [FocusedWindowWidget](<xref:Whim.Bar.FocusedWindowWidget.CreateComponent(System.Func{Whim.IWindow,System.String})>)
 - [WorkspaceWidget](xref:Whim.Bar.WorkspaceWidget.CreateComponent)
 
+More information about each widget can be found [here](../../configure/plugins/bar.md#widgets).
+
 ## Example Config
 
 ```csharp
