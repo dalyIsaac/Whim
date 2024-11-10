@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using FluentAssertions;
+using NSubstitute;
 using Whim.SliceLayout;
 using Whim.TestUtils;
 using Xunit;
@@ -148,5 +149,73 @@ public class YamlLoader_LoadWorkspacesTests
 
 		IWorkspace[] workspaces = YamlLoaderTestUtils.GetWorkspaces(ctx)!;
 		Assert.Empty(workspaces);
+	}
+
+	public static TheoryData<string, bool> WorkspacesMonitorConfig =>
+		new()
+		{
+			{
+				"""
+					workspaces:
+					  entries:
+					    - name: workspace1
+					      monitors: [0, 1]
+					    - name: workspace2
+					      monitors: [2]
+					    - name: workspace3
+					      monitors: []
+					""",
+				true
+			},
+			{
+				"""
+					{
+						"workspaces": {
+							"entries": [
+								{
+									"name": "workspace1",
+									"monitors": [0, 1]
+								},
+								{
+									"name": "workspace2",
+									"monitors": [2]
+								},
+								{
+									"name": "workspace3",
+									"monitors": []
+								}
+							]
+						}
+					}
+					""",
+				false
+			},
+		};
+
+	[Theory, MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(WorkspacesMonitorConfig))]
+	internal void Load_WorkspacesWithMonitors(string config, bool isYaml, IContext ctx)
+	{
+		// Given a valid config with workspaces and monitor indices
+		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
+
+		// When loading the workspaces
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
+
+		// Then the workspaces and monitor indices are loaded correctly
+		Assert.True(result);
+
+		// Verify the expected transforms were executed
+		var received = ctx.Store.ReceivedCalls().ToArray();
+		Assert.Equal(3, received.Length);
+
+		// Verify the monitor indices.
+		AddWorkspaceTransform[] transforms = received
+			.Select(c => c.GetArguments()[0])
+			.OfType<AddWorkspaceTransform>()
+			.ToArray();
+
+		transforms[0].MonitorIndices.Should().BeEquivalentTo([0, 1]);
+		transforms[1].MonitorIndices.Should().BeEquivalentTo([2]);
+		transforms[2].MonitorIndices.Should().BeEmpty();
 	}
 }

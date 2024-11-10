@@ -129,12 +129,23 @@ public static class YamlLoader
 			string workspaceName = (string)workspace.Name;
 
 			CreateLeafLayoutEngine[]? engines = null;
+			List<int>? monitorIndices = null;
+
 			if (workspace.LayoutEngines.Entries.AsOptional() is Schema.RequiredEntries.RequiredTypeArray definedEngines)
 			{
 				engines = YamlLayoutEngineLoader.GetCreateLeafLayoutEngines(ctx, [.. definedEngines]);
 			}
 
-			ctx.Store.Dispatch(new AddWorkspaceTransform(workspaceName, engines));
+			if (workspace.Monitors.AsOptional() is Schema.RequiredName.MonitorsEntityArray definedMonitorIndices)
+			{
+				monitorIndices = [];
+				foreach (var monitorIndex in definedMonitorIndices)
+				{
+					monitorIndices.Add((int)monitorIndex);
+				}
+			}
+
+			ctx.Store.Dispatch(new AddWorkspaceTransform(workspaceName, engines, MonitorIndices: monitorIndices));
 		}
 	}
 
