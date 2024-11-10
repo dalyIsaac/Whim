@@ -1,4 +1,3 @@
-using AutoFixture;
 using NSubstitute;
 using Whim.TestUtils;
 using Windows.Win32.Graphics.Gdi;
@@ -6,282 +5,224 @@ using Xunit;
 
 namespace Whim.Bar.Tests;
 
-public class WorkspaceWidgetViewModelCustomization : ICustomization
-{
-	public void Customize(IFixture fixture)
-	{
-		IContext context = fixture.Freeze<IContext>();
-
-		// The workspace manager should have a single workspace
-		using IWorkspace workspace = fixture.Create<IWorkspace>();
-		workspace.Id.Returns(Guid.NewGuid());
-		context.WorkspaceManager.GetEnumerator().Returns((_) => new List<IWorkspace>() { workspace }.GetEnumerator());
-
-		fixture.Inject(context);
-	}
-}
-
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WorkspaceWidgetViewModelTests
 {
-	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
-	public void WorkspaceManager_WorkspaceAdded_AlreadyExists(IContext context, IMonitor monitor)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WorkspaceWidgetViewModel_Ctor(IContext ctx, MutableRootSector root)
 	{
 		// Given
-		IWorkspace workspace = context.WorkspaceManager.First();
-		WorkspaceWidgetViewModel viewModel = new(context, monitor);
+		IMonitor monitor = StoreTestUtils.CreateMonitor((HMONITOR)100);
+		Workspace workspace1 = StoreTestUtils.CreateWorkspace(ctx);
+		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
+
+		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2);
+		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace2);
 
 		// When
-		context.WorkspaceManager.WorkspaceAdded += Raise.Event<EventHandler<WorkspaceAddedEventArgs>>(
-			context.WorkspaceManager,
-			new WorkspaceAddedEventArgs() { Workspace = workspace }
-		);
+		WorkspaceWidgetViewModel sut = new(ctx, monitor);
 
 		// Then
-		Assert.Single(viewModel.Workspaces);
-		Assert.Equal(workspace, viewModel.Workspaces[0].Workspace);
-		context.Butler.Pantry.Received(1).GetMonitorForWorkspace(workspace);
+		Assert.Equal(2, sut.Workspaces.Count);
+		Assert.Same(workspace1, sut.Workspaces[0].Workspace);
+		Assert.Same(workspace2, sut.Workspaces[1].Workspace);
+		Assert.False(sut.Workspaces[0].ActiveOnMonitor);
+		Assert.True(sut.Workspaces[1].ActiveOnMonitor);
 	}
 
-	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
-	public void WorkspaceManager_WorkspaceAdded(IContext context, IMonitor monitor, IWorkspace addedWorkspace)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WorkspaceAdded(IContext ctx, MutableRootSector root)
 	{
 		// Given
-		IWorkspace workspace = context.WorkspaceManager.First();
-		WorkspaceWidgetViewModel viewModel = new(context, monitor);
+		IMonitor monitor = StoreTestUtils.CreateMonitor((HMONITOR)100);
+		Workspace workspace1 = StoreTestUtils.CreateWorkspace(ctx);
+		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
+
+		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2);
+		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace2);
+
+		WorkspaceWidgetViewModel sut = new(ctx, monitor);
+
+		Workspace workspace3 = StoreTestUtils.CreateWorkspace(ctx);
+		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace3);
 
 		// When
-		context.WorkspaceManager.WorkspaceAdded += Raise.Event<EventHandler<WorkspaceAddedEventArgs>>(
-			context.WorkspaceManager,
-			new WorkspaceAddedEventArgs() { Workspace = addedWorkspace }
-		);
+		root.WorkspaceSector.QueueEvent(new WorkspaceAddedEventArgs() { Workspace = workspace3 });
+		root.DispatchEvents();
 
 		// Then
-		Assert.Equal(2, viewModel.Workspaces.Count);
-		context.Butler.Pantry.Received(1).GetMonitorForWorkspace(workspace);
-		context.Butler.Pantry.Received(1).GetMonitorForWorkspace(addedWorkspace);
+		Assert.Equal(3, sut.Workspaces.Count);
+		Assert.Same(workspace1, sut.Workspaces[0].Workspace);
+		Assert.Same(workspace2, sut.Workspaces[1].Workspace);
+		Assert.Same(workspace3, sut.Workspaces[2].Workspace);
+		Assert.False(sut.Workspaces[0].ActiveOnMonitor);
+		Assert.True(sut.Workspaces[1].ActiveOnMonitor);
+		Assert.False(sut.Workspaces[2].ActiveOnMonitor);
 	}
 
-	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
-	public void WorkspaceManager_WorkspaceRemoved(IContext context, IMonitor monitor)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WorkspaceRemoved(IContext ctx, MutableRootSector root)
 	{
 		// Given
-		IWorkspace workspace = context.WorkspaceManager.First();
-		WorkspaceWidgetViewModel viewModel = new(context, monitor);
+		IMonitor monitor = StoreTestUtils.CreateMonitor((HMONITOR)100);
+		Workspace workspace1 = StoreTestUtils.CreateWorkspace(ctx);
+		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
+		Workspace workspace3 = StoreTestUtils.CreateWorkspace(ctx);
+
+		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2, workspace3);
+		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace2);
+
+		WorkspaceWidgetViewModel sut = new(ctx, monitor);
 
 		// When
-		context.WorkspaceManager.WorkspaceRemoved += Raise.Event<EventHandler<WorkspaceRemovedEventArgs>>(
-			context.WorkspaceManager,
-			new WorkspaceRemovedEventArgs() { Workspace = workspace }
-		);
+		root.WorkspaceSector.Workspaces = root.WorkspaceSector.Workspaces.Remove(workspace1.Id);
+		root.WorkspaceSector.QueueEvent(new WorkspaceRemovedEventArgs() { Workspace = workspace1 });
+		root.DispatchEvents();
 
 		// Then
-		Assert.Empty(viewModel.Workspaces);
+		Assert.Equal(2, sut.Workspaces.Count);
+		Assert.Same(workspace2, sut.Workspaces[0].Workspace);
+		Assert.Same(workspace3, sut.Workspaces[1].Workspace);
+		Assert.True(sut.Workspaces[0].ActiveOnMonitor);
+		Assert.False(sut.Workspaces[1].ActiveOnMonitor);
 	}
 
-	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
-	public void WorkspaceManager_WorkspaceRemoved_DoesNotExist(
-		IContext context,
-		IMonitor monitor,
-		IWorkspace removedWorkspace
-	)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MonitorWorkspaceChanged_WrongMonitor(IContext ctx, MutableRootSector root)
 	{
 		// Given
-		IWorkspace workspace = context.WorkspaceManager.First();
-		WorkspaceWidgetViewModel viewModel = new(context, monitor);
+		IMonitor monitor1 = StoreTestUtils.CreateMonitor((HMONITOR)100);
+		IMonitor monitor2 = StoreTestUtils.CreateMonitor((HMONITOR)200);
+		Workspace workspace1 = StoreTestUtils.CreateWorkspace(ctx);
+		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
+
+		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2);
+		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor1, workspace1);
+		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor2, workspace2);
+
+		WorkspaceWidgetViewModel sut = new(ctx, monitor1);
 
 		// When
-		context.WorkspaceManager.WorkspaceRemoved += Raise.Event<EventHandler<WorkspaceRemovedEventArgs>>(
-			context.WorkspaceManager,
-			new WorkspaceRemovedEventArgs() { Workspace = removedWorkspace }
+		root.MapSector.QueueEvent(
+			new MonitorWorkspaceChangedEventArgs() { Monitor = monitor2, CurrentWorkspace = workspace2 }
 		);
+		root.DispatchEvents();
 
 		// Then
-		Assert.Single(viewModel.Workspaces);
-		Assert.Equal(workspace, viewModel.Workspaces[0].Workspace);
+		Assert.Equal(2, sut.Workspaces.Count);
+		Assert.Same(workspace1, sut.Workspaces[0].Workspace);
+		Assert.Same(workspace2, sut.Workspaces[1].Workspace);
+		Assert.True(sut.Workspaces[0].ActiveOnMonitor);
+		Assert.False(sut.Workspaces[1].ActiveOnMonitor);
 	}
 
-	#region WorkspaceManager_MonitorWorkspaceChanged
-	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
-	public void WorkspaceManager_MonitorWorkspaceChanged_Deactivate(
-		IContext context,
-		IMonitor monitor,
-		IWorkspace currentWorkspace
-	)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MonitorWorkspaceChanged_CorrectMonitor(IContext ctx, MutableRootSector root)
 	{
 		// Given
-		IWorkspace previousWorkspace = context.WorkspaceManager.First();
-		WorkspaceWidgetViewModel viewModel = new(context, monitor);
+		IMonitor monitor = StoreTestUtils.CreateMonitor((HMONITOR)100);
+		Workspace workspace1 = StoreTestUtils.CreateWorkspace(ctx);
+		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
+
+		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2);
+		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace1);
+
+		WorkspaceWidgetViewModel sut = new(ctx, monitor);
 
 		// When
-		context.Butler.MonitorWorkspaceChanged += Raise.Event<EventHandler<MonitorWorkspaceChangedEventArgs>>(
-			context.WorkspaceManager,
-			new MonitorWorkspaceChangedEventArgs()
-			{
-				Monitor = monitor,
-				PreviousWorkspace = previousWorkspace,
-				CurrentWorkspace = currentWorkspace,
-			}
+		root.MapSector.QueueEvent(
+			new MonitorWorkspaceChangedEventArgs() { Monitor = monitor, CurrentWorkspace = workspace2 }
 		);
+		root.DispatchEvents();
 
 		// Then
-		WorkspaceModel model = viewModel.Workspaces[0];
-		Assert.False(model.ActiveOnMonitor);
+		Assert.Equal(2, sut.Workspaces.Count);
+		Assert.Same(workspace1, sut.Workspaces[0].Workspace);
+		Assert.Same(workspace2, sut.Workspaces[1].Workspace);
+		Assert.False(sut.Workspaces[0].ActiveOnMonitor);
+		Assert.True(sut.Workspaces[1].ActiveOnMonitor);
 	}
 
-	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
-	public void WorkspaceManager_MonitorWorkspaceChanged_Activate(
-		IContext context,
-		IMonitor monitor,
-		IWorkspace addedWorkspace
-	)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WorkspaceRenamed_WrongMonitor(IContext ctx, MutableRootSector root)
 	{
 		// Given
-		monitor.Handle.Returns((HMONITOR)100);
+		IMonitor monitor1 = StoreTestUtils.CreateMonitor((HMONITOR)100);
+		IMonitor monitor2 = StoreTestUtils.CreateMonitor((HMONITOR)200);
+		Workspace workspace1 = StoreTestUtils.CreateWorkspace(ctx);
+		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
 
-		IWorkspace workspace = context.WorkspaceManager.First();
-		context.Butler.Pantry.GetMonitorForWorkspace(workspace).Returns(monitor);
-		WorkspaceWidgetViewModel viewModel = new(context, monitor);
+		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2);
+		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor1, workspace1);
+		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor2, workspace2);
 
-		// Add workspace
-		context.WorkspaceManager.WorkspaceAdded += Raise.Event<EventHandler<WorkspaceAddedEventArgs>>(
-			context.WorkspaceManager,
-			new WorkspaceAddedEventArgs() { Workspace = addedWorkspace }
-		);
-
-		// Verify that the correct workspace is active on the monitor
-		WorkspaceModel existingModel = viewModel.Workspaces[0];
-		WorkspaceModel addedWorkspaceModel = viewModel.Workspaces[1];
-		Assert.True(existingModel.ActiveOnMonitor);
-		Assert.False(addedWorkspaceModel.ActiveOnMonitor);
+		WorkspaceWidgetViewModel sut = new(ctx, monitor1);
+		WorkspaceModel workspaceModel = sut.Workspaces[0];
 
 		// When
-		context.Butler.MonitorWorkspaceChanged += Raise.Event<EventHandler<MonitorWorkspaceChangedEventArgs>>(
-			context.WorkspaceManager,
-			new MonitorWorkspaceChangedEventArgs()
-			{
-				Monitor = monitor,
-				PreviousWorkspace = existingModel.Workspace,
-				CurrentWorkspace = addedWorkspaceModel.Workspace,
-			}
-		);
-
-		// Then
-		Assert.False(existingModel.ActiveOnMonitor);
-		Assert.True(addedWorkspaceModel.ActiveOnMonitor);
-	}
-
-	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
-	public void WorkspaceManager_MonitorWorkspaceChanged_DifferentMonitor(
-		IContext context,
-		IMonitor monitor,
-		IWorkspace addedWorkspace,
-		IMonitor otherMonitor
-	)
-	{
-		// Given
-		monitor.Handle.Returns((HMONITOR)100);
-
-		IWorkspace workspace = context.WorkspaceManager.First();
-		context.Butler.Pantry.GetMonitorForWorkspace(workspace).Returns(monitor);
-		WorkspaceWidgetViewModel viewModel = new(context, monitor);
-
-		// Add workspace
-		context.WorkspaceManager.WorkspaceAdded += Raise.Event<EventHandler<WorkspaceAddedEventArgs>>(
-			context.WorkspaceManager,
-			new WorkspaceAddedEventArgs() { Workspace = addedWorkspace }
-		);
-
-		// Verify that the correct workspace is active on the monitor
-		WorkspaceModel existingModel = viewModel.Workspaces[0];
-		WorkspaceModel addedWorkspaceModel = viewModel.Workspaces[1];
-		Assert.True(existingModel.ActiveOnMonitor);
-		Assert.False(addedWorkspaceModel.ActiveOnMonitor);
-
-		// When
-		context.Butler.MonitorWorkspaceChanged += Raise.Event<EventHandler<MonitorWorkspaceChangedEventArgs>>(
-			context.WorkspaceManager,
-			new MonitorWorkspaceChangedEventArgs()
-			{
-				Monitor = otherMonitor,
-				PreviousWorkspace = existingModel.Workspace,
-				CurrentWorkspace = addedWorkspaceModel.Workspace,
-			}
-		);
-
-		// Then
-		Assert.True(existingModel.ActiveOnMonitor);
-		Assert.False(addedWorkspaceModel.ActiveOnMonitor);
-	}
-	#endregion
-
-	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
-	public void WorkspaceManager_WorkspaceRenamed_ExistingWorkspace(IContext context, IMonitor monitor)
-	{
-		// Given
-		IWorkspace workspace = context.WorkspaceManager.First();
-		WorkspaceWidgetViewModel viewModel = new(context, monitor);
-
-		// When
-		// Then
-		Assert.PropertyChanged(
-			viewModel.Workspaces[0],
-			nameof(WorkspaceModel.Name),
+		CustomAssert.DoesNotPropertyChange(
+			h => workspaceModel.PropertyChanged += h,
+			h => workspaceModel.PropertyChanged -= h,
 			() =>
 			{
-				context.WorkspaceManager.WorkspaceRenamed += Raise.Event<EventHandler<WorkspaceRenamedEventArgs>>(
-					context.WorkspaceManager,
-					new WorkspaceRenamedEventArgs() { Workspace = workspace, PreviousName = "Old Name" }
+				root.WorkspaceSector.QueueEvent(
+					new WorkspaceRenamedEventArgs() { Workspace = workspace2, PreviousName = "Old Name" }
 				);
+				root.DispatchEvents();
 			}
 		);
 	}
 
-	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
-	public void WorkspaceManager_WorkspaceRenamed_NonExistingWorkspace(
-		IContext context,
-		IMonitor monitor,
-		IWorkspace renamedWorkspace
-	)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void WorkspaceRenamed_CorrectMonitor(IContext ctx, MutableRootSector root)
 	{
 		// Given
-		WorkspaceWidgetViewModel viewModel = new(context, monitor);
+		IMonitor monitor = StoreTestUtils.CreateMonitor((HMONITOR)100);
+		Workspace workspace1 = StoreTestUtils.CreateWorkspace(ctx);
+		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
 
-		// Verify that property changed is not raised
+		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2);
+		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace1);
 
-		bool propertyChangedRaised = false;
-		WorkspaceModel model = viewModel.Workspaces[0];
+		WorkspaceWidgetViewModel sut = new(ctx, monitor);
+		WorkspaceModel workspaceModel = sut.Workspaces[0];
 
 		// When
-		model.PropertyChanged += (sender, args) => propertyChangedRaised = true;
-
-		context.WorkspaceManager.WorkspaceRenamed += Raise.Event<EventHandler<WorkspaceRenamedEventArgs>>(
-			context.WorkspaceManager,
-			new WorkspaceRenamedEventArgs() { Workspace = renamedWorkspace, PreviousName = "Old Name" }
+		Assert.PropertyChanged(
+			sut.Workspaces[0],
+			nameof(workspaceModel.Name),
+			() =>
+			{
+				root.WorkspaceSector.QueueEvent(
+					new WorkspaceRenamedEventArgs() { Workspace = workspace1, PreviousName = "Old Name" }
+				);
+				root.DispatchEvents();
+			}
 		);
-
-		// Then
-		Assert.False(propertyChangedRaised);
 	}
 
-	[Theory, AutoSubstituteData<WorkspaceWidgetViewModelCustomization>]
-	[System.Diagnostics.CodeAnalysis.SuppressMessage(
-		"Usage",
-		"NS5000:Received check.",
-		Justification = "The analyzer is wrong"
-	)]
-	public void Dispose(IContext context, IMonitor monitor)
+	[Theory, AutoSubstituteData]
+	public void Dispose(IContext ctx, IMonitor monitor)
 	{
 		// Given
-		WorkspaceWidgetViewModel viewModel = new(context, monitor);
+		WorkspaceWidgetViewModel sut = new(ctx, monitor);
 
 		// When
-		viewModel.Dispose();
+		sut.Dispose();
 
 		// Then
-		context.WorkspaceManager.Received(1).WorkspaceAdded -= Arg.Any<EventHandler<WorkspaceAddedEventArgs>>();
-		context.WorkspaceManager.Received(1).WorkspaceRemoved -= Arg.Any<EventHandler<WorkspaceRemovedEventArgs>>();
-		context.Butler.Received(1).MonitorWorkspaceChanged -= Arg.Any<EventHandler<MonitorWorkspaceChangedEventArgs>>();
-		context.WorkspaceManager.Received(1).WorkspaceRenamed -= Arg.Any<EventHandler<WorkspaceRenamedEventArgs>>();
+		ctx.Store.WorkspaceEvents.Received(1).WorkspaceAdded += Arg.Any<EventHandler<WorkspaceAddedEventArgs>>();
+		ctx.Store.WorkspaceEvents.Received(1).WorkspaceRemoved += Arg.Any<EventHandler<WorkspaceRemovedEventArgs>>();
+		ctx.Store.MapEvents.Received(1).MonitorWorkspaceChanged += Arg.Any<
+			EventHandler<MonitorWorkspaceChangedEventArgs>
+		>();
+		ctx.Store.WorkspaceEvents.Received(1).WorkspaceRenamed += Arg.Any<EventHandler<WorkspaceRenamedEventArgs>>();
+
+		ctx.Store.WorkspaceEvents.Received(1).WorkspaceAdded -= Arg.Any<EventHandler<WorkspaceAddedEventArgs>>();
+		ctx.Store.WorkspaceEvents.Received(1).WorkspaceRemoved -= Arg.Any<EventHandler<WorkspaceRemovedEventArgs>>();
+		ctx.Store.MapEvents.Received(1).MonitorWorkspaceChanged -= Arg.Any<
+			EventHandler<MonitorWorkspaceChangedEventArgs>
+		>();
+		ctx.Store.WorkspaceEvents.Received(1).WorkspaceRenamed -= Arg.Any<EventHandler<WorkspaceRenamedEventArgs>>();
 	}
 }

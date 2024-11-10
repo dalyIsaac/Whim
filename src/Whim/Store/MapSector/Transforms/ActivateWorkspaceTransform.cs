@@ -31,7 +31,7 @@ public record ActivateWorkspaceTransform(
 		}
 
 		Result<HMONITOR> targetMonitorHandleResult = ctx.Store.Pick(
-			PickValidMonitorForWorkspace(workspace.Id, MonitorHandle)
+			PickValidMonitorByWorkspace(workspace.Id, MonitorHandle)
 		);
 		if (!targetMonitorHandleResult.TryGet(out HMONITOR targetMonitorHandle))
 		{
