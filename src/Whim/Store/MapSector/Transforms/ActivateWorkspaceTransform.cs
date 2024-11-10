@@ -47,6 +47,64 @@ public record ActivateWorkspaceTransform(
 		return ActivateWorkspaceOnTargetMonitor(ctx, mapSector, workspace, targetMonitor);
 	}
 
+	/// <summary>
+	/// Gets the monitor to activate the workspace on, if one is not provided.
+	/// </summary>
+	/// <param name="ctx"></param>
+	/// <param name="rootSector"></param>
+	/// <param name="workspace"></param>
+	/// <returns></returns>
+	private Result<HMONITOR> GetValidMonitorForWorkspace(
+		IContext ctx,
+		MutableRootSector rootSector,
+		IWorkspace workspace
+	)
+	{
+		// Get the valid monitors for the workspace.
+		IReadOnlyList<HMONITOR> validMonitors =
+			ctx.Store.Pick(PickStickyMonitorsByWorkspace(workspace.Id)).ValueOrDefault ?? [];
+
+		// Try activate on the current monitor.
+		HMONITOR targetMonitorHandle = MonitorHandle;
+		if (targetMonitorHandle == default)
+		{
+			targetMonitorHandle = rootSector.MonitorSector.ActiveMonitorHandle;
+		}
+
+		if (validMonitors.Contains(targetMonitorHandle))
+		{
+			return targetMonitorHandle;
+		}
+
+		Logger.Debug(
+			$"Monitor {targetMonitorHandle} is not valid for workspace {workspace.Id}, falling back to the last monitor the workspace was activated on"
+		);
+
+		// If the monitor is not valid, try activate on the last monitor.
+		if (rootSector.MapSector.WorkspaceLastMonitorMap.TryGetValue(workspace.Id, out HMONITOR lastMonitorHandle))
+		{
+			if (validMonitors.Contains(lastMonitorHandle))
+			{
+				return targetMonitorHandle;
+			}
+		}
+
+		Logger.Debug(
+			$"Monitor {lastMonitorHandle} is not valid for workspace {workspace.Id}, falling back to first monitor available"
+		);
+
+		// Activate on the first available monitor.
+		foreach (IMonitor monitor in rootSector.MonitorSector.Monitors)
+		{
+			if (validMonitors.Contains(monitor.Handle))
+			{
+				return monitor.Handle;
+			}
+		}
+
+		return Result.FromException<HMONITOR>(StoreExceptions.NoValidMonitorForWorkspace(workspace.Id));
+	}
+
 	private Result<Unit> ActivateWorkspaceOnTargetMonitor(
 		IContext ctx,
 		MapSector mapSector,
@@ -125,63 +183,5 @@ public record ActivateWorkspaceTransform(
 		);
 
 		return Unit.Result;
-	}
-
-	/// <summary>
-	/// Gets the monitor to activate the workspace on, if one is not provided.
-	/// </summary>
-	/// <param name="ctx"></param>
-	/// <param name="rootSector"></param>
-	/// <param name="workspace"></param>
-	/// <returns></returns>
-	private Result<HMONITOR> GetValidMonitorForWorkspace(
-		IContext ctx,
-		MutableRootSector rootSector,
-		IWorkspace workspace
-	)
-	{
-		// Get the valid monitors for the workspace.
-		IReadOnlyList<HMONITOR> validMonitors =
-			ctx.Store.Pick(PickStickyMonitorsByWorkspace(workspace.Id)).ValueOrDefault ?? [];
-
-		// Try activate on the current monitor.
-		HMONITOR targetMonitorHandle = MonitorHandle;
-		if (targetMonitorHandle == default)
-		{
-			targetMonitorHandle = rootSector.MonitorSector.ActiveMonitorHandle;
-		}
-
-		if (validMonitors.Contains(targetMonitorHandle))
-		{
-			return targetMonitorHandle;
-		}
-
-		Logger.Debug(
-			$"Monitor {targetMonitorHandle} is not valid for workspace {workspace.Id}, falling back to the last monitor the workspace was activated on"
-		);
-
-		// If the monitor is not valid, try activate on the last monitor.
-		if (rootSector.MapSector.WorkspaceLastMonitorMap.TryGetValue(workspace.Id, out HMONITOR lastMonitorHandle))
-		{
-			if (validMonitors.Contains(lastMonitorHandle))
-			{
-				return targetMonitorHandle;
-			}
-		}
-
-		Logger.Debug(
-			$"Monitor {lastMonitorHandle} is not valid for workspace {workspace.Id}, falling back to first monitor available"
-		);
-
-		// Activate on the first available monitor.
-		foreach (IMonitor monitor in rootSector.MonitorSector.Monitors)
-		{
-			if (validMonitors.Contains(monitor.Handle))
-			{
-				return monitor.Handle;
-			}
-		}
-
-		return Result.FromException<HMONITOR>(StoreExceptions.NoValidMonitorForWorkspace(workspace.Id));
 	}
 }
