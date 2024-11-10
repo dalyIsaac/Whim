@@ -37,10 +37,6 @@ public record ActivateWorkspaceTransform(
 		{
 			return Result.FromException<Unit>(targetMonitorHandleResult.Error!);
 		}
-		mapSector.WorkspaceLastMonitorMap = mapSector.WorkspaceLastMonitorMap.SetItem(
-			workspace.Id,
-			targetMonitorHandle
-		);
 
 		Result<IMonitor> targetMonitorResult = ctx.Store.Pick(PickMonitorByHandle(targetMonitorHandle));
 		if (!targetMonitorResult.TryGet(out IMonitor targetMonitor))
@@ -58,6 +54,11 @@ public record ActivateWorkspaceTransform(
 		IMonitor targetMonitor
 	)
 	{
+		mapSector.WorkspaceLastMonitorMap = mapSector.WorkspaceLastMonitorMap.SetItem(
+			workspace.Id,
+			targetMonitor.Handle
+		);
+
 		// Get the old workspace for the event.
 		IWorkspace? oldWorkspace = ctx.Store.Pick(PickWorkspaceByMonitor(targetMonitor.Handle)).ValueOrDefault;
 
