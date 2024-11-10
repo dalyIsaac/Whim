@@ -71,7 +71,7 @@ Guid stickyWorkspaceId = context.Store.Dispatch(
 );
 ```
 
-The workspace will only be displayed on the first and second monitors (0-based index). For more on monitors, see the [Monitors](./monitors.md) page.
+Here, the workspace can only be displayed on the first and second monitors (0-based index). For more on the ordering of monitors monitors, see the [Monitors](monitors.md) page.
 
 ## Example Command
 

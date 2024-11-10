@@ -27,6 +27,13 @@ workspaces:
 
 ## Sticky Workspaces
 
-Sticky workspaces are being worked on in [this GitHub issue](https://github.com/dalyIsaac/Whim/issues/660).
+Sticky workspaces can only be displayed on specific monitors. To create a sticky workspace, specify the monitor indices when creating the workspace:
 
-👷🏗️🚧
+```yaml
+workspaces:
+  entries:
+    - name: Browser
+      monitors: [0, 1]
+```
+
+Here, the workspace can only be displayed on the first and second monitors (0-based index). For more on the ordering of monitors monitors, see the [Monitors](monitors.md) page.
