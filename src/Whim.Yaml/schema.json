@@ -128,6 +128,14 @@
         "layout_engines": {
           "$ref": "#/$defs/LayoutEngineList",
           "description": "The layout engines to use for the workspace. If not specified, the layout engines in `layout_engines` will be used."
+        },
+        "monitors": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "description": "The monitors which this workspace is restricted to. This is a 0-indexed list of monitor indices - see https://dalyisaac.github.io/Whim/configure/core/monitors.html. If not specified, this workspace will be available on all monitors."
         }
       }
     },
