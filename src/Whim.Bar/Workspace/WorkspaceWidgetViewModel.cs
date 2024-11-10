@@ -31,33 +31,37 @@ internal class WorkspaceWidgetViewModel : IDisposable
 		_context = context;
 		Monitor = monitor;
 
-		_context.WorkspaceManager.WorkspaceAdded += WorkspaceManager_WorkspaceAdded;
-		_context.WorkspaceManager.WorkspaceRemoved += WorkspaceManager_WorkspaceRemoved;
-		_context.Butler.MonitorWorkspaceChanged += Butler_MonitorWorkspaceChanged;
-		_context.WorkspaceManager.WorkspaceRenamed += WorkspaceManager_WorkspaceRenamed;
+		_context.Store.WorkspaceEvents.WorkspaceAdded += WorkspaceEvents_WorkspaceAdded;
+		_context.Store.WorkspaceEvents.WorkspaceRemoved += WorkspaceEvents_WorkspaceRemoved;
+		_context.Store.MapEvents.MonitorWorkspaceChanged += MapEvents_MonitorWorkspaceChanged;
+		_context.Store.WorkspaceEvents.WorkspaceRenamed += WorkspaceEvents_WorkspaceRenamed;
 
 		// Populate the list of workspaces
-		foreach (IWorkspace workspace in _context.WorkspaceManager)
+		foreach (IWorkspace workspace in _context.Store.Pick(Pickers.PickWorkspaces()))
 		{
-			IMonitor? monitorForWorkspace = _context.Butler.Pantry.GetMonitorForWorkspace(workspace);
+			IMonitor? monitorForWorkspace = _context
+				.Store.Pick(Pickers.PickMonitorByWorkspace(workspace.Id))
+				.ValueOrDefault;
 			Workspaces.Add(new WorkspaceModel(context, this, workspace, Monitor.Handle == monitorForWorkspace?.Handle));
 		}
 	}
 
-	private void WorkspaceManager_WorkspaceAdded(object? sender, WorkspaceEventArgs args)
+	private void WorkspaceEvents_WorkspaceAdded(object? sender, WorkspaceEventArgs args)
 	{
 		if (Workspaces.Any(model => model.Workspace.Id == args.Workspace.Id))
 		{
 			return;
 		}
 
-		IMonitor? monitorForWorkspace = _context.Butler.Pantry.GetMonitorForWorkspace(args.Workspace);
+		IMonitor? monitorForWorkspace = _context
+			.Store.Pick(Pickers.PickMonitorByWorkspace(args.Workspace.Id))
+			.ValueOrDefault;
 		Workspaces.Add(
 			new WorkspaceModel(_context, this, args.Workspace, Monitor.Handle == monitorForWorkspace?.Handle)
 		);
 	}
 
-	private void WorkspaceManager_WorkspaceRemoved(object? sender, WorkspaceEventArgs args)
+	private void WorkspaceEvents_WorkspaceRemoved(object? sender, WorkspaceEventArgs args)
 	{
 		WorkspaceModel? workspaceModel = Workspaces.FirstOrDefault(model => model.Workspace.Id == args.Workspace.Id);
 		if (workspaceModel == null)
@@ -68,7 +72,7 @@ internal class WorkspaceWidgetViewModel : IDisposable
 		Workspaces.Remove(workspaceModel);
 	}
 
-	private void Butler_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs args)
+	private void MapEvents_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs args)
 	{
 		if (args.Monitor.Handle != Monitor.Handle)
 		{
@@ -81,7 +85,7 @@ internal class WorkspaceWidgetViewModel : IDisposable
 		}
 	}
 
-	private void WorkspaceManager_WorkspaceRenamed(object? sender, WorkspaceRenamedEventArgs e)
+	private void WorkspaceEvents_WorkspaceRenamed(object? sender, WorkspaceRenamedEventArgs e)
 	{
 		WorkspaceModel? workspace = Workspaces.FirstOrDefault(m => m.Workspace.Id == e.Workspace.Id);
 		if (workspace == null)
@@ -100,10 +104,10 @@ internal class WorkspaceWidgetViewModel : IDisposable
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_context.WorkspaceManager.WorkspaceAdded -= WorkspaceManager_WorkspaceAdded;
-				_context.WorkspaceManager.WorkspaceRemoved -= WorkspaceManager_WorkspaceRemoved;
-				_context.Butler.MonitorWorkspaceChanged -= Butler_MonitorWorkspaceChanged;
-				_context.WorkspaceManager.WorkspaceRenamed -= WorkspaceManager_WorkspaceRenamed;
+				_context.Store.WorkspaceEvents.WorkspaceAdded -= WorkspaceEvents_WorkspaceAdded;
+				_context.Store.WorkspaceEvents.WorkspaceRemoved -= WorkspaceEvents_WorkspaceRemoved;
+				_context.Store.MapEvents.MonitorWorkspaceChanged -= MapEvents_MonitorWorkspaceChanged;
+				_context.Store.WorkspaceEvents.WorkspaceRenamed -= WorkspaceEvents_WorkspaceRenamed;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
