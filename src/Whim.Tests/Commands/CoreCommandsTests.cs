@@ -42,7 +42,7 @@ public class CoreCommandsTests
 	[InlineAutoSubstituteData("whim.core.focus_window_in_direction.up", Direction.Up)]
 	[InlineAutoSubstituteData("whim.core.focus_window_in_direction.down", Direction.Down)]
 	[Theory]
-	public void FocusWindowInDirection(string commandName, Direction direction, IContext ctx, IWindow window)
+	public void FocusWindowInDirection(string commandName, Direction direction, IContext ctx)
 	{
 		// Given
 		CoreCommands commands = new(ctx);
@@ -498,6 +498,91 @@ public class CoreCommandsTests
 						new() { Name = $"{engine.Name}.toggle_maximized", Window = null }
 					)
 				)
+		);
+	}
+
+	[Theory]
+	[InlineAutoSubstituteData<StoreCustomization>("whim.core.focus_next_workspace_on_current_monitor", true)]
+	[InlineAutoSubstituteData<StoreCustomization>("whim.core.focus_previous_workspace_on_current_monitor", false)]
+	internal void FocusWorkspaceOnCurrentMonitor(
+		string commandName,
+		bool getNext,
+		IContext ctx,
+		MutableRootSector root,
+		List<object> transforms
+	)
+	{
+		// Given we have three workspaces, two sticky to monitor 1
+		var workspace1 = CreateWorkspace(ctx);
+		var workspace2 = CreateWorkspace(ctx);
+		var workspace3 = CreateWorkspace(ctx);
+		AddWorkspacesToManager(ctx, root, workspace1, workspace2, workspace3);
+
+		IMonitor monitor = CreateMonitor((HMONITOR)1);
+		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace1);
+		root.MonitorSector.ActiveMonitorHandle = monitor.Handle;
+
+		root.MapSector.StickyWorkspaceMonitorIndexMap = root
+			.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(workspace1.Id, [0, 1])
+			.SetItem(workspace2.Id, [0, 4]);
+
+		// Set workspace1 as active
+		AddActiveWorkspace(ctx, root, workspace1);
+
+		CoreCommands commands = new(ctx);
+		PluginCommandsTestUtils testUtils = new(commands);
+
+		ICommand command = testUtils.GetCommand(commandName);
+		command.TryExecute();
+
+		// Then the next/previous workspace is focused
+		Guid expectedWorkspaceId = getNext ? workspace2.Id : workspace3.Id;
+		Assert.Contains(transforms, t => t.Equals(new ActivateWorkspaceTransform(expectedWorkspaceId)));
+	}
+
+	[Theory]
+	[InlineAutoSubstituteData<StoreCustomization>("whim.core.move_window_to_next_workspace_on_monitor", true)]
+	[InlineAutoSubstituteData<StoreCustomization>("whim.core.move_window_to_previous_workspace_on_monitor", false)]
+	internal void MoveWindowToWorkspaceOnCurrentMonitor(
+		string commandName,
+		bool getNext,
+		IContext ctx,
+		MutableRootSector root,
+		List<object> transforms,
+		IWindow window
+	)
+	{
+		// Given we have three workspaces, two sticky to monitor 1
+		var workspace1 = CreateWorkspace(ctx);
+		var workspace2 = CreateWorkspace(ctx);
+		var workspace3 = CreateWorkspace(ctx);
+		AddWorkspacesToManager(ctx, root, workspace1, workspace2, workspace3);
+
+		IMonitor monitor = CreateMonitor((HMONITOR)1);
+		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace1);
+		root.MonitorSector.ActiveMonitorHandle = monitor.Handle;
+
+		root.MapSector.StickyWorkspaceMonitorIndexMap = root
+			.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(workspace1.Id, [0, 1])
+			.SetItem(workspace2.Id, [0, 4]);
+
+		// Set up window in workspace1 as last focused
+		window.Handle.Returns((HWND)123);
+		workspace1 = workspace1 with { LastFocusedWindowHandle = window.Handle };
+		AddActiveWorkspace(ctx, root, workspace1);
+		PopulateWindowWorkspaceMap(ctx, root, window, workspace1);
+
+		CoreCommands commands = new(ctx);
+		PluginCommandsTestUtils testUtils = new(commands);
+
+		ICommand command = testUtils.GetCommand(commandName);
+		command.TryExecute();
+
+		// Then the window is moved to the next/previous workspace
+		Guid expectedWorkspaceId = getNext ? workspace2.Id : workspace3.Id;
+		Assert.Contains(
+			transforms,
+			t => t.Equals(new MoveWindowToWorkspaceTransform(expectedWorkspaceId, window.Handle))
 		);
 	}
 }
