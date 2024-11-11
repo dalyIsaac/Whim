@@ -187,6 +187,16 @@ internal class CoreCommands : PluginCommands
 				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_RIGHT)
 			)
 			.Add(
+				identifier: "move_window_to_next_workspace_on_monitor",
+				title: "Move window to next workspace on current monitor",
+				callback: MoveWindowToWorkspaceOnCurrentMonitor(getNext: true)
+			)
+			.Add(
+				identifier: "move_window_to_previous_workspace_on_monitor",
+				title: "Move window to previous workspace on current monitor",
+				callback: MoveWindowToWorkspaceOnCurrentMonitor(getNext: false)
+			)
+			.Add(
 				identifier: "maximize_window",
 				title: "Maximize the current window",
 				callback: () =>
@@ -237,6 +247,16 @@ internal class CoreCommands : PluginCommands
 				identifier: "focus_next_monitor",
 				title: "Focus the next monitor",
 				callback: FocusMonitorInDirection(getNext: true)
+			)
+			.Add(
+				identifier: "focus_next_workspace_on_current_monitor",
+				title: "Focus the next workspace on the current monitor",
+				callback: FocusWorkspaceOnCurrentMonitor(getNext: true)
+			)
+			.Add(
+				identifier: "focus_previous_workspace_on_current_monitor",
+				title: "Focus the previous workspace on the current monitor",
+				callback: FocusWorkspaceOnCurrentMonitor(getNext: false)
 			)
 			.Add(
 				identifier: "focus_layout.toggle_maximized",
@@ -307,6 +327,65 @@ internal class CoreCommands : PluginCommands
 			}
 
 			_context.Store.Dispatch(new FocusWorkspaceTransform(workspace.Id));
+		};
+
+	internal Action FocusWorkspaceOnCurrentMonitor(bool getNext) =>
+		() =>
+		{
+			IMonitor currentMonitor = _context.Store.Pick(PickActiveMonitor());
+
+			// Get all workspaces that can be shown on this monitor
+			if (
+				!_context
+					.Store.Pick(PickStickyWorkspacesByMonitor(currentMonitor.Handle))
+					.TryGet(out IReadOnlyList<IWorkspace> workspaces)
+			)
+			{
+				return;
+			}
+
+			// Get current workspace
+			WorkspaceId currentWorkspaceId = _context.Store.Pick(PickActiveWorkspaceId());
+			int currentIndex = workspaces.FindIndex(w => w.Id == currentWorkspaceId);
+
+			// Calculate direction based on next/previous
+			int delta = getNext ? 1 : -1;
+			int nextIndex = (currentIndex + delta).Mod(workspaces.Count);
+
+			// Focus the next/previous workspace
+			_context.Store.Dispatch(new ActivateWorkspaceTransform(workspaces[nextIndex].Id));
+		};
+
+	internal Action MoveWindowToWorkspaceOnCurrentMonitor(bool getNext) =>
+		() =>
+		{
+			if (!_context.Store.Pick(PickLastFocusedWindow()).TryGet(out IWindow window))
+			{
+				return;
+			}
+
+			IMonitor currentMonitor = _context.Store.Pick(PickActiveMonitor());
+
+			// Get all workspaces that can be shown on this monitor
+			if (
+				!_context
+					.Store.Pick(PickStickyWorkspacesByMonitor(currentMonitor.Handle))
+					.TryGet(out IReadOnlyList<IWorkspace> workspaces)
+			)
+			{
+				return;
+			}
+
+			// Get current workspace
+			WorkspaceId currentWorkspaceId = _context.Store.Pick(PickActiveWorkspaceId());
+			int currentIndex = workspaces.FindIndex(w => w.Id == currentWorkspaceId);
+
+			// Calculate direction based on next/previous
+			int delta = getNext ? 1 : -1;
+			int nextIndex = (currentIndex + delta).Mod(workspaces.Count);
+
+			// Move the window to the next/previous workspace
+			_context.Store.Dispatch(new MoveWindowToWorkspaceTransform(workspaces[nextIndex].Id, window.Handle));
 		};
 
 	// This record is necessary, otherwise the index captured is the last one (11)
