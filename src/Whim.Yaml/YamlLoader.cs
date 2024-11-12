@@ -38,7 +38,7 @@ public static class YamlLoader
 		UpdateKeybinds(ctx, schema);
 		UpdateFilters(ctx, schema);
 		UpdateRouters(ctx, schema);
-		UpdateStyles(ctx, schema);
+		UpdateStyles(ctx, schema, showErrorWindow);
 
 		YamlPluginLoader.LoadPlugins(ctx, schema);
 		YamlLayoutEngineLoader.UpdateLayoutEngines(ctx, schema);
@@ -280,7 +280,7 @@ public static class YamlLoader
 		}
 	}
 
-	private static void UpdateStyles(IContext ctx, Schema schema)
+	private static void UpdateStyles(IContext ctx, Schema schema, bool showErrorWindow)
 	{
 		if (!schema.Styles.IsValid())
 		{
@@ -296,24 +296,35 @@ public static class YamlLoader
 
 		foreach (var userDictionary in userDictionaries)
 		{
-			string filePath = (string)userDictionary;
-
-			if (!ctx.FileManager.FileExists(filePath))
+			if (GetUserDictionaryPath(ctx, (string)userDictionary, showErrorWindow) is not string filePath)
 			{
-				string relativePath = Path.Combine(ctx.FileManager.WhimDir, filePath);
-
-				if (!ctx.FileManager.FileExists(relativePath))
-				{
-					string error = $"User dictionary not found: {filePath}";
-					Logger.Error(error);
-					ShowError(ctx, error);
-					continue;
-				}
-
-				filePath = relativePath;
+				continue;
 			}
 
 			ctx.ResourceManager.AddUserDictionary(filePath);
 		}
+	}
+
+	private static string? GetUserDictionaryPath(IContext ctx, string filePath, bool showErrorWindow)
+	{
+		if (ctx.FileManager.FileExists(filePath))
+		{
+			return filePath;
+		}
+
+		string relativePath = Path.Combine(ctx.FileManager.WhimDir, filePath);
+		if (!ctx.FileManager.FileExists(relativePath))
+		{
+			string error = $"User dictionary not found: {filePath}";
+			Logger.Error(error);
+
+			if (showErrorWindow)
+			{
+				ShowError(ctx, error);
+			}
+			return null;
+		}
+
+		return relativePath;
 	}
 }

@@ -55,9 +55,9 @@ public class YamlLoader_LoadStylesTests
 	{
 		// Given
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
-		ctx.FileManager.WhimDir.Returns("C:/Users/username/.whim");
+		ctx.FileManager.WhimDir.Returns("C:\\Users\\username\\.whim");
 		ctx.FileManager.FileExists(Arg.Is<string>(p => p.StartsWith("path"))).Returns(false);
-		ctx.FileManager.FileExists(Arg.Is<string>(p => p.StartsWith("C:/Users/username/.whim"))).Returns(true);
+		ctx.FileManager.FileExists(Arg.Is<string>(p => p.StartsWith("C:\\Users\\username\\.whim"))).Returns(true);
 
 		// When
 		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
@@ -87,22 +87,46 @@ public class YamlLoader_LoadStylesTests
 					""",
 				false
 			},
+			{
+				"""
+					styles: {}
+					""",
+				true
+			},
+			{
+				"""
+					{
+					    "styles": {}
+					}
+					""",
+				false
+			},
 		};
 
-	[Theory]
-	[MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(NoStylesConfig))]
-	public void Load_NoStyles_DoesNotAddUserDictionaries(string config, bool isYaml, IContext ctx)
-	{
-		// Given
-		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
-
-		// When
-		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
-
-		// Then
-		Assert.True(result);
-		ctx.ResourceManager.DidNotReceive().AddUserDictionary(Arg.Any<string>());
-	}
+	public static TheoryData<string, bool> InvalidPathsStylesConfig =>
+		new()
+		{
+			{
+				"""
+					styles:
+					  user_dictionaries:
+					    - "the path to nowhere"
+					""",
+				true
+			},
+			{
+				"""
+					{
+					    "styles": {
+					        "user_dictionaries": [
+					            "the path to nowhere"
+					        ]
+					    }
+					}
+					""",
+				false
+			},
+		};
 
 	public static TheoryData<string, bool> InvalidStylesConfig =>
 		new()
@@ -124,28 +148,17 @@ public class YamlLoader_LoadStylesTests
 					""",
 				false
 			},
-			{
-				"""
-					styles: {}
-					""",
-				true
-			},
-			{
-				"""
-					{
-					    "styles": {}
-					}
-					""",
-				false
-			},
 		};
 
 	[Theory]
+	[MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(NoStylesConfig))]
+	[MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(InvalidPathsStylesConfig))]
 	[MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(InvalidStylesConfig))]
-	public void Load_InvalidStyles_DoesNotAddUserDictionaries(string config, bool isYaml, IContext ctx)
+	public void Load_DoesNotAddUserDictionaries(string config, bool isYaml, IContext ctx)
 	{
 		// Given
 		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
+		ctx.FileManager.FileExists(Arg.Is<string>(p => !p.Contains("yaml") && !p.Contains("json"))).Returns(false);
 
 		// When
 		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
