@@ -49,6 +49,24 @@ public class YamlLoader_LoadStylesTests
 		ctx.ResourceManager.Received(2).AddUserDictionary(Arg.Any<string>());
 	}
 
+	[Theory]
+	[MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(ValidStylesConfig))]
+	public void Load_FallbackStyles_AddsUserDictionaries(string config, bool isYaml, IContext ctx)
+	{
+		// Given
+		YamlLoaderTestUtils.SetupFileConfig(ctx, config, isYaml);
+		ctx.FileManager.WhimDir.Returns("C:/Users/username/.whim");
+		ctx.FileManager.FileExists(Arg.Is<string>(p => p.StartsWith("path"))).Returns(false);
+		ctx.FileManager.FileExists(Arg.Is<string>(p => p.StartsWith("C:/Users/username/.whim"))).Returns(true);
+
+		// When
+		bool result = YamlLoader.Load(ctx, showErrorWindow: false);
+
+		// Then
+		Assert.True(result);
+		ctx.ResourceManager.Received(2).AddUserDictionary(Arg.Any<string>());
+	}
+
 	public static TheoryData<string, bool> NoStylesConfig =>
 		new()
 		{
