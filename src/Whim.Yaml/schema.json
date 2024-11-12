@@ -113,6 +113,19 @@
           "description": "Plugin to add a tree layout"
         }
       }
+    },
+
+    "styles": {
+      "type": "object",
+      "properties": {
+        "user_dictionaries": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Paths to XAML dictionaries to use for styling"
+        }
+      }
     }
   },
 
