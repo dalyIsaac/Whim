@@ -14,6 +14,7 @@ public static class YamlLoader
 {
 	private const string JsonConfigFileName = "whim.config.json";
 	private const string YamlConfigFileName = "whim.config.yaml";
+	private static ErrorWindow? _errorWindow;
 
 	/// <summary>
 	/// Loads and applies the declarative configuration from a JSON or YAML file.
@@ -30,16 +31,14 @@ public static class YamlLoader
 			return false;
 		}
 
-		if (showErrorWindow)
-		{
-			ValidateConfig(ctx, schema);
-		}
+		ValidateConfig(ctx, schema, showErrorWindow);
 
 		UpdateWorkspaces(ctx, schema);
 
 		UpdateKeybinds(ctx, schema);
 		UpdateFilters(ctx, schema);
 		UpdateRouters(ctx, schema);
+		UpdateStyles(ctx, schema);
 
 		YamlPluginLoader.LoadPlugins(ctx, schema);
 		YamlLayoutEngineLoader.UpdateLayoutEngines(ctx, schema);
@@ -76,7 +75,7 @@ public static class YamlLoader
 		return null;
 	}
 
-	private static void ValidateConfig(IContext ctx, Schema schema)
+	private static void ValidateConfig(IContext ctx, Schema schema, bool showErrorWindow)
 	{
 		ValidationContext result = schema.Validate(ValidationContext.ValidContext, ValidationLevel.Detailed);
 		if (result.IsValid)
@@ -106,8 +105,23 @@ public static class YamlLoader
 		Logger.Error("Configuration file is not valid.");
 		Logger.Error(errors);
 
-		using ErrorWindow window = new(ctx, errors);
-		window.Activate();
+		if (showErrorWindow)
+		{
+			ShowError(ctx, errors);
+		}
+	}
+
+	private static void ShowError(IContext ctx, string errors)
+	{
+		if (_errorWindow == null)
+		{
+			_errorWindow = new(ctx, errors);
+			_errorWindow.Activate();
+		}
+		else
+		{
+			_errorWindow.AppendMessage(errors);
+		}
 	}
 
 	private static void UpdateWorkspaces(IContext ctx, Schema schema)
@@ -263,6 +277,43 @@ public static class YamlLoader
 					Logger.Error($"Invalid router type: {router.Type}");
 					break;
 			}
+		}
+	}
+
+	private static void UpdateStyles(IContext ctx, Schema schema)
+	{
+		if (!schema.Styles.IsValid())
+		{
+			Logger.Debug("Styles config is not valid.");
+			return;
+		}
+
+		if (schema.Styles.UserDictionaries.AsOptional() is not { } userDictionaries)
+		{
+			Logger.Debug("No styles found.");
+			return;
+		}
+
+		foreach (var userDictionary in userDictionaries)
+		{
+			string filePath = (string)userDictionary;
+
+			if (!ctx.FileManager.FileExists(filePath))
+			{
+				string relativePath = Path.Combine(ctx.FileManager.WhimDir, filePath);
+
+				if (!ctx.FileManager.FileExists(relativePath))
+				{
+					string error = $"User dictionary not found: {filePath}";
+					Logger.Error(error);
+					ShowError(ctx, error);
+					continue;
+				}
+
+				filePath = relativePath;
+			}
+
+			ctx.ResourceManager.AddUserDictionary(filePath);
 		}
 	}
 }
