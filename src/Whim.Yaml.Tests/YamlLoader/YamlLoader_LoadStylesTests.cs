@@ -124,6 +124,20 @@ public class YamlLoader_LoadStylesTests
 					""",
 				false
 			},
+			{
+				"""
+					styles: {}
+					""",
+				true
+			},
+			{
+				"""
+					{
+					    "styles": {}
+					}
+					""",
+				false
+			},
 		};
 
 	[Theory]
