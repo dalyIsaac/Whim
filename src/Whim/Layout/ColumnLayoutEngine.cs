@@ -21,6 +21,9 @@ public record ColumnLayoutEngine : ILayoutEngine
 	/// <inheritdoc/>
 	public LayoutEngineIdentity Identity { get; }
 
+	/// <inheritdoc/>
+	public bool SupportsStacking => false;
+
 	/// <summary>
 	/// Indicates the direction of the layout. Defaults to <see langword="false"/>.
 	/// </summary>
