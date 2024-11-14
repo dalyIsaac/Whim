@@ -47,16 +47,18 @@ namespace Whim;
 /// </summary>
 public record FocusLayoutEngine : ILayoutEngine
 {
-	private readonly ImmutableList<IWindow> _list;
-	private readonly int _focusedIndex;
+	private readonly Stack _stack;
 	private readonly bool _hideFocusedWindow;
-	private readonly bool _maximized;
+	private readonly bool _isMaximized;
 
 	/// <inheritdoc/>
 	public string Name { get; init; } = "Focus";
 
 	/// <inheritdoc/>
-	public int Count => _list.Count;
+	public bool SupportsStacking => true;
+
+	/// <inheritdoc/>
+	public int Count => _stack.Count;
 
 	/// <inheritdoc/>
 	public LayoutEngineIdentity Identity { get; }
@@ -65,27 +67,20 @@ public record FocusLayoutEngine : ILayoutEngine
 	/// Creates a new instance of the <see cref="FocusLayoutEngine"/> class.
 	/// </summary>
 	/// <param name="identity">The identity of the layout engine.</param>
-	/// <param name="maximized">Whether the focused window should be maximized.</param>
-	public FocusLayoutEngine(LayoutEngineIdentity identity, bool maximized = false)
+	/// <param name="isMsMaximized">Whether the focused window should be maximized.</param>
+	public FocusLayoutEngine(LayoutEngineIdentity identity, bool isMsMaximized = false)
 	{
 		Identity = identity;
-		_maximized = maximized;
-		_list = [];
+		_isMaximized = isMsMaximized;
+		_stack = new Stack();
 	}
 
-	private FocusLayoutEngine(
-		FocusLayoutEngine layoutEngine,
-		ImmutableList<IWindow> list,
-		int focusedIndex,
-		bool maximized,
-		bool hideFocusedWindow
-	)
+	private FocusLayoutEngine(FocusLayoutEngine layoutEngine, Stack stack, bool isMaximized, bool hideFocusedWindow)
 	{
 		Name = layoutEngine.Name;
 		Identity = layoutEngine.Identity;
-		_list = list;
-		_focusedIndex = focusedIndex < 0 || focusedIndex >= _list.Count ? 0 : focusedIndex;
-		_maximized = maximized;
+		_stack = stack;
+		_isMaximized = isMaximized;
 		_hideFocusedWindow = hideFocusedWindow;
 	}
 
@@ -94,92 +89,76 @@ public record FocusLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name}");
 
-		if (_list.Contains(window))
+		Stack newStack = _stack.AddWindow(window);
+		if (newStack.Equals(_stack))
 		{
-			Logger.Debug($"Window {window} already exists in layout engine {Name}");
 			return this;
 		}
 
-		ImmutableList<IWindow> newList = _list.Add(window);
-		return new FocusLayoutEngine(this, newList, newList.Count - 1, _maximized, false);
+		return new FocusLayoutEngine(this, newStack, _isMaximized, false);
 	}
 
 	/// <inheritdoc/>
 	public ILayoutEngine RemoveWindow(IWindow window)
 	{
-		Logger.Debug($"Removing window {window} from layout engine {Name}");
-
-		if (!_list.Contains(window))
+		Stack newStack = _stack.RemoveWindow(window);
+		if (newStack.Equals(_stack))
 		{
-			Logger.Debug($"Window {window} does not exist in layout engine {Name}");
 			return this;
 		}
 
-		return new FocusLayoutEngine(this, _list.Remove(window), _focusedIndex, _maximized, _hideFocusedWindow);
+		return new FocusLayoutEngine(this, newStack, _isMaximized, _hideFocusedWindow);
 	}
 
 	/// <inheritdoc/>
 	public bool ContainsWindow(IWindow window)
 	{
 		Logger.Debug($"Checking if layout engine {Name} contains window {window}");
-		return _list.Contains(window);
+		return _stack.Contains(window);
 	}
 
 	/// <inheritdoc/>
-	public IWindow? GetFirstWindow()
-	{
-		Logger.Debug($"Getting first window in layout engine {Name}");
-		return _list.Count == 0 ? null : _list[0];
-	}
+	public IWindow? GetFirstWindow() => _stack.GetFirstWindow();
 
 	/// <inheritdoc/>
 	public IEnumerable<IWindowState> DoLayout(IRectangle<int> rectangle, IMonitor monitor)
 	{
 		Logger.Debug($"Performing a focus layout");
 
-		if (_list.Count == 0)
+		if (_stack.Count == 0)
 		{
 			yield break;
 		}
 
-		for (int idx = 0; idx < _list.Count; idx++)
+		WindowSize windowSize;
+		if (_isMaximized)
 		{
-			IWindow window = _list[idx];
-			bool focused = idx == _focusedIndex;
-			bool maximized = _maximized && focused;
+			windowSize = WindowSize.Maximized;
+		}
+		else if (_hideFocusedWindow)
+		{
+			windowSize = WindowSize.Minimized;
+		}
+		else
+		{
+			windowSize = WindowSize.Normal;
+		}
 
-			if (!focused)
-			{
-				yield return new WindowState()
-				{
-					Window = window,
-					Rectangle = rectangle,
-					WindowSize = WindowSize.Minimized,
-				};
-			}
-			else
-			{
-				WindowSize windowSize;
-				if (maximized)
-				{
-					windowSize = WindowSize.Maximized;
-				}
-				else if (_hideFocusedWindow)
-				{
-					windowSize = WindowSize.Minimized;
-				}
-				else
-				{
-					windowSize = WindowSize.Normal;
-				}
+		yield return new WindowState()
+		{
+			Window = _stack.Top,
+			Rectangle = rectangle,
+			WindowSize = windowSize,
+		};
 
-				yield return new WindowState()
-				{
-					Window = window,
-					Rectangle = rectangle,
-					WindowSize = windowSize,
-				};
-			}
+		foreach (IWindow window in _stack.GetNonTopWindows())
+		{
+			yield return new WindowState()
+			{
+				Window = window,
+				Rectangle = rectangle,
+				WindowSize = WindowSize.Minimized,
+			};
 		}
 	}
 
@@ -188,23 +167,24 @@ public record FocusLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Focusing window {window} in direction {direction} in layout engine {Name}");
 
-		if (!_list.Contains(window))
+		int index = _stack.IndexOf(window);
+		if (index == -1)
 		{
 			Logger.Debug($"Window {window} does not exist in layout engine {Name}");
 			return this;
 		}
 
-		int index = _list.IndexOf(window);
 		int newIndex = direction switch
 		{
 			Direction.Left => index - 1,
 			Direction.Up => index - 1,
 			_ => index + 1,
 		};
-		newIndex = newIndex.Mod(_list.Count);
+		newIndex = newIndex.Mod(_stack.Count);
 
-		_list[newIndex].Focus();
-		return new FocusLayoutEngine(this, _list, newIndex, _maximized, false);
+		Stack newStack = _stack with { TopIndex = newIndex };
+		newStack.Top.Focus();
+		return new FocusLayoutEngine(this, newStack, _isMaximized, _hideFocusedWindow);
 	}
 
 	/// <inheritdoc/>
@@ -212,26 +192,21 @@ public record FocusLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Swapping window {window} in direction {direction} in layout engine {Name}");
 
-		if (!_list.Contains(window))
+		int index = _stack.IndexOf(window);
+		if (index == -1)
 		{
 			Logger.Debug($"Window {window} does not exist in layout engine {Name}");
 			return this;
 		}
 
-		int index = _list.IndexOf(window);
-		int newIndex = direction switch
+		Stack newStack = direction switch
 		{
-			Direction.Left => index - 1,
-			Direction.Up => index - 1,
-			_ => index + 1,
+			Direction.Left => _stack.SwapWithNext(index),
+			Direction.Up => _stack.SwapWithPrevious(index),
+			_ => _stack.SwapWithNext(index),
 		};
-		newIndex = newIndex.Mod(_list.Count);
 
-		IWindow oldWindow = _list[index];
-		IWindow newWindow = _list[newIndex];
-
-		ImmutableList<IWindow> newList = _list.SetItem(index, newWindow).SetItem(newIndex, oldWindow);
-		return new FocusLayoutEngine(this, newList, newIndex, _maximized, false);
+		return new FocusLayoutEngine(this, newStack, _isMaximized, _hideFocusedWindow);
 	}
 
 	/// <inheritdoc/>
@@ -245,20 +220,20 @@ public record FocusLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Minimizing window {window} in layout engine {Name}");
 
-		if (!_list.Contains(window))
+		int idx = _stack.IndexOf(window);
+		if (idx == -1)
 		{
 			return new FocusLayoutEngine(
 				this,
-				_list.Add(window),
-				_list.Count,
-				_maximized,
-				_list.IsEmpty || _hideFocusedWindow
+				_stack.AddWindow(window),
+				_isMaximized,
+				_stack.Count == 0 || _hideFocusedWindow
 			);
 		}
 
-		if (window.Equals(_list[_focusedIndex]))
+		if (idx == _stack.TopIndex)
 		{
-			return new FocusLayoutEngine(this, _list, _focusedIndex, _maximized, true);
+			return new FocusLayoutEngine(this, _stack, _isMaximized, true);
 		}
 
 		return this;
@@ -269,19 +244,16 @@ public record FocusLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Restoring window {window} in layout engine {Name}");
 
-		ImmutableList<IWindow> newList = _list;
-		int idx;
-		if (!newList.Contains(window))
+		Stack newStack = _stack;
+		int idx = _stack.IndexOf(window);
+		if (idx == -1)
 		{
-			newList = newList.Add(window);
-			idx = newList.Count - 1;
-		}
-		else
-		{
-			idx = newList.IndexOf(window);
+			idx = _stack.Count - 1;
+			newStack = _stack.AddWindow(window);
 		}
 
-		return new FocusLayoutEngine(this, newList, idx, _maximized, false);
+		newStack = newStack with { TopIndex = idx };
+		return new FocusLayoutEngine(this, newStack, _isMaximized, false);
 	}
 
 	/// <inheritdoc/>
@@ -289,15 +261,15 @@ public record FocusLayoutEngine : ILayoutEngine
 	{
 		if (action.Name == $"{Name}.toggle_maximized")
 		{
-			return new FocusLayoutEngine(this, _list, _focusedIndex, !_maximized, _hideFocusedWindow);
+			return new FocusLayoutEngine(this, _stack, !_isMaximized, _hideFocusedWindow);
 		}
 		if (action.Name == $"{Name}.set_maximized")
 		{
-			return new FocusLayoutEngine(this, _list, _focusedIndex, true, _hideFocusedWindow);
+			return new FocusLayoutEngine(this, _stack, true, _hideFocusedWindow);
 		}
 		if (action.Name == $"{Name}.unset_maximized")
 		{
-			return new FocusLayoutEngine(this, _list, _focusedIndex, false, _hideFocusedWindow);
+			return new FocusLayoutEngine(this, _stack, false, _hideFocusedWindow);
 		}
 
 		return this;
