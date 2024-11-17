@@ -68,5 +68,8 @@ jobs:
             -p:BuildInParallel=true `
             -maxCpuCount
 
+      - name: Run docfx metadata
+        run: dotnet docfx metadata .\docs\docfx.json
+
       - name: Run docfx
         run: dotnet docfx .\docs\docfx.json
