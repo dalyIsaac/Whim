@@ -52,7 +52,6 @@
 		<PackageReference Include="Corvus.Json.ExtendedTypes" />
 		<PackageReference Include="Corvus.Json.SourceGenerator">
 			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Yaml2JsonNode" />
 		<PackageReference Include="YamlDotNet" />

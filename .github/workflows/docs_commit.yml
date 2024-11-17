@@ -57,5 +57,16 @@ jobs:
         run: |
           dotnet tool restore
 
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2.0.0
+
+      - name: Build
+        run: |
+          msbuild Whim.sln `
+            -p:Configuration=$env:Configuration `
+            -p:Platform=$env:Platform `
+            -p:BuildInParallel=true `
+            -maxCpuCount
+
       - name: Run docfx
         run: dotnet docfx .\docs\docfx.json
