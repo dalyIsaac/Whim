@@ -50,8 +50,16 @@
 
 	<ItemGroup>
 		<PackageReference Include="Corvus.Json.ExtendedTypes" />
+		<PackageReference Include="Corvus.Json.SourceGenerator">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="Yaml2JsonNode" />
 		<PackageReference Include="YamlDotNet" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<AdditionalFiles Include="schema.json" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -63,10 +71,4 @@
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
 	</ItemGroup>
-
-	<Target Name="GenerateSchema" BeforeTargets="BeforeCompile">
-		<Exec Command="powershell.exe -NonInteractive -ExecutionPolicy Unrestricted .\scripts\Generate-SourceFromSchema.ps1" WorkingDirectory="..\..\" ConsoleToMsBuild="true">
-			<Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
-		</Exec>
-	</Target>
 </Project>

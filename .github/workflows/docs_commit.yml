@@ -57,9 +57,5 @@ jobs:
         run: |
           dotnet tool restore
 
-      - name: Build schema
-        run: |
-          .\scripts\Generate-SourceFromSchema.ps1
-
       - name: Run docfx
         run: dotnet docfx .\docs\docfx.json

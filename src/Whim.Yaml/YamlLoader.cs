@@ -126,13 +126,13 @@ public static class YamlLoader
 
 	private static void UpdateWorkspaces(IContext ctx, Schema schema)
 	{
-		if (!schema.Workspaces.IsValid())
+		if (schema.Workspaces is not { } workspaces || !workspaces.IsValid())
 		{
 			Logger.Debug("Workspaces config is not valid.");
 			return;
 		}
 
-		if (schema.Workspaces.Entries.AsOptional() is not { } entries)
+		if (workspaces.Entries is not { } entries)
 		{
 			Logger.Debug("No workspaces found.");
 			return;
@@ -145,12 +145,12 @@ public static class YamlLoader
 			CreateLeafLayoutEngine[]? engines = null;
 			List<int>? monitorIndices = null;
 
-			if (workspace.LayoutEngines.Entries.AsOptional() is Schema.RequiredEntries.RequiredTypeArray definedEngines)
+			if (workspace.LayoutEngines?.Entries is { } definedEngines)
 			{
 				engines = YamlLayoutEngineLoader.GetCreateLeafLayoutEngines(ctx, [.. definedEngines]);
 			}
 
-			if (workspace.Monitors.AsOptional() is Schema.RequiredName.MonitorsEntityArray definedMonitorIndices)
+			if (workspace.Monitors is { } definedMonitorIndices)
 			{
 				monitorIndices = [];
 				foreach (var monitorIndex in definedMonitorIndices)
@@ -165,18 +165,18 @@ public static class YamlLoader
 
 	private static void UpdateKeybinds(IContext ctx, Schema schema)
 	{
-		if (!schema.Keybinds.IsValid())
+		if (schema.Keybinds is not { } keybinds || !keybinds.IsValid())
 		{
 			Logger.Debug("Keybinds config is not valid.");
 			return;
 		}
 
-		if (schema.Keybinds.UnifyKeyModifiers.TryGetBoolean(out bool unifyKeyModifiers))
+		if (keybinds.UnifyKeyModifiers?.TryGetBoolean(out bool unifyKeyModifiers) == true)
 		{
 			ctx.KeybindManager.UnifyKeyModifiers = unifyKeyModifiers;
 		}
 
-		if (schema.Keybinds.Entries.AsOptional() is not { } entries)
+		if (keybinds.Entries is not { } entries)
 		{
 			Logger.Debug("No keybinds found.");
 			return;
@@ -196,13 +196,13 @@ public static class YamlLoader
 
 	private static void UpdateFilters(IContext ctx, Schema schema)
 	{
-		if (!schema.Filters.IsValid())
+		if (schema.Filters is not { } filters || !filters.IsValid())
 		{
 			Logger.Debug("Filters config is not valid.");
 			return;
 		}
 
-		if (schema.Filters.Entries.AsOptional() is not { } entries)
+		if (filters.Entries is not { } entries)
 		{
 			Logger.Debug("No filters found.");
 			return;
@@ -235,22 +235,24 @@ public static class YamlLoader
 
 	private static void UpdateRouters(IContext ctx, Schema schema)
 	{
-		if (!schema.Routers.IsValid())
+		if (schema.Routers is not { } routers || !routers.IsValid())
 		{
 			Logger.Debug("Routers cohfig is not valid.");
 			return;
 		}
 
 		if (
-			schema.Routers.RoutingBehavior.TryGetString(out string? routingBehavior)
-			&& Enum.TryParse(routingBehavior?.SnakeToPascal(), out RouterOptions routerOptions)
+			routers.RoutingBehavior?.TryGetString(out string? routingBehavior) == true
+			&& routingBehavior != null
+			&& Enum.TryParse(routingBehavior.SnakeToPascal(), out RouterOptions routerOptions)
 		)
 		{
 			ctx.RouterManager.RouterOptions = routerOptions;
 		}
 
-		if (schema.Routers.Entries.AsOptional() is not { } entries)
+		if (routers.Entries is not { } entries)
 		{
+			Logger.Debug("No routers found.");
 			return;
 		}
 
@@ -282,13 +284,13 @@ public static class YamlLoader
 
 	private static void UpdateStyles(IContext ctx, Schema schema, bool showErrorWindow)
 	{
-		if (!schema.Styles.IsValid())
+		if (schema.Styles is not { } styles || !styles.IsValid())
 		{
 			Logger.Debug("Styles config is not valid.");
 			return;
 		}
 
-		if (schema.Styles.UserDictionaries.AsOptional() is not { } userDictionaries)
+		if (styles.UserDictionaries is not { } userDictionaries)
 		{
 			Logger.Debug("No styles found.");
 			return;
