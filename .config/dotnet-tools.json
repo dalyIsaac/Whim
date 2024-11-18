@@ -13,12 +13,12 @@
       "rollForward": false
     },
     "docfx": {
-      "version": "2.77.0",
+      "version": "2.78.0",
       "commands": ["docfx"],
       "rollForward": false
     },
     "corvus.json.jsonschema.typegeneratortool": {
-      "version": "3.1.1",
+      "version": "4.0.9",
       "commands": ["generatejsonschematypes"],
       "rollForward": false
     }
