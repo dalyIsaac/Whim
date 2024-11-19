@@ -95,6 +95,28 @@ public class YamlLoader_LoadFloatingWindowPluginTests
 					""",
 				false
 			},
+			// YAML, invalid
+			{
+				"""
+					plugins:
+					  floating_window:
+					    bob: true
+					""",
+				true
+			},
+			// JSON, invalid
+			{
+				"""
+					{
+						"plugins": {
+							"floating_window": {
+								"bob": true
+							}
+						}
+					}
+					""",
+				false
+			},
 		};
 
 	[Theory, MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(DisabledFloatingWindowConfig))]
