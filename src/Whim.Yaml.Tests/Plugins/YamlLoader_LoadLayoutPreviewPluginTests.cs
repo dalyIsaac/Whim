@@ -96,6 +96,28 @@ public class YamlLoader_LoadLayoutPreviewPluginTests
 					""",
 				false
 			},
+			// YAML, invalid
+			{
+				"""
+					plugins:
+					  layout_preview:
+					    bob: true
+					""",
+				true
+			},
+			// JSON, invalid
+			{
+				"""
+					{
+						"plugins": {
+							"layout_preview": {
+								"bob": true
+							}
+						}
+					}
+					""",
+				false
+			},
 		};
 
 	[Theory, MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(DisabledLayoutPreviewConfig))]

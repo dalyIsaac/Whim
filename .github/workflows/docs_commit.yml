@@ -57,9 +57,19 @@ jobs:
         run: |
           dotnet tool restore
 
-      - name: Build schema
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2.0.0
+
+      - name: Build
         run: |
-          .\scripts\Generate-SourceFromSchema.ps1
+          msbuild Whim.sln `
+            -p:Configuration=$env:Configuration `
+            -p:Platform=$env:Platform `
+            -p:BuildInParallel=true `
+            -maxCpuCount
+
+      - name: Run docfx metadata
+        run: dotnet docfx metadata .\docs\docfx.json
 
       - name: Run docfx
         run: dotnet docfx .\docs\docfx.json

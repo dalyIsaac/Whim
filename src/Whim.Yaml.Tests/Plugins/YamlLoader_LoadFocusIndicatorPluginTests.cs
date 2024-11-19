@@ -212,6 +212,28 @@ public class YamlLoader_LoadFocusIndicatorPluginTests
 					""",
 				false
 			},
+			// YAML, invalid
+			{
+				"""
+					plugins:
+					  focus_indicator:
+					    bob: true
+					""",
+				true
+			},
+			// JSON, invalid
+			{
+				"""
+					{
+						"plugins": {
+							"focus_indicator": {
+								"bob": true
+							}
+						}
+					}
+					""",
+				false
+			},
 		};
 
 	[Theory, MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(DisabledFocusIndicatorConfig))]

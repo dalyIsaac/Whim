@@ -1,4 +1,3 @@
-using Corvus.Json;
 using Whim.FloatingWindow;
 using Whim.SliceLayout;
 using Whim.TreeLayout;
@@ -9,13 +8,13 @@ internal static class YamlLayoutEngineLoader
 {
 	public static void UpdateLayoutEngines(IContext ctx, Schema schema)
 	{
-		if (schema.LayoutEngines.AsOptional() is not { } layoutEngines)
+		if (schema.LayoutEngines is not { } layoutEngines)
 		{
 			Logger.Debug("No layout engines found.");
 			return;
 		}
 
-		CreateLeafLayoutEngine[]? engineCreators = GetCreateLeafLayoutEngines(ctx, [.. layoutEngines.Entries]);
+		CreateLeafLayoutEngine[]? engineCreators = GetCreateLeafLayoutEngines(ctx, layoutEngines.Entries);
 
 		if (engineCreators is not null)
 		{
@@ -25,25 +24,20 @@ internal static class YamlLayoutEngineLoader
 
 	public static CreateLeafLayoutEngine[]? GetCreateLeafLayoutEngines(
 		IContext ctx,
-		Schema.RequiredType[]? layoutEngines
+		Schema.RequiredEntries.RequiredTypeArray layoutEngines
 	)
 	{
-		if (layoutEngines is null)
-		{
-			return null;
-		}
-
 		List<CreateLeafLayoutEngine> leafLayoutEngineCreators = [];
 
 		foreach (var engine in layoutEngines)
 		{
 			engine.Match<object?>(
-				(in Schema.DefsRequiredType floatingWindow) =>
+				(in Schema.SchemaRequiredType floatingWindow) =>
 				{
 					CreateFloatingLayoutEngineCreator(ctx, leafLayoutEngineCreators);
 					return null;
 				},
-				(in Schema.ALayoutEngineThatDisplaysOneWindowAtATime focusLayoutEngine) =>
+				(in Schema.SchemaRequiredType1 focusLayoutEngine) =>
 				{
 					CreateFocusLayoutEngineCreator(ctx, leafLayoutEngineCreators, focusLayoutEngine);
 					return null;
@@ -53,7 +47,7 @@ internal static class YamlLayoutEngineLoader
 					CreateSliceLayoutEngineCreator(ctx, leafLayoutEngineCreators, sliceLayoutEngine);
 					return null;
 				},
-				(in Schema.ALayoutEngineThatArrangesWindowsInATreeStructure treeLayoutEngine) =>
+				(in Schema.SchemaRequiredType2 treeLayoutEngine) =>
 				{
 					CreateTreeLayoutEngineCreator(ctx, leafLayoutEngineCreators, treeLayoutEngine);
 					return null;
@@ -77,10 +71,10 @@ internal static class YamlLayoutEngineLoader
 	private static void CreateFocusLayoutEngineCreator(
 		IContext ctx,
 		List<CreateLeafLayoutEngine> leafLayoutEngineCreators,
-		Schema.ALayoutEngineThatDisplaysOneWindowAtATime focusLayoutEngine
+		Schema.SchemaRequiredType1 focusLayoutEngine
 	)
 	{
-		bool maximize = focusLayoutEngine.Maximize.AsOptional() ?? false;
+		bool maximize = focusLayoutEngine.Maximize is { } m && m;
 		leafLayoutEngineCreators.Add((id) => new FocusLayoutEngine(id, maximize));
 	}
 
@@ -100,22 +94,22 @@ internal static class YamlLayoutEngineLoader
 		}
 
 		sliceLayoutEngine.Variant.Match<object?>(
-			(in Schema.RequiredTypeAndVariant.VariantEntity.CreatesAColumnLayoutWhereWindowsAreStackedVertically _) =>
+			(in Schema.RequiredTypeAndVariant.VariantEntity.RequiredType _) =>
 			{
 				leafLayoutEngineCreators.Add((id) => SliceLayouts.CreateColumnLayout(ctx, plugin, id));
 				return null;
 			},
-			(in Schema.RequiredTypeAndVariant.VariantEntity.CreatesARowLayoutWhereWindowsAreStackedHorizontally _) =>
+			(in Schema.RequiredTypeAndVariant.VariantEntity.VariantEntityRequiredType _) =>
 			{
 				leafLayoutEngineCreators.Add((id) => SliceLayouts.CreateRowLayout(ctx, plugin, id));
 				return null;
 			},
-			(in Schema.RequiredTypeAndVariant.VariantEntity.RequiredType _) =>
+			(in Schema.RequiredTypeAndVariant.VariantEntity.VariantEntityRequiredType1 _) =>
 			{
 				leafLayoutEngineCreators.Add((id) => SliceLayouts.CreatePrimaryStackLayout(ctx, plugin, id));
 				return null;
 			},
-			(in Schema.RequiredTypeAndVariant.VariantEntity.RequiredTypeAndColumns multiColumnLayout) =>
+			(in Schema.RequiredTypeAndVariant.VariantEntity.RequiredColumnsAndType multiColumnLayout) =>
 			{
 				var columns = multiColumnLayout.Columns;
 				uint[] unsignedColumns = columns.Select(c => (uint)c).ToArray();
@@ -124,10 +118,10 @@ internal static class YamlLayoutEngineLoader
 				);
 				return null;
 			},
-			(in Schema.RequiredTypeAndVariant.VariantEntity.AnyOfRequiredType secondaryPrimaryStack) =>
+			(in Schema.RequiredTypeAndVariant.VariantEntity.VariantEntityRequiredType2 secondaryPrimaryStack) =>
 			{
-				var primaryCapacity = (uint?)secondaryPrimaryStack.PrimaryCapacity.AsOptional() ?? 1;
-				var secondaryCapacity = (uint?)secondaryPrimaryStack.SecondaryCapacity.AsOptional() ?? 2;
+				uint primaryCapacity = secondaryPrimaryStack.PrimaryCapacity is { } pc ? (uint)pc : 1;
+				uint secondaryCapacity = secondaryPrimaryStack.SecondaryCapacity is { } sc ? (uint)sc : 2;
 
 				leafLayoutEngineCreators.Add(
 					(id) =>
@@ -142,7 +136,7 @@ internal static class YamlLayoutEngineLoader
 	private static void CreateTreeLayoutEngineCreator(
 		IContext ctx,
 		List<CreateLeafLayoutEngine> leafLayoutEngineCreators,
-		Schema.ALayoutEngineThatArrangesWindowsInATreeStructure treeLayoutEngine
+		Schema.SchemaRequiredType2 treeLayoutEngine
 	)
 	{
 		if (
@@ -155,7 +149,7 @@ internal static class YamlLayoutEngineLoader
 		}
 
 		Direction defaultAddNodeDirection = Direction.Right;
-		if (treeLayoutEngine.InitialDirection.TryGetString(out string? initialDirection))
+		if (((string?)treeLayoutEngine.InitialDirection) is { } initialDirection)
 		{
 			defaultAddNodeDirection = initialDirection switch
 			{

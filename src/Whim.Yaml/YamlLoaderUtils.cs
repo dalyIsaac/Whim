@@ -1,7 +1,6 @@
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Corvus.Json;
 using static Whim.Yaml.Schema;
 
 namespace Whim.Yaml;
@@ -40,12 +39,12 @@ internal static class YamlLoaderUtils
 		BackdropType backdropType = BackdropType.Mica;
 		bool alwaysShowBackdrop = true;
 
-		if (entity.Type.AsOptional() is { } backdropTypeStr)
+		if (entity.Type is { } backdropTypeStr)
 		{
 			backdropType = ((string)backdropTypeStr).ParseBackdropType();
 		}
 
-		if (entity.AlwaysShowBackdrop.AsOptional() is { } alwaysShowBackdropValue)
+		if (entity.AlwaysShowBackdrop is { } alwaysShowBackdropValue)
 		{
 			alwaysShowBackdrop = alwaysShowBackdropValue;
 		}

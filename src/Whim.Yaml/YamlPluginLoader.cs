@@ -26,28 +26,38 @@ internal static class YamlPluginLoader
 {
 	public static void LoadPlugins(IContext ctx, Schema schema)
 	{
-		LoadFocusIndicatorPlugin(ctx, schema);
-		LoadLayoutPreviewPlugin(ctx, schema);
-		LoadUpdaterPlugin(ctx, schema);
-		LoadSliceLayoutPlugin(ctx, schema);
-		LoadTreeLayoutPlugin(ctx, schema);
+		if (schema.Plugins is not { } plugins)
+		{
+			Logger.Debug("No plugins configuration found.");
+			return;
+		}
+
+		LoadFocusIndicatorPlugin(ctx, plugins);
+		LoadLayoutPreviewPlugin(ctx, plugins);
+		LoadUpdaterPlugin(ctx, plugins);
+		LoadSliceLayoutPlugin(ctx, plugins);
+		LoadTreeLayoutPlugin(ctx, plugins);
 
 		// Load the command palette after the TreeLayoutPlugin, as it has dependencies on the TreeLayout plugin.
-		LoadCommandPalettePlugin(ctx, schema);
+		LoadCommandPalettePlugin(ctx, plugins);
 
 		// Load the bar plugin after the TreeLayoutPlugin, as it has dependencies on the TreeLayout plugin.
-		YamlBarPluginLoader.LoadBarPlugin(ctx, schema);
+		YamlBarPluginLoader.LoadBarPlugin(ctx, plugins);
 
 		// It's important for FloatingWindowPlugin to immediately precede GapsPlugin in the plugin loading order.
 		// This ensures that the GapsLayoutEngine will immediately contain the ProxyFloatingLayoutEngine, which
 		// is required for preventing gaps for floating windows.
-		LoadFloatingWindowPlugin(ctx, schema);
-		LoadGapsPlugin(ctx, schema);
+		LoadFloatingWindowPlugin(ctx, plugins);
+		LoadGapsPlugin(ctx, plugins);
 	}
 
-	private static void LoadGapsPlugin(IContext ctx, Schema schema)
+	private static void LoadGapsPlugin(IContext ctx, Schema.PluginsEntity plugins)
 	{
-		var gaps = schema.Plugins.Gaps;
+		if (plugins.Gaps is not { } gaps)
+		{
+			Logger.Debug("Gaps plugin configuration not found.");
+			return;
+		}
 
 		if (!gaps.IsValid())
 		{
@@ -55,7 +65,7 @@ internal static class YamlPluginLoader
 			return;
 		}
 
-		if (gaps.IsEnabled.AsOptional() is { } isEnabled && !isEnabled)
+		if (gaps.IsEnabled is { } isEnabled && !isEnabled)
 		{
 			Logger.Debug("Gaps plugin is not enabled.");
 			return;
@@ -63,22 +73,22 @@ internal static class YamlPluginLoader
 
 		GapsConfig config = new();
 
-		if (gaps.OuterGap.AsOptional() is { } outerGap)
+		if (gaps.OuterGap is { } outerGap)
 		{
 			config.OuterGap = (int)outerGap;
 		}
 
-		if (gaps.InnerGap.AsOptional() is { } innerGap)
+		if (gaps.InnerGap is { } innerGap)
 		{
 			config.InnerGap = (int)innerGap;
 		}
 
-		if (gaps.DefaultOuterDelta.AsOptional() is { } defaultOuterDelta)
+		if (gaps.DefaultOuterDelta is { } defaultOuterDelta)
 		{
 			config.DefaultOuterDelta = (int)defaultOuterDelta;
 		}
 
-		if (gaps.DefaultInnerDelta.AsOptional() is { } defaultInnerDelta)
+		if (gaps.DefaultInnerDelta is { } defaultInnerDelta)
 		{
 			config.DefaultInnerDelta = (int)defaultInnerDelta;
 		}
@@ -86,9 +96,13 @@ internal static class YamlPluginLoader
 		ctx.PluginManager.AddPlugin(new GapsPlugin(ctx, config));
 	}
 
-	private static void LoadCommandPalettePlugin(IContext ctx, Schema schema)
+	private static void LoadCommandPalettePlugin(IContext ctx, Schema.PluginsEntity plugins)
 	{
-		var commandPalette = schema.Plugins.CommandPalette;
+		if (plugins.CommandPalette is not { } commandPalette)
+		{
+			Logger.Debug("CommandPalette plugin configuration not found.");
+			return;
+		}
 
 		if (!commandPalette.IsValid())
 		{
@@ -96,7 +110,7 @@ internal static class YamlPluginLoader
 			return;
 		}
 
-		if (commandPalette.IsEnabled.AsOptional() is { } isEnabled && !isEnabled)
+		if (commandPalette.IsEnabled is { } isEnabled && !isEnabled)
 		{
 			Logger.Debug("CommandPalette plugin is not enabled.");
 			return;
@@ -104,22 +118,22 @@ internal static class YamlPluginLoader
 
 		CommandPaletteConfig config = new(ctx);
 
-		if (commandPalette.MaxHeightPercent.AsOptional() is { } maxHeightPercent)
+		if (commandPalette.MaxHeightPercent is { } maxHeightPercent)
 		{
 			config.MaxHeightPercent = (int)maxHeightPercent;
 		}
 
-		if (commandPalette.MaxWidthPixels.AsOptional() is { } maxWidthPixels)
+		if (commandPalette.MaxWidthPixels is { } maxWidthPixels)
 		{
 			config.MaxWidthPixels = (int)maxWidthPixels;
 		}
 
-		if (commandPalette.YPositionPercent.AsOptional() is { } yPositionPercent)
+		if (commandPalette.YPositionPercent is { } yPositionPercent)
 		{
 			config.YPositionPercent = (int)yPositionPercent;
 		}
 
-		if (commandPalette.Backdrop.AsOptional() is { } backdrop)
+		if (commandPalette.Backdrop is { } backdrop)
 		{
 			config.Backdrop = YamlLoaderUtils.ParseWindowBackdropConfig(backdrop);
 		}
@@ -141,15 +155,21 @@ internal static class YamlPluginLoader
 		}
 	}
 
-	private static void LoadFloatingWindowPlugin(IContext ctx, Schema schema)
+	private static void LoadFloatingWindowPlugin(IContext ctx, Schema.PluginsEntity plugins)
 	{
-		if (!schema.Plugins.FloatingWindow.IsValid())
+		if (plugins.FloatingWindow is not { } floatingWindow)
+		{
+			Logger.Debug("FloatingWindow plugin configuration not found.");
+			return;
+		}
+
+		if (!floatingWindow.IsValid())
 		{
 			Logger.Debug("FloatingWindow plugin is not valid.");
 			return;
 		}
 
-		if (schema.Plugins.FloatingWindow.IsEnabled.AsOptional() is { } isEnabled && !isEnabled)
+		if (floatingWindow.IsEnabled is { } isEnabled && !isEnabled)
 		{
 			Logger.Debug("FloatingWindow plugin is not enabled.");
 			return;
@@ -158,9 +178,13 @@ internal static class YamlPluginLoader
 		ctx.PluginManager.AddPlugin(new FloatingWindowPlugin(ctx));
 	}
 
-	private static void LoadFocusIndicatorPlugin(IContext ctx, Schema schema)
+	private static void LoadFocusIndicatorPlugin(IContext ctx, Schema.PluginsEntity plugins)
 	{
-		var focusIndicator = schema.Plugins.FocusIndicator;
+		if (plugins.FocusIndicator is not { } focusIndicator)
+		{
+			Logger.Debug("FocusIndicator plugin configuration not found.");
+			return;
+		}
 
 		if (!focusIndicator.IsValid())
 		{
@@ -168,7 +192,7 @@ internal static class YamlPluginLoader
 			return;
 		}
 
-		if (focusIndicator.IsEnabled.AsOptional() is { } isEnabled && !isEnabled)
+		if (focusIndicator.IsEnabled is { } isEnabled && !isEnabled)
 		{
 			Logger.Debug("FocusIndicator plugin is not enabled.");
 			return;
@@ -176,7 +200,7 @@ internal static class YamlPluginLoader
 
 		FocusIndicatorConfig config = new();
 
-		if (focusIndicator.Color.AsOptional() is { } color)
+		if (focusIndicator.Color is { } color)
 		{
 			string colorStr = (string)color;
 			var rawColor = colorStr.ParseColor();
@@ -185,17 +209,17 @@ internal static class YamlPluginLoader
 			config.Color = new SolidColorBrush(winUiColor);
 		}
 
-		if (focusIndicator.BorderSize.AsOptional() is { } borderSize)
+		if (focusIndicator.BorderSize is { } borderSize)
 		{
 			config.BorderSize = (int)borderSize;
 		}
 
-		if (focusIndicator.IsFadeEnabled.AsOptional() is { } isFadeEnabled)
+		if (focusIndicator.IsFadeEnabled is { } isFadeEnabled)
 		{
 			config.FadeEnabled = isFadeEnabled;
 		}
 
-		if (focusIndicator.FadeTimeout.AsOptional() is { } fadeTimeout)
+		if (focusIndicator.FadeTimeout is { } fadeTimeout)
 		{
 			config.FadeTimeout = TimeSpan.FromSeconds((int)fadeTimeout);
 		}
@@ -203,9 +227,13 @@ internal static class YamlPluginLoader
 		ctx.PluginManager.AddPlugin(new FocusIndicatorPlugin(ctx, config));
 	}
 
-	private static void LoadLayoutPreviewPlugin(IContext ctx, Schema schema)
+	private static void LoadLayoutPreviewPlugin(IContext ctx, Schema.PluginsEntity plugins)
 	{
-		var layoutPreview = schema.Plugins.LayoutPreview;
+		if (plugins.LayoutPreview is not { } layoutPreview)
+		{
+			Logger.Debug("LayoutPreview plugin configuration not found.");
+			return;
+		}
 
 		if (!layoutPreview.IsValid())
 		{
@@ -213,7 +241,7 @@ internal static class YamlPluginLoader
 			return;
 		}
 
-		if (layoutPreview.IsEnabled.AsOptional() is { } isEnabled && !isEnabled)
+		if (layoutPreview.IsEnabled is { } isEnabled && !isEnabled)
 		{
 			Logger.Debug("LayoutPreview plugin is not enabled.");
 			return;
@@ -222,9 +250,13 @@ internal static class YamlPluginLoader
 		ctx.PluginManager.AddPlugin(new LayoutPreviewPlugin(ctx));
 	}
 
-	private static void LoadUpdaterPlugin(IContext ctx, Schema schema)
+	private static void LoadUpdaterPlugin(IContext ctx, Schema.PluginsEntity plugins)
 	{
-		var updater = schema.Plugins.Updater;
+		if (plugins.Updater is not { } updater)
+		{
+			Logger.Debug("Updater plugin configuration not found.");
+			return;
+		}
 
 		if (!updater.IsValid())
 		{
@@ -232,7 +264,7 @@ internal static class YamlPluginLoader
 			return;
 		}
 
-		if (updater.IsEnabled.AsOptional() is { } isEnabled && !isEnabled)
+		if (updater.IsEnabled is { } isEnabled && !isEnabled)
 		{
 			Logger.Debug("Updater plugin is not enabled.");
 			return;
@@ -240,7 +272,7 @@ internal static class YamlPluginLoader
 
 		UpdaterConfig config = new();
 
-		if (updater.UpdateFrequency.AsOptional() is { } updateFrequency)
+		if (updater.UpdateFrequency is { } updateFrequency)
 		{
 			string updateFrequencyStr = ((string)updateFrequency).Capitalize();
 			config.UpdateFrequency = Enum.TryParse<UpdateFrequency>(updateFrequencyStr, out var frequency)
@@ -248,7 +280,7 @@ internal static class YamlPluginLoader
 				: UpdateFrequency.Never;
 		}
 
-		if (updater.ReleaseChannel.AsOptional() is { } releaseChannel)
+		if (updater.ReleaseChannel is { } releaseChannel)
 		{
 			string releaseChannelStr = ((string)releaseChannel).Capitalize();
 			config.ReleaseChannel = Enum.TryParse<ReleaseChannel>(releaseChannelStr, out var channel)
@@ -259,15 +291,21 @@ internal static class YamlPluginLoader
 		ctx.PluginManager.AddPlugin(new UpdaterPlugin(ctx, config));
 	}
 
-	private static void LoadSliceLayoutPlugin(IContext ctx, Schema schema)
+	private static void LoadSliceLayoutPlugin(IContext ctx, Schema.PluginsEntity plugins)
 	{
-		if (!schema.Plugins.SliceLayout.IsValid())
+		if (plugins.SliceLayout is not { } sliceLayout)
+		{
+			Logger.Debug("SliceLayout plugin configuration not found.");
+			return;
+		}
+
+		if (!sliceLayout.IsValid())
 		{
 			Logger.Debug("SliceLayout plugin is not valid.");
 			return;
 		}
 
-		if (schema.Plugins.SliceLayout.IsEnabled.AsOptional() is { } isEnabled && !isEnabled)
+		if (sliceLayout.IsEnabled is { } isEnabled && !isEnabled)
 		{
 			Logger.Debug("SliceLayout plugin is not enabled.");
 			return;
@@ -276,15 +314,21 @@ internal static class YamlPluginLoader
 		ctx.PluginManager.AddPlugin(new SliceLayoutPlugin(ctx));
 	}
 
-	private static void LoadTreeLayoutPlugin(IContext ctx, Schema schema)
+	private static void LoadTreeLayoutPlugin(IContext ctx, Schema.PluginsEntity plugins)
 	{
-		if (!schema.Plugins.TreeLayout.IsValid())
+		if (plugins.TreeLayout is not { } treeLayout)
+		{
+			Logger.Debug("TreeLayout plugin configuration not found.");
+			return;
+		}
+
+		if (!treeLayout.IsValid())
 		{
 			Logger.Debug("TreeLayout plugin is not valid.");
 			return;
 		}
 
-		if (schema.Plugins.TreeLayout.IsEnabled.AsOptional() is { } isEnabled && !isEnabled)
+		if (treeLayout.IsEnabled is { } isEnabled && !isEnabled)
 		{
 			Logger.Debug("TreeLayout plugin is not enabled.");
 			return;

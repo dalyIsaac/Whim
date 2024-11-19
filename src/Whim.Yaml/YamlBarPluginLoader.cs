@@ -13,9 +13,13 @@ internal static class YamlBarPluginLoader
 		"CA2000:Dispose objects before losing scope",
 		Justification = "Items will be disposed by the context where appropriate."
 	)]
-	public static void LoadBarPlugin(IContext ctx, Schema schema)
+	public static void LoadBarPlugin(IContext ctx, Schema.PluginsEntity plugins)
 	{
-		var bar = schema.Plugins.Bar;
+		if (plugins.Bar is not { } bar)
+		{
+			Logger.Debug("Bar plugin configuration not found.");
+			return;
+		}
 
 		if (!bar.IsValid())
 		{
@@ -23,7 +27,7 @@ internal static class YamlBarPluginLoader
 			return;
 		}
 
-		if (bar.IsEnabled.AsOptional() is { } isEnabled && !isEnabled)
+		if (bar.IsEnabled is { } isEnabled && !isEnabled)
 		{
 			Logger.Debug("Bar plugin is not enabled.");
 			return;
@@ -35,12 +39,12 @@ internal static class YamlBarPluginLoader
 
 		BarConfig config = new(leftComponents, centerComponents, rightComponents);
 
-		if (bar.Height.AsOptional() is { } height)
+		if (bar.Height is { } height)
 		{
 			config.Height = (int)height;
 		}
 
-		if (bar.Backdrop.AsOptional() is { } backdrop)
+		if (bar.Backdrop is { } backdrop)
 		{
 			config.Backdrop = YamlLoaderUtils.ParseWindowBackdropConfig(backdrop);
 		}
@@ -48,82 +52,79 @@ internal static class YamlBarPluginLoader
 		ctx.PluginManager.AddPlugin(new BarPlugin(ctx, config));
 	}
 
-	private static List<BarComponent> GetBarComponents(IContext ctx, Schema.DefsRequiredEntries componentsWrapper)
+	private static List<BarComponent> GetBarComponents(IContext ctx, Schema.SchemaRequiredEntries? componentsWrapper)
 	{
-		if (componentsWrapper.Entries.AsOptional() is not { } entries)
+		if (componentsWrapper is not { } components)
 		{
 			return [];
 		}
 
-		List<BarComponent> components = [];
+		List<BarComponent> barComponents = [];
 
-		foreach (var entry in entries)
+		foreach (var entry in components.Entries)
 		{
 			entry.Match<object?>(
-				(in Schema.AWidgetToDisplayTheActiveLayout widget) =>
+				(in Schema.SchemaRequiredType4 widget) =>
 				{
-					components.Add(CreateActiveLayoutBarWidget(ctx, widget));
+					barComponents.Add(CreateActiveLayoutBarWidget(ctx, widget));
 					return null;
 				},
-				(in Schema.AWidgetToDisplayTheBatteryStatus widget) =>
+				(in Schema.SchemaRequiredType5 widget) =>
 				{
-					components.Add(CreateBatteryBarWidget(ctx, widget));
+					barComponents.Add(CreateBatteryBarWidget(ctx, widget));
 					return null;
 				},
-				(in Schema.AWidgetToDisplayTheDateAndTime widget) =>
+				(in Schema.SchemaRequiredType6 widget) =>
 				{
-					components.Add(CreateDateTimeBarWidget(ctx, widget));
+					barComponents.Add(CreateDateTimeBarWidget(ctx, widget));
 					return null;
 				},
-				(in Schema.AWidgetToDisplayTheFocusedWindow widget) =>
+				(in Schema.SchemaRequiredType7 widget) =>
 				{
-					components.Add(CreateFocusedWindowBarWidget(ctx, widget));
+					barComponents.Add(CreateFocusedWindowBarWidget(ctx, widget));
 					return null;
 				},
-				(in Schema.AWidgetToDisplayTheWorkspace widget) =>
+				(in Schema.SchemaRequiredType9 widget) =>
 				{
-					components.Add(CreateWorkspaceBarWidget(ctx, widget));
+					barComponents.Add(CreateWorkspaceBarWidget(ctx, widget));
 					return null;
 				},
-				(in Schema.DefsRequiredType3 widget) =>
+				(in Schema.SchemaRequiredType8 widget) =>
 				{
-					components.Add(CreateTreeLayoutEngineBarWidget(ctx, widget));
+					barComponents.Add(CreateTreeLayoutEngineBarWidget(ctx, widget));
 					return null;
 				},
-				(in Schema.DefsRequiredType2 _) =>
+				(in Schema.SchemaRequiredType3 _) =>
 				{
 					return null;
 				}
 			);
 		}
 
-		return components;
+		return barComponents;
 	}
 
-	private static BarComponent CreateActiveLayoutBarWidget(IContext ctx, Schema.AWidgetToDisplayTheActiveLayout widget)
+	private static BarComponent CreateActiveLayoutBarWidget(IContext ctx, Schema.SchemaRequiredType4 widget)
 	{
 		return ActiveLayoutWidget.CreateComponent();
 	}
 
-	private static BarComponent CreateBatteryBarWidget(IContext ctx, Schema.AWidgetToDisplayTheBatteryStatus widget)
+	private static BarComponent CreateBatteryBarWidget(IContext ctx, Schema.SchemaRequiredType5 widget)
 	{
 		return BatteryWidget.CreateComponent();
 	}
 
-	private static BarComponent CreateDateTimeBarWidget(IContext ctx, Schema.AWidgetToDisplayTheDateAndTime widget)
+	private static BarComponent CreateDateTimeBarWidget(IContext ctx, Schema.SchemaRequiredType6 widget)
 	{
-		int interval = (int?)widget.Interval.AsOptional() ?? 1000;
-		string format = (string?)widget.Format.AsOptional() ?? "yyyy-MM-dd HH:mm:ss";
+		int interval = widget.Interval is { } i ? (int)i : 1000;
+		string format = widget.Format is { } f ? (string)f : "yyyy-MM-dd HH:mm:ss";
 
 		return DateTimeWidget.CreateComponent(interval, format);
 	}
 
-	private static BarComponent CreateFocusedWindowBarWidget(
-		IContext ctx,
-		Schema.AWidgetToDisplayTheFocusedWindow widget
-	)
+	private static BarComponent CreateFocusedWindowBarWidget(IContext ctx, Schema.SchemaRequiredType7 widget)
 	{
-		bool shortenTitle = widget.ShortenTitle.AsOptional() ?? false;
+		bool shortenTitle = widget.ShortenTitle is { } st && st;
 		Func<IWindow, string> getTitle = shortenTitle
 			? FocusedWindowWidget.GetShortTitle
 			: FocusedWindowWidget.GetTitle;
@@ -131,12 +132,12 @@ internal static class YamlBarPluginLoader
 		return FocusedWindowWidget.CreateComponent(getTitle);
 	}
 
-	private static BarComponent CreateWorkspaceBarWidget(IContext ctx, Schema.AWidgetToDisplayTheWorkspace widget)
+	private static BarComponent CreateWorkspaceBarWidget(IContext ctx, Schema.SchemaRequiredType9 widget)
 	{
 		return WorkspaceWidget.CreateComponent();
 	}
 
-	private static BarComponent CreateTreeLayoutEngineBarWidget(IContext ctx, Schema.DefsRequiredType3 widget)
+	private static BarComponent CreateTreeLayoutEngineBarWidget(IContext ctx, Schema.SchemaRequiredType8 widget)
 	{
 		if (
 			ctx.PluginManager.LoadedPlugins.FirstOrDefault(p => p.Name == "whim.tree_layout")
