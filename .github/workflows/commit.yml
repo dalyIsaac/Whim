@@ -80,12 +80,12 @@ jobs:
       #       dotnet format analyzers Whim.sln --verify-no-changes --no-restore
 
       - name: Check Python formatting
-        uses: astral-sh/ruff-action@v1
+        uses: astral-sh/ruff-action@v2
         with:
           args: format --check
 
       - name: Lint Python code
-        uses: astral-sh/ruff-action@v1
+        uses: astral-sh/ruff-action@v2
         with:
           args: check
 
