@@ -2,7 +2,7 @@
 PyYAML==6.0.2
 requests==2.32.3
 # indirect dependencies, frozen to use cache by `actions/setup-python`
-certifi==2024.8.30
+certifi==2024.12.14
 charset-normalizer==3.4.0
 idna==3.10
 urllib3==2.2.3
