@@ -11,13 +11,14 @@ workspaces:
   entries:
     - name: Browser
       layout_engines:
-        - type: SliceLayoutEngine
-          variant:
-            type: column
-        - type: SliceLayoutEngine
-          variant:
-            type: row
-        - type: TreeLayoutEngine
+        entries:
+          - type: SliceLayoutEngine
+            variant:
+              type: column
+          - type: SliceLayoutEngine
+            variant:
+              type: row
+          - type: TreeLayoutEngine
 
     - name: IDE
     - name: Chat
