@@ -75,17 +75,10 @@ jobs:
             ${{ matrix.platform }}-nuget-${{ hashFiles('Directory.Packages.props') }}
             ${{ matrix.platform }}-nuget-
 
-      - name: Get variables
-        shell: pwsh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          $channel, $isPrerelease = .\scripts\Get-Channel.ps1
-          $currentRelease = .\scripts\Get-CurrentWhimRelease.ps1 -Channel $channel
-          $version = "v${currentRelease}"
-
-          "CurrentRelease=${currentRelease}" >> $env:GITHUB_ENV
-          "Version=${version}" >> $env:GITHUB_ENV
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
 
       - name: Restore dependencies
         run: |
