@@ -57,6 +57,11 @@ jobs:
             ${{ matrix.platform }}-nuget-${{ hashFiles('Directory.Packages.props') }}
             ${{ matrix.platform }}-nuget-
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
       - name: Restore dependencies
         run: |
           dotnet restore Whim.sln -p:Configuration=$env:Configuration
@@ -108,6 +113,4 @@ jobs:
           dotnet test Whim.sln --collect:"XPlat Code Coverage;Format=opencover"
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4.6.0
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        uses: codecov/codecov-action@v5.3.1
