@@ -407,13 +407,12 @@ public class LegacyWorkspaceTests
 	{
 		// Given
 		Workspace workspace = CreateWorkspace(ctx);
-		LayoutEngineCustomAction<IWindow> action =
-			new()
-			{
-				Name = "Test",
-				Window = window,
-				Payload = window,
-			};
+		LayoutEngineCustomAction<IWindow> action = new()
+		{
+			Name = "Test",
+			Window = window,
+			Payload = window,
+		};
 
 		ctx.Store.Dispatch(new LayoutEngineCustomActionWithPayloadTransform<IWindow>(workspace.Id, action))
 			.Returns(isChanged);

@@ -19,8 +19,10 @@ public class MonitorInfoTests
 	public void IsPrimary()
 	{
 		// Given
-		MONITORINFOEXW monitor =
-			new() { monitorInfo = new MONITORINFO { dwFlags = (uint)MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY } };
+		MONITORINFOEXW monitor = new()
+		{
+			monitorInfo = new MONITORINFO { dwFlags = (uint)MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY },
+		};
 
 		// When
 		bool result = monitor.IsPrimary();

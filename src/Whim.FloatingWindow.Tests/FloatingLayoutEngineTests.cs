@@ -285,13 +285,12 @@ public class FloatingLayoutEngineTests
 	{
 		// Given
 		ILayoutEngine engine = new FloatingLayoutEngine(context, identity).AddWindow(window);
-		LayoutEngineCustomAction<string> action =
-			new()
-			{
-				Name = "Action",
-				Payload = "payload",
-				Window = null,
-			};
+		LayoutEngineCustomAction<string> action = new()
+		{
+			Name = "Action",
+			Payload = "payload",
+			Window = null,
+		};
 
 		// When
 		ILayoutEngine newEngine = engine.PerformCustomAction(action);

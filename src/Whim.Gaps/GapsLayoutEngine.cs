@@ -86,14 +86,13 @@ public record GapsLayoutEngine : BaseProxyLayoutEngine
 		int doubleOuterGap = outerGap * 2;
 		int doubleInnerGap = innerGap * 2;
 
-		Rectangle<int> proxiedRect =
-			new()
-			{
-				X = rectangle.X + outerGap,
-				Y = rectangle.Y + outerGap,
-				Width = rectangle.Width - doubleOuterGap,
-				Height = rectangle.Height - doubleOuterGap,
-			};
+		Rectangle<int> proxiedRect = new()
+		{
+			X = rectangle.X + outerGap,
+			Y = rectangle.Y + outerGap,
+			Width = rectangle.Width - doubleOuterGap,
+			Height = rectangle.Height - doubleOuterGap,
+		};
 
 		int idx = 0;
 		foreach (IWindowState windowState in InnerLayoutEngine.DoLayout(proxiedRect, monitor))

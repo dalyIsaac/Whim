@@ -83,16 +83,15 @@ public class LayoutEngineCustomActionTransformTests
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void PayloadAction_NoChanges(IContext ctx, MutableRootSector root, IWindow window)
 	{
-		LayoutEngineCustomActionWithPayloadTransform<IWindow?> sut =
-			new(
-				WorkspaceId,
-				new LayoutEngineCustomAction<IWindow?>
-				{
-					Name = "Action",
-					Payload = window,
-					Window = window,
-				}
-			);
+		LayoutEngineCustomActionWithPayloadTransform<IWindow?> sut = new(
+			WorkspaceId,
+			new LayoutEngineCustomAction<IWindow?>
+			{
+				Name = "Action",
+				Payload = window,
+				Window = window,
+			}
+		);
 
 		NoChanges(sut, ctx, root, window);
 	}
@@ -100,8 +99,10 @@ public class LayoutEngineCustomActionTransformTests
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void NoPayload_NoChanges(IContext ctx, MutableRootSector root, IWindow window)
 	{
-		LayoutEngineCustomActionTransform sut =
-			new(WorkspaceId, new LayoutEngineCustomAction { Name = "Action", Window = window });
+		LayoutEngineCustomActionTransform sut = new(
+			WorkspaceId,
+			new LayoutEngineCustomAction { Name = "Action", Window = window }
+		);
 
 		NoChanges(sut, ctx, root, window);
 	}
@@ -109,16 +110,15 @@ public class LayoutEngineCustomActionTransformTests
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void PayloadAction_Changes(IContext ctx, MutableRootSector root, IWindow window)
 	{
-		LayoutEngineCustomActionWithPayloadTransform<IWindow?> sut =
-			new(
-				WorkspaceId,
-				new LayoutEngineCustomAction<IWindow?>
-				{
-					Name = "Action",
-					Payload = window,
-					Window = window,
-				}
-			);
+		LayoutEngineCustomActionWithPayloadTransform<IWindow?> sut = new(
+			WorkspaceId,
+			new LayoutEngineCustomAction<IWindow?>
+			{
+				Name = "Action",
+				Payload = window,
+				Window = window,
+			}
+		);
 
 		Changes(sut, ctx, root, window);
 	}
@@ -126,8 +126,10 @@ public class LayoutEngineCustomActionTransformTests
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void NoPayload_Changes(IContext ctx, MutableRootSector root, IWindow window)
 	{
-		LayoutEngineCustomActionTransform sut =
-			new(WorkspaceId, new LayoutEngineCustomAction { Name = "Action", Window = window });
+		LayoutEngineCustomActionTransform sut = new(
+			WorkspaceId,
+			new LayoutEngineCustomAction { Name = "Action", Window = window }
+		);
 
 		Changes(sut, ctx, root, window);
 	}

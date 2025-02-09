@@ -349,14 +349,13 @@ internal static class TreeHelpers
 		double precedingWeight = 0;
 		foreach ((double weight, INode child) in parent)
 		{
-			Rectangle<int> childRectangle =
-				new()
-				{
-					X = rectangle.X,
-					Y = rectangle.Y,
-					Width = rectangle.Width,
-					Height = rectangle.Height,
-				};
+			Rectangle<int> childRectangle = new()
+			{
+				X = rectangle.X,
+				Y = rectangle.Y,
+				Width = rectangle.Width,
+				Height = rectangle.Height,
+			};
 
 			if (parent.IsHorizontal)
 			{

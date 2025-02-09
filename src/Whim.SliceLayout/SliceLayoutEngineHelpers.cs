@@ -128,8 +128,10 @@ public partial record SliceLayoutEngine
 	{
 		Logger.Debug($"Getting window at {point}");
 
-		Point<int> scaledPoint =
-			new((int)(point.X * _cachedWindowStatesScale), (int)(point.Y * _cachedWindowStatesScale));
+		Point<int> scaledPoint = new(
+			(int)(point.X * _cachedWindowStatesScale),
+			(int)(point.Y * _cachedWindowStatesScale)
+		);
 		IWindowState[] windowStates = GetLazyWindowStates();
 
 		for (int idx = 0; idx < windowStates.Length; idx++)

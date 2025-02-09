@@ -121,13 +121,12 @@ public class LayoutPreviewPluginTests
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMoveStartedEventArgs e =
-			new()
-			{
-				Window = Substitute.For<IWindow>(),
-				CursorDraggedPoint = null,
-				MovedEdges = null,
-			};
+		WindowMoveStartedEventArgs e = new()
+		{
+			Window = Substitute.For<IWindow>(),
+			CursorDraggedPoint = null,
+			MovedEdges = null,
+		};
 
 		// When
 		plugin.PreInitialize();
@@ -144,13 +143,12 @@ public class LayoutPreviewPluginTests
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMovedEventArgs e =
-			new()
-			{
-				Window = Substitute.For<IWindow>(),
-				CursorDraggedPoint = null,
-				MovedEdges = null,
-			};
+		WindowMovedEventArgs e = new()
+		{
+			Window = Substitute.For<IWindow>(),
+			CursorDraggedPoint = null,
+			MovedEdges = null,
+		};
 
 		// When
 		plugin.PreInitialize();
@@ -167,13 +165,12 @@ public class LayoutPreviewPluginTests
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMovedEventArgs e =
-			new()
-			{
-				Window = Substitute.For<IWindow>(),
-				CursorDraggedPoint = new Rectangle<int>(),
-				MovedEdges = Direction.LeftDown,
-			};
+		WindowMovedEventArgs e = new()
+		{
+			Window = Substitute.For<IWindow>(),
+			CursorDraggedPoint = new Rectangle<int>(),
+			MovedEdges = Direction.LeftDown,
+		};
 
 		// When
 		plugin.PreInitialize();
@@ -194,13 +191,12 @@ public class LayoutPreviewPluginTests
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMovedEventArgs e =
-			new()
-			{
-				Window = Substitute.For<IWindow>(),
-				CursorDraggedPoint = new Rectangle<int>(),
-				MovedEdges = null,
-			};
+		WindowMovedEventArgs e = new()
+		{
+			Window = Substitute.For<IWindow>(),
+			CursorDraggedPoint = new Rectangle<int>(),
+			MovedEdges = null,
+		};
 		rootSector.MapSector.MonitorWorkspaceMap = rootSector.MapSector.MonitorWorkspaceMap.Clear();
 
 		workspace.ActiveLayoutEngine.ClearReceivedCalls();
@@ -234,13 +230,12 @@ public class LayoutPreviewPluginTests
 		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitor);
 
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMovedEventArgs e =
-			new()
-			{
-				Window = window,
-				CursorDraggedPoint = new Rectangle<int>(),
-				MovedEdges = null,
-			};
+		WindowMovedEventArgs e = new()
+		{
+			Window = window,
+			CursorDraggedPoint = new Rectangle<int>(),
+			MovedEdges = null,
+		};
 
 		// When
 		plugin.PreInitialize();
@@ -261,13 +256,12 @@ public class LayoutPreviewPluginTests
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMovedEventArgs e =
-			new()
-			{
-				Window = window,
-				CursorDraggedPoint = new Rectangle<int>(),
-				MovedEdges = null,
-			};
+		WindowMovedEventArgs e = new()
+		{
+			Window = window,
+			CursorDraggedPoint = new Rectangle<int>(),
+			MovedEdges = null,
+		};
 
 		workspace.ActiveLayoutEngine.ClearReceivedCalls();
 
@@ -288,13 +282,12 @@ public class LayoutPreviewPluginTests
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
-		WindowMoveEndedEventArgs e =
-			new()
-			{
-				Window = Substitute.For<IWindow>(),
-				CursorDraggedPoint = null,
-				MovedEdges = null,
-			};
+		WindowMoveEndedEventArgs e = new()
+		{
+			Window = Substitute.For<IWindow>(),
+			CursorDraggedPoint = null,
+			MovedEdges = null,
+		};
 
 		// When
 		plugin.PreInitialize();
@@ -339,13 +332,12 @@ public class LayoutPreviewPluginTests
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
 
-		WindowMovedEventArgs moveArgs =
-			new()
-			{
-				Window = movedWindow,
-				CursorDraggedPoint = new Rectangle<int>(),
-				MovedEdges = null,
-			};
+		WindowMovedEventArgs moveArgs = new()
+		{
+			Window = movedWindow,
+			CursorDraggedPoint = new Rectangle<int>(),
+			MovedEdges = null,
+		};
 		WindowEventArgs removeArgs = new WindowRemovedEventArgs() { Window = movedWindow };
 
 		// When
@@ -364,13 +356,12 @@ public class LayoutPreviewPluginTests
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
 
-		WindowMovedEventArgs moveArgs =
-			new()
-			{
-				Window = movedWindow,
-				CursorDraggedPoint = new Rectangle<int>(),
-				MovedEdges = null,
-			};
+		WindowMovedEventArgs moveArgs = new()
+		{
+			Window = movedWindow,
+			CursorDraggedPoint = new Rectangle<int>(),
+			MovedEdges = null,
+		};
 
 		WindowFocusedEventArgs focusArgs = new() { Window = movedWindow };
 

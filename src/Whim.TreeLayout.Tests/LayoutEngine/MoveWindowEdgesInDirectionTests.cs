@@ -1008,14 +1008,13 @@ public class MoveSingleWindowEdgeInDirectionTests
 		// Given
 		Assert.Equal(4, windows.Length);
 		var (topLeft, bottomLeft, topRight, bottomRight) = (windows[0], windows[1], windows[2], windows[3]);
-		Dictionary<string, IWindow> windowsDict =
-			new()
-			{
-				{ "topLeft", topLeft },
-				{ "topRight", topRight },
-				{ "bottomLeft", bottomLeft },
-				{ "bottomRight", bottomRight },
-			};
+		Dictionary<string, IWindow> windowsDict = new()
+		{
+			{ "topLeft", topLeft },
+			{ "topRight", topRight },
+			{ "bottomLeft", bottomLeft },
+			{ "bottomRight", bottomRight },
+		};
 
 		LayoutEngineWrapper wrapper = new();
 

@@ -6,17 +6,16 @@ namespace Whim.Tests;
 [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class MonitorEventListenerTests
 {
-	private static readonly WindowMessageMonitorEventArgs _windowMessageArgs =
-		new()
+	private static readonly WindowMessageMonitorEventArgs _windowMessageArgs = new()
+	{
+		MessagePayload = new()
 		{
-			MessagePayload = new()
-			{
-				HWnd = (HWND)1,
-				LParam = (LPARAM)1,
-				UMsg = 1,
-				WParam = (WPARAM)1,
-			},
-		};
+			HWnd = (HWND)1,
+			LParam = (LPARAM)1,
+			UMsg = 1,
+			WParam = (WPARAM)1,
+		},
+	};
 
 	[Theory, AutoSubstituteData]
 	[SuppressMessage("Usage", "NS5000:Received check.")]

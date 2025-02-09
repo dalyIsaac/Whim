@@ -962,13 +962,12 @@ public class ColumnLayoutEngineTests
 	{
 		// Given
 		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window);
-		LayoutEngineCustomAction<string> action =
-			new()
-			{
-				Name = "Action",
-				Payload = "payload",
-				Window = Substitute.For<IWindow>(),
-			};
+		LayoutEngineCustomAction<string> action = new()
+		{
+			Name = "Action",
+			Payload = "payload",
+			Window = Substitute.For<IWindow>(),
+		};
 
 		// When
 		ILayoutEngine newEngine = engine.PerformCustomAction(action);

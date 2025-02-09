@@ -39,14 +39,13 @@ public record BarLayoutEngine : BaseProxyLayoutEngine
 		double scale = monitor.ScaleFactor / 100.0;
 		int height = (int)(_barConfig.Height * scale);
 
-		Rectangle<int> proxiedRect =
-			new()
-			{
-				X = rectangle.X,
-				Y = rectangle.Y + height,
-				Width = rectangle.Width,
-				Height = Math.Max(0, rectangle.Height - height),
-			};
+		Rectangle<int> proxiedRect = new()
+		{
+			X = rectangle.X,
+			Y = rectangle.Y + height,
+			Width = rectangle.Width,
+			Height = Math.Max(0, rectangle.Height - height),
+		};
 		return InnerLayoutEngine.DoLayout(proxiedRect, monitor);
 	}
 

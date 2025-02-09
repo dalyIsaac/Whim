@@ -106,13 +106,12 @@ public class SelectVariantViewModelTests
 		IEnumerable<SelectOption> optionsMock = Substitute.For<IEnumerable<SelectOption>>();
 		optionsMock.GetEnumerator().Returns(_ => new List<SelectOption>().GetEnumerator());
 
-		SelectVariantConfig activationConfig =
-			new()
-			{
-				Callback = (items) => { },
-				Options = optionsMock,
-				ConfirmButtonText = "Call",
-			};
+		SelectVariantConfig activationConfig = new()
+		{
+			Callback = (items) => { },
+			Options = optionsMock,
+			ConfirmButtonText = "Call",
+		};
 
 		selectVariantViewModel.Activate(activationConfig);
 
@@ -219,13 +218,12 @@ public class SelectVariantViewModelTests
 				))
 			);
 
-		SelectVariantConfig activationConfig =
-			new()
-			{
-				Callback = callbackMock,
-				Options = options,
-				Matcher = matcherMock,
-			};
+		SelectVariantConfig activationConfig = new()
+		{
+			Callback = callbackMock,
+			Options = options,
+			Matcher = matcherMock,
+		};
 
 		return (
 			selectVariantViewModel,
@@ -528,14 +526,13 @@ public class SelectVariantViewModelTests
 		) = CreateOptionsStubs();
 		selectVariantViewModel.LoadSelectMatches("test", activationConfig);
 
-		SelectOption newOption =
-			new()
-			{
-				Id = "5",
-				Title = "title5",
-				IsSelected = false,
-				IsEnabled = false,
-			};
+		SelectOption newOption = new()
+		{
+			Id = "5",
+			Title = "title5",
+			IsSelected = false,
+			IsEnabled = false,
+		};
 
 		List<SelectOption> updatedOptions = [options[0], newOption, options[2]];
 
@@ -587,14 +584,13 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.Activate(activationConfig);
 
 		// Second load
-		SelectOption secondNewOption =
-			new()
-			{
-				Id = "5",
-				Title = "title5",
-				IsSelected = false,
-				IsEnabled = false,
-			};
+		SelectOption secondNewOption = new()
+		{
+			Id = "5",
+			Title = "title5",
+			IsSelected = false,
+			IsEnabled = false,
+		};
 		List<SelectOption> secondOptions = [secondNewOption];
 		List<SelectVariantRowModel> secondVariantItems = secondOptions
 			.Select(o => new SelectVariantRowModel(o))
@@ -614,14 +610,13 @@ public class SelectVariantViewModelTests
 		);
 
 		// When third load
-		SelectOption thirdNewOption =
-			new()
-			{
-				Id = "6",
-				Title = "title6",
-				IsSelected = false,
-				IsEnabled = false,
-			};
+		SelectOption thirdNewOption = new()
+		{
+			Id = "6",
+			Title = "title6",
+			IsSelected = false,
+			IsEnabled = false,
+		};
 		List<SelectOption> thirdOptions = [secondNewOption, thirdNewOption];
 		List<SelectVariantRowModel> thirdVariantItems = thirdOptions.Select(o => new SelectVariantRowModel(o)).ToList();
 

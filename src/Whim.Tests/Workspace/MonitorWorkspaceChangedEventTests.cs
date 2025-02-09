@@ -44,20 +44,18 @@ public class MonitorWorkspaceChangedEventTests
 		IWorkspace workspace = StoreTestUtils.CreateWorkspace(ctx);
 		IWorkspace aWorkspace = StoreTestUtils.CreateWorkspace(ctx);
 		IWorkspace bWorkspace = StoreTestUtils.CreateWorkspace(ctx);
-		MonitorWorkspaceChangedEventArgs a =
-			new()
-			{
-				Monitor = monitor,
-				CurrentWorkspace = workspace,
-				PreviousWorkspace = aWorkspace,
-			};
-		MonitorWorkspaceChangedEventArgs b =
-			new()
-			{
-				Monitor = monitor,
-				CurrentWorkspace = workspace,
-				PreviousWorkspace = bWorkspace,
-			};
+		MonitorWorkspaceChangedEventArgs a = new()
+		{
+			Monitor = monitor,
+			CurrentWorkspace = workspace,
+			PreviousWorkspace = aWorkspace,
+		};
+		MonitorWorkspaceChangedEventArgs b = new()
+		{
+			Monitor = monitor,
+			CurrentWorkspace = workspace,
+			PreviousWorkspace = bWorkspace,
+		};
 
 		// Then
 		Assert.False(a.Equals(b));
@@ -70,20 +68,18 @@ public class MonitorWorkspaceChangedEventTests
 		IWorkspace aCurrentWorkspace = StoreTestUtils.CreateWorkspace(ctx);
 		IWorkspace bCurrentWorkspace = StoreTestUtils.CreateWorkspace(ctx);
 		IWorkspace previousWorkspace = StoreTestUtils.CreateWorkspace(ctx);
-		MonitorWorkspaceChangedEventArgs a =
-			new()
-			{
-				Monitor = monitor,
-				CurrentWorkspace = aCurrentWorkspace,
-				PreviousWorkspace = bCurrentWorkspace,
-			};
-		MonitorWorkspaceChangedEventArgs b =
-			new()
-			{
-				Monitor = monitor,
-				CurrentWorkspace = aCurrentWorkspace,
-				PreviousWorkspace = previousWorkspace,
-			};
+		MonitorWorkspaceChangedEventArgs a = new()
+		{
+			Monitor = monitor,
+			CurrentWorkspace = aCurrentWorkspace,
+			PreviousWorkspace = bCurrentWorkspace,
+		};
+		MonitorWorkspaceChangedEventArgs b = new()
+		{
+			Monitor = monitor,
+			CurrentWorkspace = aCurrentWorkspace,
+			PreviousWorkspace = previousWorkspace,
+		};
 
 		// Then
 		Assert.False(a.Equals(b));
@@ -93,20 +89,18 @@ public class MonitorWorkspaceChangedEventTests
 	public void Equals_Sucess(IMonitor monitor, IWorkspace currentWorkspace, IWorkspace previousWorkspace)
 	{
 		// Given
-		MonitorWorkspaceChangedEventArgs a =
-			new()
-			{
-				Monitor = monitor,
-				CurrentWorkspace = currentWorkspace,
-				PreviousWorkspace = previousWorkspace,
-			};
-		MonitorWorkspaceChangedEventArgs b =
-			new()
-			{
-				Monitor = monitor,
-				CurrentWorkspace = currentWorkspace,
-				PreviousWorkspace = previousWorkspace,
-			};
+		MonitorWorkspaceChangedEventArgs a = new()
+		{
+			Monitor = monitor,
+			CurrentWorkspace = currentWorkspace,
+			PreviousWorkspace = previousWorkspace,
+		};
+		MonitorWorkspaceChangedEventArgs b = new()
+		{
+			Monitor = monitor,
+			CurrentWorkspace = currentWorkspace,
+			PreviousWorkspace = previousWorkspace,
+		};
 
 		// Then
 		Assert.True(a.Equals(b));
@@ -116,13 +110,12 @@ public class MonitorWorkspaceChangedEventTests
 	public void GetHashCode_Success(IMonitor monitor, IWorkspace currentWorkspace, IWorkspace previousWorkspace)
 	{
 		// Given
-		MonitorWorkspaceChangedEventArgs a =
-			new()
-			{
-				Monitor = monitor,
-				CurrentWorkspace = currentWorkspace,
-				PreviousWorkspace = previousWorkspace,
-			};
+		MonitorWorkspaceChangedEventArgs a = new()
+		{
+			Monitor = monitor,
+			CurrentWorkspace = currentWorkspace,
+			PreviousWorkspace = previousWorkspace,
+		};
 
 		// Then
 		Assert.Equal(HashCode.Combine(monitor, previousWorkspace, currentWorkspace), a.GetHashCode());

@@ -60,14 +60,13 @@ public class RectangleTests
 	public void Add_ReturnsNewRectangle_WhenRectanglesAreAdded()
 	{
 		Rectangle<int> rect1 = new() { Width = 10, Height = 10 };
-		Rectangle<int> rect2 =
-			new()
-			{
-				X = 5,
-				Y = 5,
-				Width = 5,
-				Height = 5,
-			};
+		Rectangle<int> rect2 = new()
+		{
+			X = 5,
+			Y = 5,
+			Width = 5,
+			Height = 5,
+		};
 		IRectangle<int> rect3 = rect1.Add(rect2);
 		Assert.StrictEqual(
 			new Rectangle<int>()
@@ -86,14 +85,13 @@ public class RectangleTests
 	{
 		// Given
 		Rectangle<int> rect1 = new() { Width = 10, Height = 10 };
-		Rectangle<int> rect2 =
-			new()
-			{
-				X = 5,
-				Y = 5,
-				Width = 5,
-				Height = 5,
-			};
+		Rectangle<int> rect2 = new()
+		{
+			X = 5,
+			Y = 5,
+			Width = 5,
+			Height = 5,
+		};
 
 		// When
 		int hashCode1 = rect1.GetHashCode();
