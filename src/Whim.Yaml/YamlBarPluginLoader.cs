@@ -137,7 +137,10 @@ internal static class YamlBarPluginLoader
 		return WorkspaceWidget.CreateComponent();
 	}
 
-	private static BarComponent CreateTreeLayoutEngineBarWidget(IContext ctx, Schema.TreeLayoutEngineWidgetEntity widget)
+	private static BarComponent CreateTreeLayoutEngineBarWidget(
+		IContext ctx,
+		Schema.TreeLayoutEngineWidgetEntity widget
+	)
 	{
 		if (
 			ctx.PluginManager.LoadedPlugins.FirstOrDefault(p => p.Name == "whim.tree_layout")

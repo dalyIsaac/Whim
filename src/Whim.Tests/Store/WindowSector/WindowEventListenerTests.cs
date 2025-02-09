@@ -373,7 +373,15 @@ public class WindowEventListenerTests
 		ctx.Store.Dispatch(Arg.Any<WindowMinimizeStartedTransform>()).Throws(new WhimException("welp"));
 
 		// When we send through the event
-		capture.WinEventProc!.Invoke(new HWINEVENTHOOK(0), PInvoke.EVENT_SYSTEM_MINIMIZESTART, window.Handle, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke(
+			new HWINEVENTHOOK(0),
+			PInvoke.EVENT_SYSTEM_MINIMIZESTART,
+			window.Handle,
+			0,
+			0,
+			0,
+			0
+		);
 
 		// Then nothing happens
 		AssertDispatches(ctx, windowMinimizeStartedTransformCount: 1);
