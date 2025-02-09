@@ -186,13 +186,12 @@ public abstract class ProxyLayoutEngineBaseTests
 	{
 		// Given
 		ILayoutEngine layoutEngine = CreateLayoutEngine(inner).AddWindow(window1);
-		LayoutEngineCustomAction<string> action =
-			new()
-			{
-				Name = "Action",
-				Payload = "payload",
-				Window = null,
-			};
+		LayoutEngineCustomAction<string> action = new()
+		{
+			Name = "Action",
+			Payload = "payload",
+			Window = null,
+		};
 
 		// When
 		layoutEngine.PerformCustomAction(action);

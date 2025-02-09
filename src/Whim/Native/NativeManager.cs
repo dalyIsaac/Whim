@@ -255,13 +255,12 @@ internal partial class NativeManager : INativeManager
 	{
 		// Ideally this would be replaced by the dispatcher from Microsoft.UI.
 		// However, ICompositionSupportsSystemBackdrop.SystemBackdrop uses Windows.UI.
-		DispatcherQueueOptions options =
-			new()
-			{
-				apartmentType = DISPATCHERQUEUE_THREAD_APARTMENTTYPE.DQTAT_COM_STA,
-				threadType = DISPATCHERQUEUE_THREAD_TYPE.DQTYPE_THREAD_CURRENT,
-				dwSize = (uint)Marshal.SizeOf(typeof(DispatcherQueueOptions)),
-			};
+		DispatcherQueueOptions options = new()
+		{
+			apartmentType = DISPATCHERQUEUE_THREAD_APARTMENTTYPE.DQTAT_COM_STA,
+			threadType = DISPATCHERQUEUE_THREAD_TYPE.DQTYPE_THREAD_CURRENT,
+			dwSize = (uint)Marshal.SizeOf(typeof(DispatcherQueueOptions)),
+		};
 
 		PInvoke.CreateDispatcherQueueController(options, out nint raw);
 

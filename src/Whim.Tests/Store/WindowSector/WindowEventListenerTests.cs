@@ -184,7 +184,7 @@ public class WindowEventListenerTests
 
 		// When we invoke the WinEventProc with the given params
 		capture.WinEventProc!.Invoke(
-			(HWINEVENTHOOK)0,
+			new HWINEVENTHOOK(0),
 			PInvoke.EVENT_OBJECT_SHOW,
 			hwndValue == null ? HWND.Null : (HWND)hwndValue,
 			idObject,
@@ -212,7 +212,7 @@ public class WindowEventListenerTests
 		sut.Initialize();
 
 		// When we create a window
-		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke(new HWINEVENTHOOK(0), PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
 
 		// Then we don't receive any further dispatches
 		AssertDispatches(ctx, windowAddedTransformCount: 1);
@@ -232,7 +232,7 @@ public class WindowEventListenerTests
 		sut.Initialize();
 
 		// When we create a window
-		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke(new HWINEVENTHOOK(0), PInvoke.EVENT_OBJECT_SHOW, hwnd, 0, 0, 0, 0);
 
 		// Then we don't receive any further dispatches
 		AssertDispatches(ctx, windowAddedTransformCount: 1);
@@ -317,7 +317,7 @@ public class WindowEventListenerTests
 		sut.Initialize();
 
 		// When we send through the event
-		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, ev, window.Handle, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke(new HWINEVENTHOOK(0), ev, window.Handle, 0, 0, 0, 0);
 
 		// Then a transform was dispatched
 		ctx.Store.Received(1).Dispatch(createTransform(window));
@@ -337,7 +337,7 @@ public class WindowEventListenerTests
 		sut.Initialize();
 
 		// When we send through the event
-		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_OBJECT_SHOW, window.Handle, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke(new HWINEVENTHOOK(0), PInvoke.EVENT_OBJECT_SHOW, window.Handle, 0, 0, 0, 0);
 
 		// Then nothing happens
 		AssertDispatches(ctx);
@@ -354,7 +354,7 @@ public class WindowEventListenerTests
 		sut.Initialize();
 
 		// When we send through the event
-		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, 0xBAAAD, window.Handle, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke(new HWINEVENTHOOK(0), 0xBAAAD, window.Handle, 0, 0, 0, 0);
 
 		// Then nothing happens
 		AssertDispatches(ctx);
@@ -373,7 +373,15 @@ public class WindowEventListenerTests
 		ctx.Store.Dispatch(Arg.Any<WindowMinimizeStartedTransform>()).Throws(new WhimException("welp"));
 
 		// When we send through the event
-		capture.WinEventProc!.Invoke((HWINEVENTHOOK)0, PInvoke.EVENT_SYSTEM_MINIMIZESTART, window.Handle, 0, 0, 0, 0);
+		capture.WinEventProc!.Invoke(
+			new HWINEVENTHOOK(0),
+			PInvoke.EVENT_SYSTEM_MINIMIZESTART,
+			window.Handle,
+			0,
+			0,
+			0,
+			0
+		);
 
 		// Then nothing happens
 		AssertDispatches(ctx, windowMinimizeStartedTransformCount: 1);

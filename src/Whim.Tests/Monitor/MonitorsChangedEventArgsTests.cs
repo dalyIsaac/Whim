@@ -6,13 +6,12 @@ public class MonitorsChangedEventArgsTests
 	public void CurrentMonitors_ReturnsSameInstance()
 	{
 		// Given
-		MonitorsChangedEventArgs args =
-			new()
-			{
-				UnchangedMonitors = [],
-				RemovedMonitors = [],
-				AddedMonitors = [],
-			};
+		MonitorsChangedEventArgs args = new()
+		{
+			UnchangedMonitors = [],
+			RemovedMonitors = [],
+			AddedMonitors = [],
+		};
 
 		// When
 		IEnumerable<IMonitor> currentMonitors1 = args.CurrentMonitors;
@@ -31,13 +30,12 @@ public class MonitorsChangedEventArgsTests
 	)
 	{
 		// Given
-		MonitorsChangedEventArgs args =
-			new()
-			{
-				UnchangedMonitors = [unchangedMonitor1, unchangedMonitor2],
-				RemovedMonitors = [],
-				AddedMonitors = [addedMonitor1, addedMonitor2],
-			};
+		MonitorsChangedEventArgs args = new()
+		{
+			UnchangedMonitors = [unchangedMonitor1, unchangedMonitor2],
+			RemovedMonitors = [],
+			AddedMonitors = [addedMonitor1, addedMonitor2],
+		};
 
 		// When
 		IEnumerable<IMonitor> currentMonitors = args.CurrentMonitors;
@@ -63,13 +61,12 @@ public class MonitorsChangedEventArgsTests
 		// Given
 
 
-		MonitorsChangedEventArgs args =
-			new()
-			{
-				UnchangedMonitors = [unchangedMonitor1, unchangedMonitor2],
-				RemovedMonitors = [removedMonitor1, removedMonitor2],
-				AddedMonitors = [],
-			};
+		MonitorsChangedEventArgs args = new()
+		{
+			UnchangedMonitors = [unchangedMonitor1, unchangedMonitor2],
+			RemovedMonitors = [removedMonitor1, removedMonitor2],
+			AddedMonitors = [],
+		};
 
 		// When
 		IEnumerable<IMonitor> previousMonitors = args.PreviousMonitors;

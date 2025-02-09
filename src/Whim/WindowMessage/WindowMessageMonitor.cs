@@ -66,17 +66,16 @@ internal class WindowMessageMonitor : IWindowMessageMonitor
 
 	private LRESULT WindowProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam, nuint uIdSubclass, nuint dwRefData)
 	{
-		WindowMessageMonitorEventArgs eventArgs =
-			new()
+		WindowMessageMonitorEventArgs eventArgs = new()
+		{
+			MessagePayload = new()
 			{
-				MessagePayload = new()
-				{
-					HWnd = hWnd,
-					UMsg = uMsg,
-					WParam = wParam,
-					LParam = lParam,
-				},
-			};
+				HWnd = hWnd,
+				UMsg = uMsg,
+				WParam = wParam,
+				LParam = lParam,
+			},
+		};
 
 		switch (uMsg)
 		{

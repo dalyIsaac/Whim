@@ -89,7 +89,7 @@ internal static class MonitorTestUtils
 					{
 						unsafe
 						{
-							callInfo.ArgAt<MONITORENUMPROC>(2).Invoke(hMonitor, (HDC)0, &rect, (LPARAM)0);
+							callInfo.ArgAt<MONITORENUMPROC>(2).Invoke(hMonitor, new HDC(0), &rect, (LPARAM)0);
 						}
 					}
 

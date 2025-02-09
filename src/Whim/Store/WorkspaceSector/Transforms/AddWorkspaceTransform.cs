@@ -69,12 +69,11 @@ public record AddWorkspaceTransform(
 			layoutEnginesBuilder.Add(currentEngine);
 		}
 
-		Workspace workspace =
-			new(ctx, id)
-			{
-				BackingName = Name ?? $"Workspace {sector.Workspaces.Count + 1}",
-				LayoutEngines = layoutEnginesBuilder.ToImmutable(),
-			};
+		Workspace workspace = new(ctx, id)
+		{
+			BackingName = Name ?? $"Workspace {sector.Workspaces.Count + 1}",
+			LayoutEngines = layoutEnginesBuilder.ToImmutable(),
+		};
 		sector.Workspaces = sector.Workspaces.Add(workspace.Id, workspace);
 		sector.WorkspaceOrder = sector.WorkspaceOrder.Add(workspace.Id);
 		sector.QueueEvent(new WorkspaceAddedEventArgs() { Workspace = workspace });

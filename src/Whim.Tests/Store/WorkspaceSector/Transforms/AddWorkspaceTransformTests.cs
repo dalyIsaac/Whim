@@ -61,15 +61,20 @@ public class AddWorkspaceTransformTests_NotInitialized
 		workspaceToCreate.MonitorIndices.Should().BeEquivalentTo(monitorIndices);
 	}
 
-	private static readonly List<CreateLeafLayoutEngine> createLeafLayoutEngines =
-		new() { (id) => Substitute.For<ILayoutEngine>() };
+	private static readonly List<CreateLeafLayoutEngine> createLeafLayoutEngines = new()
+	{
+		(id) => Substitute.For<ILayoutEngine>(),
+	};
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void NoName(IContext ctx, MutableRootSector root)
 	{
 		Guid id = Guid.NewGuid();
-		AddWorkspaceTransform sut =
-			new(CreateLeafLayoutEngines: createLeafLayoutEngines, WorkspaceId: id, MonitorIndices: [1, 2]);
+		AddWorkspaceTransform sut = new(
+			CreateLeafLayoutEngines: createLeafLayoutEngines,
+			WorkspaceId: id,
+			MonitorIndices: [1, 2]
+		);
 		Result<Guid> result = ctx.Store.Dispatch(sut);
 		AssertWorkspaceToCreate(root, result, id, null, createLeafLayoutEngines, [1, 2]);
 	}
@@ -113,8 +118,12 @@ public class AddWorkspaceTransformTests_NotInitialized
 	internal void Everything(IContext ctx, MutableRootSector root)
 	{
 		Guid id = Guid.NewGuid();
-		AddWorkspaceTransform sut =
-			new("Test", CreateLeafLayoutEngines: createLeafLayoutEngines, WorkspaceId: id, MonitorIndices: [1, 2]);
+		AddWorkspaceTransform sut = new(
+			"Test",
+			CreateLeafLayoutEngines: createLeafLayoutEngines,
+			WorkspaceId: id,
+			MonitorIndices: [1, 2]
+		);
 		Result<Guid> result = ctx.Store.Dispatch(sut);
 		AssertWorkspaceToCreate(root, result, id, "Test", createLeafLayoutEngines, [1, 2]);
 	}
@@ -122,10 +131,15 @@ public class AddWorkspaceTransformTests_NotInitialized
 
 public class AddWorkspaceTransformTests_Initialized
 {
-	private static readonly List<CreateLeafLayoutEngine> sectorCreateLeafLayoutEngines =
-		new() { (id) => Substitute.For<ILayoutEngine>() };
-	private static readonly List<CreateLeafLayoutEngine> transformCreateLeafLayoutEngines =
-		new() { (id) => Substitute.For<ILayoutEngine>(), (id) => Substitute.For<ILayoutEngine>() };
+	private static readonly List<CreateLeafLayoutEngine> sectorCreateLeafLayoutEngines = new()
+	{
+		(id) => Substitute.For<ILayoutEngine>(),
+	};
+	private static readonly List<CreateLeafLayoutEngine> transformCreateLeafLayoutEngines = new()
+	{
+		(id) => Substitute.For<ILayoutEngine>(),
+		(id) => Substitute.For<ILayoutEngine>(),
+	};
 
 	private static void Setup_WorkspaceSector(MutableRootSector root)
 	{
@@ -232,8 +246,10 @@ public class AddWorkspaceTransformTests_Initialized
 	internal void NoName(IContext ctx, MutableRootSector root)
 	{
 		Setup_WorkspaceSector(root);
-		AddWorkspaceTransform sut =
-			new(CreateLeafLayoutEngines: transformCreateLeafLayoutEngines, MonitorIndices: [1, 2]);
+		AddWorkspaceTransform sut = new(
+			CreateLeafLayoutEngines: transformCreateLeafLayoutEngines,
+			MonitorIndices: [1, 2]
+		);
 		AssertExecuteTransform(ctx, sut, root, null, "Workspace 1", transformCreateLeafLayoutEngines.Count, [1, 2]);
 	}
 

@@ -16,13 +16,12 @@ public class FreeTextVariantViewModelCustomization : ICustomization
 		FreeTextVariantCallback callback = Substitute.For<FreeTextVariantCallback>();
 		fixture.Inject(callback);
 
-		FreeTextVariantConfig config =
-			new()
-			{
-				InitialText = "Hello, world!",
-				Callback = callback,
-				Prompt = "Hello, world!",
-			};
+		FreeTextVariantConfig config = new()
+		{
+			InitialText = "Hello, world!",
+			Callback = callback,
+			Prompt = "Hello, world!",
+		};
 		fixture.Inject(config);
 	}
 }

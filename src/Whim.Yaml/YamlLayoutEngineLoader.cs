@@ -24,7 +24,7 @@ internal static class YamlLayoutEngineLoader
 
 	public static CreateLeafLayoutEngine[]? GetCreateLeafLayoutEngines(
 		IContext ctx,
-		Schema.RequiredEntries.RequiredTypeArray layoutEngines
+		Schema.LayoutEngineListEntity.EntriesArray layoutEngines
 	)
 	{
 		List<CreateLeafLayoutEngine> leafLayoutEngineCreators = [];
@@ -32,27 +32,27 @@ internal static class YamlLayoutEngineLoader
 		foreach (var engine in layoutEngines)
 		{
 			engine.Match<object?>(
-				(in Schema.SchemaRequiredType floatingWindow) =>
+				(in Schema.FloatingWindowEngineEntity floatingWindow) =>
 				{
 					CreateFloatingLayoutEngineCreator(ctx, leafLayoutEngineCreators);
 					return null;
 				},
-				(in Schema.SchemaRequiredType1 focusLayoutEngine) =>
+				(in Schema.FocusLayoutEngineEntity focusLayoutEngine) =>
 				{
 					CreateFocusLayoutEngineCreator(ctx, leafLayoutEngineCreators, focusLayoutEngine);
 					return null;
 				},
-				(in Schema.RequiredTypeAndVariant sliceLayoutEngine) =>
+				(in Schema.SliceLayoutEngineEntity sliceLayoutEngine) =>
 				{
 					CreateSliceLayoutEngineCreator(ctx, leafLayoutEngineCreators, sliceLayoutEngine);
 					return null;
 				},
-				(in Schema.SchemaRequiredType2 treeLayoutEngine) =>
+				(in Schema.TreeLayoutEngineEntity treeLayoutEngine) =>
 				{
 					CreateTreeLayoutEngineCreator(ctx, leafLayoutEngineCreators, treeLayoutEngine);
 					return null;
 				},
-				(in Schema.RequiredType fallback) => null
+				(in Schema.LayoutEngineEntity fallback) => null
 			);
 		}
 
@@ -71,7 +71,7 @@ internal static class YamlLayoutEngineLoader
 	private static void CreateFocusLayoutEngineCreator(
 		IContext ctx,
 		List<CreateLeafLayoutEngine> leafLayoutEngineCreators,
-		Schema.SchemaRequiredType1 focusLayoutEngine
+		Schema.FocusLayoutEngineEntity focusLayoutEngine
 	)
 	{
 		bool maximize = focusLayoutEngine.Maximize is { } m && m;
@@ -81,7 +81,7 @@ internal static class YamlLayoutEngineLoader
 	private static void CreateSliceLayoutEngineCreator(
 		IContext ctx,
 		List<CreateLeafLayoutEngine> leafLayoutEngineCreators,
-		Schema.RequiredTypeAndVariant sliceLayoutEngine
+		Schema.SliceLayoutEngineEntity sliceLayoutEngine
 	)
 	{
 		if (
@@ -94,22 +94,22 @@ internal static class YamlLayoutEngineLoader
 		}
 
 		sliceLayoutEngine.Variant.Match<object?>(
-			(in Schema.RequiredTypeAndVariant.VariantEntity.RequiredType _) =>
+			(in Schema.SliceLayoutEngineEntity.VariantEntity.AnyOf0Entity _) =>
 			{
 				leafLayoutEngineCreators.Add((id) => SliceLayouts.CreateColumnLayout(ctx, plugin, id));
 				return null;
 			},
-			(in Schema.RequiredTypeAndVariant.VariantEntity.VariantEntityRequiredType _) =>
+			(in Schema.SliceLayoutEngineEntity.VariantEntity.AnyOf1Entity _) =>
 			{
 				leafLayoutEngineCreators.Add((id) => SliceLayouts.CreateRowLayout(ctx, plugin, id));
 				return null;
 			},
-			(in Schema.RequiredTypeAndVariant.VariantEntity.VariantEntityRequiredType1 _) =>
+			(in Schema.SliceLayoutEngineEntity.VariantEntity.AnyOf2Entity _) =>
 			{
 				leafLayoutEngineCreators.Add((id) => SliceLayouts.CreatePrimaryStackLayout(ctx, plugin, id));
 				return null;
 			},
-			(in Schema.RequiredTypeAndVariant.VariantEntity.RequiredColumnsAndType multiColumnLayout) =>
+			(in Schema.SliceLayoutEngineEntity.VariantEntity.AnyOf3Entity multiColumnLayout) =>
 			{
 				var columns = multiColumnLayout.Columns;
 				uint[] unsignedColumns = columns.Select(c => (uint)c).ToArray();
@@ -118,7 +118,7 @@ internal static class YamlLayoutEngineLoader
 				);
 				return null;
 			},
-			(in Schema.RequiredTypeAndVariant.VariantEntity.VariantEntityRequiredType2 secondaryPrimaryStack) =>
+			(in Schema.SliceLayoutEngineEntity.VariantEntity.AnyOf4Entity secondaryPrimaryStack) =>
 			{
 				uint primaryCapacity = secondaryPrimaryStack.PrimaryCapacity is { } pc ? (uint)pc : 1;
 				uint secondaryCapacity = secondaryPrimaryStack.SecondaryCapacity is { } sc ? (uint)sc : 2;
@@ -129,14 +129,14 @@ internal static class YamlLayoutEngineLoader
 				);
 				return null;
 			},
-			(in Schema.RequiredTypeAndVariant.VariantEntity _) => null
+			(in Schema.SliceLayoutEngineEntity.VariantEntity _) => null
 		);
 	}
 
 	private static void CreateTreeLayoutEngineCreator(
 		IContext ctx,
 		List<CreateLeafLayoutEngine> leafLayoutEngineCreators,
-		Schema.SchemaRequiredType2 treeLayoutEngine
+		Schema.TreeLayoutEngineEntity treeLayoutEngine
 	)
 	{
 		if (

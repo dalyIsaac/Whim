@@ -295,13 +295,12 @@ public class TreeHelpersTests
 	internal void GetNodeContainingPoint_DoesNotContainPointInChildNode()
 	{
 		// Given
-		SplitNode node =
-			new(
-				equalWeight: false,
-				isHorizontal: true,
-				[new WindowNode(Substitute.For<IWindow>()), new WindowNode(Substitute.For<IWindow>())],
-				[0.5, 0.25]
-			);
+		SplitNode node = new(
+			equalWeight: false,
+			isHorizontal: true,
+			[new WindowNode(Substitute.For<IWindow>()), new WindowNode(Substitute.For<IWindow>())],
+			[0.5, 0.25]
+		);
 
 		Point<double> point = new() { X = 0.8, Y = 0.4 };
 

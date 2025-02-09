@@ -52,13 +52,12 @@ internal record MonitorsChangedTransform : Transform
 			}
 		}
 
-		MonitorsChangedEventArgs args =
-			new()
-			{
-				UnchangedMonitors = unchangedMonitors,
-				RemovedMonitors = removedMonitors,
-				AddedMonitors = addedMonitors,
-			};
+		MonitorsChangedEventArgs args = new()
+		{
+			UnchangedMonitors = unchangedMonitors,
+			RemovedMonitors = removedMonitors,
+			AddedMonitors = addedMonitors,
+		};
 
 		if (addedMonitors.Count != 0 || removedMonitors.Count != 0)
 		{

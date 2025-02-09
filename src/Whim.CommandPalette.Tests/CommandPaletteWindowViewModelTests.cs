@@ -48,8 +48,13 @@ public class CommandPaletteWindowViewModelTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		CommandPaletteWindowViewModel vm =
-			new(wrapper.Context, wrapper.Plugin, wrapper.MenuVariant, wrapper.FreeTextVariant, wrapper.SelectVariant);
+		CommandPaletteWindowViewModel vm = new(
+			wrapper.Context,
+			wrapper.Plugin,
+			wrapper.MenuVariant,
+			wrapper.FreeTextVariant,
+			wrapper.SelectVariant
+		);
 
 		// When
 		// Then
@@ -61,8 +66,13 @@ public class CommandPaletteWindowViewModelTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		CommandPaletteWindowViewModel vm =
-			new(wrapper.Context, wrapper.Plugin, wrapper.MenuVariant, wrapper.FreeTextVariant, wrapper.SelectVariant);
+		CommandPaletteWindowViewModel vm = new(
+			wrapper.Context,
+			wrapper.Plugin,
+			wrapper.MenuVariant,
+			wrapper.FreeTextVariant,
+			wrapper.SelectVariant
+		);
 
 		// When
 		// Then
@@ -78,8 +88,13 @@ public class CommandPaletteWindowViewModelTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		CommandPaletteWindowViewModel vm =
-			new(wrapper.Context, wrapper.Plugin, wrapper.MenuVariant, wrapper.FreeTextVariant, wrapper.SelectVariant);
+		CommandPaletteWindowViewModel vm = new(
+			wrapper.Context,
+			wrapper.Plugin,
+			wrapper.MenuVariant,
+			wrapper.FreeTextVariant,
+			wrapper.SelectVariant
+		);
 
 		vm.Activate(new MenuVariantConfig() { Commands = [] }, null);
 
@@ -95,8 +110,13 @@ public class CommandPaletteWindowViewModelTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		CommandPaletteWindowViewModel vm =
-			new(wrapper.Context, wrapper.Plugin, wrapper.MenuVariant, wrapper.FreeTextVariant, wrapper.SelectVariant);
+		CommandPaletteWindowViewModel vm = new(
+			wrapper.Context,
+			wrapper.Plugin,
+			wrapper.MenuVariant,
+			wrapper.FreeTextVariant,
+			wrapper.SelectVariant
+		);
 
 		// When
 		Assert.Raises<EventArgs>(
@@ -116,8 +136,13 @@ public class CommandPaletteWindowViewModelTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		CommandPaletteWindowViewModel vm =
-			new(wrapper.Context, wrapper.Plugin, wrapper.MenuVariant, wrapper.FreeTextVariant, wrapper.SelectVariant);
+		CommandPaletteWindowViewModel vm = new(
+			wrapper.Context,
+			wrapper.Plugin,
+			wrapper.MenuVariant,
+			wrapper.FreeTextVariant,
+			wrapper.SelectVariant
+		);
 
 		IMonitor monitor = Substitute.For<IMonitor>();
 		monitor.WorkingArea.Returns(
@@ -130,13 +155,12 @@ public class CommandPaletteWindowViewModelTests
 			}
 		);
 
-		MenuVariantConfig config =
-			new()
-			{
-				Commands = [],
-				InitialText = "Initial text",
-				Hint = "Hint",
-			};
+		MenuVariantConfig config = new()
+		{
+			Commands = [],
+			InitialText = "Initial text",
+			Hint = "Hint",
+		};
 
 		IEnumerable<ICommand> ICommands = [new Command("id", "title", () => { })];
 
@@ -185,8 +209,13 @@ public class CommandPaletteWindowViewModelTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		CommandPaletteWindowViewModel vm =
-			new(wrapper.Context, wrapper.Plugin, wrapper.MenuVariant, wrapper.FreeTextVariant, wrapper.SelectVariant);
+		CommandPaletteWindowViewModel vm = new(
+			wrapper.Context,
+			wrapper.Plugin,
+			wrapper.MenuVariant,
+			wrapper.FreeTextVariant,
+			wrapper.SelectVariant
+		);
 
 		// When
 		vm.Activate(config, null);
@@ -201,8 +230,13 @@ public class CommandPaletteWindowViewModelTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		CommandPaletteWindowViewModel vm =
-			new(wrapper.Context, wrapper.Plugin, wrapper.MenuVariant, wrapper.FreeTextVariant, wrapper.SelectVariant);
+		CommandPaletteWindowViewModel vm = new(
+			wrapper.Context,
+			wrapper.Plugin,
+			wrapper.MenuVariant,
+			wrapper.FreeTextVariant,
+			wrapper.SelectVariant
+		);
 
 		MenuVariantConfig config = new() { Commands = [] };
 
@@ -220,8 +254,13 @@ public class CommandPaletteWindowViewModelTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		CommandPaletteWindowViewModel vm =
-			new(wrapper.Context, wrapper.Plugin, wrapper.MenuVariant, wrapper.FreeTextVariant, wrapper.SelectVariant);
+		CommandPaletteWindowViewModel vm = new(
+			wrapper.Context,
+			wrapper.Plugin,
+			wrapper.MenuVariant,
+			wrapper.FreeTextVariant,
+			wrapper.SelectVariant
+		);
 
 		MenuVariantConfig config = new() { Commands = [] };
 
@@ -239,8 +278,13 @@ public class CommandPaletteWindowViewModelTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		CommandPaletteWindowViewModel vm =
-			new(wrapper.Context, wrapper.Plugin, wrapper.MenuVariant, wrapper.FreeTextVariant, wrapper.SelectVariant);
+		CommandPaletteWindowViewModel vm = new(
+			wrapper.Context,
+			wrapper.Plugin,
+			wrapper.MenuVariant,
+			wrapper.FreeTextVariant,
+			wrapper.SelectVariant
+		);
 
 		// When
 		bool result = vm.IsVisible;
@@ -254,8 +298,13 @@ public class CommandPaletteWindowViewModelTests
 	{
 		// Given
 		Wrapper wrapper = new();
-		CommandPaletteWindowViewModel vm =
-			new(wrapper.Context, wrapper.Plugin, wrapper.MenuVariant, wrapper.FreeTextVariant, wrapper.SelectVariant);
+		CommandPaletteWindowViewModel vm = new(
+			wrapper.Context,
+			wrapper.Plugin,
+			wrapper.MenuVariant,
+			wrapper.FreeTextVariant,
+			wrapper.SelectVariant
+		);
 
 		// When
 		// Then

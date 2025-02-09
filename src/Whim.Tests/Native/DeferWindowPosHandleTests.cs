@@ -123,14 +123,13 @@ public class DeferWindowPosHandleTests
 	internal void SetMultipleWindows(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
 	{
 		// Given
-		DeferWindowPosState state1 =
-			new(
-				(HWND)1,
-				WindowSize.Normal,
-				Rectangle.UnitSquare<int>(),
-				(HWND)123,
-				SET_WINDOW_POS_FLAGS.SWP_NOSENDCHANGING
-			);
+		DeferWindowPosState state1 = new(
+			(HWND)1,
+			WindowSize.Normal,
+			Rectangle.UnitSquare<int>(),
+			(HWND)123,
+			SET_WINDOW_POS_FLAGS.SWP_NOSENDCHANGING
+		);
 		DeferWindowPosState state2 = new((HWND)2, WindowSize.Minimized, new Rectangle<int>(1, 2, 3, 4), (HWND)234);
 		DeferWindowPosState state3 = new((HWND)3, WindowSize.Maximized, new Rectangle<int>(5, 6, 7, 8));
 		DeferWindowPosState state4 = new((HWND)4, WindowSize.Normal, new Rectangle<int>(9, 10, 11, 12));

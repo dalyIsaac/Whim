@@ -58,8 +58,12 @@ public class SliceLayoutsTests
 	{
 		// Given
 		LayoutEngineIdentity identity = new();
-		SliceLayoutEngine row1 =
-			new(ctx, plugin, identity, new ParentArea(isRow: true, (1, new OverflowArea(isRow: true))));
+		SliceLayoutEngine row1 = new(
+			ctx,
+			plugin,
+			identity,
+			new ParentArea(isRow: true, (1, new OverflowArea(isRow: true)))
+		);
 		SliceLayoutEngine row2 = new(ctx, plugin, identity, new ParentArea(isRow: true, (1, new SliceArea(0, 0))));
 
 		// Then

@@ -21,8 +21,12 @@ public class TreeLayoutCommandPaletteCommandsCustomization : ICustomization
 		ITreeLayoutPlugin treeLayoutPlugin = fixture.Freeze<ITreeLayoutPlugin>();
 		ICommandPalettePlugin commandPalettePlugin = fixture.Freeze<ICommandPalettePlugin>();
 
-		TreeLayoutCommandPalettePluginCommands commands =
-			new(ctx, treeLayoutCommandPalettePlugin, treeLayoutPlugin, commandPalettePlugin);
+		TreeLayoutCommandPalettePluginCommands commands = new(
+			ctx,
+			treeLayoutCommandPalettePlugin,
+			treeLayoutPlugin,
+			commandPalettePlugin
+		);
 		fixture.Inject(commands);
 	}
 }

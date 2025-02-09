@@ -298,13 +298,12 @@ public class BarLayoutEngineTests
 			},
 		];
 
-		Rectangle<int> expectedGivenRect =
-			new()
-			{
-				Y = 30,
-				Width = 100,
-				Height = 70,
-			};
+		Rectangle<int> expectedGivenRect = new()
+		{
+			Y = 30,
+			Width = 100,
+			Height = 70,
+		};
 
 		innerLayoutEngine.DoLayout(expectedGivenRect, monitor).Returns(expectedWindowStates);
 
@@ -337,13 +336,12 @@ public class BarLayoutEngineTests
 	{
 		// Given
 		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
-		LayoutEngineCustomAction<string> action =
-			new()
-			{
-				Name = "Action",
-				Payload = "payload",
-				Window = null,
-			};
+		LayoutEngineCustomAction<string> action = new()
+		{
+			Name = "Action",
+			Payload = "payload",
+			Window = null,
+		};
 		innerLayoutEngine.PerformCustomAction(action).Returns(performCustomActionResult);
 
 		// When
@@ -359,13 +357,12 @@ public class BarLayoutEngineTests
 	{
 		// Given
 		BarLayoutEngine engine = CreateSut(innerLayoutEngine);
-		LayoutEngineCustomAction<string> action =
-			new()
-			{
-				Name = "Action",
-				Payload = "payload",
-				Window = null,
-			};
+		LayoutEngineCustomAction<string> action = new()
+		{
+			Name = "Action",
+			Payload = "payload",
+			Window = null,
+		};
 		innerLayoutEngine.PerformCustomAction(action).Returns(innerLayoutEngine);
 
 		// When

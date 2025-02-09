@@ -120,14 +120,13 @@ public class GapsLayoutEngineTests
 
 		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
 
-		Rectangle<int> rect =
-			new()
-			{
-				X = 0,
-				Y = 0,
-				Width = 1920,
-				Height = 1080,
-			};
+		Rectangle<int> rect = new()
+		{
+			X = 0,
+			Y = 0,
+			Width = 1920,
+			Height = 1080,
+		};
 
 		IMonitor monitor = Substitute.For<IMonitor>();
 		monitor.ScaleFactor.Returns(scale);
@@ -886,13 +885,12 @@ public class GapsLayoutEngineTests
 		// Given
 		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
 
-		LayoutEngineCustomAction<string> action =
-			new()
-			{
-				Name = "Action",
-				Payload = "payload",
-				Window = Substitute.For<IWindow>(),
-			};
+		LayoutEngineCustomAction<string> action = new()
+		{
+			Name = "Action",
+			Payload = "payload",
+			Window = Substitute.For<IWindow>(),
+		};
 		innerLayoutEngine.PerformCustomAction(action).Returns(performCustomActionResult);
 
 		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
@@ -912,13 +910,12 @@ public class GapsLayoutEngineTests
 		// Given
 		GapsConfig gapsConfig = new() { OuterGap = 10, InnerGap = 5 };
 
-		LayoutEngineCustomAction<string> action =
-			new()
-			{
-				Name = "Action",
-				Payload = "payload",
-				Window = Substitute.For<IWindow>(),
-			};
+		LayoutEngineCustomAction<string> action = new()
+		{
+			Name = "Action",
+			Payload = "payload",
+			Window = Substitute.For<IWindow>(),
+		};
 		innerLayoutEngine.PerformCustomAction(action).Returns(innerLayoutEngine);
 
 		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
