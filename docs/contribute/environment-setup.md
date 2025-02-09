@@ -4,6 +4,7 @@
 2. Install tools for the Windows App SDK:
    1. Go to the [Install tools for the Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/set-up-your-development-environment) page
    2. Follow the instructions for [winget for C# developers](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/set-up-your-development-environment?tabs=cs-vs-community%2Ccpp-vs-community%2Cvs-2022-17-1-a%2Cvs-2022-17-1-b#for-c-developers), or [installing Visual Studio](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/set-up-your-development-environment?tabs=cs-vs-community%2Ccpp-vs-community%2Cvs-2022-17-1-a%2Cvs-2022-17-1-b#install-visual-studio)
+3. Ensure that the dotnet version specified in the [global.json](https://github.com/dalyIsaac/Whim/blob/main/global.json) file is installed - if it isn't, install it from the [dotnet download page](https://dotnet.microsoft.com/en-us/download).
 
 After cloning, make sure to run the following in a shell in the root Whim directory:
 
