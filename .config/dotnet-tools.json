@@ -3,23 +3,18 @@
   "isRoot": true,
   "tools": {
     "xamlstyler.console": {
-      "version": "3.2404.2",
+      "version": "3.2501.8",
       "commands": ["xstyler"],
       "rollForward": false
     },
     "csharpier": {
-      "version": "0.29.2",
+      "version": "0.30.6",
       "commands": ["dotnet-csharpier"],
       "rollForward": false
     },
     "docfx": {
-      "version": "2.78.0",
+      "version": "2.78.2",
       "commands": ["docfx"],
-      "rollForward": false
-    },
-    "corvus.json.jsonschema.typegeneratortool": {
-      "version": "4.0.9",
-      "commands": ["generatejsonschematypes"],
       "rollForward": false
     }
   }
