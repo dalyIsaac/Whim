@@ -57,6 +57,10 @@
 		<PackageReference Include="YamlDotNet" />
 	</ItemGroup>
 
+	<PropertyGroup>
+		<CorvusJsonSchemaOptionalAsNullable>NullOrUndefined </CorvusJsonSchemaOptionalAsNullable>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<AdditionalFiles Include="schema.json" />
 	</ItemGroup>

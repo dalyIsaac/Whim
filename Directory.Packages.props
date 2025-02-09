@@ -3,8 +3,8 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Corvus.Json.ExtendedTypes" Version="4.0.9" />
-    <PackageVersion Include="Corvus.Json.SourceGenerator" Version="4.0.9" />
+    <PackageVersion Include="Corvus.Json.ExtendedTypes" Version="4.2.4" />
+    <PackageVersion Include="Corvus.Json.SourceGenerator" Version="4.2.4" />
     <PackageVersion Include="DotNext" Version="5.18.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Scripting" Version="4.12.0" />
     <PackageVersion Include="Microsoft.Win32.SystemEvents" Version="9.0.1" />
