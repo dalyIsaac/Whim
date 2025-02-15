@@ -1,4 +1,4 @@
-# [Whim](https://dalyisaac.github.io/Whim) 🪟
+# [Whim testing](https://dalyisaac.github.io/Whim) 🪟
 
 <!-- NOTE: This is largely a duplicate of docs/docs/index.md -->
 

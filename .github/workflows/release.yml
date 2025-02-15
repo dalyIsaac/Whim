@@ -8,6 +8,7 @@ on:
     tags:
       - v*
     paths:
+      - ".github/workflows/release.yml"
       - "src/**"
       - "scripts/**"
       - "whim-installer.iss"
@@ -24,7 +25,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Create the release
+      - name: Create the next release
+        id: create-release
         shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -34,20 +36,27 @@ jobs:
           $currentRelease = "v${currentRelease}"
 
           $nextRelease = .\scripts\Get-NextWhimRelease.ps1 -Channel $channel
-          $nextRelease = "v${nextRelease}"
+          $ghNextRelease = "v${nextRelease}"
 
           $resp = gh api repos/$env:GITHUB_REPOSITORY/releases/generate-notes `
             -H "Accept: application/vnd.github.v3+json" `
-            -f tag_name=$nextRelease `
+            -f tag_name=$ghNextRelease `
             -f previous_tag_name=$currentRelease `
             | ConvertFrom-Json
 
           $notes = $resp.body ?? "Initial release"
 
-          gh release create "$nextRelease" `
-            --title "$nextRelease" `
+          gh release create "$ghNextRelease" `
+            --title "$ghNextRelease" `
             --prerelease="$isPrerelease" `
             --notes $notes
+
+          "VERSION=${nextRelease}" >> $env:GITHUB_OUTPUT
+          "GITHUB_RELEASE=${ghNextRelease}" >> $env:GITHUB_OUTPUT
+
+    outputs:
+      VERSION: ${{ steps.create-release.outputs.VERSION }}
+      GITHUB_RELEASE: ${{ steps.create-release.outputs.GITHUB_RELEASE }}
 
   release:
     runs-on: windows-latest
@@ -57,10 +66,12 @@ jobs:
       # We install the packages to the D:\ drive to avoid the slow IO on the C:\ drive.
       # Based on https://github.com/actions/setup-dotnet/issues/260#issuecomment-1790162905
       NUGET_PACKAGES: D:\a\.nuget\packages
+      VERSION: ${{ needs.create-release.outputs.VERSION }}
+      GITHUB_RELEASE: ${{ needs.create-release.outputs.GITHUB_RELEASE }}
 
     strategy:
       matrix:
-        configuration: [Release]
+        CONFIGURATION: [Release]
         platform: [x64, arm64]
 
     steps:
@@ -76,11 +87,15 @@ jobs:
             ${{ matrix.platform }}-nuget-${{ hashFiles('Directory.Packages.props') }}
             ${{ matrix.platform }}-nuget-
 
-      - name: Restore dependencies
+      - name: Print version
         run: |
-          dotnet restore Whim.sln -p:Configuration=$env:Configuration
+          echo "Version: $env:VERSION"
+
+      - name: Restore dependencies
         env:
-          Configuration: ${{ matrix.configuration }}
+          CONFIGURATION: ${{ matrix.CONFIGURATION }}
+        run: |
+          dotnet restore Whim.sln -p:Configuration=$env:CONFIGURATION
 
       - name: Install dotnet tools
         run: |
@@ -90,28 +105,31 @@ jobs:
         uses: microsoft/setup-msbuild@v2.0.0
 
       - name: Build
+        env:
+          CONFIGURATION: ${{ matrix.configuration }}
+          PLATFORM: ${{ matrix.platform }}
         run: |
           msbuild Whim.sln `
-            -p:Configuration=$env:Configuration `
-            -p:Platform=$env:Platform `
-            -p:Version=$env:CurrentRelease `
+            -p:Configuration=$env:CONFIGURATION `
+            -p:Platform=$env:PLATFORM `
+            -p:Version=$env:VERSION `
             -p:BuildInParallel=true `
             -maxCpuCount
-        env:
-          Configuration: ${{ matrix.configuration }}
-          Platform: ${{ matrix.platform }}
 
       - name: Build release
         shell: pwsh
         env:
           Platform: ${{ matrix.platform }}
         run: |
-          $installerPath = .\scripts\Create-Installer.ps1 -Architecture $env:Platform
+          $installerPath = .\scripts\Create-Installer.ps1 -Architecture $env:PLATFORM
           "InstallerPath=${installerPath}" >> $env:GITHUB_ENV
+          if (-not (Test-Path $installerPath)) {
+            throw "Installer not found at $installerPath"
+          }
 
       - name: Upload release assets
         shell: pwsh
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload "${env:Version}" "${env:InstallerPath}"
+          gh release upload "${env:GITHUB_RELEASE}" "${env:InstallerPath}"
