@@ -4,17 +4,23 @@
   "tools": {
     "xamlstyler.console": {
       "version": "3.2501.8",
-      "commands": ["xstyler"],
+      "commands": [
+        "xstyler"
+      ],
       "rollForward": false
     },
     "csharpier": {
       "version": "0.30.6",
-      "commands": ["dotnet-csharpier"],
+      "commands": [
+        "dotnet-csharpier"
+      ],
       "rollForward": false
     },
     "docfx": {
-      "version": "2.78.2",
-      "commands": ["docfx"],
+      "version": "2.78.3",
+      "commands": [
+        "docfx"
+      ],
       "rollForward": false
     }
   }
