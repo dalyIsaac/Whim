@@ -14,6 +14,7 @@ internal class WindowProcessorManager
 	{
 		_ctx = ctx;
 		_processorCreators.Add(FirefoxWindowProcessor.Create);
+		_processorCreators.Add(TeamsWindowProcessor.Create);
 	}
 
 	internal bool ShouldBeIgnored(
