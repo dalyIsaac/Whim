@@ -34,7 +34,7 @@ Whim has a simple configuration system that uses [YAML or JSON](https://dalyisaa
 
 Whim works by sitting on top of Windows' own window manager. It listens to window events and moves windows accordingly. Whim does not use Windows' native "virtual" desktops, as they lack the ability to activate "desktops" independently of monitors. Instead, Whim has [workspaces](https://dalyisaac.github.io/Whim/docs/customize/workspaces.html).
 
-To see how Whim compares to other Windows window managers, see [Whim vs. Other Window Managers](https://dalyisaac.github.io/Whim/docs/getting-started/comparison.html).
+To see how Whim compares to other Windows window managers, see [Whim vs. Other Window Managers](https://dalyisaac.github.io/Whim/intro/comparison.html).
 
 ## Documentation 📖
 
