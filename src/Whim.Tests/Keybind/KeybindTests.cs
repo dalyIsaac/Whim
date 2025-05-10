@@ -78,12 +78,22 @@ public class KeybindTests
 	}
 
 	[Theory]
+	[InlineData("A", KeyModifiers.None, VIRTUAL_KEY.VK_A)]
+	[InlineData("LCtrl", KeyModifiers.LControl, VIRTUAL_KEY.None)]
+	[InlineData("LCtrl + LShift + LAlt", KeyModifiers.LControl | KeyModifiers.LShift | KeyModifiers.LAlt, VIRTUAL_KEY.None)]
+	public void Keybind_FromString_OnlyKeyOrModifier(string input, KeyModifiers expectedModifiers, VIRTUAL_KEY expectedKey)
+	{
+		IKeybind? keybind = Keybind.FromString(input);
+		Assert.NotNull(keybind);
+		Assert.Equal(expectedModifiers, keybind.Modifiers);
+		Assert.Equal(expectedKey, keybind.Key);
+	}
+
+	[Theory]
 	[InlineData("")]
 	[InlineData(" ")]
 	[InlineData("+++++")]
-	[InlineData("A")]
-	[InlineData("A + B")]
-	[InlineData("LCtrl + LShift + LAlt")]
+	[InlineData("A+B")]
 	public void Keybind_FromString_Invalid_ReturnsNull(string input)
 	{
 		IKeybind? keybind = Keybind.FromString(input);

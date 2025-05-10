@@ -85,12 +85,6 @@ internal class KeybindHook : IKeybindHook
 		}
 
 		KeyModifiers modifiers = GetModifiersPressed();
-		if (modifiers == KeyModifiers.None)
-		{
-			Logger.Verbose("No modifiers");
-			return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
-		}
-
 		if (DoKeyboardEvent(new Keybind(modifiers, key)))
 		{
 			return (LRESULT)1;

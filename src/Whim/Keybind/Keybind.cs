@@ -75,11 +75,17 @@ public readonly record struct Keybind : IKeybind
 			}
 			else if (part.Trim().TryParseKey(out VIRTUAL_KEY k))
 			{
+				if (key != VIRTUAL_KEY.None)
+				{
+					// If we already have a key, we can't parse this keybind.
+					return null;
+				}
+
 				key = k;
 			}
 		}
 
-		if (modifiers == KeyModifiers.None || key == VIRTUAL_KEY.None)
+		if (modifiers == KeyModifiers.None && key == VIRTUAL_KEY.None)
 		{
 			return null;
 		}
