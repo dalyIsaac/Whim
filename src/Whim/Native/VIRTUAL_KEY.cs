@@ -1,3 +1,4 @@
+
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 namespace Windows.Win32
 {
@@ -6,6 +7,7 @@ namespace Windows.Win32
 		/// <summary>
 		/// Symbolic constant names and virtual-key codes used by the system.
 		/// </summary>
+		[global::System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1028:Enum Storage should be Int32")]
 		public enum VIRTUAL_KEY : ushort
 		{
 			/// <summary>
@@ -689,9 +691,19 @@ namespace Windows.Win32
 			VK_LMENU = 0xA4,
 
 			/// <summary>
+			/// Left ALT key
+			/// </summary>
+			VK_LALT = 0xA4,
+
+			/// <summary>
 			/// Right ALT key
 			/// </summary>
 			VK_RMENU = 0xA5,
+
+			/// <summary>
+			/// Right ALT key
+			/// </summary>
+			VK_RALT = 0xA5,
 
 			/// <summary>
 			/// Browser Back key

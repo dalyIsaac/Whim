@@ -10,37 +10,48 @@ public interface IKeybind
 	/// <summary>
 	/// The value for the key modifier <c>Win</c> command.
 	/// </summary>
-	public const KeyModifiers Win = KeyModifiers.LWin;
+	const KeyModifiers Win = KeyModifiers.LWin;
 
 	/// <summary>
 	/// The value for the key modifier <c>Win</c> + <c>Alt</c> command.
 	/// </summary>
-	public const KeyModifiers WinAlt = KeyModifiers.LWin | KeyModifiers.LAlt;
+	const KeyModifiers WinAlt = KeyModifiers.LWin | KeyModifiers.LAlt;
 
 	/// <summary>
 	/// The value for the key modifier <c>Win</c> + <c>Shift</c> command.
 	/// </summary>
-	public const KeyModifiers WinShift = KeyModifiers.LWin | KeyModifiers.LShift;
+	const KeyModifiers WinShift = KeyModifiers.LWin | KeyModifiers.LShift;
 
 	/// <summary>
 	/// The value for the key modifier <c>Win</c> + <c>Ctrl</c> command.
 	/// </summary>
-	public const KeyModifiers WinCtrl = KeyModifiers.LWin | KeyModifiers.LControl;
+	const KeyModifiers WinCtrl = KeyModifiers.LWin | KeyModifiers.LControl;
 
 	/// <summary>
 	/// The value for the key modifier <c>Win</c> + <c>Ctrl</c> + <c>Shift</c> command.
 	/// </summary>
-	public const KeyModifiers WinCtrlShift = KeyModifiers.LWin | KeyModifiers.LControl | KeyModifiers.LShift;
+	const KeyModifiers WinCtrlShift = KeyModifiers.LWin | KeyModifiers.LControl | KeyModifiers.LShift;
 
 	/// <summary>
 	/// Modifiers like Alt, Ctrl, and Win.
 	/// </summary>
+	[Obsolete("Use Keys instead.")]
 	KeyModifiers Modifiers { get; }
 
 	/// <summary>
 	/// See https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
 	/// </summary>
+	[Obsolete("Use Keys instead.")]
 	VIRTUAL_KEY Key { get; }
+
+	/// <summary>
+	/// All the keys in the keybind.
+	/// </summary>
+	/// <remarks>
+	/// Whim does not distinguish between key modifiers and keys. This means that you have
+	/// <c>A + B</c> as a keybind, in addition to the typical <c>Win + A</c>.
+	/// </remarks>
+	IEnumerable<VIRTUAL_KEY> Keys { get; }
 
 	/// <summary>
 	/// Returns a string representation of the keybind.

@@ -65,25 +65,8 @@ internal class KeybindHook : IKeybindHook
 		{
 			return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 		}
+		
 		VIRTUAL_KEY key = (VIRTUAL_KEY)kbdll.vkCode;
-
-		// If one of the following keys are pressed, and they're the only key pressed,
-		// then we want to ignore the keypress.
-		switch (key)
-		{
-			case VIRTUAL_KEY.VK_LSHIFT:
-			case VIRTUAL_KEY.VK_RSHIFT:
-			case VIRTUAL_KEY.VK_LMENU:
-			case VIRTUAL_KEY.VK_RMENU:
-			case VIRTUAL_KEY.VK_LCONTROL:
-			case VIRTUAL_KEY.VK_RCONTROL:
-			case VIRTUAL_KEY.VK_LWIN:
-			case VIRTUAL_KEY.VK_RWIN:
-				return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
-			default:
-				break;
-		}
-
 		KeyModifiers modifiers = GetModifiersPressed();
 		if (DoKeyboardEvent(new Keybind(modifiers, key)))
 		{

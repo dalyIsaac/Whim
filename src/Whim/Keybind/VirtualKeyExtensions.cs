@@ -7,16 +7,35 @@ namespace Whim;
 /// </summary>
 public static class VirtualKeyExtensions
 {
+	private static readonly HashSet<VIRTUAL_KEY> _keyModifiers =
+	[
+		VIRTUAL_KEY.VK_LCONTROL,
+		VIRTUAL_KEY.VK_RCONTROL,
+		VIRTUAL_KEY.VK_LSHIFT,
+		VIRTUAL_KEY.VK_RSHIFT,
+		VIRTUAL_KEY.VK_LALT,
+		VIRTUAL_KEY.VK_RALT,
+		VIRTUAL_KEY.VK_LWIN,
+		VIRTUAL_KEY.VK_RWIN,
+	];
+
 	/// <summary>
 	/// Return the <see cref="VIRTUAL_KEY"/> as a string.
 	/// </summary>
 	/// <param name="key"></param>
+	/// <param name="unifyKeyModifiers">
+	/// Whether to treat key modifiers like `LWin` and `RWin` as the same.
+	/// </param>
 	/// <returns></returns>
-	public static string GetKeyString(this VIRTUAL_KEY key)
+	public static string GetKeyString(this VIRTUAL_KEY key, bool unifyKeyModifiers = false)
 	{
 		string keyString = key.ToString();
 		keyString = keyString.Replace("VK_", "");
 
+		if (unifyKeyModifiers && _keyModifiers.Contains(key))
+		{
+			keyString = keyString[1..];
+		}
 		// Return the keybinding, capitalizing the first letter.
 		return string.Concat(keyString[0].ToString().ToUpper(), keyString[1..].ToLower());
 	}
@@ -36,7 +55,7 @@ public static class VirtualKeyExtensions
 	/// <remarks>
 	/// This method is case-insensitive.
 	/// </remarks>
-	/// <seealso cref="GetKeyString(VIRTUAL_KEY)"/>
+	/// <seealso cref="GetKeyString(VIRTUAL_KEY, bool)"/>
 	/// <seealso cref="VIRTUAL_KEY"/>
 	public static bool TryParseKey(this string keyString, out VIRTUAL_KEY key)
 	{
@@ -49,11 +68,19 @@ public static class VirtualKeyExtensions
 
 		keyString = keyString.ToUpperInvariant();
 		keyString = keyString.Replace(" ", "");
-		keyString = $"VK_{keyString}";
+		string enumString = $"VK_{keyString}";
 
-		if (Enum.TryParse(keyString, out VIRTUAL_KEY k))
+		if (Enum.TryParse(enumString, out VIRTUAL_KEY k))
 		{
 			key = k;
+			return true;
+		}
+
+		// Handle unified modifiers.
+		enumString = $"VK_L{keyString}";
+		if (Enum.TryParse(enumString, out VIRTUAL_KEY k2))
+		{
+			key = k2;
 			return true;
 		}
 

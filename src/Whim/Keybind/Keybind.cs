@@ -7,20 +7,41 @@ namespace Whim;
 public readonly record struct Keybind : IKeybind
 {
 	/// <inheritdoc />
+	[Obsolete("Use Keys instead.")]
 	public KeyModifiers Modifiers { get; }
 
 	/// <inheritdoc />
+	[Obsolete("Use Keys instead.")]
 	public VIRTUAL_KEY Key { get; }
+
+	private readonly ImmutableArray<VIRTUAL_KEY> _keys;
+
+	/// <inheritdoc />
+	public IEnumerable<VIRTUAL_KEY> Keys => _keys;
 
 	/// <summary>
 	/// Creates a new keybind.
 	/// </summary>
 	/// <param name="modifiers">The modifiers for the keybind.</param>
 	/// <param name="key">The key for the keybind.</param>
+	[Obsolete("Provide VIRTUAL_KEYs instead of KeyModifiers.")]
 	public Keybind(KeyModifiers modifiers, VIRTUAL_KEY key)
 	{
-		Modifiers = modifiers;
-		Key = key;
+		_keys = [.. modifiers.GetVirtualKeys(), key];
+	}
+
+	/// <summary>
+	/// Creates a new keybind.
+	/// </summary>
+	/// <param name="key">
+	/// One of the keys for the keybind.
+	/// </param>
+	/// <param name="otherKeys">
+	/// Any other keys for the keybind.
+	/// </param>
+	public Keybind(VIRTUAL_KEY key, params VIRTUAL_KEY[] otherKeys)
+	{
+		_keys = [key, .. otherKeys];
 	}
 
 	/// <inheritdoc />
@@ -30,14 +51,17 @@ public readonly record struct Keybind : IKeybind
 	public string ToString(bool unifyKeyModifiers)
 	{
 		StringBuilder sb = new();
-		sb.AppendJoin(" + ", Modifiers.GetParts(unifyKeyModifiers));
 
-		if (sb.Length > 0)
+		foreach (VIRTUAL_KEY key in Keys)
 		{
-			sb.Append(" + ");
+			if (sb.Length > 0)
+			{
+				sb.Append(" + ");
+			}
+
+			sb.Append(key.GetKeyString(unifyKeyModifiers));
 		}
 
-		sb.Append(Key.GetKeyString());
 		return sb.ToString();
 	}
 
@@ -47,10 +71,14 @@ public readonly record struct Keybind : IKeybind
 	/// <param name="keybind">
 	/// The string to parse.
 	/// </param>
+	/// <param name="unifyKeyModifiers">
+	/// Whether to treat key modifiers like `LWin` and `RWin` as the same.
+	/// See <see cref="IKeybindManager.UnifyKeyModifiers"/>.
+	/// </param>
 	/// <returns>
 	/// The parsed keybind, if successful; otherwise, <see langword="null"/>.
 	/// </returns>
-	public static IKeybind? FromString(string keybind)
+	public static IKeybind? FromString(string keybind, bool unifyKeyModifiers = false)
 	{
 		if (string.IsNullOrWhiteSpace(keybind))
 		{
@@ -63,33 +91,31 @@ public readonly record struct Keybind : IKeybind
 			return null;
 		}
 
-		KeyModifiers modifiers = KeyModifiers.None;
-		VIRTUAL_KEY key = VIRTUAL_KEY.None;
+		VIRTUAL_KEY firstKey = VIRTUAL_KEY.None;
+		List<VIRTUAL_KEY> keys = [];
 
 		foreach (string part in parts)
 		{
-			// Some keys are also modifiers, so we need to check for them first.
-			if (part.Trim().TryParseKeyModifier(out KeyModifiers modifier))
+			if (!part.Trim().TryParseKey(out VIRTUAL_KEY k))
 			{
-				modifiers |= modifier;
+				continue;
 			}
-			else if (part.Trim().TryParseKey(out VIRTUAL_KEY k))
-			{
-				if (key != VIRTUAL_KEY.None)
-				{
-					// If we already have a key, we can't parse this keybind.
-					return null;
-				}
 
-				key = k;
+			if (firstKey == VIRTUAL_KEY.None)
+			{
+				firstKey = k;
+			}
+			else
+			{
+				keys.Add(k);
 			}
 		}
 
-		if (modifiers == KeyModifiers.None && key == VIRTUAL_KEY.None)
+		if (firstKey == VIRTUAL_KEY.None)
 		{
 			return null;
 		}
 
-		return new Keybind(modifiers, key);
+		return new Keybind(firstKey, [.. keys]);
 	}
 }

@@ -1,3 +1,5 @@
+using Windows.Win32.UI.Input.KeyboardAndMouse;
+
 namespace Whim;
 
 /// <summary>
@@ -132,6 +134,53 @@ public static class KeyModifiersExtensions
 			parts.Add("RAlt");
 		}
 		return parts.ToImmutable();
+	}
+
+	/// <summary>
+	/// Get the virtual keys for the given key modifiers.
+	/// </summary>
+	/// <param name="modifiers">
+	/// The key modifiers.
+	/// </param>
+	/// <returns>
+	/// An <see cref="IEnumerable{T}"/> of virtual keys.
+	/// </returns>
+	public static IEnumerable<VIRTUAL_KEY> GetVirtualKeys(this KeyModifiers modifiers)
+	{
+		ImmutableArray<VIRTUAL_KEY>.Builder keys = ImmutableArray.CreateBuilder<VIRTUAL_KEY>();
+		if (modifiers.HasFlag(KeyModifiers.LWin))
+		{
+			keys.Add(VIRTUAL_KEY.VK_LWIN);
+		}
+		if (modifiers.HasFlag(KeyModifiers.RWin))
+		{
+			keys.Add(VIRTUAL_KEY.VK_RWIN);
+		}
+		if (modifiers.HasFlag(KeyModifiers.LControl))
+		{
+			keys.Add(VIRTUAL_KEY.VK_LCONTROL);
+		}
+		if (modifiers.HasFlag(KeyModifiers.RControl))
+		{
+			keys.Add(VIRTUAL_KEY.VK_RCONTROL);
+		}
+		if (modifiers.HasFlag(KeyModifiers.LShift))
+		{
+			keys.Add(VIRTUAL_KEY.VK_LSHIFT);
+		}
+		if (modifiers.HasFlag(KeyModifiers.RShift))
+		{
+			keys.Add(VIRTUAL_KEY.VK_RSHIFT);
+		}
+		if (modifiers.HasFlag(KeyModifiers.LAlt))
+		{
+			keys.Add(VIRTUAL_KEY.VK_LMENU);
+		}
+		if (modifiers.HasFlag(KeyModifiers.RAlt))
+		{
+			keys.Add(VIRTUAL_KEY.VK_RMENU);
+		}
+		return keys.ToImmutable();
 	}
 
 	/// <summary>
