@@ -11,7 +11,7 @@ public readonly record struct Keybind : IKeybind
 	public KeyModifiers Modifiers { get; }
 
 	/// <inheritdoc />
-	[Obsolete("Use Keys instead.")]
+	[Obsolete("Use Keys instead. Whim now supports multiple non-modifier keys in a keybind.")]
 	public VIRTUAL_KEY Key { get; }
 
 	private readonly ImmutableArray<VIRTUAL_KEY> _keys;
@@ -27,6 +27,8 @@ public readonly record struct Keybind : IKeybind
 	[Obsolete("Provide VIRTUAL_KEYs instead of KeyModifiers.")]
 	public Keybind(KeyModifiers modifiers, VIRTUAL_KEY key)
 	{
+		Modifiers = modifiers;
+		Key = key;
 		_keys = [.. modifiers.GetVirtualKeys(), key];
 	}
 

@@ -65,10 +65,9 @@ internal class KeybindHook : IKeybindHook
 		{
 			return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 		}
-		
+
 		VIRTUAL_KEY key = (VIRTUAL_KEY)kbdll.vkCode;
-		KeyModifiers modifiers = GetModifiersPressed();
-		if (DoKeyboardEvent(new Keybind(modifiers, key)))
+		if (GetKeybindForKey(key) is Keybind keybind && DoKeyboardEvent(keybind))
 		{
 			return (LRESULT)1;
 		}
@@ -76,49 +75,34 @@ internal class KeybindHook : IKeybindHook
 		return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 	}
 
-	private bool IsModifierPressed(VIRTUAL_KEY key) =>
-		(_internalContext.CoreNativeManager.GetKeyState((int)key) & 0x8000) == 0x8000;
-
-	private KeyModifiers GetModifiersPressed()
+	private IKeybind? GetKeybindForKey(VIRTUAL_KEY eventKey)
 	{
-		KeyModifiers modifiers = 0;
-
-		// There is no other way to distinguish between left and right modifier keys.
-		if (IsModifierPressed(VIRTUAL_KEY.VK_LSHIFT))
+		foreach (IKeybind k in _context.KeybindManager.GetKeybindsForKey(eventKey))
 		{
-			modifiers |= KeyModifiers.LShift;
-		}
-		if (IsModifierPressed(VIRTUAL_KEY.VK_RSHIFT))
-		{
-			modifiers |= KeyModifiers.RShift;
-		}
-		if (IsModifierPressed(VIRTUAL_KEY.VK_LMENU))
-		{
-			modifiers |= KeyModifiers.LAlt;
-		}
-		if (IsModifierPressed(VIRTUAL_KEY.VK_RMENU))
-		{
-			modifiers |= KeyModifiers.RAlt;
-		}
-		if (IsModifierPressed(VIRTUAL_KEY.VK_LCONTROL))
-		{
-			modifiers |= KeyModifiers.LControl;
-		}
-		if (IsModifierPressed(VIRTUAL_KEY.VK_RCONTROL))
-		{
-			modifiers |= KeyModifiers.RControl;
-		}
-		if (IsModifierPressed(VIRTUAL_KEY.VK_LWIN))
-		{
-			modifiers |= KeyModifiers.LWin;
-		}
-		if (IsModifierPressed(VIRTUAL_KEY.VK_RWIN))
-		{
-			modifiers |= KeyModifiers.RWin;
+			if (IsKeybindPressed(k, eventKey))
+			{
+				return k;
+			}
 		}
 
-		return modifiers;
+		return null;
 	}
+
+	private bool IsKeybindPressed(IKeybind keybind, VIRTUAL_KEY eventKey)
+	{
+		foreach (VIRTUAL_KEY key in keybind.Keys)
+		{
+			if (eventKey != key && !IsKeyPressed(key))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private bool IsKeyPressed(VIRTUAL_KEY key) =>
+		(_internalContext.CoreNativeManager.GetKeyState((int)key) & 0x8000) == 0x8000;
 
 	private bool DoKeyboardEvent(Keybind keybind)
 	{

@@ -1,8 +1,11 @@
+using Windows.Win32.UI.Input.KeyboardAndMouse;
+
 namespace Whim;
 
 internal class KeybindManager(IContext context) : IKeybindManager
 {
 	private readonly IContext _context = context;
+	private readonly KeybindTree _keybindTree = new();
 	private readonly Dictionary<IKeybind, List<string>> _keybindsCommandsMap = [];
 	private readonly Dictionary<string, IKeybind> _commandsKeybindsMap = [];
 	private bool _uniqueKeyModifiers = true;
@@ -51,6 +54,7 @@ internal class KeybindManager(IContext context) : IKeybindManager
 
 		value.Add(commandId);
 		_commandsKeybindsMap[commandId] = keybind;
+		_keybindTree.Add(keybind);
 	}
 
 	public ICommand[] GetCommands(IKeybind keybind)
@@ -89,6 +93,12 @@ internal class KeybindManager(IContext context) : IKeybindManager
 		return _commandsKeybindsMap.TryGetValue(commandId, out IKeybind? keybind) ? keybind : null;
 	}
 
+	public IEnumerable<IKeybind> GetKeybindsForKey(VIRTUAL_KEY key)
+	{
+		Logger.Debug($"Getting keybinds for key '{key}'");
+		return _keybindTree.GetKeybindsForKey(key);
+	}
+
 	public bool Remove(string commandId)
 	{
 		Logger.Debug($"Removing keybind for command '{commandId}'");
@@ -101,6 +111,7 @@ internal class KeybindManager(IContext context) : IKeybindManager
 
 		_commandsKeybindsMap.Remove(commandId);
 		_keybindsCommandsMap[keybind].Remove(commandId);
+		_keybindTree.Remove(keybind);
 		return true;
 	}
 
@@ -109,5 +120,6 @@ internal class KeybindManager(IContext context) : IKeybindManager
 		Logger.Debug("Removing all keybinds");
 		_commandsKeybindsMap.Clear();
 		_keybindsCommandsMap.Clear();
+		_keybindTree.Clear();
 	}
 }

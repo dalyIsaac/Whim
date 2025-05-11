@@ -10,26 +10,33 @@ public interface IKeybind
 	/// <summary>
 	/// The value for the key modifier <c>Win</c> command.
 	/// </summary>
+	[Obsolete("Use new KeyModifiers(VIRTUAL_KEY.VK_LWIN, otherKey1, otherKey2, otherKeyN) instead.")]
 	const KeyModifiers Win = KeyModifiers.LWin;
 
 	/// <summary>
 	/// The value for the key modifier <c>Win</c> + <c>Alt</c> command.
 	/// </summary>
+	[Obsolete("Use new KeyModifiers(VIRTUAL_KEY.VK_LWIN, VIRTUAL_KEY.VK_LALT, otherKey1, otherKeyN) instead.")]
 	const KeyModifiers WinAlt = KeyModifiers.LWin | KeyModifiers.LAlt;
 
 	/// <summary>
 	/// The value for the key modifier <c>Win</c> + <c>Shift</c> command.
 	/// </summary>
+	[Obsolete("Use new KeyModifiers(VIRTUAL_KEY.VK_LWIN, VIRTUAL_KEY.VK_LSHIFT, otherKey1, otherKeyN) instead.")]
 	const KeyModifiers WinShift = KeyModifiers.LWin | KeyModifiers.LShift;
 
 	/// <summary>
 	/// The value for the key modifier <c>Win</c> + <c>Ctrl</c> command.
 	/// </summary>
+	[Obsolete("Use new KeyModifiers(VIRTUAL_KEY.VK_LWIN, VIRTUAL_KEY.VK_LCONTROL, otherKey1, otherKeyN) instead.")]
 	const KeyModifiers WinCtrl = KeyModifiers.LWin | KeyModifiers.LControl;
 
 	/// <summary>
 	/// The value for the key modifier <c>Win</c> + <c>Ctrl</c> + <c>Shift</c> command.
 	/// </summary>
+	[Obsolete(
+		"Use new KeyModifiers(VIRTUAL_KEY.VK_LWIN, VIRTUAL_KEY.VK_LCONTROL, VIRTUAL_KEY.VK_LSHIFT, otherKey1, otherKeyN) instead."
+	)]
 	const KeyModifiers WinCtrlShift = KeyModifiers.LWin | KeyModifiers.LControl | KeyModifiers.LShift;
 
 	/// <summary>

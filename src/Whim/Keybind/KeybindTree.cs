@@ -3,9 +3,9 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 namespace Whim;
 
 /// <summary>
-///Stores a mapping of keys to keybinds.
+///Stores a tree mapping of keys to keybinds.
 /// </summary>
-internal class KeybindMap
+internal class KeybindTree
 {
 	private readonly Dictionary<VIRTUAL_KEY, List<IKeybind>> _keyKeybindsMap = [];
 
@@ -44,13 +44,8 @@ internal class KeybindMap
 		}
 	}
 
-	public IEnumerable<IKeybind> GetKeybindsForKey(VIRTUAL_KEY key)
-	{
-		if (_keyKeybindsMap.TryGetValue(key, out List<IKeybind>? keybinds))
-		{
-			return keybinds;
-		}
+	public IEnumerable<IKeybind> GetKeybindsForKey(VIRTUAL_KEY key) =>
+		_keyKeybindsMap.TryGetValue(key, out List<IKeybind>? keybinds) ? keybinds : [];
 
-		return [];
-	}
+	public void Clear() => _keyKeybindsMap.Clear();
 }

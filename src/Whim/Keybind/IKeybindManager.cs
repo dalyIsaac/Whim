@@ -1,3 +1,5 @@
+using Windows.Win32.UI.Input.KeyboardAndMouse;
+
 namespace Whim;
 
 /// <summary>
@@ -54,4 +56,15 @@ public interface IKeybindManager
 	/// <param name="keybind">The keybind to get the commands for.</param>
 	/// <returns>An array of commands bound to the given keybind.</returns>
 	ICommand[] GetCommands(IKeybind keybind);
+
+	/// <summary>
+	/// Gets all the keybinds for the given key.
+	/// </summary>
+	/// <param name="key">
+	/// The key to get the keybinds for.
+	/// </param>
+	/// <returns>
+	/// The keybinds for the given key.
+	/// </returns>
+	IEnumerable<IKeybind> GetKeybindsForKey(VIRTUAL_KEY key);
 }
