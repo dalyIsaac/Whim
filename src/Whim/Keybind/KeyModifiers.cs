@@ -177,50 +177,6 @@ public static class KeyModifiersExtensions
 	}
 
 	/// <summary>
-	/// Tries to parse a key modifier from a string.
-	/// </summary>
-	/// <param name="modifier">
-	/// The string to parse. This is case-insensitive.
-	/// </param>
-	/// <param name="keyModifier">
-	/// The parsed key modifier, if successful.
-	/// </param>
-	/// <returns>
-	/// <see langword="true"/> if the parse was successful; otherwise, <see langword="false"/>.
-	/// </returns>
-	public static bool TryParseKeyModifier(this string modifier, out KeyModifiers keyModifier)
-	{
-		keyModifier = modifier.ToUpperInvariant() switch
-		{
-			"CTRL" => KeyModifiers.LControl,
-			"CONTROL" => KeyModifiers.LControl,
-			"LCTRL" => KeyModifiers.LControl,
-			"LCONTROL" => KeyModifiers.LControl,
-
-			"RCTRL" => KeyModifiers.RControl,
-			"RCONTROL" => KeyModifiers.RControl,
-
-			"SHIFT" => KeyModifiers.LShift,
-			"LSHIFT" => KeyModifiers.LShift,
-
-			"RSHIFT" => KeyModifiers.RShift,
-
-			"ALT" => KeyModifiers.LAlt,
-			"LALT" => KeyModifiers.LAlt,
-
-			"RALT" => KeyModifiers.RAlt,
-
-			"WIN" => KeyModifiers.LWin,
-			"LWIN" => KeyModifiers.LWin,
-
-			"RWIN" => KeyModifiers.RWin,
-
-			_ => KeyModifiers.None,
-		};
-		return keyModifier != KeyModifiers.None;
-	}
-
-	/// <summary>
 	/// Returns a list of <see cref="VIRTUAL_KEY"/>s that represent the key modifiers
 	/// </summary>
 	/// <param name="modifiers"></param>

@@ -78,6 +78,7 @@ public class KeybindHookTests
 			.Returns(new KBDLLHOOKSTRUCT { vkCode = (uint)key });
 
 		ctx.KeybindManager.GetCommands(Arg.Any<IKeybind>()).Returns(commands);
+		ctx.KeybindManager.Modifiers.Returns(modifiers);
 	}
 
 	[Theory, AutoSubstituteData<KeybindHookCustomization>]
@@ -258,7 +259,7 @@ public class KeybindHookTests
 		// Then
 		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
 		Assert.Equal(0, (nint)result!);
-		ctx.KeybindManager.DidNotReceive().GetCommands(new Keybind(KeyModifiers.None, VIRTUAL_KEY.VK_A));
+		ctx.KeybindManager.Received(1).GetCommands(new Keybind(KeyModifiers.None, VIRTUAL_KEY.VK_A));
 	}
 
 	[Theory, AutoSubstituteData<KeybindHookCustomization>]

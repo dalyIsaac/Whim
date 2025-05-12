@@ -60,6 +60,9 @@ public class KeybindTests
 		Assert.Equal(expected, keybind.ToString(unifyKeyModifiers: true));
 	}
 
+	// TODO: Test ToString with multiple modifiers.
+
+	// TODO: Convert test to use new Keybind constructor, and add tests for "A + B" and "A".
 	[Theory]
 	[InlineData("LShift + A", KeyModifiers.LShift, VIRTUAL_KEY.VK_A)]
 	[InlineData("LCtrl + A", KeyModifiers.LControl, VIRTUAL_KEY.VK_A)]
@@ -81,8 +84,6 @@ public class KeybindTests
 	[InlineData("")]
 	[InlineData(" ")]
 	[InlineData("+++++")]
-	[InlineData("A")]
-	[InlineData("A + B")]
 	[InlineData("LCtrl + LShift + LAlt")]
 	public void Keybind_FromString_Invalid_ReturnsNull(string input)
 	{

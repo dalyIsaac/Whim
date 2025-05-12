@@ -36,4 +36,49 @@ public class VirtualKeyExtensionsTests
 		Assert.Equal(expectedSuccess, success);
 		Assert.Equal(expected, key);
 	}
+
+	[Theory]
+	[InlineData("CTRL", VIRTUAL_KEY.VK_LCONTROL, true)]
+	[InlineData("Ctrl", VIRTUAL_KEY.VK_LCONTROL, true)]
+	[InlineData("CONTROL", VIRTUAL_KEY.VK_LCONTROL, true)]
+	[InlineData("Control", VIRTUAL_KEY.VK_LCONTROL, true)]
+	[InlineData("LCTRL", VIRTUAL_KEY.VK_LCONTROL, true)]
+	[InlineData("Lctrl", VIRTUAL_KEY.VK_LCONTROL, true)]
+	[InlineData("LCONTROL", VIRTUAL_KEY.VK_LCONTROL, true)]
+	[InlineData("Lcontrol", VIRTUAL_KEY.VK_LCONTROL, true)]
+	[InlineData("RCTRL", VIRTUAL_KEY.VK_RCONTROL, true)]
+	[InlineData("Rctrl", VIRTUAL_KEY.VK_RCONTROL, true)]
+	[InlineData("RCONTROL", VIRTUAL_KEY.VK_RCONTROL, true)]
+	[InlineData("Rcontrol", VIRTUAL_KEY.VK_RCONTROL, true)]
+	[InlineData("SHIFT", VIRTUAL_KEY.VK_LSHIFT, true)]
+	[InlineData("Shift", VIRTUAL_KEY.VK_LSHIFT, true)]
+	[InlineData("LSHIFT", VIRTUAL_KEY.VK_LSHIFT, true)]
+	[InlineData("Lshift", VIRTUAL_KEY.VK_LSHIFT, true)]
+	[InlineData("RSHIFT", VIRTUAL_KEY.VK_RSHIFT, true)]
+	[InlineData("Rshift", VIRTUAL_KEY.VK_RSHIFT, true)]
+	[InlineData("ALT", VIRTUAL_KEY.VK_LALT, true)]
+	[InlineData("Alt", VIRTUAL_KEY.VK_LALT, true)]
+	[InlineData("LALT", VIRTUAL_KEY.VK_LALT, true)]
+	[InlineData("Lalt", VIRTUAL_KEY.VK_LALT, true)]
+	[InlineData("RALT", VIRTUAL_KEY.VK_RALT, true)]
+	[InlineData("Ralt", VIRTUAL_KEY.VK_RALT, true)]
+	[InlineData("WIN", VIRTUAL_KEY.VK_LWIN, true)]
+	[InlineData("Win", VIRTUAL_KEY.VK_LWIN, true)]
+	[InlineData("LWIN", VIRTUAL_KEY.VK_LWIN, true)]
+	[InlineData("Lwin", VIRTUAL_KEY.VK_LWIN, true)]
+	[InlineData("RWIN", VIRTUAL_KEY.VK_RWIN, true)]
+	[InlineData("Rwin", VIRTUAL_KEY.VK_RWIN, true)]
+	[InlineData(" ", VIRTUAL_KEY.None, false)]
+	[InlineData("", VIRTUAL_KEY.None, false)]
+	[InlineData("Bob", VIRTUAL_KEY.None, false)]
+	[InlineData("A", VIRTUAL_KEY.None, false)]
+	public void TryParseKeyModifier(string keyString, VIRTUAL_KEY expected, bool expectedSuccess)
+	{
+		// When
+		bool success = keyString.TryParseKeyModifier(out VIRTUAL_KEY key);
+
+		// Then
+		Assert.Equal(expectedSuccess, success);
+		Assert.Equal(expected, key);
+	}
 }

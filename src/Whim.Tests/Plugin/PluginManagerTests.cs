@@ -228,7 +228,7 @@ public class PluginManagerTests
 		Assert.Equal("whim.plugin2.command22", commands[2].Id);
 		Assert.Equal("whim.plugin3.command3", commands[3].Id);
 
-		ctx.KeybindManager.Received(2).SetKeybind(Arg.Any<string>(), Arg.Any<Keybind>());
+		ctx.KeybindManager.Received(2).SetKeybind(Arg.Any<string>(), Arg.Any<IKeybind>());
 		ctx.KeybindManager.Received(1)
 			.SetKeybind("whim.plugin2.command2", new Keybind(KeyModifiers.LControl, VIRTUAL_KEY.VK_A));
 		ctx.KeybindManager.Received(1)

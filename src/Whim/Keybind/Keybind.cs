@@ -5,7 +5,7 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 namespace Whim;
 
 /// <inheritdoc />
-public struct Keybind : IKeybind
+public readonly struct Keybind : IKeybind, IEquatable<Keybind>
 {
 	private readonly ImmutableArray<VIRTUAL_KEY> _mods;
 	private readonly int _hashCode;
@@ -24,8 +24,8 @@ public struct Keybind : IKeybind
 	/// </summary>
 	/// <param name="modifiers">The modifiers for the keybind.</param>
 	/// <param name="key">The key for the keybind.</param>
-	public Keybind(KeyModifiers modifiers, VIRTUAL_KEY key) : this([.. modifiers.GetKeys()], key)
-	{ }
+	public Keybind(KeyModifiers modifiers, VIRTUAL_KEY key)
+		: this([.. modifiers.GetKeys()], key) { }
 
 	/// <summary>
 	/// Creates a new keybind.
@@ -38,12 +38,7 @@ public struct Keybind : IKeybind
 	/// </param>
 	public Keybind(IEnumerable<VIRTUAL_KEY> modifiers, VIRTUAL_KEY key)
 	{
-		IEnumerable<VIRTUAL_KEY> sortedModifiers = modifiers
-			.Where(x => x != VIRTUAL_KEY.None)
-			.Distinct()
-			.OrderBy(x => x);
-
-		_mods = [.. sortedModifiers];
+		_mods = VirtualKeyExtensions.SortModifiers(modifiers);
 		Key = key;
 		Modifiers = KeyModifiers.None;
 
@@ -65,7 +60,6 @@ public struct Keybind : IKeybind
 	public string ToString(bool unifyKeyModifiers)
 	{
 		StringBuilder sb = new();
-		sb.AppendJoin(" + ", Modifiers.GetParts(unifyKeyModifiers));
 
 		foreach (VIRTUAL_KEY key in Mods)
 		{
@@ -103,7 +97,7 @@ public struct Keybind : IKeybind
 			return null;
 		}
 
-		string[] parts = keybind.Split('+', StringSplitOptions.RemoveEmptyEntries);
+		string[] parts = keybind.Trim().Split('+', StringSplitOptions.RemoveEmptyEntries);
 		if (parts.Length == 0)
 		{
 			return null;
@@ -112,21 +106,41 @@ public struct Keybind : IKeybind
 		List<VIRTUAL_KEY> mods = [];
 		VIRTUAL_KEY key = VIRTUAL_KEY.None;
 
-		for (int i = 0; i < parts.Length - 1; i++)
+		for (int i = 0; i < parts.Length; i++)
 		{
-			if (!parts[i].Trim().TryParseKey(out VIRTUAL_KEY k))
+			string part = parts[i].Trim();
+			bool isLast = i == parts.Length - 1;
+
+			if (part.TryParseKeyModifier(out VIRTUAL_KEY parsedModifier))
 			{
+				// The last key must not be a modifier.
+				if (isLast)
+				{
+					return null;
+				}
+
+				mods.Add(parsedModifier);
 				continue;
 			}
 
-			if (i == parts.Length - 1)
+			if (part.TryParseKey(out VIRTUAL_KEY parsedKey))
 			{
-				key = k;
+				if (isLast)
+				{
+					key = parsedKey;
+					continue;
+				}
+
+				mods.Add(parsedKey);
+				continue;
 			}
-			else
-			{
-				mods.Add(k);
-			}
+
+			return null;
+		}
+
+		if (key == VIRTUAL_KEY.None)
+		{
+			return null;
 		}
 
 		return new Keybind(mods, key);
@@ -140,6 +154,12 @@ public struct Keybind : IKeybind
 			return false;
 		}
 
+		return Equals(other);
+	}
+
+	/// <inheritdoc />
+	public bool Equals(Keybind other)
+	{
 		if (other.Mods.Count != Mods.Count)
 		{
 			return false;
@@ -155,6 +175,12 @@ public struct Keybind : IKeybind
 
 		return Key == other.Key;
 	}
+
+	/// <inheritdoc />
+	public static bool operator ==(Keybind left, Keybind right) => left.Equals(right);
+
+	/// <inheritdoc />
+	public static bool operator !=(Keybind left, Keybind right) => !(left == right);
 
 	/// <inheritdoc />
 	public override int GetHashCode() => _hashCode;
