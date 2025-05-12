@@ -14,6 +14,7 @@ internal class KeybindHook : IKeybindHook
 	private readonly HOOKPROC _lowLevelKeyboardProc;
 	private UnhookWindowsHookExSafeHandle? _unhookKeyboardHook;
 	private bool _disposedValue;
+	private readonly byte[] _keyState = new byte[256];
 
 	public KeybindHook(IContext context, IInternalContext internalContext)
 	{
@@ -77,23 +78,34 @@ internal class KeybindHook : IKeybindHook
 
 	private IKeybind? GetKeybindForKey(VIRTUAL_KEY eventKey)
 	{
-		foreach (IKeybind k in _context.KeybindManager.GetKeybindsForKey(eventKey))
+		Span<byte> lpKeyState = _keyState.AsSpan();
+		if (!_internalContext.CoreNativeManager.GetKeyboardState(lpKeyState))
 		{
-			if (IsKeybindPressed(k, eventKey))
+			return null;
+		}
+
+		foreach (IKeybind keybind in _context.KeybindManager.GetKeybindsForKey(eventKey))
+		{
+			if (keybind is Keybind k && IsKeybindPressed(lpKeyState, k))
 			{
-				return k;
+				return keybind;
 			}
 		}
 
 		return null;
 	}
 
-	private bool IsKeybindPressed(IKeybind keybind, VIRTUAL_KEY eventKey)
+	private bool IsKeybindPressed(Span<byte> lpKeyState, Keybind keybind)
 	{
 		foreach (VIRTUAL_KEY key in keybind.Keys)
 		{
-			if (eventKey != key && !IsKeyPressed(key))
+			bool isPressed = _context.KeybindManager.UnifyKeyModifiers
+				? IsUnifiedKeyPressed(lpKeyState, key)
+				: IsKeyPressed(lpKeyState, key);
+
+			if (!isPressed)
 			{
+				Logger.Verbose($"Key {key} is not pressed");
 				return false;
 			}
 		}
@@ -101,8 +113,29 @@ internal class KeybindHook : IKeybindHook
 		return true;
 	}
 
-	private bool IsKeyPressed(VIRTUAL_KEY key) =>
-		(_internalContext.CoreNativeManager.GetKeyState((int)key) & 0x8000) == 0x8000;
+	private static bool IsUnifiedKeyPressed(Span<byte> lpKeyState, VIRTUAL_KEY key) =>
+		key switch
+		{
+			VIRTUAL_KEY.VK_LCONTROL or VIRTUAL_KEY.VK_RCONTROL => IsKeyPressed(lpKeyState, VIRTUAL_KEY.VK_LCONTROL)
+				|| IsKeyPressed(lpKeyState, VIRTUAL_KEY.VK_RCONTROL),
+			VIRTUAL_KEY.VK_LSHIFT or VIRTUAL_KEY.VK_RSHIFT => IsKeyPressed(lpKeyState, VIRTUAL_KEY.VK_LSHIFT)
+				|| IsKeyPressed(lpKeyState, VIRTUAL_KEY.VK_RSHIFT),
+			VIRTUAL_KEY.VK_LMENU or VIRTUAL_KEY.VK_RMENU => IsKeyPressed(lpKeyState, VIRTUAL_KEY.VK_LMENU)
+				|| IsKeyPressed(lpKeyState, VIRTUAL_KEY.VK_RMENU),
+			_ => IsKeyPressed(lpKeyState, key),
+		};
+
+	private static bool IsKeyPressed(Span<byte> lpKeyState, VIRTUAL_KEY key)
+	{
+		if ((int)key > lpKeyState.Length)
+		{
+			Logger.Verbose($"Key {key} is out of bounds for key state array");
+			return false;
+		}
+
+		// If the high-order bit is 1, the key is down. Otherwise, it is up.
+		return (lpKeyState[(int)key] & 0x80) != 0;
+	}
 
 	private bool DoKeyboardEvent(Keybind keybind)
 	{

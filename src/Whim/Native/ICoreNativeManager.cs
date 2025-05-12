@@ -53,14 +53,20 @@ internal interface ICoreNativeManager
 	/// <returns></returns>
 	LRESULT CallNextHookEx(int nCode, WPARAM wParam, LPARAM lParam);
 
-	/// <summary>
-	/// Set the <see cref="PInvoke.GetKeyState(int)"/> <br/>
-	///
-	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getkeystate
-	/// </summary>
-	/// <param name="nVirtKey"></param>
-	/// <returns></returns>
-	short GetKeyState(int nVirtKey);
+	/// <summary>Copies the status of the 256 virtual keys to the specified buffer.</summary>
+	/// <param name="lpKeyState">
+	/// <para>Type: <b>PBYTE</b> The 256-byte array that receives the status data for each virtual key.</para>
+	/// <para><see href="https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-getkeyboardstate#parameters">Read more on docs.microsoft.com</see>.</para>
+	/// </param>
+	/// <returns>
+	/// <para>Type: <b>BOOL</b> If the function succeeds, the return value is nonzero. If the function fails, the return value is zero. To get extended error information, call <a href="https://docs.microsoft.com/windows/desktop/api/errhandlingapi/nf-errhandlingapi-getlasterror">GetLastError</a>.</para>
+	/// </returns>
+	/// <remarks>
+	/// <para>An application can call this function to retrieve the current status of all the virtual keys. The status changes as a thread removes keyboard messages from its message queue. The status does not change as keyboard messages are posted to the thread's message queue, nor does it change as keyboard messages are posted to or retrieved from message queues of other threads. (Exception: Threads that are connected through <a href="https://docs.microsoft.com/windows/desktop/api/winuser/nf-winuser-attachthreadinput">AttachThreadInput</a> share the same keyboard state.) When the function returns, each member of the array pointed to by the <i>lpKeyState</i> parameter contains status data for a virtual key. If the high-order bit is 1, the key is down; otherwise, it is up. If the key is a toggle key, for example CAPS LOCK, then the low-order bit is 1 when the key is toggled and is 0 if the key is untoggled.  The low-order bit is meaningless for non-toggle keys. A toggle key is said to be toggled when it is turned on. A toggle key's indicator light (if any) on the keyboard will be on when the key is toggled, and off when the key is untoggled. To retrieve status information for an individual key, use the <a href="https://docs.microsoft.com/windows/desktop/api/winuser/nf-winuser-getkeystate">GetKeyState</a> function. To retrieve the current state for an individual key regardless of whether the corresponding keyboard message has been retrieved from the message queue, use the <a href="https://docs.microsoft.com/windows/desktop/api/winuser/nf-winuser-getasynckeystate">GetAsyncKeyState</a> function. An application can use the virtual-key code constants <b>VK_SHIFT</b>, <b>VK_CONTROL</b> and <b>VK_MENU</b> as indices into the array pointed to by <i>lpKeyState</i>. This gives the status of the SHIFT, CTRL, or ALT keys without distinguishing between left and right. An application can also use the following virtual-key code constants as indices to distinguish between the left and right instances of those keys: </para>
+	/// <para>This doc was truncated.</para>
+	/// <para><see href="https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-getkeyboardstate#">Read more on docs.microsoft.com</see>.</para>
+	/// </remarks>
+	bool GetKeyboardState(Span<byte> lpKeyState);
 
 	/// <summary>
 	/// Set the <see cref="PInvoke.GetCursorPos(out System.Drawing.Point)"/> <br/>
@@ -186,8 +192,6 @@ internal interface ICoreNativeManager
 	/// Synthesizes keystrokes, mouse motions, and button clicks.
 	/// </summary>
 	/// <remarks>
-	/// This uses <see cref="PInvoke.SendInput(Span{INPUT}, int)"/> <br/>
-	///
 	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-sendinput
 	/// </remarks>
 	/// <param name="pInputs"></param>
@@ -220,11 +224,15 @@ internal interface ICoreNativeManager
 	/// <returns></returns>
 	uint GetWindowThreadProcessId(HWND hWnd, out uint lpdwProcessId);
 
-	/// <summary>
-	/// Safe wrapper around <see cref="PInvoke.GetWindowText"/>.
-	/// </summary>
-	/// <param name="hwnd"></param>
-	/// <returns></returns>
+	/// <summary>Copies the text of the specified window's title bar (if it has one) into a buffer. If the specified window is a control, the text of the control is copied. However, GetWindowText cannot retrieve the text of a control in another application. (Unicode)</summary>
+	/// <param name="hwnd">
+	/// <para>Type: <b>HWND</b> A handle to the window or control containing the text.</para>
+	/// <para><see href="https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-getwindowtextw#parameters">Read more on docs.microsoft.com</see>.</para>
+	/// </param>
+	/// <returns>
+	/// The text of the window for the given <paramref name="hwnd"/>.
+	/// If the function fails, an empty string is returned.
+	/// </returns>
 	string GetWindowText(HWND hwnd);
 
 	/// <summary>
