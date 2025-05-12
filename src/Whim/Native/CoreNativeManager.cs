@@ -29,7 +29,7 @@ internal class CoreNativeManager(IContext context) : ICoreNativeManager
 	public LRESULT CallNextHookEx(int nCode, WPARAM wParam, LPARAM lParam) =>
 		PInvoke.CallNextHookEx(null, nCode, wParam, lParam);
 
-	public bool GetKeyboardState(Span<byte> lpKeyState) => PInvoke.GetKeyboardState(lpKeyState);
+	public short GetKeyState(int nVirtKey) => PInvoke.GetKeyState(nVirtKey);
 
 	public BOOL GetCursorPos(out IPoint<int> lpPoint)
 	{

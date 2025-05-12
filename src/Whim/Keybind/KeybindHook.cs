@@ -15,7 +15,6 @@ internal class KeybindHook : IKeybindHook
 	private readonly HOOKPROC _lowLevelKeyboardProc;
 	private UnhookWindowsHookExSafeHandle? _unhookKeyboardHook;
 	private bool _disposedValue;
-	private readonly byte[] _keyState = new byte[256];
 
 	public KeybindHook(IContext context, IInternalContext internalContext)
 	{
@@ -69,6 +68,13 @@ internal class KeybindHook : IKeybindHook
 		}
 
 		VIRTUAL_KEY key = (VIRTUAL_KEY)kbdll.vkCode;
+
+		// Ignore key modifiers which are a modifier.
+		if (_context.KeybindManager.Modifiers.Contains(key))
+		{
+			return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
+		}
+
 		if (GetKeybindForKey(key) is Keybind keybind && DoKeyboardEvent(keybind))
 		{
 			return (LRESULT)1;
@@ -79,16 +85,10 @@ internal class KeybindHook : IKeybindHook
 
 	private IKeybind? GetKeybindForKey(VIRTUAL_KEY eventKey)
 	{
-		Span<byte> lpKeyState = _keyState.AsSpan();
-		if (!_internalContext.CoreNativeManager.GetKeyboardState(lpKeyState))
-		{
-			return null;
-		}
-
 		List<VIRTUAL_KEY> pressedModifiers = [];
 		foreach (VIRTUAL_KEY modifier in _context.KeybindManager.Modifiers)
 		{
-			if (IsKeyPressed(lpKeyState, modifier))
+			if (IsModifierPressed(modifier))
 			{
 				pressedModifiers.Add(modifier);
 			}
@@ -97,17 +97,8 @@ internal class KeybindHook : IKeybindHook
 		return new Keybind(pressedModifiers, eventKey);
 	}
 
-	private static bool IsKeyPressed(Span<byte> lpKeyState, VIRTUAL_KEY key)
-	{
-		if ((int)key > lpKeyState.Length)
-		{
-			Logger.Verbose($"Key {key} is out of bounds for key state array");
-			return false;
-		}
-
-		// If the high-order bit is 1, the key is down. Otherwise, it is up.
-		return (lpKeyState[(int)key] & 0x80) != 0;
-	}
+	private bool IsModifierPressed(VIRTUAL_KEY key) =>
+		(_internalContext.CoreNativeManager.GetKeyState((int)key) & 0x8000) == 0x8000;
 
 	private bool DoKeyboardEvent(Keybind keybind)
 	{

@@ -5,12 +5,13 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 namespace Whim;
 
 /// <inheritdoc />
-public readonly record struct Keybind : IKeybind
+public struct Keybind : IKeybind
 {
 	private readonly ImmutableArray<VIRTUAL_KEY> _mods;
+	private readonly int _hashCode;
 
 	/// <inheritdoc />
-	public IEnumerable<VIRTUAL_KEY> Mods => _mods;
+	public IReadOnlyList<VIRTUAL_KEY> Mods => _mods;
 
 	/// <inheritdoc />
 	public KeyModifiers Modifiers { get; }
@@ -23,12 +24,8 @@ public readonly record struct Keybind : IKeybind
 	/// </summary>
 	/// <param name="modifiers">The modifiers for the keybind.</param>
 	/// <param name="key">The key for the keybind.</param>
-	public Keybind(KeyModifiers modifiers, VIRTUAL_KEY key)
-	{
-		Modifiers = modifiers;
-		Key = key;
-		_mods = [.. modifiers.GetKeys()];
-	}
+	public Keybind(KeyModifiers modifiers, VIRTUAL_KEY key) : this([.. modifiers.GetKeys()], key)
+	{ }
 
 	/// <summary>
 	/// Creates a new keybind.
@@ -57,6 +54,8 @@ public readonly record struct Keybind : IKeybind
 				Modifiers |= modifier;
 			}
 		}
+
+		_hashCode = _mods.Aggregate(0, (acc, mod) => acc ^ (int)mod) ^ (int)key;
 	}
 
 	/// <inheritdoc />
@@ -132,4 +131,31 @@ public readonly record struct Keybind : IKeybind
 
 		return new Keybind(mods, key);
 	}
+
+	/// <inheritdoc />
+	public override bool Equals(object? obj)
+	{
+		if (obj == null || GetType() != obj.GetType() || obj is not Keybind other)
+		{
+			return false;
+		}
+
+		if (other.Mods.Count != Mods.Count)
+		{
+			return false;
+		}
+
+		for (int idx = 0; idx < Mods.Count; idx += 1)
+		{
+			if (Mods[idx] != other.Mods[idx])
+			{
+				return false;
+			}
+		}
+
+		return Key == other.Key;
+	}
+
+	/// <inheritdoc />
+	public override int GetHashCode() => _hashCode;
 }
