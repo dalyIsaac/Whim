@@ -1,3 +1,5 @@
+using Windows.Win32.UI.Input.KeyboardAndMouse;
+
 namespace Whim;
 
 /// <summary>
@@ -16,6 +18,11 @@ public interface IKeybindManager
 	/// All new keybinds will also be unified.
 	/// </remarks>
 	bool UnifyKeyModifiers { get; set; }
+
+	/// <summary>
+	/// All the modifiers which are currently being used.
+	/// </summary>
+	IEnumerable<VIRTUAL_KEY> Modifiers { get; }
 
 	/// <summary>
 	/// Sets a keybind.

@@ -1,3 +1,5 @@
+using Windows.Win32.UI.Input.KeyboardAndMouse;
+
 namespace Whim;
 
 /// <summary>
@@ -216,5 +218,49 @@ public static class KeyModifiersExtensions
 			_ => KeyModifiers.None,
 		};
 		return keyModifier != KeyModifiers.None;
+	}
+
+	/// <summary>
+	/// Returns a list of <see cref="VIRTUAL_KEY"/>s that represent the key modifiers
+	/// </summary>
+	/// <param name="modifiers"></param>
+	/// <returns></returns>
+	public static IList<VIRTUAL_KEY> GetKeys(this KeyModifiers modifiers)
+	{
+		List<VIRTUAL_KEY> keys = [];
+		if (modifiers.HasFlag(KeyModifiers.LControl))
+		{
+			keys.Add(VIRTUAL_KEY.VK_LCONTROL);
+		}
+		if (modifiers.HasFlag(KeyModifiers.RControl))
+		{
+			keys.Add(VIRTUAL_KEY.VK_RCONTROL);
+		}
+		if (modifiers.HasFlag(KeyModifiers.LShift))
+		{
+			keys.Add(VIRTUAL_KEY.VK_LSHIFT);
+		}
+		if (modifiers.HasFlag(KeyModifiers.RShift))
+		{
+			keys.Add(VIRTUAL_KEY.VK_RSHIFT);
+		}
+		if (modifiers.HasFlag(KeyModifiers.LAlt))
+		{
+			keys.Add(VIRTUAL_KEY.VK_LMENU);
+		}
+		if (modifiers.HasFlag(KeyModifiers.RAlt))
+		{
+			keys.Add(VIRTUAL_KEY.VK_RMENU);
+		}
+		if (modifiers.HasFlag(KeyModifiers.LWin))
+		{
+			keys.Add(VIRTUAL_KEY.VK_LWIN);
+		}
+		if (modifiers.HasFlag(KeyModifiers.RWin))
+		{
+			keys.Add(VIRTUAL_KEY.VK_RWIN);
+		}
+
+		return keys;
 	}
 }

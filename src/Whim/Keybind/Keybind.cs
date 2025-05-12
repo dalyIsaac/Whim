@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
@@ -6,6 +7,11 @@ namespace Whim;
 /// <inheritdoc />
 public readonly record struct Keybind : IKeybind
 {
+	private readonly ImmutableArray<VIRTUAL_KEY> _mods;
+
+	/// <inheritdoc />
+	public IEnumerable<VIRTUAL_KEY> Mods => _mods;
+
 	/// <inheritdoc />
 	public KeyModifiers Modifiers { get; }
 
@@ -21,6 +27,36 @@ public readonly record struct Keybind : IKeybind
 	{
 		Modifiers = modifiers;
 		Key = key;
+		_mods = [.. modifiers.GetKeys()];
+	}
+
+	/// <summary>
+	/// Creates a new keybind.
+	/// </summary>
+	/// <param name="modifiers">
+	/// The modifiers for the keybind.
+	/// </param>
+	/// <param name="key">
+	/// The key for the keybind.
+	/// </param>
+	public Keybind(IEnumerable<VIRTUAL_KEY> modifiers, VIRTUAL_KEY key)
+	{
+		IEnumerable<VIRTUAL_KEY> sortedModifiers = modifiers
+			.Where(x => x != VIRTUAL_KEY.None)
+			.Distinct()
+			.OrderBy(x => x);
+
+		_mods = [.. sortedModifiers];
+		Key = key;
+		Modifiers = KeyModifiers.None;
+
+		foreach (VIRTUAL_KEY mod in _mods)
+		{
+			if (mod.TryGetModifier(out KeyModifiers modifier))
+			{
+				Modifiers |= modifier;
+			}
+		}
 	}
 
 	/// <inheritdoc />
@@ -32,12 +68,23 @@ public readonly record struct Keybind : IKeybind
 		StringBuilder sb = new();
 		sb.AppendJoin(" + ", Modifiers.GetParts(unifyKeyModifiers));
 
+		foreach (VIRTUAL_KEY key in Mods)
+		{
+			if (sb.Length > 0)
+			{
+				sb.Append(" + ");
+			}
+
+			sb.Append(key.GetKeyString(unifyKeyModifiers));
+		}
+
 		if (sb.Length > 0)
 		{
 			sb.Append(" + ");
 		}
 
 		sb.Append(Key.GetKeyString());
+
 		return sb.ToString();
 	}
 
@@ -63,27 +110,26 @@ public readonly record struct Keybind : IKeybind
 			return null;
 		}
 
-		KeyModifiers modifiers = KeyModifiers.None;
+		List<VIRTUAL_KEY> mods = [];
 		VIRTUAL_KEY key = VIRTUAL_KEY.None;
 
-		foreach (string part in parts)
+		for (int i = 0; i < parts.Length - 1; i++)
 		{
-			// Some keys are also modifiers, so we need to check for them first.
-			if (part.Trim().TryParseKeyModifier(out KeyModifiers modifier))
+			if (!parts[i].Trim().TryParseKey(out VIRTUAL_KEY k))
 			{
-				modifiers |= modifier;
+				continue;
 			}
-			else if (part.Trim().TryParseKey(out VIRTUAL_KEY k))
+
+			if (i == parts.Length - 1)
 			{
 				key = k;
 			}
+			else
+			{
+				mods.Add(k);
+			}
 		}
 
-		if (modifiers == KeyModifiers.None || key == VIRTUAL_KEY.None)
-		{
-			return null;
-		}
-
-		return new Keybind(modifiers, key);
+		return new Keybind(mods, key);
 	}
 }

@@ -35,7 +35,13 @@ public interface IKeybind
 	/// <summary>
 	/// Modifiers like Alt, Ctrl, and Win.
 	/// </summary>
+	[Obsolete("Use Mods instead.")]
 	KeyModifiers Modifiers { get; }
+
+	/// <summary>
+	/// Modifiers like Alt, Ctrl, and Win.
+	/// </summary>
+	IEnumerable<VIRTUAL_KEY> Mods { get; }
 
 	/// <summary>
 	/// See https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
