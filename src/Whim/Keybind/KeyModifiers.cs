@@ -142,38 +142,36 @@ public static class KeyModifiersExtensions
 	/// </summary>
 	/// <param name="keybind"></param>
 	/// <returns></returns>
-	public static IKeybind UnifyModifiers(this IKeybind keybind) => new Keybind(keybind.Modifiers.Unify(), keybind.Key);
-
-	/// <summary>
-	/// Returns a new <see cref="KeyModifiers"/>, with the right modifiers replaced with left
-	/// modifiers.
-	/// </summary>
-	/// <param name="modifiers"></param>
-	/// <returns></returns>
-	public static KeyModifiers Unify(this KeyModifiers modifiers)
+	public static IKeybind UnifyModifiers(this IKeybind keybind)
 	{
-		KeyModifiers newModifiers = modifiers;
-		if (modifiers.HasFlag(KeyModifiers.RWin))
+		HashSet<VIRTUAL_KEY> mods = [];
+		foreach (VIRTUAL_KEY key in keybind.Mods)
 		{
-			newModifiers &= ~KeyModifiers.RWin;
-			newModifiers |= KeyModifiers.LWin;
+			switch (key)
+			{
+				case VIRTUAL_KEY.VK_LCONTROL:
+				case VIRTUAL_KEY.VK_RCONTROL:
+					mods.Add(VIRTUAL_KEY.VK_LCONTROL);
+					break;
+				case VIRTUAL_KEY.VK_LSHIFT:
+				case VIRTUAL_KEY.VK_RSHIFT:
+					mods.Add(VIRTUAL_KEY.VK_LSHIFT);
+					break;
+				case VIRTUAL_KEY.VK_LMENU:
+				case VIRTUAL_KEY.VK_RMENU:
+					mods.Add(VIRTUAL_KEY.VK_LMENU);
+					break;
+				case VIRTUAL_KEY.VK_LWIN:
+				case VIRTUAL_KEY.VK_RWIN:
+					mods.Add(VIRTUAL_KEY.VK_LWIN);
+					break;
+				default:
+					mods.Add(key);
+					break;
+			}
 		}
-		if (modifiers.HasFlag(KeyModifiers.RControl))
-		{
-			newModifiers &= ~KeyModifiers.RControl;
-			newModifiers |= KeyModifiers.LControl;
-		}
-		if (modifiers.HasFlag(KeyModifiers.RShift))
-		{
-			newModifiers &= ~KeyModifiers.RShift;
-			newModifiers |= KeyModifiers.LShift;
-		}
-		if (modifiers.HasFlag(KeyModifiers.RAlt))
-		{
-			newModifiers &= ~KeyModifiers.RAlt;
-			newModifiers |= KeyModifiers.LAlt;
-		}
-		return newModifiers;
+
+		return new Keybind(mods, keybind.Key);
 	}
 
 	/// <summary>
