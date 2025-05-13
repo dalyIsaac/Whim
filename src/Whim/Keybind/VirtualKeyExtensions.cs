@@ -75,21 +75,19 @@ public static class VirtualKeyExtensions
 			return false;
 		}
 
+		if (TryParseKeyModifier(keyString, out VIRTUAL_KEY modKey))
+		{
+			key = modKey;
+			return true;
+		}
+
 		keyString = keyString.ToUpperInvariant();
 		keyString = keyString.Replace(" ", "");
 		string enumString = $"VK_{keyString}";
 
-		if (Enum.TryParse(enumString, out VIRTUAL_KEY k))
+		if (Enum.TryParse(enumString, out VIRTUAL_KEY keyKey))
 		{
-			key = k;
-			return true;
-		}
-
-		// Handle unified modifiers.
-		enumString = $"VK_L{keyString}";
-		if (Enum.TryParse(enumString, out VIRTUAL_KEY k2))
-		{
-			key = k2;
+			key = keyKey;
 			return true;
 		}
 
@@ -206,7 +204,7 @@ public static class VirtualKeyExtensions
 	/// The sorted key modifiers.
 	/// </returns>
 	public static ImmutableArray<VIRTUAL_KEY> SortModifiers(IEnumerable<VIRTUAL_KEY> modifiers) =>
-		modifiers.Distinct().OrderBy(x => x.GetVirtualKeyIndex()).ToImmutableArray();
+		[.. modifiers.Distinct().OrderBy(x => x.GetVirtualKeyIndex())];
 
 	private static int GetVirtualKeyIndex(this VIRTUAL_KEY key) =>
 		key switch
