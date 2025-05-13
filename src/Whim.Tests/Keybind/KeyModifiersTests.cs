@@ -71,34 +71,9 @@ public class KeyModifiersTests
 	}
 
 	[Theory]
-	[InlineData(KeyModifiers.None, KeyModifiers.None)]
-	[InlineData(KeyModifiers.LControl, KeyModifiers.LControl)]
-	[InlineData(KeyModifiers.RControl, KeyModifiers.LControl)]
-	[InlineData(KeyModifiers.LShift, KeyModifiers.LShift)]
-	[InlineData(KeyModifiers.RShift, KeyModifiers.LShift)]
-	[InlineData(KeyModifiers.LAlt, KeyModifiers.LAlt)]
-	[InlineData(KeyModifiers.RAlt, KeyModifiers.LAlt)]
-	[InlineData(KeyModifiers.LWin, KeyModifiers.LWin)]
-	[InlineData(KeyModifiers.RWin, KeyModifiers.LWin)]
-	[InlineData(KeyModifiers.LControl | KeyModifiers.LShift, KeyModifiers.LControl | KeyModifiers.LShift)]
-	[InlineData(KeyModifiers.LControl | KeyModifiers.LAlt, KeyModifiers.LControl | KeyModifiers.LAlt)]
-	[InlineData(KeyModifiers.LControl | KeyModifiers.LWin, KeyModifiers.LControl | KeyModifiers.LWin)]
-	[InlineData(
-		KeyModifiers.LControl | KeyModifiers.LShift | KeyModifiers.LAlt,
-		KeyModifiers.LControl | KeyModifiers.LShift | KeyModifiers.LAlt
-	)]
-	[InlineData(
-		KeyModifiers.LWin
-			| KeyModifiers.RWin
-			| KeyModifiers.LControl
-			| KeyModifiers.RControl
-			| KeyModifiers.LAlt
-			| KeyModifiers.RAlt
-			| KeyModifiers.LShift
-			| KeyModifiers.RShift,
-		KeyModifiers.LWin | KeyModifiers.LControl | KeyModifiers.LAlt | KeyModifiers.LShift
-	)]
-	public void UnifyModifiers(KeyModifiers modifiers, KeyModifiers expectedModifiers)
+	[MemberData(nameof(GetUnifyModifiersTestData))]
+	[Obsolete("Modifiers are obsolete")]
+	public void UnifyModifiers(IEnumerable<VIRTUAL_KEY> modifiers, IEnumerable<VIRTUAL_KEY> expectedModifiers)
 	{
 		// Given
 		IKeybind keybind = new Keybind(modifiers, VIRTUAL_KEY.VK_A);
@@ -107,7 +82,48 @@ public class KeyModifiersTests
 		IKeybind unifiedKeybind = keybind.UnifyModifiers();
 
 		// Then
-		Assert.Equal(expectedModifiers, unifiedKeybind.Modifiers);
+		Assert.Equal(expectedModifiers, unifiedKeybind.Mods);
 		Assert.Equal(VIRTUAL_KEY.VK_A, unifiedKeybind.Key);
 	}
+
+	public static TheoryData<IEnumerable<VIRTUAL_KEY>, IEnumerable<VIRTUAL_KEY>> GetUnifyModifiersTestData() =>
+		new()
+		{
+			// None
+			{ [], [] },
+			// Control keys
+			{ [VIRTUAL_KEY.VK_LCONTROL], [VIRTUAL_KEY.VK_LCONTROL] },
+			{ [VIRTUAL_KEY.VK_RCONTROL], [VIRTUAL_KEY.VK_LCONTROL] },
+			// Shift keys
+			{ [VIRTUAL_KEY.VK_LSHIFT], [VIRTUAL_KEY.VK_LSHIFT] },
+			{ [VIRTUAL_KEY.VK_RSHIFT], [VIRTUAL_KEY.VK_LSHIFT] },
+			// Alt keys
+			{ [VIRTUAL_KEY.VK_LMENU], [VIRTUAL_KEY.VK_LMENU] },
+			{ [VIRTUAL_KEY.VK_RMENU], [VIRTUAL_KEY.VK_LMENU] },
+			// Win keys
+			{ [VIRTUAL_KEY.VK_LWIN], [VIRTUAL_KEY.VK_LWIN] },
+			{ [VIRTUAL_KEY.VK_RWIN], [VIRTUAL_KEY.VK_LWIN] },
+			// Combinations
+			{ [VIRTUAL_KEY.VK_LCONTROL, VIRTUAL_KEY.VK_LSHIFT], [VIRTUAL_KEY.VK_LCONTROL, VIRTUAL_KEY.VK_LSHIFT] },
+			{ [VIRTUAL_KEY.VK_LCONTROL, VIRTUAL_KEY.VK_LMENU], [VIRTUAL_KEY.VK_LCONTROL, VIRTUAL_KEY.VK_LMENU] },
+			{ [VIRTUAL_KEY.VK_LCONTROL, VIRTUAL_KEY.VK_LWIN], [VIRTUAL_KEY.VK_LWIN, VIRTUAL_KEY.VK_LCONTROL] },
+			{
+				[VIRTUAL_KEY.VK_LCONTROL, VIRTUAL_KEY.VK_LSHIFT, VIRTUAL_KEY.VK_LMENU],
+				[VIRTUAL_KEY.VK_LCONTROL, VIRTUAL_KEY.VK_LSHIFT, VIRTUAL_KEY.VK_LMENU]
+			},
+			// All modifiers mixed
+			{
+				[
+					VIRTUAL_KEY.VK_LWIN,
+					VIRTUAL_KEY.VK_RWIN,
+					VIRTUAL_KEY.VK_LCONTROL,
+					VIRTUAL_KEY.VK_RCONTROL,
+					VIRTUAL_KEY.VK_LMENU,
+					VIRTUAL_KEY.VK_RMENU,
+					VIRTUAL_KEY.VK_LSHIFT,
+					VIRTUAL_KEY.VK_RSHIFT,
+				],
+				[VIRTUAL_KEY.VK_LWIN, VIRTUAL_KEY.VK_LCONTROL, VIRTUAL_KEY.VK_LSHIFT, VIRTUAL_KEY.VK_LMENU]
+			},
+		};
 }
