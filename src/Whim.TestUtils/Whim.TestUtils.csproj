@@ -1,48 +1,48 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AnalysisModeDesign>All</AnalysisModeDesign>
-    <AnalysisModeDocumentation>All</AnalysisModeDocumentation>
-    <AnalysisModeGlobalization>None</AnalysisModeGlobalization>
-    <AnalysisModeInteroperability>All</AnalysisModeInteroperability>
-    <AnalysisModeMaintainability>All</AnalysisModeMaintainability>
-    <AnalysisModeNaming>All</AnalysisModeNaming>
-    <AnalysisModePerformance>All</AnalysisModePerformance>
-    <AnalysisModeReliability>All</AnalysisModeReliability>
-    <AnalysisModeSecurity>All</AnalysisModeSecurity>
-    <AnalysisModeSingleFile>All</AnalysisModeSingleFile>
-    <AnalysisModeStyle>All</AnalysisModeStyle>
-    <AnalysisModeUsage>All</AnalysisModeUsage>
-    <Authors>Isaac Daly</Authors>
-    <BuildInParallel>true</BuildInParallel>
-    <Description>An extensible window manager for Windows.</Description>
-    <EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <GenerateLibraryLayout>true</GenerateLibraryLayout>
-    <IsPackable>false</IsPackable>
-    <Nullable>enable</Nullable>
-    <Platforms>x64;arm64;Any CPU</Platforms>
-    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
-    <Version>0.7.0</Version>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="AutoFixture" />
-    <PackageReference Include="AutoFixture.AutoNSubstitute" />
-    <PackageReference Include="AutoFixture.Xunit2" />
-    <PackageReference Include="FluentAssertions" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="NSubstitute" />
-    <PackageReference Include="NSubstitute.Analyzers.CSharp" />
-    <PackageReference Include="xunit" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Whim\Whim.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <InternalsVisibleTo Include="Whim.Tests" />
-	  <InternalsVisibleTo Include="Whim.Bar.Tests" />
-	  <InternalsVisibleTo Include="Whim.Gaps.Tests" />
-	  <InternalsVisibleTo Include="Whim.FloatingWindow.Tests" />
-    <InternalsVisibleTo Include="Whim.LayoutPreview.Tests" />
-  </ItemGroup>
+	<PropertyGroup>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<AnalysisModeDesign>All</AnalysisModeDesign>
+		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
+		<AnalysisModeGlobalization>None</AnalysisModeGlobalization>
+		<AnalysisModeInteroperability>All</AnalysisModeInteroperability>
+		<AnalysisModeMaintainability>All</AnalysisModeMaintainability>
+		<AnalysisModeNaming>All</AnalysisModeNaming>
+		<AnalysisModePerformance>All</AnalysisModePerformance>
+		<AnalysisModeReliability>All</AnalysisModeReliability>
+		<AnalysisModeSecurity>All</AnalysisModeSecurity>
+		<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
+		<AnalysisModeStyle>All</AnalysisModeStyle>
+		<AnalysisModeUsage>All</AnalysisModeUsage>
+		<Authors>Isaac Daly</Authors>
+		<BuildInParallel>true</BuildInParallel>
+		<Description>An extensible window manager for Windows.</Description>
+		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<GenerateLibraryLayout>true</GenerateLibraryLayout>
+		<IsPackable>false</IsPackable>
+		<Nullable>enable</Nullable>
+		<Platforms>x64;arm64;Any CPU</Platforms>
+		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+		<Version>0.7.0</Version>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="AutoFixture" />
+		<PackageReference Include="AutoFixture.AutoNSubstitute" />
+		<PackageReference Include="AutoFixture.Xunit2" />
+		<PackageReference Include="FluentAssertions" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" />
+		<PackageReference Include="NSubstitute" />
+		<PackageReference Include="NSubstitute.Analyzers.CSharp" />
+		<PackageReference Include="xunit" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Whim\Whim.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<InternalsVisibleTo Include="Whim.Tests" />
+		<InternalsVisibleTo Include="Whim.Bar.Tests" />
+		<InternalsVisibleTo Include="Whim.Gaps.Tests" />
+		<InternalsVisibleTo Include="Whim.FloatingWindow.Tests" />
+		<InternalsVisibleTo Include="Whim.LayoutPreview.Tests" />
+	</ItemGroup>
 </Project>

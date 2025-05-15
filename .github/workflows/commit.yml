@@ -69,7 +69,7 @@ jobs:
 
       - name: Check C# formatting
         run: |
-          dotnet tool run dotnet-csharpier . --check
+          dotnet tool run csharpier check .
 
       - name: Check XAML formatting
         run: |

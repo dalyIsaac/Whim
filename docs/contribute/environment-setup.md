@@ -26,6 +26,6 @@ cd Whim
 dotnet tool restore
 
 # Run the formatters
-dotnet tool run dotnet-csharpier .
+dotnet tool run csharpier format .
 dotnet tool run xstyler --recursive --d . --config ./.xamlstylerrc
 ```

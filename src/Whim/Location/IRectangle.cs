@@ -26,7 +26,6 @@ public interface IRectangle<T> : IPoint<T>
 	/// <summary>
 	/// Indicates whether the specified point is inside this item's bounding box.
 	/// </summary>
-
 	/// <summary>
 	/// Checks if the given <paramref name="point"/> is inside the bounding box of this <see cref="IRectangle{T}"/>.
 	/// </summary>

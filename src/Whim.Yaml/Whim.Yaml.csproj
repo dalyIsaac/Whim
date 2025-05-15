@@ -42,12 +42,10 @@
 		<ProjectReference Include="..\Whim.Updater\Whim.Updater.csproj" />
 		<ProjectReference Include="..\Whim\Whim.csproj" />
 	</ItemGroup>
-
 	<ItemGroup>
 		<InternalsVisibleTo Include="Whim.Yaml.Tests" />
 		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
 	</ItemGroup>
-
 	<ItemGroup>
 		<PackageReference Include="Corvus.Json.ExtendedTypes" />
 		<PackageReference Include="Corvus.Json.SourceGenerator">
@@ -56,19 +54,15 @@
 		<PackageReference Include="Yaml2JsonNode" />
 		<PackageReference Include="YamlDotNet" />
 	</ItemGroup>
-
 	<PropertyGroup>
 		<CorvusJsonSchemaOptionalAsNullable>NullOrUndefined </CorvusJsonSchemaOptionalAsNullable>
 	</PropertyGroup>
-
 	<ItemGroup>
 		<AdditionalFiles Include="schema.json" />
 	</ItemGroup>
-
 	<ItemGroup>
 		<None Remove="ErrorWindow.xaml" />
 	</ItemGroup>
-
 	<ItemGroup>
 		<Page Update="ErrorWindow.xaml">
 			<Generator>MSBuild:Compile</Generator>
