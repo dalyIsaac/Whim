@@ -1,4 +1,3 @@
-using System.Linq;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim;
