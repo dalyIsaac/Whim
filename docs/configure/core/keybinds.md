@@ -6,6 +6,8 @@ The keybinds configuration has a list of bindings that you can use to bind comma
 
 A key modifier is a key that is pressed in combination with another key to perform a specific action. The `bindings` property is a list of keybinds that map a command to a key combination.
 
+The format of a keybind is `Mod1+Mod2+...+Key`, where `Mod1`, `Mod2`, etc. are key modifiers and `Key` is the key that is pressed in combination with the modifiers.
+
 Key modifiers are typically one of the following:
 
 - `Ctrl`
