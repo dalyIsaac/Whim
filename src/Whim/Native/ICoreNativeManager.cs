@@ -220,11 +220,15 @@ internal interface ICoreNativeManager
 	/// <returns></returns>
 	uint GetWindowThreadProcessId(HWND hWnd, out uint lpdwProcessId);
 
-	/// <summary>
-	/// Safe wrapper around <see cref="PInvoke.GetWindowText"/>.
-	/// </summary>
-	/// <param name="hwnd"></param>
-	/// <returns></returns>
+	/// <summary>Copies the text of the specified window's title bar (if it has one) into a buffer. If the specified window is a control, the text of the control is copied. However, GetWindowText cannot retrieve the text of a control in another application. (Unicode)</summary>
+	/// <param name="hwnd">
+	/// <para>Type: <b>HWND</b> A handle to the window or control containing the text.</para>
+	/// <para><see href="https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-getwindowtextw#parameters">Read more on docs.microsoft.com</see>.</para>
+	/// </param>
+	/// <returns>
+	/// The text of the window for the given <paramref name="hwnd"/>.
+	/// If the function fails, an empty string is returned.
+	/// </returns>
 	string GetWindowText(HWND hwnd);
 
 	/// <summary>

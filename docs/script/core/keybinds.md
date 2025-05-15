@@ -11,16 +11,29 @@ See the listing of [core commands](../../configure/core/commands.md#core-command
 New keybindings are created by binding a [command](commands.md) identifier to a "Keybind" (<xref:Whim.Keybind>). For instance, the following binds `whim.core.cycle_layout_engine.next` to <kbd>Alt</kbd> + <kbd>SPACE</kbd>.
 
 ```csharp
-context.KeybindManager.SetKeybind("whim.core.cycle_layout_engine.next", new Keybind(KeyModifiers.LAlt, VIRTUAL_KEY.VK_SPACE));
+context.KeybindManager.SetKeybind("whim.core.cycle_layout_engine.next", new Keybind(modifiers: [VIRTUAL_KEY.VK_LALT], key: VIRTUAL_KEY.VK_SPACE));
 ```
 
-Keybinds have a `Modifiers` and `Key` property. The available modifiers and keys can be found in the <xref:Whim.KeyModifiers> and <xref:Windows.Win32.UI.Input.KeyboardAndMouse.VIRTUAL_KEY> enums. Modifiers can be combined using the bitwise OR operator. For instance, the following creates a new <kbd>Alt</kbd> + <kbd>Shift</kbd> modifier, which can be used to create Keybinds:
+The keys which comprise a keybind come from the <xref:Windows.Win32.UI.Input.KeyboardAndMouse.VIRTUAL_KEY> enum.
 
-```csharp
-KeyModifiers AltShift = KeyModifiers.LAlt | KeyModifiers.LShift;
-```
+## Keys and Modifiers
 
-A number of common modifiers combinations are also accessible from the <xref:Whim.IKeybind> interface.
+A `Key` is a single key that is pressed in conjunction with the modifiers.
+
+The `Mods` are a list of modifiers that are pressed in conjunction with the key. Any key can be a modifier, but typically they are one of the following:
+
+- `VIRTUAL_KEY.VK_LCONTROL`
+- `VIRTUAL_KEY.VK_RCONTROL`
+- `VIRTUAL_KEY.VK_CONTROL`
+- `VIRTUAL_KEY.VK_LSHIFT`
+- `VIRTUAL_KEY.VK_RSHIFT`
+- `VIRTUAL_KEY.VK_SHIFT`
+- `VIRTUAL_KEY.VK_LALT`
+- `VIRTUAL_KEY.VK_RALT`
+- `VIRTUAL_KEY.VK_ALT`
+- `VIRTUAL_KEY.VK_LWIN`
+- `VIRTUAL_KEY.VK_RWIN`
+- `VIRTUAL_KEY.VK_WIN`
 
 To treat key modifiers like `LWin` and `RWin` the same, see <xref:Whim.IKeybindManager.UnifyKeyModifiers>.
 

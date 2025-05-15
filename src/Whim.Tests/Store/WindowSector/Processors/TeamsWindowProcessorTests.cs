@@ -1,6 +1,4 @@
-using NSubstitute;
-using Whim;
-using Xunit;
+namespace Whim.Tests;
 
 public class TeamsWindowProcessorTests
 {

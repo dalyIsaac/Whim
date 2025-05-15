@@ -1,3 +1,5 @@
+using Windows.Win32.UI.Input.KeyboardAndMouse;
+
 namespace Whim;
 
 /// <summary>
@@ -140,81 +142,79 @@ public static class KeyModifiersExtensions
 	/// </summary>
 	/// <param name="keybind"></param>
 	/// <returns></returns>
-	public static IKeybind UnifyModifiers(this IKeybind keybind) => new Keybind(keybind.Modifiers.Unify(), keybind.Key);
-
-	/// <summary>
-	/// Returns a new <see cref="KeyModifiers"/>, with the right modifiers replaced with left
-	/// modifiers.
-	/// </summary>
-	/// <param name="modifiers"></param>
-	/// <returns></returns>
-	public static KeyModifiers Unify(this KeyModifiers modifiers)
+	public static IKeybind UnifyModifiers(this IKeybind keybind)
 	{
-		KeyModifiers newModifiers = modifiers;
-		if (modifiers.HasFlag(KeyModifiers.RWin))
+		HashSet<VIRTUAL_KEY> mods = [];
+		foreach (VIRTUAL_KEY key in keybind.Mods)
 		{
-			newModifiers &= ~KeyModifiers.RWin;
-			newModifiers |= KeyModifiers.LWin;
+			switch (key)
+			{
+				case VIRTUAL_KEY.VK_LCONTROL:
+				case VIRTUAL_KEY.VK_RCONTROL:
+					mods.Add(VIRTUAL_KEY.VK_LCONTROL);
+					break;
+				case VIRTUAL_KEY.VK_LSHIFT:
+				case VIRTUAL_KEY.VK_RSHIFT:
+					mods.Add(VIRTUAL_KEY.VK_LSHIFT);
+					break;
+				case VIRTUAL_KEY.VK_LMENU:
+				case VIRTUAL_KEY.VK_RMENU:
+					mods.Add(VIRTUAL_KEY.VK_LMENU);
+					break;
+				case VIRTUAL_KEY.VK_LWIN:
+				case VIRTUAL_KEY.VK_RWIN:
+					mods.Add(VIRTUAL_KEY.VK_LWIN);
+					break;
+				default:
+					mods.Add(key);
+					break;
+			}
 		}
-		if (modifiers.HasFlag(KeyModifiers.RControl))
-		{
-			newModifiers &= ~KeyModifiers.RControl;
-			newModifiers |= KeyModifiers.LControl;
-		}
-		if (modifiers.HasFlag(KeyModifiers.RShift))
-		{
-			newModifiers &= ~KeyModifiers.RShift;
-			newModifiers |= KeyModifiers.LShift;
-		}
-		if (modifiers.HasFlag(KeyModifiers.RAlt))
-		{
-			newModifiers &= ~KeyModifiers.RAlt;
-			newModifiers |= KeyModifiers.LAlt;
-		}
-		return newModifiers;
+
+		return new Keybind(mods, keybind.Key);
 	}
 
 	/// <summary>
-	/// Tries to parse a key modifier from a string.
+	/// Returns a list of <see cref="VIRTUAL_KEY"/>s that represent the key modifiers
 	/// </summary>
-	/// <param name="modifier">
-	/// The string to parse. This is case-insensitive.
-	/// </param>
-	/// <param name="keyModifier">
-	/// The parsed key modifier, if successful.
-	/// </param>
-	/// <returns>
-	/// <see langword="true"/> if the parse was successful; otherwise, <see langword="false"/>.
-	/// </returns>
-	public static bool TryParseKeyModifier(this string modifier, out KeyModifiers keyModifier)
+	/// <param name="modifiers"></param>
+	/// <returns></returns>
+	public static IList<VIRTUAL_KEY> GetKeys(this KeyModifiers modifiers)
 	{
-		keyModifier = modifier.ToUpperInvariant() switch
+		List<VIRTUAL_KEY> keys = [];
+		if (modifiers.HasFlag(KeyModifiers.LControl))
 		{
-			"CTRL" => KeyModifiers.LControl,
-			"CONTROL" => KeyModifiers.LControl,
-			"LCTRL" => KeyModifiers.LControl,
-			"LCONTROL" => KeyModifiers.LControl,
+			keys.Add(VIRTUAL_KEY.VK_LCONTROL);
+		}
+		if (modifiers.HasFlag(KeyModifiers.RControl))
+		{
+			keys.Add(VIRTUAL_KEY.VK_RCONTROL);
+		}
+		if (modifiers.HasFlag(KeyModifiers.LShift))
+		{
+			keys.Add(VIRTUAL_KEY.VK_LSHIFT);
+		}
+		if (modifiers.HasFlag(KeyModifiers.RShift))
+		{
+			keys.Add(VIRTUAL_KEY.VK_RSHIFT);
+		}
+		if (modifiers.HasFlag(KeyModifiers.LAlt))
+		{
+			keys.Add(VIRTUAL_KEY.VK_LMENU);
+		}
+		if (modifiers.HasFlag(KeyModifiers.RAlt))
+		{
+			keys.Add(VIRTUAL_KEY.VK_RMENU);
+		}
+		if (modifiers.HasFlag(KeyModifiers.LWin))
+		{
+			keys.Add(VIRTUAL_KEY.VK_LWIN);
+		}
+		if (modifiers.HasFlag(KeyModifiers.RWin))
+		{
+			keys.Add(VIRTUAL_KEY.VK_RWIN);
+		}
 
-			"RCTRL" => KeyModifiers.RControl,
-			"RCONTROL" => KeyModifiers.RControl,
-
-			"SHIFT" => KeyModifiers.LShift,
-			"LSHIFT" => KeyModifiers.LShift,
-
-			"RSHIFT" => KeyModifiers.RShift,
-
-			"ALT" => KeyModifiers.LAlt,
-			"LALT" => KeyModifiers.LAlt,
-
-			"RALT" => KeyModifiers.RAlt,
-
-			"WIN" => KeyModifiers.LWin,
-			"LWIN" => KeyModifiers.LWin,
-
-			"RWIN" => KeyModifiers.RWin,
-
-			_ => KeyModifiers.None,
-		};
-		return keyModifier != KeyModifiers.None;
+		return keys;
 	}
 }

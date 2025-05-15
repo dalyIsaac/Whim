@@ -78,6 +78,7 @@ public class KeybindHookTests
 			.Returns(new KBDLLHOOKSTRUCT { vkCode = (uint)key });
 
 		ctx.KeybindManager.GetCommands(Arg.Any<IKeybind>()).Returns(commands);
+		ctx.KeybindManager.Modifiers.Returns(modifiers);
 	}
 
 	[Theory, AutoSubstituteData<KeybindHookCustomization>]
@@ -182,37 +183,130 @@ public class KeybindHookTests
 		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
 	}
 
+	[Theory]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LSHIFT)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RSHIFT)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LMENU)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RMENU)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LCONTROL)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RCONTROL)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LWIN)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RWIN)]
+	internal void LowLevelKeyboardProc_OnlyModifierPressed_IgnoresKey(
+		VIRTUAL_KEY modifier,
+		IContext ctx,
+		IInternalContext internalCtx
+	)
+	{
+		// Given: Only the modifier is pressed
+		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+		KeybindHook keybindHook = new(ctx, internalCtx);
+
+		// Setup so only the modifier is pressed
+		ctx.KeybindManager.Modifiers.Returns([modifier]);
+		internalCtx.CoreNativeManager.GetKeyState((int)modifier).Returns((short)-32768);
+		internalCtx
+			.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>())
+			.Returns(new KBDLLHOOKSTRUCT { vkCode = (uint)modifier });
+
+		// When
+		keybindHook.PostInitialize();
+		LRESULT? result = capture.LowLevelKeyboardProc?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
+
+		// Then: Should call next hook
+		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
+		Assert.Equal(0, (nint)result!);
+	}
+
 	public static readonly TheoryData<VIRTUAL_KEY[], VIRTUAL_KEY, Keybind> KeybindsToExecute = new()
 	{
+		// Standard modifier combinations
 		{
 			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_LSHIFT },
 			VIRTUAL_KEY.VK_A,
-			new Keybind(KeyModifiers.LShift, VIRTUAL_KEY.VK_A)
+			new Keybind([VIRTUAL_KEY.VK_LSHIFT], VIRTUAL_KEY.VK_A)
 		},
 		{
 			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_RSHIFT },
 			VIRTUAL_KEY.VK_A,
-			new Keybind(KeyModifiers.RShift, VIRTUAL_KEY.VK_A)
+			new Keybind([VIRTUAL_KEY.VK_RSHIFT], VIRTUAL_KEY.VK_A)
 		},
 		{
 			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_LMENU, VIRTUAL_KEY.VK_LCONTROL },
 			VIRTUAL_KEY.VK_A,
-			new Keybind(KeyModifiers.LAlt | KeyModifiers.LControl, VIRTUAL_KEY.VK_A)
+			new Keybind(modifiers: [VIRTUAL_KEY.VK_LMENU, VIRTUAL_KEY.VK_LCONTROL], VIRTUAL_KEY.VK_A)
 		},
 		{
 			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_RMENU, VIRTUAL_KEY.VK_RCONTROL },
 			VIRTUAL_KEY.VK_A,
-			new Keybind(KeyModifiers.RAlt | KeyModifiers.RControl, VIRTUAL_KEY.VK_A)
+			new Keybind([VIRTUAL_KEY.VK_RMENU, VIRTUAL_KEY.VK_RCONTROL], VIRTUAL_KEY.VK_A)
 		},
 		{
 			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_LWIN },
 			VIRTUAL_KEY.VK_A,
-			new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_A)
+			new Keybind([VIRTUAL_KEY.VK_LWIN], VIRTUAL_KEY.VK_A)
 		},
 		{
 			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_RWIN },
 			VIRTUAL_KEY.VK_A,
-			new Keybind(KeyModifiers.RWin, VIRTUAL_KEY.VK_A)
+			new Keybind([VIRTUAL_KEY.VK_RWIN], VIRTUAL_KEY.VK_A)
+		},
+		// Non-standard modifier combinations
+		{
+			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_LWIN, VIRTUAL_KEY.VK_LSHIFT, VIRTUAL_KEY.VK_LCONTROL },
+			VIRTUAL_KEY.VK_A,
+			new Keybind([VIRTUAL_KEY.VK_LWIN, VIRTUAL_KEY.VK_LSHIFT, VIRTUAL_KEY.VK_LCONTROL], VIRTUAL_KEY.VK_A)
+		},
+		{
+			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_RWIN, VIRTUAL_KEY.VK_RMENU },
+			VIRTUAL_KEY.VK_A,
+			new Keybind([VIRTUAL_KEY.VK_RWIN, VIRTUAL_KEY.VK_RMENU], VIRTUAL_KEY.VK_A)
+		},
+		{
+			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_LSHIFT, VIRTUAL_KEY.VK_RMENU },
+			VIRTUAL_KEY.VK_A,
+			new Keybind([VIRTUAL_KEY.VK_LSHIFT, VIRTUAL_KEY.VK_RMENU], VIRTUAL_KEY.VK_A)
+		},
+		{
+			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_LWIN, VIRTUAL_KEY.VK_LCONTROL, VIRTUAL_KEY.VK_RMENU },
+			VIRTUAL_KEY.VK_A,
+			new Keybind([VIRTUAL_KEY.VK_LWIN, VIRTUAL_KEY.VK_LCONTROL, VIRTUAL_KEY.VK_RMENU], VIRTUAL_KEY.VK_A)
+		},
+		// Additional non-standard modifier combinations
+		{
+			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_LSHIFT, VIRTUAL_KEY.VK_SPACE },
+			VIRTUAL_KEY.VK_B,
+			new Keybind([VIRTUAL_KEY.VK_LSHIFT, VIRTUAL_KEY.VK_SPACE], VIRTUAL_KEY.VK_B)
+		},
+		{
+			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_LCONTROL, VIRTUAL_KEY.VK_OEM_2 },
+			VIRTUAL_KEY.VK_C,
+			new Keybind([VIRTUAL_KEY.VK_LCONTROL, VIRTUAL_KEY.VK_OEM_2], VIRTUAL_KEY.VK_C)
+		},
+		{
+			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_RMENU, VIRTUAL_KEY.VK_TAB },
+			VIRTUAL_KEY.VK_D,
+			new Keybind([VIRTUAL_KEY.VK_RMENU, VIRTUAL_KEY.VK_TAB], VIRTUAL_KEY.VK_D)
+		},
+		{
+			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_LWIN, VIRTUAL_KEY.VK_ESCAPE },
+			VIRTUAL_KEY.VK_E,
+			new Keybind([VIRTUAL_KEY.VK_LWIN, VIRTUAL_KEY.VK_ESCAPE], VIRTUAL_KEY.VK_E)
+		},
+		{
+			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_RSHIFT, VIRTUAL_KEY.VK_OEM_PLUS },
+			VIRTUAL_KEY.VK_F,
+			new Keybind([VIRTUAL_KEY.VK_RSHIFT, VIRTUAL_KEY.VK_OEM_PLUS], VIRTUAL_KEY.VK_F)
+		},
+		{
+			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_OEM_COMMA, VIRTUAL_KEY.VK_OEM_PERIOD },
+			VIRTUAL_KEY.VK_G,
+			new Keybind([VIRTUAL_KEY.VK_OEM_COMMA, VIRTUAL_KEY.VK_OEM_PERIOD], VIRTUAL_KEY.VK_G)
+		},
+		{
+			new VIRTUAL_KEY[] { VIRTUAL_KEY.VK_F1, VIRTUAL_KEY.VK_F2 },
+			VIRTUAL_KEY.VK_H,
+			new Keybind([VIRTUAL_KEY.VK_F1, VIRTUAL_KEY.VK_F2], VIRTUAL_KEY.VK_H)
 		},
 	};
 
@@ -226,8 +320,8 @@ public class KeybindHookTests
 
 		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
 		KeybindHook keybindHook = new(ctx, internalCtx);
-		ICommand[] commands = Enumerable.Range(0, 3).Select(_ => Substitute.For<ICommand>()).ToArray();
-		SetupKey(ctx, internalCtx, modifiers, key, commands.Select(c => c).ToArray());
+		ICommand[] commands = [.. Enumerable.Range(0, 3).Select(_ => Substitute.For<ICommand>())];
+		SetupKey(ctx, internalCtx, modifiers, key, [.. commands.Select(c => c)]);
 
 		// When
 		keybindHook.PostInitialize();
@@ -258,7 +352,7 @@ public class KeybindHookTests
 		// Then
 		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
 		Assert.Equal(0, (nint)result!);
-		ctx.KeybindManager.DidNotReceive().GetCommands(new Keybind(KeyModifiers.None, VIRTUAL_KEY.VK_A));
+		ctx.KeybindManager.Received(1).GetCommands(new Keybind([], VIRTUAL_KEY.VK_A));
 	}
 
 	[Theory, AutoSubstituteData<KeybindHookCustomization>]
@@ -276,7 +370,7 @@ public class KeybindHookTests
 		// Then
 		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
 		Assert.Equal(0, (nint)result!);
-		ctx.KeybindManager.Received(1).GetCommands(new Keybind(KeyModifiers.LWin, VIRTUAL_KEY.VK_U));
+		ctx.KeybindManager.Received(1).GetCommands(new Keybind([VIRTUAL_KEY.VK_LWIN], VIRTUAL_KEY.VK_U));
 	}
 
 	[Theory, AutoSubstituteData<KeybindHookCustomization>]

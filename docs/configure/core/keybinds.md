@@ -6,7 +6,7 @@ The keybinds configuration has a list of bindings that you can use to bind comma
 
 A key modifier is a key that is pressed in combination with another key to perform a specific action. The `bindings` property is a list of keybinds that map a command to a key combination.
 
-Key modifiers can be any of the following:
+Key modifiers are typically one of the following:
 
 - `Ctrl`
 - `Control`
@@ -24,7 +24,9 @@ Key modifiers can be any of the following:
 - `LWin`
 - `RWin`
 
-The associated key for each modifier can be any of the <xref:Windows.Win32.UI.Input.KeyboardAndMouse.VIRTUAL_KEY>s.
+Keybinds can also be any other key, though it's recommended to use keys which aren't typically used for other purposes.
+
+The associated key for each modifier can be any of the <xref:Windows.Win32.UI.Input.KeyboardAndMouse.VIRTUAL*KEY>s, without the `VK*` prefix.
 
 ## Commands
 

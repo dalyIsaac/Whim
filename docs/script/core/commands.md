@@ -18,7 +18,7 @@ context.CommandManager.Add(
 );
 
 // Create an associated keybind.
-context.KeybindManager.SetKeybind("whim.custom.close_window", new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_D));
+context.KeybindManager.SetKeybind("whim.custom.close_window", new Keybind([VIRTUAL_KEY.VK_LWIN, VIRTUAL_KEY.VK_LALT], VIRTUAL_KEY.VK_D));
 ```
 
 The core commands can be found at [Commands](../../configure/core/commands.md).
