@@ -26,7 +26,7 @@ Key modifiers are typically one of the following:
 
 Keybinds can also be any other key, though it's recommended to use keys which aren't typically used for other purposes.
 
-The associated key for each modifier can be any of the <xref:Windows.Win32.UI.Input.KeyboardAndMouse.VIRTUAL*KEY>s, without the `VK*` prefix.
+The associated key for each modifier can be any of the <xref:Windows.Win32.UI.Input.KeyboardAndMouse.VIRTUAL_KEY>s, without the `VK*` prefix.
 
 ## Commands
 
