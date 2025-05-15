@@ -394,7 +394,7 @@ internal class CoreCommands : PluginCommands
 	{
 		public void Execute(IContext context)
 		{
-			IWorkspace[] workspaces = context.Store.Pick(PickWorkspaces()).ToArray();
+			IWorkspace[] workspaces = [.. context.Store.Pick(PickWorkspaces())];
 			if (Index <= workspaces.Length)
 			{
 				context.Store.Dispatch(new ActivateWorkspaceTransform(workspaces[Index - 1].Id));
