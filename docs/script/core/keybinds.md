@@ -11,7 +11,13 @@ See the listing of [core commands](../../configure/core/commands.md#core-command
 New keybindings are created by binding a [command](commands.md) identifier to a "Keybind" (<xref:Whim.Keybind>). For instance, the following binds `whim.core.cycle_layout_engine.next` to <kbd>Alt</kbd> + <kbd>SPACE</kbd>.
 
 ```csharp
-context.KeybindManager.SetKeybind("whim.core.cycle_layout_engine.next", new Keybind(modifiers: [VIRTUAL_KEY.VK_LALT], key: VIRTUAL_KEY.VK_SPACE));
+context.KeybindManager.SetKeybind(
+    "whim.core.cycle_layout_engine.next",
+    new Keybind(
+        modifiers: [VIRTUAL_KEY.VK_LALT],
+        key: VIRTUAL_KEY.VK_SPACE
+    )
+);
 ```
 
 The keys which comprise a keybind come from the <xref:Windows.Win32.UI.Input.KeyboardAndMouse.VIRTUAL_KEY> enum.
