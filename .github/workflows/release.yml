@@ -22,7 +22,7 @@ jobs:
     outputs:
       should-skip: ${{ steps.check-labels.outputs.should-skip }}
     steps:
-      - name: Check for skip-release label
+      - name: Check for 'skip release' label
         id: check-labels
         shell: pwsh
         env:
@@ -47,8 +47,8 @@ jobs:
           if ($prs) {
             $prsArray = $prs | ConvertFrom-Json
             foreach ($pr in $prsArray) {
-              if ($pr.labels -contains "skip-release") {
-                Write-Host "Found PR #$($pr.number) with skip-release label"
+              if ($pr.labels -contains "skip release") {
+                Write-Host "Found PR #$($pr.number) with skip release label"
                 $shouldSkip = $true
                 break
               }
