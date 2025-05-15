@@ -1,31 +1,31 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <AnalysisModeDesign>All</AnalysisModeDesign>
-    <AnalysisModeDocumentation>All</AnalysisModeDocumentation>
-    <AnalysisModeGlobalization>None</AnalysisModeGlobalization>
-    <AnalysisModeInteroperability>All</AnalysisModeInteroperability>
-    <AnalysisModeMaintainability>All</AnalysisModeMaintainability>
-    <AnalysisModeNaming>All</AnalysisModeNaming>
-    <AnalysisModePerformance>All</AnalysisModePerformance>
-    <AnalysisModeReliability>All</AnalysisModeReliability>
-    <AnalysisModeSecurity>All</AnalysisModeSecurity>
-    <AnalysisModeSingleFile>All</AnalysisModeSingleFile>
-    <AnalysisModeStyle>All</AnalysisModeStyle>
-    <AnalysisModeUsage>All</AnalysisModeUsage>
-    <Authors>Isaac Daly</Authors>
-    <BuildInParallel>true</BuildInParallel>
-    <Description>An extensible window manager for Windows.</Description>
-    <EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <GenerateLibraryLayout>true</GenerateLibraryLayout>
-    <Nullable>enable</Nullable>
-    <Platforms>x64;arm64;Any CPU</Platforms>
-    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
-    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
-    <Version>0.7.0</Version>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Whim\Whim.csproj" />
-    <ProjectReference Include="..\Whim.FloatingWindow\Whim.FloatingWindow.csproj" />
-  </ItemGroup>
+	<PropertyGroup>
+		<AnalysisModeDesign>All</AnalysisModeDesign>
+		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
+		<AnalysisModeGlobalization>None</AnalysisModeGlobalization>
+		<AnalysisModeInteroperability>All</AnalysisModeInteroperability>
+		<AnalysisModeMaintainability>All</AnalysisModeMaintainability>
+		<AnalysisModeNaming>All</AnalysisModeNaming>
+		<AnalysisModePerformance>All</AnalysisModePerformance>
+		<AnalysisModeReliability>All</AnalysisModeReliability>
+		<AnalysisModeSecurity>All</AnalysisModeSecurity>
+		<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
+		<AnalysisModeStyle>All</AnalysisModeStyle>
+		<AnalysisModeUsage>All</AnalysisModeUsage>
+		<Authors>Isaac Daly</Authors>
+		<BuildInParallel>true</BuildInParallel>
+		<Description>An extensible window manager for Windows.</Description>
+		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<GenerateLibraryLayout>true</GenerateLibraryLayout>
+		<Nullable>enable</Nullable>
+		<Platforms>x64;arm64;Any CPU</Platforms>
+		<RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+		<Version>0.7.0</Version>
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Whim\Whim.csproj" />
+		<ProjectReference Include="..\Whim.FloatingWindow\Whim.FloatingWindow.csproj" />
+	</ItemGroup>
 </Project>

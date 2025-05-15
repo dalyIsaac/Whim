@@ -11,7 +11,6 @@ namespace Whim.Bar;
 /// This is used instead of a <see cref="ComboBox"/> because the <see cref="ComboBox"/>
 /// doesn't easily support variable-width buttons, or have data binding.
 /// </summary>
-
 public sealed partial class DropDown : UserControl
 {
 	/// <summary>

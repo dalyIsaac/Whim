@@ -40,7 +40,6 @@ public static class YamlLoaderTestUtils
 				workspace.Name.Returns(transform.Name);
 #pragma warning restore CS0618 // Type or member is obsolete
 
-
 				var engines = transform.CreateLeafLayoutEngines?.Select(c => c(new()));
 				workspace.LayoutEngines.Returns(engines?.ToImmutableList() ?? []);
 

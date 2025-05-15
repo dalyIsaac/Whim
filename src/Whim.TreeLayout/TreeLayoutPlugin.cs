@@ -77,17 +77,16 @@ public class TreeLayoutPlugin(IContext context) : ITreeLayoutPlugin
 
 		_addNodeDirections[engine.Identity] = direction;
 
-		context.NativeManager.TryEnqueue(
-			() =>
-				AddWindowDirectionChanged?.Invoke(
-					this,
-					new AddWindowDirectionChangedEventArgs()
-					{
-						CurrentDirection = direction,
-						PreviousDirection = previousDirection,
-						TreeLayoutEngine = engine,
-					}
-				)
+		context.NativeManager.TryEnqueue(() =>
+			AddWindowDirectionChanged?.Invoke(
+				this,
+				new AddWindowDirectionChangedEventArgs()
+				{
+					CurrentDirection = direction,
+					PreviousDirection = previousDirection,
+					TreeLayoutEngine = engine,
+				}
+			)
 		);
 	}
 

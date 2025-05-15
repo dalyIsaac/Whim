@@ -169,16 +169,15 @@ internal class WorkspaceSector(IContext ctx, IInternalContext internalCtx)
 
 		Logger.Debug($"Starting layout for workspace {workspace}");
 
-		_ctx.NativeManager.TryEnqueue(
-			() => WorkspaceLayoutStarted?.Invoke(this, new WorkspaceLayoutStartedEventArgs { Workspace = workspace })
+		_ctx.NativeManager.TryEnqueue(() =>
+			WorkspaceLayoutStarted?.Invoke(this, new WorkspaceLayoutStartedEventArgs { Workspace = workspace })
 		);
 
 		// Execute the layout task, and update the window states before the completed event.
 		SetWindowPositions(workspace, monitor);
 
-		_ctx.NativeManager.TryEnqueue(
-			() =>
-				WorkspaceLayoutCompleted?.Invoke(this, new WorkspaceLayoutCompletedEventArgs { Workspace = workspace })
+		_ctx.NativeManager.TryEnqueue(() =>
+			WorkspaceLayoutCompleted?.Invoke(this, new WorkspaceLayoutCompletedEventArgs { Workspace = workspace })
 		);
 	}
 

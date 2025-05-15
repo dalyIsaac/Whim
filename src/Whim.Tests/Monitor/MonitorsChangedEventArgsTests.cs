@@ -60,7 +60,6 @@ public class MonitorsChangedEventArgsTests
 	{
 		// Given
 
-
 		MonitorsChangedEventArgs args = new()
 		{
 			UnchangedMonitors = [unchangedMonitor1, unchangedMonitor2],
