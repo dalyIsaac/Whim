@@ -183,6 +183,41 @@ public class KeybindHookTests
 		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
 	}
 
+	[Theory]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LSHIFT)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RSHIFT)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LMENU)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RMENU)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LCONTROL)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RCONTROL)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LWIN)]
+	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RWIN)]
+	internal void LowLevelKeyboardProc_OnlyModifierPressed_IgnoresKey(
+		VIRTUAL_KEY modifier,
+		IContext ctx,
+		IInternalContext internalCtx
+	)
+	{
+		// Given: Only the modifier is pressed
+		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+		KeybindHook keybindHook = new(ctx, internalCtx);
+
+		// Setup so only the modifier is pressed
+		ctx.KeybindManager.Modifiers.Returns([modifier]);
+		internalCtx.CoreNativeManager.GetKeyState((int)modifier).Returns((short)-32768);
+		internalCtx
+			.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>())
+			.Returns(new KBDLLHOOKSTRUCT { vkCode = (uint)modifier });
+
+		// When
+		keybindHook.PostInitialize();
+		LRESULT? result = capture.LowLevelKeyboardProc?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
+
+		// Then: Should call next hook
+		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
+		Assert.Equal(0, (nint)result!);
+	}
+
 	public static readonly TheoryData<VIRTUAL_KEY[], VIRTUAL_KEY, Keybind> KeybindsToExecute = new()
 	{
 		// Standard modifier combinations
