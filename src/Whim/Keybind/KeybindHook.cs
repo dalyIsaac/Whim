@@ -16,6 +16,8 @@ internal class KeybindHook : IKeybindHook
 	private UnhookWindowsHookExSafeHandle? _unhookKeyboardHook;
 	private bool _disposedValue;
 
+	private readonly byte[] _lpKeyState = new byte[256];
+
 	public KeybindHook(IContext context, IInternalContext internalContext)
 	{
 		_context = context;
@@ -57,12 +59,12 @@ internal class KeybindHook : IKeybindHook
 	private LRESULT LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 	{
 		Logger.Verbose($"{nCode} {wParam.Value} {lParam.Value}");
-		if (nCode != 0 || ((nuint)wParam != PInvoke.WM_KEYDOWN && (nuint)wParam != PInvoke.WM_SYSKEYDOWN))
-		{
-			return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
-		}
 
-		if (_internalContext.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(lParam) is not KBDLLHOOKSTRUCT kbdll)
+		if (
+			nCode < 0
+			|| ((nuint)wParam != PInvoke.WM_KEYDOWN && (nuint)wParam != PInvoke.WM_SYSKEYDOWN)
+			|| _internalContext.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(lParam) is not KBDLLHOOKSTRUCT kbdll
+		)
 		{
 			return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 		}
@@ -70,7 +72,10 @@ internal class KeybindHook : IKeybindHook
 		VIRTUAL_KEY key = (VIRTUAL_KEY)kbdll.vkCode;
 
 		// Ignore key modifiers which are a modifier.
-		if (_context.KeybindManager.Modifiers.Contains(key))
+		if (
+			_context.KeybindManager.Modifiers.Contains(key)
+			|| !_internalContext.CoreNativeManager.GetKeyboardState(_lpKeyState)
+		)
 		{
 			return _internalContext.CoreNativeManager.CallNextHookEx(nCode, wParam, lParam);
 		}
@@ -88,16 +93,43 @@ internal class KeybindHook : IKeybindHook
 		List<VIRTUAL_KEY> pressedModifiers = [];
 		foreach (VIRTUAL_KEY modifier in _context.KeybindManager.Modifiers)
 		{
-			if (IsModifierPressed(modifier))
+			switch (modifier)
 			{
-				pressedModifiers.Add(modifier);
+				case VIRTUAL_KEY.VK_LWIN:
+				case VIRTUAL_KEY.VK_RWIN:
+				case VIRTUAL_KEY.VK_LSHIFT:
+				case VIRTUAL_KEY.VK_RSHIFT:
+				case VIRTUAL_KEY.VK_LCONTROL:
+				case VIRTUAL_KEY.VK_RCONTROL:
+				case VIRTUAL_KEY.VK_LMENU:
+				case VIRTUAL_KEY.VK_RMENU:
+				{
+					if (IsStandardModifierPressed(modifier))
+					{
+						pressedModifiers.Add(modifier);
+					}
+
+					break;
+				}
+
+				default:
+				{
+					if (IsNonStandardModifierPressed(modifier))
+					{
+						pressedModifiers.Add(modifier);
+					}
+
+					break;
+				}
 			}
 		}
 
 		return new Keybind(pressedModifiers, eventKey);
 	}
 
-	private bool IsModifierPressed(VIRTUAL_KEY key) =>
+	private bool IsNonStandardModifierPressed(VIRTUAL_KEY key) => (_lpKeyState[(int)key] & 0x80) == 0x80;
+
+	private bool IsStandardModifierPressed(VIRTUAL_KEY key) =>
 		(_internalContext.CoreNativeManager.GetKeyState((int)key) & 0x8000) == 0x8000;
 
 	private bool DoKeyboardEvent(Keybind keybind)

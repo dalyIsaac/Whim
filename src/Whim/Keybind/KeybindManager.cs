@@ -1,3 +1,4 @@
+using System.Linq;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim;
@@ -24,8 +25,8 @@ internal class KeybindManager(IContext context) : IKeybindManager
 		}
 	}
 
-	private readonly HashSet<VIRTUAL_KEY> _modifiers = [];
-	public IEnumerable<VIRTUAL_KEY> Modifiers => _modifiers;
+	private VIRTUAL_KEY[] _modifiers = [];
+	public IReadOnlyList<VIRTUAL_KEY> Modifiers => _modifiers;
 
 	private void UnifyKeybinds()
 	{
@@ -57,7 +58,7 @@ internal class KeybindManager(IContext context) : IKeybindManager
 
 		value.Add(commandId);
 		_commandsKeybindsMap[commandId] = keybind;
-		_modifiers.UnionWith(keybind.Mods);
+		_modifiers = _modifiers.Union(keybind.Mods).ToArray();
 	}
 
 	public ICommand[] GetCommands(IKeybind keybind)
@@ -92,7 +93,7 @@ internal class KeybindManager(IContext context) : IKeybindManager
 	public IKeybind? TryGetKeybind(string commandId)
 	{
 		Logger.Debug($"Getting keybind for command '{commandId}'");
-		return _commandsKeybindsMap.TryGetValue(commandId, out IKeybind? keybind) ? keybind : null;
+		return _commandsKeybindsMap.GetValueOrDefault(commandId);
 	}
 
 	public bool Remove(string commandId)
