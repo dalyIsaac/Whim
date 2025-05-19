@@ -31,6 +31,16 @@ internal class CoreNativeManager(IContext context) : ICoreNativeManager
 
 	public short GetKeyState(int nVirtKey) => PInvoke.GetKeyState(nVirtKey);
 
+	public bool GetKeyboardState(byte[] lpKeyState)
+	{
+		if (lpKeyState.Length != 256)
+		{
+			throw new ArgumentException("lpKeyState must be 256 bytes long");
+		}
+
+		return PInvoke.GetKeyboardState(lpKeyState);
+	}
+
 	public BOOL GetCursorPos(out IPoint<int> lpPoint)
 	{
 		bool res = PInvoke.GetCursorPos(out Point point);

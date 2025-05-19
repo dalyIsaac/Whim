@@ -35,6 +35,7 @@ GetCursorPos
 GetDesktopWindow
 GetDpiForMonitor
 GetForegroundWindow
+GetKeyboardState
 GetKeyState
 GetMonitorInfo
 GetShellWindow

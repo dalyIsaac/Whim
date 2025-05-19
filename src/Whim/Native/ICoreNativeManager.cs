@@ -63,6 +63,20 @@ internal interface ICoreNativeManager
 	short GetKeyState(int nVirtKey);
 
 	/// <summary>
+	/// Copies the status of the 256 virtual keys to the specified buffer. The status of each key is either 0 (up) or 1 (down).
+	/// </summary>
+	/// <param name="lpKeyState">
+	/// The buffer that receives the key state information. The buffer must be 256 bytes in size.
+	/// </param>
+	/// <returns>
+	/// <b>true</b> if the function succeeds; otherwise, <b>false</b>.
+	/// </returns>
+	/// <remarks>
+	/// For more, see https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-getkeystate
+	/// </remarks>
+	bool GetKeyboardState(byte[] lpKeyState);
+
+	/// <summary>
 	/// Set the <see cref="PInvoke.GetCursorPos(out System.Drawing.Point)"/> <br/>
 	///
 	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-getcursorpos

@@ -13,7 +13,7 @@ public interface IKeybindManager
 	/// Defaults to <c>true</c>.
 	/// </summary>
 	/// <remarks>
-	/// When this is set to <c>true</c>, all of the existing keybinds will be re-added in a unified
+	/// When this is set to <c>true</c>, all the existing keybinds will be re-added in a unified
 	/// form.
 	/// All new keybinds will also be unified.
 	/// </remarks>
@@ -22,7 +22,7 @@ public interface IKeybindManager
 	/// <summary>
 	/// All the modifiers which are currently being used.
 	/// </summary>
-	IEnumerable<VIRTUAL_KEY> Modifiers { get; }
+	IReadOnlyList<VIRTUAL_KEY> Modifiers { get; }
 
 	/// <summary>
 	/// Sets a keybind.
