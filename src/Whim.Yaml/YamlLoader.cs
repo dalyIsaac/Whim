@@ -96,7 +96,7 @@ public static class YamlLoader
 			sb.AppendLine(error.Message);
 			sb.AppendFormat(
 				"Violated {0}\n",
-				error.Location.TryGetValue(out var location) ? location.ValidationLocation.ToString() : "unknown schema"
+				error.Location.HasValue ? error.Location.Value.ValidationLocation.ToString() : "unknown schema"
 			);
 			idx += 1;
 		}

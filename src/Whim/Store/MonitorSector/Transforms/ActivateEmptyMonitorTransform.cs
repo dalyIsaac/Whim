@@ -13,7 +13,7 @@ internal record ActivateEmptyMonitorTransform(HMONITOR Handle) : Transform
 		Result<IMonitor> result = ctx.Store.Pick(PickMonitorByHandle(Handle));
 		if (result.Error is not null)
 		{
-			return Result.FromException<Unit>(result.Error);
+			return new Result<Unit>(result.Error);
 		}
 
 		root.MonitorSector.ActiveMonitorHandle = Handle;

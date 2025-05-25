@@ -49,7 +49,7 @@ public static partial class Pickers
 				}
 			}
 
-			return Result.FromException<IWorkspace>(new WhimException($"Workspace with name {name} not found"));
+			return Result.FromError<IWorkspace>(new WhimError($"Workspace with name {name} not found"));
 		};
 
 	/// <summary>
@@ -67,7 +67,7 @@ public static partial class Pickers
 	{
 		if (!rootSector.WorkspaceSector.Workspaces.TryGetValue(workspaceId, out Workspace? workspace))
 		{
-			return Result.FromException<TResult>(StoreExceptions.WorkspaceNotFound(workspaceId));
+			return Result.FromError<TResult>(StoreExceptions.WorkspaceNotFound(workspaceId));
 		}
 
 		return operation(workspace);
@@ -93,10 +93,9 @@ public static partial class Pickers
 		{
 			return operation(PickActiveWorkspace()(rootSector));
 		}
-
 		if (!rootSector.WorkspaceSector.Workspaces.TryGetValue(workspaceId, out Workspace? workspace))
 		{
-			return Result.FromException<TResult>(StoreExceptions.WorkspaceNotFound(workspaceId));
+			return Result.FromError<TResult>(StoreExceptions.WorkspaceNotFound(workspaceId));
 		}
 
 		return operation(workspace);
@@ -199,7 +198,7 @@ public static partial class Pickers
 				{
 					if (workspace.LastFocusedWindowHandle.IsNull)
 					{
-						return Result.FromException<IWindow>(new WhimException("No last focused window in workspace"));
+						return Result.FromError<IWindow>(new WhimError("No last focused window in workspace"));
 					}
 
 					return PickWindowByHandle(workspace.LastFocusedWindowHandle)(rootSector);
@@ -222,7 +221,7 @@ public static partial class Pickers
 				{
 					if (workspace.LastFocusedWindowHandle.IsNull)
 					{
-						return Result.FromException<HWND>(new WhimException("No last focused window in workspace"));
+						return Result.FromError<HWND>(new WhimError("No last focused window in workspace"));
 					}
 
 					return Result.FromValue(workspace.LastFocusedWindowHandle);
@@ -248,9 +247,7 @@ public static partial class Pickers
 					if (workspace.WindowPositions.TryGetValue(windowHandle, out WindowPosition? position))
 					{
 						return position;
-					}
-
-					return Result.FromException<WindowPosition>(
+					}				return Result.FromError<WindowPosition>(
 						StoreExceptions.WindowNotFoundInWorkspace(windowHandle, workspaceId)
 					);
 				}
@@ -275,7 +272,7 @@ public static partial class Pickers
 				return PickWindowPosition(workspace.Id, windowHandle)(rootSector);
 			}
 
-			return Result.FromException<WindowPosition>(workspaceResult.Error!);
+			return Result.FromError<WindowPosition>(workspaceResult.Error!);
 		};
 
 	/// <summary>

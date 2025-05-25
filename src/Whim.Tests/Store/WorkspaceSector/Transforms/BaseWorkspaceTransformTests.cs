@@ -13,7 +13,7 @@ public class BaseWorkspaceTransformTests
 			IInternalContext internalCtx,
 			MutableRootSector rootSector,
 			Workspace workspace
-		) => Result.FromException<Workspace>(new InvalidOperationException());
+		) => new Result<Workspace>(new WhimError("CreateWorkspace failed", new InvalidOperationException()));
 	}
 
 	private record SuccessfulWorkspaceTransform(Guid WorkspaceId, bool SkipDoLayout = false)

@@ -65,7 +65,7 @@ public static class WorkspaceUtils
 		{
 			if (!defaultToLastFocusedWindow)
 			{
-				return Result.FromException<IWindow>(new WhimException("No window provided"));
+				return Result.FromError<IWindow>(new WhimError("No window provided"));
 			}
 
 			windowHandle = workspace.LastFocusedWindowHandle;
@@ -73,12 +73,12 @@ public static class WorkspaceUtils
 
 		if (windowHandle.IsNull)
 		{
-			return Result.FromException<IWindow>(new WhimException("No windows in workspace"));
+			return Result.FromError<IWindow>(new WhimError("No windows in workspace"));
 		}
 
 		if (isWindowRequiredInWorkspace && !workspace.WindowPositions.ContainsKey(windowHandle))
 		{
-			return Result.FromException<IWindow>(new WhimException("Window not in workspace"));
+			return Result.FromError<IWindow>(new WhimError("Window not in workspace"));
 		}
 
 		return ctx.Store.Pick(PickWindowByHandle(windowHandle));

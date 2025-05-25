@@ -7,10 +7,9 @@ namespace Whim;
 public record LayoutAllActiveWorkspacesTransform() : Transform
 {
 	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
-	{
-		if (ctx.Store.IsDisposing)
+	{		if (ctx.Store.IsDisposing)
 		{
-			return Result.FromException<Unit>(new WhimException("Whim is shutting down"));
+			return new(new WhimError("Whim is shutting down"));
 		}
 
 		foreach (IWorkspace workspace in ctx.Store.Pick(PickAllActiveWorkspaces()))

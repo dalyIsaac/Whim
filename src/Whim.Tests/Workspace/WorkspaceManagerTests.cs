@@ -318,7 +318,7 @@ public class WorkspaceManagerTests
 		WorkspaceManager sut = new(ctx);
 
 		ctx.Store.Pick(Arg.Any<PurePicker<Result<IWorkspace>>>())
-			.Returns(Result.FromException<IWorkspace>(StoreExceptions.WorkspaceNotFound(Guid.NewGuid())));
+			.Returns(new Result<IWorkspace>(StoreExceptions.WorkspaceNotFound(Guid.NewGuid())));
 
 		// When
 		IWorkspace? result = sut.TryGet("foo");

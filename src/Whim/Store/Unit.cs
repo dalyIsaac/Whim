@@ -8,5 +8,5 @@ public record Unit()
 	/// <summary>
 	/// Default placeholder for empty results.
 	/// </summary>
-	public static Result<Unit> Result { get; } = DotNext.Result.FromValue(new Unit());
+	public static Result<Unit> Result { get; } = Whim.Result.FromValue(new Unit());
 }

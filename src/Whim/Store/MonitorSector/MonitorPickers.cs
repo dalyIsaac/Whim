@@ -6,22 +6,20 @@ public static partial class Pickers
 	/// Get a monitor by its <see cref="HMONITOR"/> handle.
 	/// </summary>
 	/// <param name="handle"></param>
-	/// <returns>
-	/// The monitor with the given handle, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
-	/// If the monitor is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// <returns>	/// The monitor with the given handle, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// If the monitor is not found, then an error will be returned.
 	/// </returns>
 	public static PurePicker<Result<IMonitor>> PickMonitorByHandle(HMONITOR handle) =>
 		(rootSector) =>
 		{
 			foreach (IMonitor m in rootSector.MonitorSector.Monitors)
 			{
-				if (m.Handle == handle)
-				{
-					return Result.FromValue(m);
-				}
+				if (m.Handle == handle)			{
+				return Result.FromValue(m);
 			}
+		}
 
-			return Result.FromException<IMonitor>(StoreExceptions.MonitorNotFound(handle));
+		return Result.FromError<IMonitor>(StoreExceptions.MonitorNotFound(handle));
 		};
 
 	/// <summary>
@@ -105,7 +103,7 @@ public static partial class Pickers
 					return Result.FromValue(monitors[0]);
 				}
 
-				return Result.FromException<IMonitor>(StoreExceptions.MonitorNotFound(handle));
+				return Result.FromError<IMonitor>(StoreExceptions.MonitorNotFound(handle));
 			}
 
 			int delta = reverse ? -1 : 1;
@@ -128,7 +126,7 @@ public static partial class Pickers
 			ImmutableArray<IMonitor> monitors = rootSector.MonitorSector.Monitors;
 			if (index < 0 || index >= monitors.Length)
 			{
-				return Result.FromException<IMonitor>(StoreExceptions.InvalidMonitorIndex(index));
+				return Result.FromError<IMonitor>(StoreExceptions.InvalidMonitorIndex(index));
 			}
 
 			return Result.FromValue(monitors[index]);
@@ -177,6 +175,6 @@ internal record GetMonitorAtPointPicker(IPoint<int> Point, bool GetFirst = false
 			return Result.FromValue(sector.Monitors[0]);
 		}
 
-		return Result.FromException<IMonitor>(StoreExceptions.NoMonitorFoundAtPoint(Point));
+		return Result.FromError<IMonitor>(StoreExceptions.NoMonitorFoundAtPoint(Point));
 	}
 }

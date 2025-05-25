@@ -81,7 +81,7 @@ public class InitializeWorkspacesTransformTests
 		SavedWorkspace workspace = new("test", [new SavedWindow(window.Handle, Rectangle.UnitSquare<double>())], null);
 		AddWorkspacesToSavedState(internalCtx, workspace);
 
-		ctx.CreateWindow(window.Handle).Returns(Result.FromException<IWindow>(new Exception("nope")));
+		ctx.CreateWindow(window.Handle).Returns(new Result<IWindow>(new WhimError("nope", new Exception("nope"))));
 
 		InitializeWorkspacesTransform sut = new();
 
@@ -148,7 +148,7 @@ public class InitializeWorkspacesTransformTests
 		ctx.CreateWindow(BrowserHandle).Returns(Result.FromValue(browserWindow));
 		ctx.CreateWindow(DiscordHandle).Returns(Result.FromValue(discordWindow));
 		ctx.CreateWindow(SpotifyHandle).Returns(Result.FromValue(spotifyWindow));
-		ctx.CreateWindow(BrokenHandle).Returns(Result.FromException<IWindow>(new Exception("nope")));
+		ctx.CreateWindow(BrokenHandle).Returns(new Result<IWindow>(new WhimError("nope", new Exception("nope"))));
 		ctx.CreateWindow(VscodeHandle).Returns(Result.FromValue(vscodeWindow));
 	}
 

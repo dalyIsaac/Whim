@@ -32,15 +32,15 @@ public abstract record BaseWorkspaceTransform(WorkspaceId WorkspaceId, bool Skip
 		WorkspaceSector sector = rootSector.WorkspaceSector;
 		WorkspaceId workspaceId = WorkspaceId.OrActiveWorkspace(ctx);
 
-		if (!sector.Workspaces.TryGetValue(workspaceId, out Workspace? workspace))
+	if (!sector.Workspaces.TryGetValue(workspaceId, out Workspace? workspace))
 		{
-			return Result.FromException<bool>(StoreExceptions.WorkspaceNotFound(workspaceId));
+			return new Result<bool>(StoreExceptions.WorkspaceNotFound(workspaceId));
 		}
 
 		Result<Workspace> newWorkspaceResult = WorkspaceOperation(ctx, internalCtx, rootSector, workspace);
 		if (!newWorkspaceResult.TryGet(out Workspace newWorkspace))
 		{
-			return Result.FromException<bool>(newWorkspaceResult.Error!);
+			return new Result<bool>(newWorkspaceResult.Error!);
 		}
 
 		if (newWorkspace == workspace)

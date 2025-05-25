@@ -38,7 +38,7 @@ public static partial class Pickers
 		rootSector =>
 			rootSector.MapSector.MonitorWorkspaceMap.TryGetValue(monitorHandle, out WorkspaceId workspaceId)
 				? PickWorkspaceById(workspaceId)(rootSector)
-				: Result.FromException<IWorkspace>(StoreExceptions.MonitorNotFound(monitorHandle));
+				: new(StoreExceptions.MonitorNotFound(monitorHandle));
 
 	/// <summary>
 	/// Retrieves the workspace for the given window.
@@ -59,7 +59,7 @@ public static partial class Pickers
 				}
 			}
 
-			return Result.FromException<IWorkspace>(StoreExceptions.WindowNotFound(windowHandle));
+			return new(StoreExceptions.WindowNotFound(windowHandle));
 		};
 
 	/// <summary>
@@ -78,7 +78,7 @@ public static partial class Pickers
 			HMONITOR monitorHandle = rootSector.MapSector.GetMonitorByWorkspace(searchWorkspaceId);
 
 			return monitorHandle == default
-				? Result.FromException<IMonitor>(StoreExceptions.NoMonitorFoundForWorkspace(searchWorkspaceId))
+				? new(StoreExceptions.NoMonitorFoundForWorkspace(searchWorkspaceId))
 				: PickMonitorByHandle(monitorHandle)(rootSector);
 		};
 
@@ -96,7 +96,7 @@ public static partial class Pickers
 		rootSector =>
 			rootSector.MapSector.WindowWorkspaceMap.TryGetValue(windowHandle, out WorkspaceId workspaceId)
 				? PickMonitorByWorkspace(workspaceId)(rootSector)
-				: Result.FromException<IMonitor>(StoreExceptions.NoMonitorFoundForWindow(windowHandle));
+				: new(StoreExceptions.NoMonitorFoundForWindow(windowHandle));
 
 	/// <summary>
 	/// Gets the adjacent workspace for the given workspace.
@@ -126,10 +126,9 @@ public static partial class Pickers
 
 			ImmutableArray<WorkspaceId> order = workspaceSector.WorkspaceOrder;
 			int idx = order.IndexOf(workspaceId);
-
 			if (idx == -1)
 			{
-				return Result.FromException<IWorkspace>(StoreExceptions.WorkspaceNotFound(workspaceId));
+				return new(StoreExceptions.WorkspaceNotFound(workspaceId));
 			}
 
 			WorkspaceId activeWorkspaceId = PickActiveWorkspaceId()(rootSector);
@@ -150,7 +149,7 @@ public static partial class Pickers
 				nextIdx = (nextIdx + delta).Mod(order.Length);
 			}
 
-			return Result.FromException<IWorkspace>(new WhimException($"No adjacent workspace found to {workspaceId}"));
+			return new(new WhimError($"No adjacent workspace found to {workspaceId}"));
 		};
 
 	/// <summary>
@@ -171,7 +170,7 @@ public static partial class Pickers
 				return Result.FromValue(WorkspaceUtils.GetActiveLayoutEngine(workspace));
 			}
 
-			return Result.FromException<ILayoutEngine>(workspaceResult.Error!);
+			return new(workspaceResult.Error!);
 		};
 
 	/// <summary>
@@ -193,10 +192,9 @@ public static partial class Pickers
 			IMapSector mapSector = rootSector.MapSector;
 			IWorkspaceSector workspaceSector = rootSector.WorkspaceSector;
 			ImmutableArray<IMonitor> monitors = rootSector.MonitorSector.Monitors;
-
 			if (!workspaceSector.Workspaces.ContainsKey(workspaceId))
 			{
-				return Result.FromException<IReadOnlyList<HMONITOR>>(StoreExceptions.WorkspaceNotFound(workspaceId));
+				return new(StoreExceptions.WorkspaceNotFound(workspaceId));
 			}
 
 			// If the workspace is sticky, try get the associated monitors.
@@ -207,10 +205,12 @@ public static partial class Pickers
 				)
 			)
 			{
-				List<HMONITOR> monitorHandles = monitorIndices
-					.Where(monitorIndex => monitorIndex >= 0 && monitorIndex < monitors.Length)
-					.Select(monitorIndex => monitors[monitorIndex].Handle)
-					.ToList();
+				List<HMONITOR> monitorHandles =
+				[
+					.. monitorIndices
+						.Where(monitorIndex => monitorIndex >= 0 && monitorIndex < monitors.Length)
+						.Select(monitorIndex => monitors[monitorIndex].Handle),
+				];
 
 				if (monitorHandles.Count != 0)
 				{
@@ -249,10 +249,7 @@ public static partial class Pickers
 			{
 				return monitorIndices;
 			}
-
-			return Result.FromException<IReadOnlyList<int>>(
-				new WhimException($"No explicit monitor indices found for {workspaceId}")
-			);
+			return new(new WhimError($"No explicit monitor indices found for {workspaceId}"));
 		};
 
 	/// <summary>
@@ -315,11 +312,10 @@ public static partial class Pickers
 		HMONITOR monitorHandle = default
 	) =>
 		rootSector =>
-		{
-			// Verify the workspace exists.
+		{ // Verify the workspace exists.
 			if (!rootSector.WorkspaceSector.Workspaces.ContainsKey(workspaceId))
 			{
-				return Result.FromException<HMONITOR>(StoreExceptions.WorkspaceNotFound(workspaceId));
+				return new(StoreExceptions.WorkspaceNotFound(workspaceId));
 			}
 
 			// Get the valid monitors for the workspace.
@@ -353,9 +349,7 @@ public static partial class Pickers
 
 			Logger.Debug(
 				$"Monitor {lastMonitorHandle} is not valid for workspace {workspaceId}, falling back to first monitor available"
-			);
-
-			// Activate on the first available monitor.
+			); // Activate on the first available monitor.
 			foreach (IMonitor monitor in rootSector.MonitorSector.Monitors)
 			{
 				if (validMonitors.Contains(monitor.Handle))
@@ -364,7 +358,7 @@ public static partial class Pickers
 				}
 			}
 
-			return Result.FromException<HMONITOR>(StoreExceptions.NoValidMonitorForWorkspace(workspaceId));
+			return new(StoreExceptions.NoValidMonitorForWorkspace(workspaceId));
 		};
 
 	/// <summary>
@@ -382,13 +376,11 @@ public static partial class Pickers
 		{
 			IMapSector mapSector = rootSector.MapSector;
 			IWorkspaceSector workspaceSector = rootSector.WorkspaceSector;
-			IMonitorSector monitorSector = rootSector.MonitorSector;
-
-			// Verify the monitor exists.
+			IMonitorSector monitorSector = rootSector.MonitorSector; // Verify the monitor exists.
 			Result<IMonitor> monitorResult = PickMonitorByHandle(monitorHandle)(rootSector);
 			if (!monitorResult.IsSuccessful)
 			{
-				return Result.FromException<IReadOnlyList<IWorkspace>>(monitorResult.Error!);
+				return new(monitorResult.Error!);
 			}
 
 			// Get the index of the monitor.

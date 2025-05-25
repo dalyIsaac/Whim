@@ -11,7 +11,7 @@ internal record WindowMinimizeStartedTransform(IWindow Window) : Transform
 		Result<IWorkspace> workspaceResult = ctx.Store.Pick(PickWorkspaceByWindow(Window.Handle));
 		if (!workspaceResult.TryGet(out IWorkspace workspace))
 		{
-			return Result.FromException<Unit>(workspaceResult.Error!);
+			return new Result<Unit>(workspaceResult.Error!);
 		}
 
 		workspace.MinimizeWindowStart(Window);

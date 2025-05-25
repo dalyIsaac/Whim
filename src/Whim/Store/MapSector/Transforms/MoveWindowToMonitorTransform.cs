@@ -14,11 +14,10 @@ public record MoveWindowToMonitorTransform(HMONITOR MonitorHandle, HWND WindowHa
 	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		MapSector mapSector = rootSector.MapSector;
-
 		HWND windowHandle = WindowHandle.OrLastFocusedWindow(ctx);
 		if (windowHandle == default)
 		{
-			return Result.FromException<Unit>(StoreExceptions.NoValidWindow());
+			return new(StoreExceptions.NoValidWindow());
 		}
 
 		Logger.Debug($"Moving window {windowHandle} to monitor {MonitorHandle}");
@@ -26,13 +25,13 @@ public record MoveWindowToMonitorTransform(HMONITOR MonitorHandle, HWND WindowHa
 		Result<IWorkspace> workspaceResult = ctx.Store.Pick(PickWorkspaceByMonitor(MonitorHandle));
 		if (!workspaceResult.TryGet(out IWorkspace workspace))
 		{
-			return Result.FromException<Unit>(workspaceResult.Error!);
+			return new(workspaceResult.Error!);
 		}
 
 		Result<IMonitor> oldMonitorResult = ctx.Store.Pick(PickMonitorByWindow(windowHandle));
 		if (!oldMonitorResult.TryGet(out IMonitor oldMonitor))
 		{
-			return Result.FromException<Unit>(oldMonitorResult.Error!);
+			return new(oldMonitorResult.Error!);
 		}
 
 		if (oldMonitor.Handle == MonitorHandle)

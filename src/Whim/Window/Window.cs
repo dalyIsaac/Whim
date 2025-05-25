@@ -157,10 +157,9 @@ internal class Window : IWindow
 			// Win32Exception is thrown when it's not possible to get information about the process.
 			// https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.process?view=net-6.0#remarks
 			// The exception will usually have a message of:
-			// "Unable to enumerate the process modules."
-			// This will be thrown by Path.GetFileName.
-			return Result.FromException<IWindow>(
-				new WhimException($"Could not create a Window instance for {hwnd.Value}", ex)
+			// "Unable to enumerate the process modules."		// This will be thrown by Path.GetFileName.
+			return new Result<IWindow>(
+				new WhimError($"Could not create a Window instance for {hwnd.Value}", ex)
 			);
 		}
 

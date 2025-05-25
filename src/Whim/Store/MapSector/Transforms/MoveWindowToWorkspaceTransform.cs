@@ -13,24 +13,23 @@ namespace Whim;
 public record MoveWindowToWorkspaceTransform(WorkspaceId TargetWorkspaceId, HWND WindowHandle = default) : Transform
 {
 	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
-	{
-		Result<IWorkspace> targetWorkspaceResult = ctx.Store.Pick(PickWorkspaceById(TargetWorkspaceId));
+	{		Result<IWorkspace> targetWorkspaceResult = ctx.Store.Pick(PickWorkspaceById(TargetWorkspaceId));
 		if (!targetWorkspaceResult.TryGet(out IWorkspace targetWorkspace))
 		{
-			return Result.FromException<Unit>(targetWorkspaceResult.Error!);
+			return new(targetWorkspaceResult.Error!);
 		}
 
 		// Get the window.
 		HWND windowHandle = WindowHandle.OrLastFocusedWindow(ctx);
 		if (windowHandle == default)
 		{
-			return Result.FromException<Unit>(StoreExceptions.NoValidWindow());
+			return new(StoreExceptions.NoValidWindow());
 		}
 
 		Result<IWindow> windowResult = ctx.Store.Pick(PickWindowByHandle(windowHandle));
 		if (!windowResult.TryGet(out IWindow window))
 		{
-			return Result.FromException<Unit>(windowResult.Error!);
+			return new(windowResult.Error!);
 		}
 
 		Logger.Debug($"Moving window {windowHandle} to workspace {TargetWorkspaceId}");
@@ -39,7 +38,7 @@ public record MoveWindowToWorkspaceTransform(WorkspaceId TargetWorkspaceId, HWND
 		Result<IWorkspace> oldWorkspaceResult = ctx.Store.Pick(PickWorkspaceByWindow(windowHandle));
 		if (!oldWorkspaceResult.TryGet(out IWorkspace oldWorkspace))
 		{
-			return Result.FromException<Unit>(oldWorkspaceResult.Error!);
+			return new(oldWorkspaceResult.Error!);
 		}
 
 		if (oldWorkspace.Id == TargetWorkspaceId)

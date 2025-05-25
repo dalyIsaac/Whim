@@ -33,7 +33,6 @@
 		<Page Remove="Resources\Defaults.xaml" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="DotNext" />
 		<PackageReference Include="Microsoft.CodeAnalysis.Scripting" />
 		<PackageReference Include="Microsoft.Win32.SystemEvents" />
 		<PackageReference Include="Microsoft.Windows.CsWin32">

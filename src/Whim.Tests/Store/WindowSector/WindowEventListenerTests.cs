@@ -89,7 +89,7 @@ public class WindowEventListenerTests
 	private static void Setup_EmptyWindowSlice(IContext ctx, IInternalContext internalCtx) =>
 		ctx
 			.Store.Pick(Arg.Any<PurePicker<Result<IWindow>>>())
-			.Returns(Result.FromException<IWindow>(new WhimException("welp")));
+			.Returns(Result.FromError<IWindow>(new WhimError("welp")));
 
 	private static IWindow Setup_FilledWindowSlice(IContext ctx, IInternalContext internalCtx)
 	{
@@ -205,8 +205,7 @@ public class WindowEventListenerTests
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		Setup_EmptyWindowSlice(ctx, internalCtx);
 
-		ctx.Store.Dispatch(Arg.Any<WindowAddedTransform>())
-			.Returns(Result.FromException<IWindow>(new WhimException("welp")));
+		ctx.Store.Dispatch(Arg.Any<WindowAddedTransform>()).Returns(new Result<IWindow>(new WhimError("welp")));
 
 		WindowEventListener sut = new(ctx, internalCtx);
 		sut.Initialize();
@@ -370,7 +369,7 @@ public class WindowEventListenerTests
 		WindowEventListener sut = new(ctx, internalCtx);
 		sut.Initialize();
 
-		ctx.Store.Dispatch(Arg.Any<WindowMinimizeStartedTransform>()).Throws(new WhimException("welp"));
+		ctx.Store.Dispatch(Arg.Any<WindowMinimizeStartedTransform>()).Throws(new Exception("welp"));
 
 		// When we send through the event
 		capture.WinEventProc!.Invoke(

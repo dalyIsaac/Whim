@@ -1,8 +1,8 @@
 # Result
 
-Whim uses the [`Result<T>`](https://dotnet.github.io/dotNext/api/DotNext.Result-1.html) type from the [`dotNext` library](https://dotnet.github.io/dotNext/index.html).
+Whim uses a custom `Result<T>` type for functional error handling, avoiding exceptions that could crash the application. This type represents the result of an operation that may fail, allowing callers to check success or failure explicitly.
 
-The idea of its usage throughout Whim is to avoid throwing exceptions, which can bubble up and cause the application to crash. Instead, the `Result<T>` type is used to represent the result of an operation that may fail, and the caller can check if the operation was successful or not.
+The `Result<T>` struct contains either a successful value or a `WhimError` describing what went wrong.
 
 ## Returning a `Result<T>`
 
@@ -17,7 +17,27 @@ if (!windowResult.TryGet(out IWindow window))
 
 // ...
 
-return Result.FromValue(window);
+return window;
+```
+
+## Creating Results
+
+### Success Cases
+```csharp
+// Implicit conversion from value
+return window;
+
+// Explicit construction
+return new Result<IWindow>(window);
+```
+
+### Error Cases
+```csharp
+// From WhimError
+return new Result<IWindow>(new WhimError("Window not found"));
+
+// From exception
+return new Result<IWindow>(new WhimError("Operation failed", innerException));
 ```
 
 ## `Unit`
@@ -28,8 +48,8 @@ Sometimes an operation does not return a value, but the caller still needs to kn
 Result<IMonitor> oldMonitorResult = context.Store.Pick(PickMonitorByWindow(windowHandle));
 if (!oldMonitorResult.TryGet(out IMonitor oldMonitor))
 {
-    // Forward the exception to the caller.
-    return Result.FromException<Unit>(oldMonitorResult.Error!);
+    // Forward the error to the caller.
+    return new(oldMonitorResult.Error!);
 }
 
 if (oldMonitor.Handle == MonitorHandle)
