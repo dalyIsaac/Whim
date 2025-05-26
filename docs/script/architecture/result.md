@@ -23,6 +23,7 @@ return window;
 ## Creating Results
 
 ### Success Cases
+
 ```csharp
 // Implicit conversion from value
 return window;
@@ -32,6 +33,7 @@ return new Result<IWindow>(window);
 ```
 
 ### Error Cases
+
 ```csharp
 // From WhimError
 return new Result<IWindow>(new WhimError("Window not found"));
