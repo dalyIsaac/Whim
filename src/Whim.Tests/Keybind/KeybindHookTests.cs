@@ -203,8 +203,8 @@ public class KeybindHookTests
 		KeybindHook keybindHook = new(ctx, internalCtx);
 
 		// Setup so only the modifier is pressed
-        VIRTUAL_KEY[] modifiers = [modifier];
-        ctx.KeybindManager.Modifiers.Returns(modifiers);
+		VIRTUAL_KEY[] modifiers = [modifier];
+		ctx.KeybindManager.Modifiers.Returns(modifiers);
 		internalCtx.CoreNativeManager.GetKeyState((int)modifier).Returns((short)-32768);
 		internalCtx
 			.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>())
