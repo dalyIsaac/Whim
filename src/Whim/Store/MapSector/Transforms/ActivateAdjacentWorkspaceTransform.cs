@@ -22,6 +22,7 @@ public record ActivateAdjacentWorkspaceTransform(
 	{
 		MapSector mapSector = rootSector.MapSector;
 		HMONITOR targetMonitorHandle = MonitorHandle.OrActiveMonitor(rootSector);
+
 		if (!mapSector.MonitorWorkspaceMap.TryGetValue(targetMonitorHandle, out WorkspaceId currentWorkspaceId))
 		{
 			return new(StoreExceptions.NoWorkspaceFoundForMonitor(targetMonitorHandle));

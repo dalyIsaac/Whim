@@ -203,7 +203,8 @@ public class KeybindHookTests
 		KeybindHook keybindHook = new(ctx, internalCtx);
 
 		// Setup so only the modifier is pressed
-		ctx.KeybindManager.Modifiers.Returns([modifier]);
+        VIRTUAL_KEY[] modifiers = [modifier];
+        ctx.KeybindManager.Modifiers.Returns(modifiers);
 		internalCtx.CoreNativeManager.GetKeyState((int)modifier).Returns((short)-32768);
 		internalCtx
 			.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>())
@@ -321,7 +322,7 @@ public class KeybindHookTests
 		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
 		KeybindHook keybindHook = new(ctx, internalCtx);
 		ICommand[] commands = [.. Enumerable.Range(0, 3).Select(_ => Substitute.For<ICommand>())];
-		SetupKey(ctx, internalCtx, modifiers, key, [.. commands.Select(c => c)]);
+		SetupKey(ctx, internalCtx, modifiers, key, commands);
 
 		// When
 		keybindHook.PostInitialize();

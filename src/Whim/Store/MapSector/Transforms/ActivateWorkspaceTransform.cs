@@ -23,6 +23,7 @@ public record ActivateWorkspaceTransform(
 	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		MapSector mapSector = rootSector.MapSector;
+
 		Result<IWorkspace> workspaceResult = ctx.Store.Pick(PickWorkspaceById(WorkspaceId));
 		if (!workspaceResult.TryGet(out IWorkspace workspace))
 		{
