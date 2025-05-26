@@ -311,17 +311,29 @@ public class KeybindHookTests
 		},
 	};
 
-	[MemberData(nameof(KeybindsToExecute))]
-	[Theory]
-	internal void LowLevelKeyboardProc_ValidKeybind(VIRTUAL_KEY[] modifiers, VIRTUAL_KEY key, Keybind keybind)
+	[Theory, MemberAutoSubstituteData<KeybindHookCustomization>(nameof(KeybindsToExecute))]
+	internal void LowLevelKeyboardProc_ValidKeybind(
+		VIRTUAL_KEY[] modifiers,
+		VIRTUAL_KEY key,
+		Keybind keybind,
+		IContext ctx,
+		IInternalContext internalCtx
+	)
 	{
 		// Given
-		IContext ctx = Substitute.For<IContext>();
-		IInternalContext internalCtx = Substitute.For<IInternalContext>();
-
 		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
 		KeybindHook keybindHook = new(ctx, internalCtx);
-		ICommand[] commands = [.. Enumerable.Range(0, 3).Select(_ => Substitute.For<ICommand>())];
+		ICommand[] commands =
+		[
+			.. Enumerable
+				.Range(0, 3)
+				.Select(_ =>
+				{
+					ICommand command = Substitute.For<ICommand>();
+					command.TryExecute().Returns(true);
+					return command;
+				}),
+		];
 		SetupKey(ctx, internalCtx, modifiers, key, commands);
 
 		// When
