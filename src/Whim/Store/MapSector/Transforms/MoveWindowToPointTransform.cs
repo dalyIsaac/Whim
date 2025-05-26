@@ -13,7 +13,7 @@ namespace Whim;
 public record MoveWindowToPointTransform(HWND WindowHandle, IPoint<int> Point) : Transform
 {
 	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
-	{		// Get the monitor.
+	{ // Get the monitor.
 		if (!ctx.Store.Pick(PickMonitorAtPoint(Point)).TryGet(out IMonitor targetMonitor))
 		{
 			return new(StoreExceptions.NoMonitorFoundAtPoint(Point));

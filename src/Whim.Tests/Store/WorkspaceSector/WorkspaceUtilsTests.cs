@@ -175,7 +175,10 @@ public class WorkspaceUtilsTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void GetValidWorkspaceWindow_WindowNotRequiredInWorkspace_WindowNotInWorkspace(IContext ctx, MutableRootSector root)
+	internal void GetValidWorkspaceWindow_WindowNotRequiredInWorkspace_WindowNotInWorkspace(
+		IContext ctx,
+		MutableRootSector root
+	)
 	{
 		// Given the handle is not null, but the window is not in the workspace
 		IWindow window = CreateWindow((HWND)1);

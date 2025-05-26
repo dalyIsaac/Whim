@@ -12,7 +12,8 @@ public record MergeWorkspaceWindowsTransform(WorkspaceId SourceWorkspaceId, Work
 		MapSector sector = rootSector.MapSector;
 
 		// Get the workspaces.
-		Result<IWorkspace> sourceWorkspace = ctx.Store.Pick(PickWorkspaceById(SourceWorkspaceId));		if (!sourceWorkspace.TryGet(out IWorkspace Source))
+		Result<IWorkspace> sourceWorkspace = ctx.Store.Pick(PickWorkspaceById(SourceWorkspaceId));
+		if (!sourceWorkspace.TryGet(out IWorkspace Source))
 		{
 			return new(sourceWorkspace.Error!);
 		}

@@ -158,9 +158,7 @@ internal class Window : IWindow
 			// https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.process?view=net-6.0#remarks
 			// The exception will usually have a message of:
 			// "Unable to enumerate the process modules."		// This will be thrown by Path.GetFileName.
-			return new Result<IWindow>(
-				new WhimError($"Could not create a Window instance for {hwnd.Value}", ex)
-			);
+			return new Result<IWindow>(new WhimError($"Could not create a Window instance for {hwnd.Value}", ex));
 		}
 
 		return new Window(context, internalContext)

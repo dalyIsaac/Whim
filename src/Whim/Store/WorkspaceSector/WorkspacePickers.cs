@@ -247,7 +247,8 @@ public static partial class Pickers
 					if (workspace.WindowPositions.TryGetValue(windowHandle, out WindowPosition? position))
 					{
 						return position;
-					}				return Result.FromError<WindowPosition>(
+					}
+					return Result.FromError<WindowPosition>(
 						StoreExceptions.WindowNotFoundInWorkspace(windowHandle, workspaceId)
 					);
 				}

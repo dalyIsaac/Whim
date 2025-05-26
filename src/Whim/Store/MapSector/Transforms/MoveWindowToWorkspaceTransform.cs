@@ -13,7 +13,8 @@ namespace Whim;
 public record MoveWindowToWorkspaceTransform(WorkspaceId TargetWorkspaceId, HWND WindowHandle = default) : Transform
 {
 	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
-	{		Result<IWorkspace> targetWorkspaceResult = ctx.Store.Pick(PickWorkspaceById(TargetWorkspaceId));
+	{
+		Result<IWorkspace> targetWorkspaceResult = ctx.Store.Pick(PickWorkspaceById(TargetWorkspaceId));
 		if (!targetWorkspaceResult.TryGet(out IWorkspace targetWorkspace))
 		{
 			return new(targetWorkspaceResult.Error!);

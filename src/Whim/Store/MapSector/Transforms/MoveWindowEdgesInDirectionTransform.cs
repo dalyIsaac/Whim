@@ -21,7 +21,8 @@ public record MoveWindowEdgesInDirectionTransform(
 ) : Transform
 {
 	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
-	{		HWND windowHandle = WindowHandle.OrLastFocusedWindow(ctx);
+	{
+		HWND windowHandle = WindowHandle.OrLastFocusedWindow(ctx);
 		if (windowHandle == default)
 		{
 			return new(StoreExceptions.NoValidWindow());

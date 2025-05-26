@@ -12,7 +12,7 @@ namespace Whim;
 public record MoveWindowToMonitorIndexTransform(int MonitorIndex, HWND WindowHandle = default) : Transform
 {
 	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
-	{		// Get the monitor at index.
+	{ // Get the monitor at index.
 		Result<IMonitor> monitorResult = ctx.Store.Pick(PickMonitorByIndex(MonitorIndex));
 		if (!monitorResult.TryGet(out IMonitor monitor))
 		{

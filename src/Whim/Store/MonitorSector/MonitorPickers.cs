@@ -14,12 +14,13 @@ public static partial class Pickers
 		{
 			foreach (IMonitor m in rootSector.MonitorSector.Monitors)
 			{
-				if (m.Handle == handle)			{
-				return Result.FromValue(m);
+				if (m.Handle == handle)
+				{
+					return Result.FromValue(m);
+				}
 			}
-		}
 
-		return Result.FromError<IMonitor>(StoreExceptions.MonitorNotFound(handle));
+			return Result.FromError<IMonitor>(StoreExceptions.MonitorNotFound(handle));
 		};
 
 	/// <summary>
