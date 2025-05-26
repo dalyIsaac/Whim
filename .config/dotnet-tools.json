@@ -8,7 +8,7 @@
       "rollForward": false
     },
     "csharpier": {
-      "version": "1.0.1",
+      "version": "1.0.2",
       "commands": ["csharpier"],
       "rollForward": false
     },
