@@ -23,31 +23,24 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 
 	private Result<IWindow> GetWindow(IContext ctx, IInternalContext internalCtx)
 	{
-		// Filter the handle.		if (internalCtx.CoreNativeManager.IsSplashScreen(Handle))
+		// Filter the handle.
+		if (internalCtx.CoreNativeManager.IsSplashScreen(Handle))
 		{
-			return new Result<IWindow>(
-				new WhimError($"Window {Handle} is a splash screen, ignoring")
-			);
+			return new Result<IWindow>(new WhimError($"Window {Handle} is a splash screen, ignoring"));
 		}
 		if (internalCtx.CoreNativeManager.IsCloakedWindow(Handle))
 		{
-			return new Result<IWindow>(
-				new WhimError($"Window {Handle} is cloaked, ignoring")
-			);
+			return new Result<IWindow>(new WhimError($"Window {Handle} is cloaked, ignoring"));
 		}
 
 		if (!internalCtx.CoreNativeManager.IsStandardWindow(Handle))
 		{
-			return new Result<IWindow>(
-				new WhimError($"Window {Handle} is not a standard window, ignoring")
-			);
+			return new Result<IWindow>(new WhimError($"Window {Handle} is not a standard window, ignoring"));
 		}
 
 		if (!internalCtx.CoreNativeManager.HasNoVisibleOwner(Handle))
 		{
-			return new Result<IWindow>(
-				new WhimError($"Window {Handle} is a tooltip, ignoring")
-			);
+			return new Result<IWindow>(new WhimError($"Window {Handle} has no visible owner, ignoring"));
 		}
 
 		Result<IWindow> windowResult = Window.CreateWindow(ctx, internalCtx, Handle);

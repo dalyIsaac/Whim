@@ -174,11 +174,12 @@ public class WorkspaceUtilsTests
 		Assert.False(result.IsSuccessful);
 	}
 
-	[Theory, AutoSubstituteData]
-	internal void GetValidWorkspaceWindow_WindowNotRequiredInWorkspace_WindowNotInWorkspace(IContext ctx)
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void GetValidWorkspaceWindow_WindowNotRequiredInWorkspace_WindowNotInWorkspace(IContext ctx, MutableRootSector root)
 	{
 		// Given the handle is not null, but the window is not in the workspace
-		HWND windowHandle = new(1);
+		IWindow window = CreateWindow((HWND)1);
+		AddWindowToSector(root, window);
 		Workspace workspace = CreateWorkspace(ctx);
 
 		bool isWindowRequiredInWorkspace = false;
@@ -187,7 +188,7 @@ public class WorkspaceUtilsTests
 		Result<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(
 			ctx,
 			workspace,
-			windowHandle,
+			window.Handle,
 			defaultToLastFocusedWindow: false,
 			isWindowRequiredInWorkspace
 		);

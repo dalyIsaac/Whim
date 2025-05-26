@@ -44,6 +44,16 @@ public readonly struct Result<T>
 	public WhimError? Error => IsSuccessful ? null : _error;
 
 	/// <summary>
+	/// Creates a new Result instance representing a successful operation with no value.
+	/// </summary>
+	public Result()
+	{
+		_value = default;
+		_error = null;
+		IsSuccessful = true;
+	}
+
+	/// <summary>
 	/// Creates a successful result with the specified value.
 	/// </summary>
 	/// <param name="value">The value to wrap in the result.</param>
