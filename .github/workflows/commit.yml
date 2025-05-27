@@ -110,26 +110,3 @@ jobs:
       - name: Upload coverage to Codecov
         if: ${{ always() }}
         uses: codecov/codecov-action@v5.4.3
-
-      - name: Prepare test file list for Codecov
-        id: prep_test_files
-        if: ${{ always() }}
-        shell: pwsh
-        run: |
-          $matchingFiles = Get-ChildItem -Path . -Recurse -File -Filter "TestResults.xml" -ErrorAction SilentlyContinue
-
-          if ($matchingFiles) {
-            $filePathsForJoining = $matchingFiles | ForEach-Object { $_.FullName.Replace('\\', '/') }
-            $commaSeparatedFiles = $filePathsForJoining -join ','
-            Write-Host "Found test files for Codecov: $commaSeparatedFiles"
-          } else {
-            $commaSeparatedFiles = ''
-            Write-Host "No test files found matching '**/TestResults/**/*.xml' for Codecov."
-          }
-          echo "test_files=$commaSeparatedFiles" >> $env:GITHUB_OUTPUT
-
-      - name: Upload test results to Codecov
-        if: ${{ always() }}
-        uses: codecov/test-results-action@v1
-        with:
-          files: ${{ steps.prep_test_files.outputs.test_files }}
