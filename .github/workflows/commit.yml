@@ -116,10 +116,7 @@ jobs:
         if: ${{ always() }}
         shell: pwsh
         run: |
-          $regex = '(?:^|[\\\\/])TestResults(?:[\\\\/]|$)'; # Matches TestResults as a whole directory name
-          $matchingFiles = Get-ChildItem -Path . -Recurse -File -Filter "*.xml" -ErrorAction SilentlyContinue | Where-Object {
-              $_.DirectoryName -match $regex
-          }
+          $matchingFiles = Get-ChildItem -Path . -Recurse -File -Filter "TestResults.xml" -ErrorAction SilentlyContinue
 
           if ($matchingFiles) {
             $filePathsForJoining = $matchingFiles | ForEach-Object { $_.FullName.Replace('\\', '/') }
