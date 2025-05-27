@@ -106,13 +106,14 @@ jobs:
       - name: Test
         run: |
           dotnet test Whim.sln --collect:"XPlat Code Coverage;Format=opencover" --logger:junit
-        continue-on-error: true
 
       - name: Upload coverage to Codecov
+        if: ${{ always() }}
         uses: codecov/codecov-action@v5.4.3
 
       - name: Prepare test file list for Codecov
         id: prep_test_files
+        if: ${{ always() }}
         shell: pwsh
         run: |
           $regex = '(?:^|[\\\\/])TestResults(?:[\\\\/]|$)'; # Matches TestResults as a whole directory name
