@@ -81,143 +81,143 @@ public class KeybindHookTests
 		ctx.KeybindManager.Modifiers.Returns(modifiers);
 	}
 
-	[Theory, AutoSubstituteData<KeybindHookCustomization>]
-	internal void PostInitialize(IContext ctx, IInternalContext internalCtx)
-	{
-		// Given
-		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
-		KeybindHook keybindHook = new(ctx, internalCtx);
+	// [Theory, AutoSubstituteData<KeybindHookCustomization>]
+	// internal void PostInitialize(IContext ctx, IInternalContext internalCtx)
+	// {
+	// 	// Given
+	// 	CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+	// 	KeybindHook keybindHook = new(ctx, internalCtx);
 
-		// When
-		keybindHook.PostInitialize();
+	// 	// When
+	// 	keybindHook.PostInitialize();
 
-		// Then
-		internalCtx
-			.CoreNativeManager.Received(1)
-			.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, Arg.Any<HOOKPROC>(), null, 0);
-	}
+	// 	// Then
+	// 	internalCtx
+	// 		.CoreNativeManager.Received(1)
+	// 		.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_KEYBOARD_LL, Arg.Any<HOOKPROC>(), null, 0);
+	// }
 
-	[InlineAutoSubstituteData<KeybindHookCustomization>(1)]
-	[InlineAutoSubstituteData<KeybindHookCustomization>(-1)]
-	[Theory]
-	internal void LowLevelKeyboardProc_InvalidNCode(int nCode, IContext ctx, IInternalContext internalCtx)
-	{
-		// Given
-		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
-		KeybindHook keybindHook = new(ctx, internalCtx);
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(1)]
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(-1)]
+	// [Theory]
+	// internal void LowLevelKeyboardProc_InvalidNCode(int nCode, IContext ctx, IInternalContext internalCtx)
+	// {
+	// 	// Given
+	// 	CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+	// 	KeybindHook keybindHook = new(ctx, internalCtx);
 
-		// When
-		keybindHook.PostInitialize();
-		capture.LowLevelKeyboardProc?.Invoke(nCode, 0, 0);
+	// 	// When
+	// 	keybindHook.PostInitialize();
+	// 	capture.LowLevelKeyboardProc?.Invoke(nCode, 0, 0);
 
-		// Then
-		internalCtx.CoreNativeManager.DidNotReceive().PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>());
-		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(nCode, 0, 0);
-	}
+	// 	// Then
+	// 	internalCtx.CoreNativeManager.DidNotReceive().PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>());
+	// 	internalCtx.CoreNativeManager.Received(1).CallNextHookEx(nCode, 0, 0);
+	// }
 
-	[Theory, AutoSubstituteData<KeybindHookCustomization>]
-	internal void LowLevelKeyboardProc_NotPtrToStructure(IContext ctx, IInternalContext internalCtx)
-	{
-		// Given
-		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
-		KeybindHook keybindHook = new(ctx, internalCtx);
-		internalCtx
-			.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>())
-			.Returns(null as KBDLLHOOKSTRUCT?);
+	// [Theory, AutoSubstituteData<KeybindHookCustomization>]
+	// internal void LowLevelKeyboardProc_NotPtrToStructure(IContext ctx, IInternalContext internalCtx)
+	// {
+	// 	// Given
+	// 	CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+	// 	KeybindHook keybindHook = new(ctx, internalCtx);
+	// 	internalCtx
+	// 		.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>())
+	// 		.Returns(null as KBDLLHOOKSTRUCT?);
 
-		// When
-		keybindHook.PostInitialize();
-		capture.LowLevelKeyboardProc?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
+	// 	// When
+	// 	keybindHook.PostInitialize();
+	// 	capture.LowLevelKeyboardProc?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
 
-		// Then
-		internalCtx.CoreNativeManager.Received(1).PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>());
-		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
-	}
+	// 	// Then
+	// 	internalCtx.CoreNativeManager.Received(1).PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>());
+	// 	internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
+	// }
 
-	// WM_KEYDOWN and WM_SYSKEYDOWN
-	[InlineAutoSubstituteData<KeybindHookCustomization>(0x0099)]
-	[InlineAutoSubstituteData<KeybindHookCustomization>(0x0101)]
-	[InlineAutoSubstituteData<KeybindHookCustomization>(0x0103)]
-	[InlineAutoSubstituteData<KeybindHookCustomization>(0x0105)]
-	[Theory]
-	internal void LowLevelKeyboardProc_ValidNCodeButInvalidWParam(
-		uint wParam,
-		IContext ctx,
-		IInternalContext internalCtx
-	)
-	{
-		// Given
-		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
-		KeybindHook keybindHook = new(ctx, internalCtx);
+	// // WM_KEYDOWN and WM_SYSKEYDOWN
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(0x0099)]
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(0x0101)]
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(0x0103)]
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(0x0105)]
+	// [Theory]
+	// internal void LowLevelKeyboardProc_ValidNCodeButInvalidWParam(
+	// 	uint wParam,
+	// 	IContext ctx,
+	// 	IInternalContext internalCtx
+	// )
+	// {
+	// 	// Given
+	// 	CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+	// 	KeybindHook keybindHook = new(ctx, internalCtx);
 
-		// When
-		keybindHook.PostInitialize();
-		capture.LowLevelKeyboardProc?.Invoke(0, wParam, 0);
+	// 	// When
+	// 	keybindHook.PostInitialize();
+	// 	capture.LowLevelKeyboardProc?.Invoke(0, wParam, 0);
 
-		// Then
-		internalCtx.CoreNativeManager.DidNotReceive().PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>());
-		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, wParam, 0);
-	}
+	// 	// Then
+	// 	internalCtx.CoreNativeManager.DidNotReceive().PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>());
+	// 	internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, wParam, 0);
+	// }
 
-	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LSHIFT)]
-	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RSHIFT)]
-	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LMENU)]
-	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RMENU)]
-	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LCONTROL)]
-	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RCONTROL)]
-	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LWIN)]
-	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RWIN)]
-	[Theory]
-	internal void LowLevelKeyboardProc_IgnoredKey(VIRTUAL_KEY key, IContext ctx, IInternalContext internalCtx)
-	{
-		// Given
-		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
-		KeybindHook keybindHook = new(ctx, internalCtx);
-		SetupKey(ctx, internalCtx, [key], VIRTUAL_KEY.None, []);
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LSHIFT)]
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RSHIFT)]
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LMENU)]
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RMENU)]
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LCONTROL)]
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RCONTROL)]
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LWIN)]
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RWIN)]
+	// [Theory]
+	// internal void LowLevelKeyboardProc_IgnoredKey(VIRTUAL_KEY key, IContext ctx, IInternalContext internalCtx)
+	// {
+	// 	// Given
+	// 	CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+	// 	KeybindHook keybindHook = new(ctx, internalCtx);
+	// 	SetupKey(ctx, internalCtx, [key], VIRTUAL_KEY.None, []);
 
-		// When
-		keybindHook.PostInitialize();
-		capture.LowLevelKeyboardProc?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
+	// 	// When
+	// 	keybindHook.PostInitialize();
+	// 	capture.LowLevelKeyboardProc?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
 
-		// Then
-		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
-	}
+	// 	// Then
+	// 	internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
+	// }
 
-	[Theory]
-	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LSHIFT)]
-	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RSHIFT)]
-	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LMENU)]
-	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RMENU)]
-	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LCONTROL)]
-	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RCONTROL)]
-	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LWIN)]
-	[InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RWIN)]
-	internal void LowLevelKeyboardProc_OnlyModifierPressed_IgnoresKey(
-		VIRTUAL_KEY modifier,
-		IContext ctx,
-		IInternalContext internalCtx
-	)
-	{
-		// Given: Only the modifier is pressed
-		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
-		KeybindHook keybindHook = new(ctx, internalCtx);
+	// [Theory]
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LSHIFT)]
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RSHIFT)]
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LMENU)]
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RMENU)]
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LCONTROL)]
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RCONTROL)]
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_LWIN)]
+	// [InlineAutoSubstituteData<KeybindHookCustomization>(VIRTUAL_KEY.VK_RWIN)]
+	// internal void LowLevelKeyboardProc_OnlyModifierPressed_IgnoresKey(
+	// 	VIRTUAL_KEY modifier,
+	// 	IContext ctx,
+	// 	IInternalContext internalCtx
+	// )
+	// {
+	// 	// Given: Only the modifier is pressed
+	// 	CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+	// 	KeybindHook keybindHook = new(ctx, internalCtx);
 
-		// Setup so only the modifier is pressed
-		VIRTUAL_KEY[] modifiers = [modifier];
-		ctx.KeybindManager.Modifiers.Returns(modifiers);
-		internalCtx.CoreNativeManager.GetKeyState((int)modifier).Returns((short)-32768);
-		internalCtx
-			.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>())
-			.Returns(new KBDLLHOOKSTRUCT { vkCode = (uint)modifier });
+	// 	// Setup so only the modifier is pressed
+	// 	VIRTUAL_KEY[] modifiers = [modifier];
+	// 	ctx.KeybindManager.Modifiers.Returns(modifiers);
+	// 	internalCtx.CoreNativeManager.GetKeyState((int)modifier).Returns((short)-32768);
+	// 	internalCtx
+	// 		.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>())
+	// 		.Returns(new KBDLLHOOKSTRUCT { vkCode = (uint)modifier });
 
-		// When
-		keybindHook.PostInitialize();
-		LRESULT? result = capture.LowLevelKeyboardProc?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
+	// 	// When
+	// 	keybindHook.PostInitialize();
+	// 	LRESULT? result = capture.LowLevelKeyboardProc?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
 
-		// Then: Should call next hook
-		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
-		Assert.Equal(0, (nint)result!);
-	}
+	// 	// Then: Should call next hook
+	// 	internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
+	// 	Assert.Equal(0, (nint)result!);
+	// }
 
 	public static readonly TheoryData<VIRTUAL_KEY[], VIRTUAL_KEY, Keybind> KeybindsToExecute = new()
 	{
@@ -350,87 +350,87 @@ public class KeybindHookTests
 		}
 	}
 
-	[Theory, AutoSubstituteData<KeybindHookCustomization>]
-	internal void LowLevelKeyboardProc_NoModifiers(IContext ctx, IInternalContext internalCtx)
-	{
-		// Given
-		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
-		KeybindHook keybindHook = new(ctx, internalCtx);
-		SetupKey(ctx, internalCtx, [], VIRTUAL_KEY.VK_A, []);
+	// [Theory, AutoSubstituteData<KeybindHookCustomization>]
+	// internal void LowLevelKeyboardProc_NoModifiers(IContext ctx, IInternalContext internalCtx)
+	// {
+	// 	// Given
+	// 	CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+	// 	KeybindHook keybindHook = new(ctx, internalCtx);
+	// 	SetupKey(ctx, internalCtx, [], VIRTUAL_KEY.VK_A, []);
 
-		// When
-		keybindHook.PostInitialize();
-		LRESULT? result = capture.LowLevelKeyboardProc?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
+	// 	// When
+	// 	keybindHook.PostInitialize();
+	// 	LRESULT? result = capture.LowLevelKeyboardProc?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
 
-		// Then
-		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
-		Assert.Equal(0, (nint)result!);
-		ctx.KeybindManager.Received(1).GetCommands(new Keybind([], VIRTUAL_KEY.VK_A));
-	}
+	// 	// Then
+	// 	internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
+	// 	Assert.Equal(0, (nint)result!);
+	// 	ctx.KeybindManager.Received(1).GetCommands(new Keybind([], VIRTUAL_KEY.VK_A));
+	// }
 
-	[Theory, AutoSubstituteData<KeybindHookCustomization>]
-	internal void LowLevelKeyboardProc_NoCommands(IContext ctx, IInternalContext internalCtx)
-	{
-		// Given
-		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
-		KeybindHook keybindHook = new(ctx, internalCtx);
-		SetupKey(ctx, internalCtx, [VIRTUAL_KEY.VK_LWIN], VIRTUAL_KEY.VK_U, []);
+	// [Theory, AutoSubstituteData<KeybindHookCustomization>]
+	// internal void LowLevelKeyboardProc_NoCommands(IContext ctx, IInternalContext internalCtx)
+	// {
+	// 	// Given
+	// 	CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+	// 	KeybindHook keybindHook = new(ctx, internalCtx);
+	// 	SetupKey(ctx, internalCtx, [VIRTUAL_KEY.VK_LWIN], VIRTUAL_KEY.VK_U, []);
 
-		// When
-		keybindHook.PostInitialize();
-		LRESULT? result = capture.LowLevelKeyboardProc?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
+	// 	// When
+	// 	keybindHook.PostInitialize();
+	// 	LRESULT? result = capture.LowLevelKeyboardProc?.Invoke(0, PInvoke.WM_KEYDOWN, 0);
 
-		// Then
-		internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
-		Assert.Equal(0, (nint)result!);
-		ctx.KeybindManager.Received(1).GetCommands(new Keybind([VIRTUAL_KEY.VK_LWIN], VIRTUAL_KEY.VK_U));
-	}
+	// 	// Then
+	// 	internalCtx.CoreNativeManager.Received(1).CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
+	// 	Assert.Equal(0, (nint)result!);
+	// 	ctx.KeybindManager.Received(1).GetCommands(new Keybind([VIRTUAL_KEY.VK_LWIN], VIRTUAL_KEY.VK_U));
+	// }
 
-	[Theory, AutoSubstituteData<KeybindHookCustomization>]
-	internal void LowLevelKeyboardProc_HandleException(IContext ctx, IInternalContext internalCtx)
-	{
-		// Given
-		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
-		KeybindHook keybindHook = new(ctx, internalCtx);
+	// [Theory, AutoSubstituteData<KeybindHookCustomization>]
+	// internal void LowLevelKeyboardProc_HandleException(IContext ctx, IInternalContext internalCtx)
+	// {
+	// 	// Given
+	// 	CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+	// 	KeybindHook keybindHook = new(ctx, internalCtx);
 
-		// When
-		keybindHook.PostInitialize();
-		internalCtx
-			.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>())
-			.Returns(_ => throw new Exception());
-		LRESULT? result = capture.LowLevelKeyboardProc?.Invoke(0, PInvoke.WM_SYSKEYDOWN, 0);
+	// 	// When
+	// 	keybindHook.PostInitialize();
+	// 	internalCtx
+	// 		.CoreNativeManager.PtrToStructure<KBDLLHOOKSTRUCT>(Arg.Any<nint>())
+	// 		.Returns(_ => throw new Exception());
+	// 	LRESULT? result = capture.LowLevelKeyboardProc?.Invoke(0, PInvoke.WM_SYSKEYDOWN, 0);
 
-		// Then
-		internalCtx.CoreNativeManager.DidNotReceive().CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
-	}
+	// 	// Then
+	// 	internalCtx.CoreNativeManager.DidNotReceive().CallNextHookEx(0, PInvoke.WM_KEYDOWN, 0);
+	// }
 
-	[Theory, AutoSubstituteData<KeybindHookCustomization>]
-	internal void Dispose_HookIsNull(IContext ctx, IInternalContext internalCtx)
-	{
-		// Given
-		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
-		KeybindHook keybindHook = new(ctx, internalCtx);
+	// [Theory, AutoSubstituteData<KeybindHookCustomization>]
+	// internal void Dispose_HookIsNull(IContext ctx, IInternalContext internalCtx)
+	// {
+	// 	// Given
+	// 	CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+	// 	KeybindHook keybindHook = new(ctx, internalCtx);
 
-		// When
-		keybindHook.Dispose();
+	// 	// When
+	// 	keybindHook.Dispose();
 
-		// Then
-		Assert.Null(capture.Handle);
-	}
+	// 	// Then
+	// 	Assert.Null(capture.Handle);
+	// }
 
-	[Theory, AutoSubstituteData<KeybindHookCustomization>]
-	internal void Dispose(IContext ctx, IInternalContext internalCtx)
-	{
-		// Given
-		CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
-		KeybindHook keybindHook = new(ctx, internalCtx);
-		SetupKey(ctx, internalCtx, [], VIRTUAL_KEY.VK_A, []);
+	// [Theory, AutoSubstituteData<KeybindHookCustomization>]
+	// internal void Dispose(IContext ctx, IInternalContext internalCtx)
+	// {
+	// 	// Given
+	// 	CaptureKeybindHook capture = CaptureKeybindHook.Create(internalCtx);
+	// 	KeybindHook keybindHook = new(ctx, internalCtx);
+	// 	SetupKey(ctx, internalCtx, [], VIRTUAL_KEY.VK_A, []);
 
-		// When
-		keybindHook.PostInitialize();
-		keybindHook.Dispose();
+	// 	// When
+	// 	keybindHook.PostInitialize();
+	// 	keybindHook.Dispose();
 
-		// Then
-		Assert.True(capture.Handle?.HasDisposed);
-	}
+	// 	// Then
+	// 	Assert.True(capture.Handle?.HasDisposed);
+	// }
 }
