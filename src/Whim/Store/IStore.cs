@@ -25,7 +25,7 @@ public interface IStore : IDisposable
 	/// <summary>
 	/// Initialize the event listeners.
 	/// </summary>
-	public void Initialize();
+	void Initialize();
 
 	/// <summary>
 	/// Dispatch updates to transform Whim's state.
@@ -51,7 +51,9 @@ public interface IStore : IDisposable
 	/// Guid firstWorkspace = context.Store.Dispatch(new AddWorkspaceTransform("First Workspace")).Value;
 	/// </code>
 	/// </example>
-	public Result<TResult> Dispatch<TResult>(Transform<TResult> transform);
+	Result<TResult> Dispatch<TResult>(Transform<TResult> transform);
+
+	WhimResult<TResult> WhimDispatch<TResult>(WhimTransform<TResult> transform);
 
 	/// <summary>
 	/// Entry-point to pick from Whim's state.
@@ -77,7 +79,7 @@ public interface IStore : IDisposable
 	/// IMonitor monitor = context.Store.Pick(PickMonitorAtPoint(new Point&lt;int&gt;(100, 200))).Value;
 	/// </code>
 	/// </example>
-	public TResult Pick<TResult>(Picker<TResult> picker);
+	TResult Pick<TResult>(Picker<TResult> picker);
 
 	/// <summary>
 	/// Entry-point to pick from Whim's state.
@@ -103,5 +105,5 @@ public interface IStore : IDisposable
 	/// IWorkspace workspace = context.Store.Pick(PickWorkspaceByWindow(window.Handle)).Value;
 	/// </code>
 	/// </example>
-	public TResult Pick<TResult>(PurePicker<TResult> picker);
+	TResult Pick<TResult>(PurePicker<TResult> picker);
 }

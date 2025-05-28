@@ -88,6 +88,31 @@ internal class Store : IStore
 		return DispatchFn(transform);
 	}
 
+	public WhimResult<TResult> WhimDispatch<TResult>(WhimTransform<TResult> transform)
+	{
+		if (_internalCtx.CoreNativeManager.IsStaThread())
+		{
+			return Task.Run(() =>
+			{
+				Logger.Verbose($"Entering task, executing transform {transform}");
+				try
+				{
+					_lock.EnterWriteLock();
+					return transform.Execute(_ctx, _internalCtx, _root.MutableRootSector);
+				}
+				finally
+				{
+					_root.DoLayout();
+					_root.DispatchEvents();
+					_lock.ExitWriteLock();
+				}
+			}).Result;
+		}
+
+		Logger.Verbose($"Executing transform {transform}");
+		return transform.Execute(_ctx, _internalCtx, _root.MutableRootSector);
+	}
+
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private TResult PickFn<TResult>(Picker<TResult> picker) => picker.Execute(_ctx, _internalCtx, _root);
 

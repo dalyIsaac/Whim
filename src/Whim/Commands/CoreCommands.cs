@@ -19,13 +19,13 @@ internal class CoreCommands : PluginCommands
 		_ = Add(
 				identifier: "activate_previous_workspace",
 				title: "Activate the previous workspace",
-				callback: () => _context.Store.Dispatch(new ActivateAdjacentWorkspaceTransform(Reverse: true)),
+				callback: () => _context.Store.WhimDispatch(new ActivateAdjacentWorkspaceTransform(Reverse: true)),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_LEFT)
 			)
 			.Add(
 				identifier: "activate_next_workspace",
 				title: "Activate the next workspace",
-				callback: () => _context.Store.Dispatch(new ActivateAdjacentWorkspaceTransform()),
+				callback: () => _context.Store.WhimDispatch(new ActivateAdjacentWorkspaceTransform()),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_RIGHT)
 			)
 			.Add(

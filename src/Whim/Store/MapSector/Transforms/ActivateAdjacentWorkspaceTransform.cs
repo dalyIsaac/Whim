@@ -16,16 +16,16 @@ public record ActivateAdjacentWorkspaceTransform(
 	HMONITOR MonitorHandle = default,
 	bool Reverse = false,
 	bool SkipActive = false
-) : Transform
+) : WhimTransform
 {
-	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal override WhimResult<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		MapSector mapSector = rootSector.MapSector;
 		HMONITOR targetMonitorHandle = MonitorHandle.OrActiveMonitor(rootSector);
 
 		if (!mapSector.MonitorWorkspaceMap.TryGetValue(targetMonitorHandle, out WorkspaceId currentWorkspaceId))
 		{
-			return Result.FromException<Unit>(StoreExceptions.NoWorkspaceFoundForMonitor(targetMonitorHandle));
+			return new(StoreExceptions.NoWorkspaceFoundForMonitor(targetMonitorHandle));
 		}
 
 		Result<IWorkspace> nextWorkspaceResult = ctx.Store.Pick(
@@ -33,7 +33,7 @@ public record ActivateAdjacentWorkspaceTransform(
 		);
 		if (!nextWorkspaceResult.TryGet(out IWorkspace? nextWorkspace))
 		{
-			return Result.FromException<Unit>(nextWorkspaceResult.Error!);
+			return WhimResult.FromException<Unit>(nextWorkspaceResult.Error!);
 		}
 
 		return ctx.Store.Dispatch(new ActivateWorkspaceTransform(nextWorkspace.Id, targetMonitorHandle));

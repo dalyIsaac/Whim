@@ -115,6 +115,25 @@ public readonly struct WhimResult<T>
 	/// </summary>
 	/// <param name="error">The error to convert.</param>
 	public static implicit operator WhimResult<T>(WhimError error) => new(error);
+
+	/// <summary>
+	/// Implicitly converts a DotNext.Result&lt;T, Exception&gt; to a WhimResult&lt;T&gt;.
+	/// This assumes that DotNext.Result&lt;T, Exception&gt; has an IsSuccessful property,
+	/// a Value property (of type T) accessible when successful,
+	/// and an Error property (of type Exception) accessible when failed.
+	/// </summary>
+	/// <param name="sourceDotNextResult">The DotNext.Result&lt;T, Exception&gt; to convert.</param>
+	public static implicit operator WhimResult<T>(DotNext.Result<T> sourceDotNextResult)
+	{
+		if (sourceDotNextResult.IsSuccessful)
+		{
+			return new WhimResult<T>(sourceDotNextResult.Value);
+		}
+		else
+		{
+			return WhimResult.FromException<T>(sourceDotNextResult.Error);
+		}
+	}
 }
 
 /// <summary>

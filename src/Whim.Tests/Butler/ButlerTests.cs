@@ -83,7 +83,7 @@ public class ButlerTests
 		sut.ActivateAdjacent(monitor);
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new ActivateAdjacentWorkspaceTransform(monitor.Handle, false, false));
+		ctx.Store.Received(1).WhimDispatch(new ActivateAdjacentWorkspaceTransform(monitor.Handle, false, false));
 	}
 
 	[Theory, AutoSubstituteData]

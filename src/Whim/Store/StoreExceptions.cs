@@ -22,8 +22,8 @@ internal static class StoreExceptions
 	public static Exception NoMonitorFoundForWindow(HWND windowHandle) =>
 		new WhimException($"No monitor found for window {windowHandle}.");
 
-	public static Exception NoWorkspaceFoundForMonitor(HMONITOR monitorHandle) =>
-		new WhimException($"No workspace found for monitor {monitorHandle}.");
+	public static WhimError NoWorkspaceFoundForMonitor(HMONITOR monitorHandle) =>
+		new($"No workspace found for monitor {monitorHandle}.");
 
 	public static Exception NoWorkspaceFoundForWindow(HWND windowHandle) =>
 		new WhimException($"No workspace found for window {windowHandle}.");
