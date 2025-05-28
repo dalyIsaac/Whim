@@ -101,4 +101,105 @@ public class ResultTests
 		// Then
 		Assert.Equal(error, result.Error);
 	}
+
+	[Fact]
+	public void Result_OrInvoke_ReturnsValueForSuccessfulResult()
+	{
+		// Given
+		int expectedValue = 42;
+		WhimResult<int> result = new(expectedValue);
+
+		// When
+		int value = result.OrInvoke(() => 0);
+
+		// Then
+		Assert.Equal(expectedValue, value);
+	}
+
+	[Fact]
+	public void Result_OrInvoke_InvokesFunctionForFailedResult()
+	{
+		// Given
+		WhimError error = new("Test error");
+		WhimResult<int> result = new(error);
+		int fallbackValue = 0;
+
+		// When
+		int value = result.OrInvoke(() => fallbackValue);
+
+		// Then
+		Assert.Equal(fallbackValue, value);
+	}
+
+	[Fact]
+	public void Result_ImplicitConversion_FromValue()
+	{
+		// Given
+		int expectedValue = 42;
+
+		// When
+		WhimResult<int> result = expectedValue;
+
+		// Then
+		Assert.True(result.IsSuccessful);
+		Assert.Equal(expectedValue, result.Value);
+	}
+
+	[Fact]
+	public void Result_ImplicitConversion_FromError()
+	{
+		// Given
+		WhimError error = new("Test error");
+
+		// When
+		WhimResult<int> result = error;
+
+		// Then
+		Assert.False(result.IsSuccessful);
+		Assert.Equal(error, result.Error);
+	}
+
+	[Fact]
+	public void WhimResult_FromValue_CreatesSuccessfulResult()
+	{
+		// Given
+		int expectedValue = 42;
+
+		// When
+		WhimResult<int> result = WhimResult.FromValue(expectedValue);
+
+		// Then
+		Assert.True(result.IsSuccessful);
+		Assert.Equal(expectedValue, result.Value);
+	}
+
+	[Fact]
+	public void WhimResult_FromError_CreatesFailedResult()
+	{
+		// Given
+		WhimError error = new("Test error");
+
+		// When
+		WhimResult<int> result = WhimResult.FromError<int>(error);
+
+		// Then
+		Assert.False(result.IsSuccessful);
+		Assert.Equal(error, result.Error);
+	}
+
+	[Fact]
+	public void WhimResult_FromException_CreatesFailedResult()
+	{
+		// Given
+		Exception exception = new("Test exception");
+
+		// When
+		WhimResult<int> result = WhimResult.FromException<int>(exception);
+
+		// Then
+		Assert.False(result.IsSuccessful);
+		Assert.NotNull(result.Error);
+		Assert.Equal(exception.Message, result.Error.Message);
+		Assert.Equal(exception, result.Error.InnerException);
+	}
 }
