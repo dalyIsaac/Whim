@@ -18,9 +18,9 @@ public record ActivateWorkspaceTransform(
 	WorkspaceId WorkspaceId,
 	HMONITOR MonitorHandle = default,
 	bool FocusWorkspaceWindow = true
-) : Transform
+) : WhimTransform
 {
-	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal override WhimResult<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		MapSector mapSector = rootSector.MapSector;
 

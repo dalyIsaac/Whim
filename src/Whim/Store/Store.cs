@@ -53,6 +53,9 @@ internal class Store : IStore
 	protected virtual Result<TResult> DispatchFn<TResult>(Transform<TResult> transform) =>
 		transform.Execute(_ctx, _internalCtx, _root.MutableRootSector);
 
+	protected virtual Result<TResult> WhimDispatchFn<TResult>(WhimTransform<TResult> transform) =>
+		transform.Execute(_ctx, _internalCtx, _root.MutableRootSector);
+
 	public Result<TResult> Dispatch<TResult>(Transform<TResult> transform)
 	{
 		if (_internalCtx.CoreNativeManager.IsStaThread())
@@ -98,7 +101,7 @@ internal class Store : IStore
 				try
 				{
 					_lock.EnterWriteLock();
-					return transform.Execute(_ctx, _internalCtx, _root.MutableRootSector);
+					return WhimDispatchFn(transform);
 				}
 				finally
 				{

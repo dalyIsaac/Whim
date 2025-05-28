@@ -36,6 +36,6 @@ public record ActivateAdjacentWorkspaceTransform(
 			return WhimResult.FromException<Unit>(nextWorkspaceResult.Error!);
 		}
 
-		return ctx.Store.Dispatch(new ActivateWorkspaceTransform(nextWorkspace.Id, targetMonitorHandle));
+		return ctx.Store.WhimDispatch(new ActivateWorkspaceTransform(nextWorkspace.Id, targetMonitorHandle));
 	}
 }

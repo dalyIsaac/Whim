@@ -32,7 +32,7 @@ internal partial class Butler : IButler
 
 	#region Chores
 	public void Activate(IWorkspace workspace, IMonitor? monitor = null) =>
-		_context.Store.Dispatch(new ActivateWorkspaceTransform(workspace.Id, monitor?.Handle ?? default));
+		_context.Store.WhimDispatch(new ActivateWorkspaceTransform(workspace.Id, monitor?.Handle ?? default));
 
 	public void ActivateAdjacent(IMonitor? monitor = null, bool reverse = false, bool skipActive = false) =>
 		_context.Store.WhimDispatch(

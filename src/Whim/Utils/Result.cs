@@ -134,6 +134,27 @@ public readonly struct WhimResult<T>
 			return WhimResult.FromException<T>(sourceDotNextResult.Error);
 		}
 	}
+
+	/// <summary>
+	/// Implicitly converts a WhimResult&lt;T&gt; to a DotNext.Result&lt;T&gt;.
+	/// </summary>
+	/// <param name="whimResult">The WhimResult&lt;T&gt; to convert.</param>
+	public static implicit operator DotNext.Result<T>(WhimResult<T> whimResult)
+	{
+		if (whimResult.IsSuccessful)
+		{
+			// If WhimResult was created via default constructor WhimResult(), ValueOrDefault is default(T).
+			// DotNext.Result should be able to handle a successful result with a default(T) value.
+			return new DotNext.Result<T>(whimResult.ValueOrDefault!);
+		}
+		else
+		{
+			// whimResult.Error is guaranteed to be non-null if !IsSuccessful.
+			// WhimError ensures Message is non-null.
+			Exception ex = whimResult.Error!.InnerException ?? new Exception(whimResult.Error.Message);
+			return new DotNext.Result<T>(ex);
+		}
+	}
 }
 
 /// <summary>

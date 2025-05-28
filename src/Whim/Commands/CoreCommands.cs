@@ -352,7 +352,7 @@ internal class CoreCommands : PluginCommands
 			int nextIndex = (currentIndex + delta).Mod(workspaces.Count);
 
 			// Focus the next/previous workspace
-			_context.Store.Dispatch(new ActivateWorkspaceTransform(workspaces[nextIndex].Id));
+			_context.Store.WhimDispatch(new ActivateWorkspaceTransform(workspaces[nextIndex].Id));
 		};
 
 	internal Action MoveWindowToWorkspaceOnCurrentMonitor(bool getNext) =>
@@ -396,7 +396,7 @@ internal class CoreCommands : PluginCommands
 			IWorkspace[] workspaces = [.. context.Store.Pick(PickWorkspaces())];
 			if (Index <= workspaces.Length)
 			{
-				context.Store.Dispatch(new ActivateWorkspaceTransform(workspaces[Index - 1].Id));
+				context.Store.WhimDispatch(new ActivateWorkspaceTransform(workspaces[Index - 1].Id));
 			}
 		}
 	}

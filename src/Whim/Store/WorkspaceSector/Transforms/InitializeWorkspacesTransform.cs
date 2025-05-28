@@ -145,7 +145,7 @@ internal record InitializeWorkspacesTransform : Transform
 				if (!processedMonitors.Contains(monitor))
 				{
 					processedMonitors.Add(monitor);
-					ctx.Store.Dispatch(new ActivateWorkspaceTransform(workspaceId, monitor));
+					ctx.Store.WhimDispatch(new ActivateWorkspaceTransform(workspaceId, monitor));
 					break;
 				}
 			}
@@ -159,7 +159,7 @@ internal record InitializeWorkspacesTransform : Transform
 		foreach (HMONITOR monitor in unprocessedMonitors)
 		{
 			ctx.Store.Dispatch(new AddWorkspaceTransform($"Workspace {workspaceSector.Workspaces.Count + 1}"));
-			ctx.Store.Dispatch(new ActivateWorkspaceTransform(workspaceSector.WorkspaceOrder[^1], monitor));
+			ctx.Store.WhimDispatch(new ActivateWorkspaceTransform(workspaceSector.WorkspaceOrder[^1], monitor));
 		}
 	}
 }

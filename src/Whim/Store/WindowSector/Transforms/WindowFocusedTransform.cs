@@ -94,6 +94,6 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 			return;
 		}
 
-		ctx.Store.Dispatch(new ActivateWorkspaceTransform(workspaceForWindow.Id));
+		ctx.Store.WhimDispatch(new ActivateWorkspaceTransform(workspaceForWindow.Id));
 	}
 }

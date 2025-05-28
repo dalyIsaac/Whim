@@ -70,7 +70,7 @@ public class ButlerTests
 		sut.Activate(workspace);
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new ActivateWorkspaceTransform(workspace.Id, default));
+		ctx.Store.Received(1).WhimDispatch(new ActivateWorkspaceTransform(workspace.Id, default));
 	}
 
 	[Theory, AutoSubstituteData]

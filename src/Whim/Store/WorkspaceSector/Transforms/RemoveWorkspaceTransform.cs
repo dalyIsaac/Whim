@@ -47,7 +47,7 @@ public abstract record BaseRemoveWorkspaceTransform() : Transform
 		// Queue events
 		WorkspaceId targetWorkspaceId = sector.WorkspaceOrder[^1];
 		ctx.Store.Dispatch(new MergeWorkspaceWindowsTransform(workspaceToRemove.Id, targetWorkspaceId));
-		ctx.Store.Dispatch(new ActivateWorkspaceTransform(targetWorkspaceId));
+		ctx.Store.WhimDispatch(new ActivateWorkspaceTransform(targetWorkspaceId));
 
 		sector.QueueEvent(new WorkspaceRemovedEventArgs() { Workspace = workspaceToRemove });
 		sector.WorkspacesToLayout.Remove(workspaceToRemove.Id);

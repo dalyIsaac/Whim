@@ -19,6 +19,12 @@ internal class StoreWrapper(IContext ctx, IInternalContext internalCtx) : Store(
 		Transforms.Add(transform);
 		return base.DispatchFn(transform);
 	}
+
+	protected override Result<TResult> WhimDispatchFn<TResult>(WhimTransform<TResult> transform)
+	{
+		Transforms.Add(transform);
+		return base.WhimDispatchFn(transform);
+	}
 }
 
 [SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable")]

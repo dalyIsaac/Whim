@@ -68,7 +68,7 @@ public record MoveWindowToWorkspaceTransform(WorkspaceId TargetWorkspaceId, HWND
 		}
 		else
 		{
-			ctx.Store.Dispatch(new ActivateWorkspaceTransform(TargetWorkspaceId));
+			ctx.Store.WhimDispatch(new ActivateWorkspaceTransform(TargetWorkspaceId));
 		}
 
 		rootSector.WorkspaceSector.WindowHandleToFocus = window.Handle;
