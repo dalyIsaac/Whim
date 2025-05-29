@@ -5,9 +5,10 @@ namespace Whim;
 /// </summary>
 /// <param name="SourceWorkspaceId">The id of the workspace to remove.</param>
 /// <param name="TargetWorkspaceId">The id of the workspace to merge the windows into.</param>
-public record MergeWorkspaceWindowsTransform(WorkspaceId SourceWorkspaceId, WorkspaceId TargetWorkspaceId) : Transform
+public record MergeWorkspaceWindowsTransform(WorkspaceId SourceWorkspaceId, WorkspaceId TargetWorkspaceId)
+	: WhimTransform
 {
-	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal override WhimResult<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		MapSector sector = rootSector.MapSector;
 

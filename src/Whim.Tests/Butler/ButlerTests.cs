@@ -218,7 +218,7 @@ public class ButlerTests
 		sut.MergeWorkspaceWindows(source, target);
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new MergeWorkspaceWindowsTransform(source.Id, target.Id));
+		ctx.Store.Received(1).WhimDispatch(new MergeWorkspaceWindowsTransform(source.Id, target.Id));
 	}
 
 	[Theory, AutoSubstituteData]

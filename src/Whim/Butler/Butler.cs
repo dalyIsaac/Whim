@@ -72,7 +72,7 @@ internal partial class Butler : IButler
 		_context.Store.Dispatch(new MoveWindowToWorkspaceTransform(targetWorkspace.Id, window?.Handle ?? default));
 
 	public void MergeWorkspaceWindows(IWorkspace source, IWorkspace target) =>
-		_context.Store.Dispatch(new MergeWorkspaceWindowsTransform(source.Id, target.Id));
+		_context.Store.WhimDispatch(new MergeWorkspaceWindowsTransform(source.Id, target.Id));
 
 	public void SwapWorkspaceWithAdjacentMonitor(IWorkspace? workspace = null, bool reverse = false) =>
 		_context.Store.Dispatch(new SwapWorkspaceWithAdjacentMonitorTransform(workspace?.Id ?? default, reverse));
