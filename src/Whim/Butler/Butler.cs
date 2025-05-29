@@ -46,7 +46,7 @@ internal partial class Butler : IButler
 
 	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null) =>
 		_context
-			.Store.Dispatch(new MoveWindowEdgesInDirectionTransform(edges, pixelsDeltas, window?.Handle ?? default))
+			.Store.WhimDispatch(new MoveWindowEdgesInDirectionTransform(edges, pixelsDeltas, window?.Handle ?? default))
 			.IsSuccessful;
 
 	public void MoveWindowToAdjacentWorkspace(IWindow? window = null, bool reverse = false, bool skipActive = false) =>

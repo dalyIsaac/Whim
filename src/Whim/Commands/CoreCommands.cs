@@ -81,7 +81,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_left_edge_left",
 				title: "Move the current window's left edge to the left",
 				callback: () =>
-					_context.Store.Dispatch(
+					_context.Store.WhimDispatch(
 						new MoveWindowEdgesInDirectionTransform(
 							Direction.Left,
 							new Point<int>() { X = -MoveWindowEdgeDelta, Y = 0 }
@@ -93,7 +93,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_left_edge_right",
 				title: "Move the current window's left edge to the right",
 				callback: () =>
-					_context.Store.Dispatch(
+					_context.Store.WhimDispatch(
 						new MoveWindowEdgesInDirectionTransform(
 							Direction.Left,
 							new Point<int>() { X = MoveWindowEdgeDelta, Y = 0 }
@@ -105,7 +105,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_right_edge_left",
 				title: "Move the current window's right edge to the left",
 				callback: () =>
-					_context.Store.Dispatch(
+					_context.Store.WhimDispatch(
 						new MoveWindowEdgesInDirectionTransform(
 							Direction.Right,
 							new Point<int>() { X = -MoveWindowEdgeDelta, Y = 0 }
@@ -117,7 +117,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_right_edge_right",
 				title: "Move the current window's right edge to the right",
 				callback: () =>
-					_context.Store.Dispatch(
+					_context.Store.WhimDispatch(
 						new MoveWindowEdgesInDirectionTransform(
 							Direction.Right,
 							new Point<int>() { X = MoveWindowEdgeDelta, Y = 0 }
@@ -129,7 +129,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_top_edge_up",
 				title: "Move the current window's top edge up",
 				callback: () =>
-					_context.Store.Dispatch(
+					_context.Store.WhimDispatch(
 						new MoveWindowEdgesInDirectionTransform(
 							Direction.Up,
 							new Point<int>() { Y = -MoveWindowEdgeDelta }
@@ -141,7 +141,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_top_edge_down",
 				title: "Move the current window's top edge down",
 				callback: () =>
-					_context.Store.Dispatch(
+					_context.Store.WhimDispatch(
 						new MoveWindowEdgesInDirectionTransform(
 							Direction.Up,
 							new Point<int>() { Y = MoveWindowEdgeDelta }
@@ -153,7 +153,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_bottom_edge_up",
 				title: "Move the current window's bottom edge up",
 				callback: () =>
-					_context.Store.Dispatch(
+					_context.Store.WhimDispatch(
 						new MoveWindowEdgesInDirectionTransform(
 							Direction.Down,
 							new Point<int>() { Y = -MoveWindowEdgeDelta }
@@ -165,7 +165,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_bottom_edge_down",
 				title: "Move the current window's bottom edge down",
 				callback: () =>
-					_context.Store.Dispatch(
+					_context.Store.WhimDispatch(
 						new MoveWindowEdgesInDirectionTransform(
 							Direction.Down,
 							new Point<int>() { Y = MoveWindowEdgeDelta }

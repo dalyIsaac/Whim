@@ -10,7 +10,7 @@ public class MoveWindowEdgesInDirectionTransformTests
 		MoveWindowEdgesInDirectionTransform sut = new(Direction.Down, new Point<int>());
 
 		// When
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then
 		Assert.False(result.IsSuccessful);
@@ -23,7 +23,7 @@ public class MoveWindowEdgesInDirectionTransformTests
 		MoveWindowEdgesInDirectionTransform sut = new(Direction.Down, new Point<int>(), (HWND)10);
 
 		// When
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then
 		Assert.False(result.IsSuccessful);
@@ -39,7 +39,7 @@ public class MoveWindowEdgesInDirectionTransformTests
 		MoveWindowEdgesInDirectionTransform sut = new(Direction.Down, new Point<int>(), window.Handle);
 
 		// When
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then
 		Assert.False(result.IsSuccessful);
@@ -58,7 +58,7 @@ public class MoveWindowEdgesInDirectionTransformTests
 		MoveWindowEdgesInDirectionTransform sut = new(Direction.Down, new Point<int>(), window.Handle);
 
 		// When
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then
 		Assert.False(result.IsSuccessful);
@@ -78,7 +78,7 @@ public class MoveWindowEdgesInDirectionTransformTests
 		MoveWindowEdgesInDirectionTransform sut = new(Direction.Down, pixelDeltas, window.Handle);
 
 		// When
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then
 		Assert.True(result.IsSuccessful);

@@ -123,7 +123,9 @@ public class ButlerTests
 
 		// Then
 		ctx.Store.Received(1)
-			.Dispatch(new MoveWindowEdgesInDirectionTransform(Direction.Down, new Point<int>(10, 10), window.Handle));
+			.WhimDispatch(
+				new MoveWindowEdgesInDirectionTransform(Direction.Down, new Point<int>(10, 10), window.Handle)
+			);
 	}
 
 	[Theory, AutoSubstituteData]

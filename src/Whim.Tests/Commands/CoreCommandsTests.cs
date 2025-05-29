@@ -103,7 +103,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new MoveWindowEdgesInDirectionTransform(direction, pixelsDeltas));
+		ctx.Store.Received(1).WhimDispatch(new MoveWindowEdgesInDirectionTransform(direction, pixelsDeltas));
 	}
 
 	[Theory, AutoSubstituteData]

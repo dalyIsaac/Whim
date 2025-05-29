@@ -18,9 +18,9 @@ public record MoveWindowEdgesInDirectionTransform(
 	Direction Edges,
 	IPoint<int> PixelsDeltas,
 	HWND WindowHandle = default
-) : Transform
+) : WhimTransform
 {
-	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal override WhimResult<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		HWND windowHandle = WindowHandle.OrLastFocusedWindow(ctx);
 		if (windowHandle == default)
