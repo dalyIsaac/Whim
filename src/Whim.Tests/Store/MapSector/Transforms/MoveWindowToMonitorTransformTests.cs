@@ -10,7 +10,7 @@ public class MoveWindowToMonitorTransformTests
 		MoveWindowToMonitorTransform sut = new((HMONITOR)10);
 
 		// When
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then
 		Assert.False(result.IsSuccessful);
@@ -23,7 +23,7 @@ public class MoveWindowToMonitorTransformTests
 		MoveWindowToMonitorTransform sut = new((HMONITOR)10);
 
 		// When
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then
 		Assert.False(result.IsSuccessful);
@@ -40,7 +40,7 @@ public class MoveWindowToMonitorTransformTests
 		MoveWindowToMonitorTransform sut = new(monitorHandle, window.Handle);
 
 		// When
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then
 		Assert.False(result.IsSuccessful);
@@ -59,7 +59,7 @@ public class MoveWindowToMonitorTransformTests
 		MoveWindowToMonitorTransform sut = new(monitor.Handle, window.Handle);
 
 		// When
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then
 		Assert.False(result.IsSuccessful);
@@ -77,7 +77,7 @@ public class MoveWindowToMonitorTransformTests
 		MoveWindowToMonitorTransform sut = new(monitor.Handle, window.Handle);
 
 		// When
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then
 		Assert.True(result.IsSuccessful);
@@ -97,7 +97,7 @@ public class MoveWindowToMonitorTransformTests
 		MoveWindowToMonitorTransform sut = new(newMonitor.Handle, window.Handle);
 
 		// When
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then
 		Assert.True(result.IsSuccessful);

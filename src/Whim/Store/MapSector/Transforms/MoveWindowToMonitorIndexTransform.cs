@@ -20,6 +20,6 @@ public record MoveWindowToMonitorIndexTransform(int MonitorIndex, HWND WindowHan
 			return Result.FromException<Unit>(monitorResult.Error!);
 		}
 
-		return ctx.Store.Dispatch(new MoveWindowToMonitorTransform(monitor.Handle, WindowHandle));
+		return ctx.Store.WhimDispatch(new MoveWindowToMonitorTransform(monitor.Handle, WindowHandle));
 	}
 }

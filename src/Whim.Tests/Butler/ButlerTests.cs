@@ -164,7 +164,7 @@ public class ButlerTests
 		sut.MoveWindowToMonitor(monitor, window);
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new MoveWindowToMonitorTransform(monitor.Handle, window.Handle));
+		ctx.Store.Received(1).WhimDispatch(new MoveWindowToMonitorTransform(monitor.Handle, window.Handle));
 	}
 
 	[Theory, AutoSubstituteData]

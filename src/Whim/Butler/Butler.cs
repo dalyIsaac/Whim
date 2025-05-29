@@ -55,7 +55,7 @@ internal partial class Butler : IButler
 		);
 
 	public void MoveWindowToMonitor(IMonitor monitor, IWindow? window = null) =>
-		_context.Store.Dispatch(
+		_context.Store.WhimDispatch(
 			new MoveWindowToMonitorTransform(monitor?.Handle ?? default, window?.Handle ?? default)
 		);
 

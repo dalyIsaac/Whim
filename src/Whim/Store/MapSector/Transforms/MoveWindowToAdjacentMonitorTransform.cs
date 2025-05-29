@@ -21,6 +21,6 @@ public record MoveWindowToAdjacentMonitorTransform(HWND WindowHandle = default, 
 			return Result.FromException<Unit>(targetMonitorResult.Error!);
 		}
 
-		return ctx.Store.Dispatch(new MoveWindowToMonitorTransform(targetMonitor.Handle, WindowHandle));
+		return ctx.Store.WhimDispatch(new MoveWindowToMonitorTransform(targetMonitor.Handle, WindowHandle));
 	}
 }
