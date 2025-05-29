@@ -68,16 +68,16 @@ internal partial class Butler : IButler
 		);
 
 	public void MoveWindowToPoint(IWindow window, IPoint<int> point) =>
-		_context.Store.Dispatch(new MoveWindowToPointTransform(window?.Handle ?? default, point));
+		_context.Store.WhimDispatch(new MoveWindowToPointTransform(window?.Handle ?? default, point));
 
 	public void MoveWindowToWorkspace(IWorkspace targetWorkspace, IWindow? window = null) =>
-		_context.Store.Dispatch(new MoveWindowToWorkspaceTransform(targetWorkspace.Id, window?.Handle ?? default));
+		_context.Store.WhimDispatch(new MoveWindowToWorkspaceTransform(targetWorkspace.Id, window?.Handle ?? default));
 
 	public void MergeWorkspaceWindows(IWorkspace source, IWorkspace target) =>
 		_context.Store.WhimDispatch(new MergeWorkspaceWindowsTransform(source.Id, target.Id));
 
 	public void SwapWorkspaceWithAdjacentMonitor(IWorkspace? workspace = null, bool reverse = false) =>
-		_context.Store.Dispatch(new SwapWorkspaceWithAdjacentMonitorTransform(workspace?.Id ?? default, reverse));
+		_context.Store.WhimDispatch(new SwapWorkspaceWithAdjacentMonitorTransform(workspace?.Id ?? default, reverse));
 
 	protected virtual void Dispose(bool disposing)
 	{

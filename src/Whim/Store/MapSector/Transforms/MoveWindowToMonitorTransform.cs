@@ -41,6 +41,6 @@ public record MoveWindowToMonitorTransform(HMONITOR MonitorHandle, HWND WindowHa
 			return Unit.Result;
 		}
 
-		return ctx.Store.Dispatch(new MoveWindowToWorkspaceTransform(workspace.Id, windowHandle));
+		return ctx.Store.WhimDispatch(new MoveWindowToWorkspaceTransform(workspace.Id, windowHandle));
 	}
 }

@@ -384,7 +384,7 @@ internal class CoreCommands : PluginCommands
 			int nextIndex = (currentIndex + delta).Mod(workspaces.Count);
 
 			// Move the window to the next/previous workspace
-			_context.Store.Dispatch(new MoveWindowToWorkspaceTransform(workspaces[nextIndex].Id, window.Handle));
+			_context.Store.WhimDispatch(new MoveWindowToWorkspaceTransform(workspaces[nextIndex].Id, window.Handle));
 		};
 
 	// This record is necessary, otherwise the index captured is the last one (11)

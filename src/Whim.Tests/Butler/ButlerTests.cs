@@ -151,7 +151,7 @@ public class ButlerTests
 		sut.MoveWindowToPoint(window, new Point<int>(10, 10));
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new MoveWindowToPointTransform(window.Handle, new Point<int>(10, 10)));
+		ctx.Store.Received(1).WhimDispatch(new MoveWindowToPointTransform(window.Handle, new Point<int>(10, 10)));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -204,7 +204,7 @@ public class ButlerTests
 		sut.MoveWindowToWorkspace(workspace, window);
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new MoveWindowToWorkspaceTransform(workspace.Id, window.Handle));
+		ctx.Store.Received(1).WhimDispatch(new MoveWindowToWorkspaceTransform(workspace.Id, window.Handle));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -234,6 +234,6 @@ public class ButlerTests
 		sut.SwapWorkspaceWithAdjacentMonitor(workspace);
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new SwapWorkspaceWithAdjacentMonitorTransform(workspace.Id, false));
+		ctx.Store.Received(1).WhimDispatch(new SwapWorkspaceWithAdjacentMonitorTransform(workspace.Id, false));
 	}
 }

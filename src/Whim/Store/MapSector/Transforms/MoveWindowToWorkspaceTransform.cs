@@ -10,9 +10,9 @@ namespace Whim;
 /// The window to move. If <see langword="null"/>, this will default to
 /// the focused/active window.
 /// </param>
-public record MoveWindowToWorkspaceTransform(WorkspaceId TargetWorkspaceId, HWND WindowHandle = default) : Transform
+public record MoveWindowToWorkspaceTransform(WorkspaceId TargetWorkspaceId, HWND WindowHandle = default) : WhimTransform
 {
-	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal override WhimResult<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		Result<IWorkspace> targetWorkspaceResult = ctx.Store.Pick(PickWorkspaceById(TargetWorkspaceId));
 		if (!targetWorkspaceResult.TryGet(out IWorkspace targetWorkspace))

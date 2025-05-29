@@ -8,9 +8,9 @@ namespace Whim;
 /// When <see langword="true"/>, swaps workspace with the previous monitor, otherwise with the next. Defaults to <see langword="false" />.
 /// </param>
 public record SwapWorkspaceWithAdjacentMonitorTransform(WorkspaceId WorkspaceId = default, bool Reverse = false)
-	: Transform
+	: WhimTransform
 {
-	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal override WhimResult<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		// Get the current monitor.
 		WorkspaceId workspaceId = WorkspaceId.OrActiveWorkspace(ctx);

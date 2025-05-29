@@ -13,7 +13,7 @@ public class MoveWindowToWorkspaceTransformTests
 		CustomAssert.DoesNotRaise<MonitorWorkspaceChangedEventArgs>(
 			h => rootSector.MapSector.MonitorWorkspaceChanged += h,
 			h => rootSector.MapSector.MonitorWorkspaceChanged -= h,
-			() => result = ctx.Store.Dispatch(sut)
+			() => result = ctx.Store.WhimDispatch(sut)
 		);
 		return result!.Value;
 	}
@@ -30,7 +30,7 @@ public class MoveWindowToWorkspaceTransformTests
 		CustomAssert.Raises<MonitorWorkspaceChangedEventArgs>(
 			h => rootSector.MapSector.MonitorWorkspaceChanged += h,
 			h => rootSector.MapSector.MonitorWorkspaceChanged -= h,
-			() => result = ctx.Store.Dispatch(sut),
+			() => result = ctx.Store.WhimDispatch(sut),
 			(sender, args) => evs.Add(args)
 		);
 

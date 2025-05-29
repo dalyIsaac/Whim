@@ -10,9 +10,9 @@ namespace Whim;
 /// The point to move the window to. The point is in the coordinate space of the monitors,
 /// not the unit square.
 /// </param>
-public record MoveWindowToPointTransform(HWND WindowHandle, IPoint<int> Point) : Transform
+public record MoveWindowToPointTransform(HWND WindowHandle, IPoint<int> Point) : WhimTransform
 {
-	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal override WhimResult<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		// Get the monitor.
 		if (!ctx.Store.Pick(PickMonitorAtPoint(Point)).TryGet(out IMonitor targetMonitor))
