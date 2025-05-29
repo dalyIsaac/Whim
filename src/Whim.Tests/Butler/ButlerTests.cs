@@ -109,7 +109,7 @@ public class ButlerTests
 		sut.FocusMonitorDesktop(monitor);
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new FocusMonitorDesktopTransform(monitor.Handle));
+		ctx.Store.Received(1).WhimDispatch(new FocusMonitorDesktopTransform(monitor.Handle));
 	}
 
 	[Theory, AutoSubstituteData]

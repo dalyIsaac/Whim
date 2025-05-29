@@ -113,7 +113,7 @@ internal class Store : IStore
 		}
 
 		Logger.Verbose($"Executing transform {transform}");
-		return transform.Execute(_ctx, _internalCtx, _root.MutableRootSector);
+		return WhimDispatchFn(transform);
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]

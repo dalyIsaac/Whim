@@ -32,7 +32,7 @@ public record FocusWorkspaceTransform(WorkspaceId WorkspaceId) : BaseWorkspaceTr
 			return Result.FromException<Workspace>(monitorResult.Error!);
 		}
 
-		ctx.Store.Dispatch(new FocusMonitorDesktopTransform(monitor.Handle));
+		ctx.Store.WhimDispatch(new FocusMonitorDesktopTransform(monitor.Handle));
 		return workspace;
 	}
 }

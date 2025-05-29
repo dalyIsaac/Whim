@@ -42,7 +42,7 @@ internal partial class Butler : IButler
 	public void LayoutAllActiveWorkspaces() => _context.Store.Dispatch(new LayoutAllActiveWorkspacesTransform());
 
 	public void FocusMonitorDesktop(IMonitor monitor) =>
-		_context.Store.Dispatch(new FocusMonitorDesktopTransform(monitor?.Handle ?? default));
+		_context.Store.WhimDispatch(new FocusMonitorDesktopTransform(monitor?.Handle ?? default));
 
 	public bool MoveWindowEdgesInDirection(Direction edges, IPoint<int> pixelsDeltas, IWindow? window = null) =>
 		_context

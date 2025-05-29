@@ -4,14 +4,14 @@ namespace Whim;
 /// Focus the Windows desktop's window.
 /// </summary>
 /// <param name="MonitorHandle"></param>
-public record FocusMonitorDesktopTransform(HMONITOR MonitorHandle) : Transform
+public record FocusMonitorDesktopTransform(HMONITOR MonitorHandle) : WhimTransform
 {
-	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal override WhimResult<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		Result<IMonitor> monitorResult = ctx.Store.Pick(PickMonitorByHandle(MonitorHandle));
 		if (!monitorResult.TryGet(out IMonitor monitor))
 		{
-			return Result.FromException<Unit>(monitorResult.Error!);
+			return WhimResult.FromException<Unit>(monitorResult.Error!);
 		}
 
 		rootSector.WorkspaceSector.WindowHandleToFocus = internalCtx.CoreNativeManager.GetDesktopWindow();

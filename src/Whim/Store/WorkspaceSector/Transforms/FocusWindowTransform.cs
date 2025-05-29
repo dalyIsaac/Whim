@@ -29,7 +29,7 @@ public record FocusWindowTransform(HWND WindowHandle = default) : Transform<Unit
 			{
 				Logger.Debug("No last focused window to focus, focusing desktop");
 				HMONITOR activeMonitor = ctx.Store.Pick(PickActiveMonitor()).Handle;
-				return ctx.Store.Dispatch(new FocusMonitorDesktopTransform(activeMonitor));
+				return ctx.Store.WhimDispatch(new FocusMonitorDesktopTransform(activeMonitor));
 			}
 
 			windowHandle = lastFocusedWindowHandle;
