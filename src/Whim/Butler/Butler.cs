@@ -39,7 +39,7 @@ internal partial class Butler : IButler
 			new ActivateAdjacentWorkspaceTransform(monitor?.Handle ?? default, reverse, skipActive)
 		);
 
-	public void LayoutAllActiveWorkspaces() => _context.Store.Dispatch(new LayoutAllActiveWorkspacesTransform());
+	public void LayoutAllActiveWorkspaces() => _context.Store.WhimDispatch(new LayoutAllActiveWorkspacesTransform());
 
 	public void FocusMonitorDesktop(IMonitor monitor) =>
 		_context.Store.WhimDispatch(new FocusMonitorDesktopTransform(monitor?.Handle ?? default));

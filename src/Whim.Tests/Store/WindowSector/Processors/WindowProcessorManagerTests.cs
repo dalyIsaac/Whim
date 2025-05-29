@@ -76,6 +76,6 @@ public class WindowProcessorManagerTests
 
 		// Then the result should be true, and a LayoutAllActiveWorkspacesTransform should be dispatched
 		Assert.True(result);
-		ctx.Store.Received().Dispatch(Arg.Any<LayoutAllActiveWorkspacesTransform>());
+		ctx.Store.Received().WhimDispatch(Arg.Any<LayoutAllActiveWorkspacesTransform>());
 	}
 }

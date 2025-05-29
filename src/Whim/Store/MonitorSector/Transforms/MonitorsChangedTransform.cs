@@ -179,7 +179,7 @@ internal record MonitorsChangedTransform : Transform
 
 			// For each workspace which is active in a monitor, do a layout.
 			// This will handle cases when the monitor's properties have changed.
-			ctx.Store.Dispatch(new LayoutAllActiveWorkspacesTransform());
+			ctx.Store.WhimDispatch(new LayoutAllActiveWorkspacesTransform());
 		});
 	}
 }

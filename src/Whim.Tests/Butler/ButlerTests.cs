@@ -96,7 +96,7 @@ public class ButlerTests
 		sut.LayoutAllActiveWorkspaces();
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new LayoutAllActiveWorkspacesTransform());
+		ctx.Store.Received(1).WhimDispatch(new LayoutAllActiveWorkspacesTransform());
 	}
 
 	[Theory, AutoSubstituteData]
