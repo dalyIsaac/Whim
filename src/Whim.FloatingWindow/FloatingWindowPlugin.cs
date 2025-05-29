@@ -81,7 +81,9 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin
 
 		if (_floatingWindows.Remove(window.Handle))
 		{
-			_context.Store.WhimDispatch(new MoveWindowToPointTransform(window.Handle, windowPosition.LastWindowRectangle));
+			_context.Store.WhimDispatch(
+				new MoveWindowToPointTransform(window.Handle, windowPosition.LastWindowRectangle)
+			);
 		}
 	}
 
