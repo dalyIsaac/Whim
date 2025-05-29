@@ -9,9 +9,9 @@ namespace Whim;
 /// <param name="Reverse">
 /// When <see langword="true"/>, moves to the previous monitor, otherwise moves to the next monitor. Defaults to <see langword="false" />.
 /// </param>
-public record MoveWindowToAdjacentMonitorTransform(HWND WindowHandle = default, bool Reverse = false) : Transform
+public record MoveWindowToAdjacentMonitorTransform(HWND WindowHandle = default, bool Reverse = false) : WhimTransform
 {
-	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal override WhimResult<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		HMONITOR activeMonitorHandle = rootSector.MonitorSector.ActiveMonitorHandle;
 

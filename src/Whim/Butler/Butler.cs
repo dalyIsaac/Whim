@@ -60,10 +60,12 @@ internal partial class Butler : IButler
 		);
 
 	public void MoveWindowToPreviousMonitor(IWindow? window = null) =>
-		_context.Store.Dispatch(new MoveWindowToAdjacentMonitorTransform(window?.Handle ?? default, Reverse: true));
+		_context.Store.WhimDispatch(new MoveWindowToAdjacentMonitorTransform(window?.Handle ?? default, Reverse: true));
 
 	public void MoveWindowToNextMonitor(IWindow? window = null) =>
-		_context.Store.Dispatch(new MoveWindowToAdjacentMonitorTransform(window?.Handle ?? default, Reverse: false));
+		_context.Store.WhimDispatch(
+			new MoveWindowToAdjacentMonitorTransform(window?.Handle ?? default, Reverse: false)
+		);
 
 	public void MoveWindowToPoint(IWindow window, IPoint<int> point) =>
 		_context.Store.Dispatch(new MoveWindowToPointTransform(window?.Handle ?? default, point));

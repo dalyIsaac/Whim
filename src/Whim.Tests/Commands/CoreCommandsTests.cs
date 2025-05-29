@@ -119,7 +119,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new MoveWindowToAdjacentMonitorTransform(Reverse: true));
+		ctx.Store.Received(1).WhimDispatch(new MoveWindowToAdjacentMonitorTransform(Reverse: true));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -135,7 +135,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new MoveWindowToAdjacentMonitorTransform());
+		ctx.Store.Received(1).WhimDispatch(new MoveWindowToAdjacentMonitorTransform());
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]

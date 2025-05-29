@@ -177,7 +177,7 @@ public class ButlerTests
 		sut.MoveWindowToPreviousMonitor(window);
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new MoveWindowToAdjacentMonitorTransform(window.Handle, Reverse: true));
+		ctx.Store.Received(1).WhimDispatch(new MoveWindowToAdjacentMonitorTransform(window.Handle, Reverse: true));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -190,7 +190,7 @@ public class ButlerTests
 		sut.MoveWindowToNextMonitor(window);
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new MoveWindowToAdjacentMonitorTransform(window.Handle, Reverse: false));
+		ctx.Store.Received(1).WhimDispatch(new MoveWindowToAdjacentMonitorTransform(window.Handle, Reverse: false));
 	}
 
 	[Theory, AutoSubstituteData]

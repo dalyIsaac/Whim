@@ -176,13 +176,13 @@ internal class CoreCommands : PluginCommands
 			.Add(
 				identifier: "move_window_to_previous_monitor",
 				title: "Move the window to the previous monitor",
-				callback: () => _context.Store.Dispatch(new MoveWindowToAdjacentMonitorTransform(Reverse: true)),
+				callback: () => _context.Store.WhimDispatch(new MoveWindowToAdjacentMonitorTransform(Reverse: true)),
 				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_LEFT)
 			)
 			.Add(
 				identifier: "move_window_to_next_monitor",
 				title: "Move the window to the next monitor",
-				callback: () => _context.Store.Dispatch(new MoveWindowToAdjacentMonitorTransform()),
+				callback: () => _context.Store.WhimDispatch(new MoveWindowToAdjacentMonitorTransform()),
 				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_RIGHT)
 			)
 			.Add(
