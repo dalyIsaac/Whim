@@ -9,9 +9,9 @@ namespace Whim;
 /// <param name="WindowHandle">
 /// The handle of the window to move. If not provided, this will default to the focused/active window.
 /// </param>
-public record MoveWindowToMonitorIndexTransform(int MonitorIndex, HWND WindowHandle = default) : Transform
+public record MoveWindowToMonitorIndexTransform(int MonitorIndex, HWND WindowHandle = default) : WhimTransform
 {
-	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal override WhimResult<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		// Get the monitor at index.
 		Result<IMonitor> monitorResult = ctx.Store.Pick(PickMonitorByIndex(MonitorIndex));
