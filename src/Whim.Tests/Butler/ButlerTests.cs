@@ -138,7 +138,7 @@ public class ButlerTests
 		sut.MoveWindowToAdjacentWorkspace(window);
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new MoveWindowToAdjacentWorkspaceTransform(window.Handle, false, false));
+		ctx.Store.Received(1).WhimDispatch(new MoveWindowToAdjacentWorkspaceTransform(window.Handle, false, false));
 	}
 
 	[Theory, AutoSubstituteData]

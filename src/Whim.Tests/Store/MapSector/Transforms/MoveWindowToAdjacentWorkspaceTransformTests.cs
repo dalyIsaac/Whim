@@ -10,7 +10,7 @@ public class MoveWindowToAdjacentWorkspaceTransformTests
 		MoveWindowToAdjacentWorkspaceTransform sut = new();
 
 		// When
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then
 		Assert.False(result.IsSuccessful);
@@ -23,7 +23,7 @@ public class MoveWindowToAdjacentWorkspaceTransformTests
 		MoveWindowToAdjacentWorkspaceTransform sut = new((HWND)10);
 
 		// When
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then
 		Assert.False(result.IsSuccessful);
@@ -39,7 +39,7 @@ public class MoveWindowToAdjacentWorkspaceTransformTests
 		MoveWindowToAdjacentWorkspaceTransform sut = new(window.Handle);
 
 		// When
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then
 		Assert.False(result.IsSuccessful);
@@ -60,7 +60,7 @@ public class MoveWindowToAdjacentWorkspaceTransformTests
 		MoveWindowToAdjacentWorkspaceTransform sut = new(window.Handle);
 
 		// When
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then
 		Assert.False(result.IsSuccessful);
@@ -76,7 +76,7 @@ public class MoveWindowToAdjacentWorkspaceTransformTests
 		MoveWindowToAdjacentWorkspaceTransform sut = new(window.Handle);
 
 		// When
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then
 		Assert.True(result.IsSuccessful);
@@ -98,7 +98,7 @@ public class MoveWindowToAdjacentWorkspaceTransformTests
 
 		// When
 		Result<Unit>? result = null;
-		CustomAssert.Layout(rootSector, () => result = ctx.Store.Dispatch(sut), [workspace1.Id, workspace2.Id]);
+		CustomAssert.Layout(rootSector, () => result = ctx.Store.WhimDispatch(sut), [workspace1.Id, workspace2.Id]);
 
 		// Then
 		Assert.True(result!.Value.IsSuccessful);

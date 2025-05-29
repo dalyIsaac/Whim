@@ -50,7 +50,7 @@ internal partial class Butler : IButler
 			.IsSuccessful;
 
 	public void MoveWindowToAdjacentWorkspace(IWindow? window = null, bool reverse = false, bool skipActive = false) =>
-		_context.Store.Dispatch(
+		_context.Store.WhimDispatch(
 			new MoveWindowToAdjacentWorkspaceTransform(window?.Handle ?? default, reverse, skipActive)
 		);
 

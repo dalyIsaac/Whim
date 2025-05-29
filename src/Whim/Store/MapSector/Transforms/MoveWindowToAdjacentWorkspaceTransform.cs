@@ -16,9 +16,9 @@ public record MoveWindowToAdjacentWorkspaceTransform(
 	HWND WindowHandle = default,
 	bool Reverse = false,
 	bool SkipActive = false
-) : Transform
+) : WhimTransform
 {
-	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal override WhimResult<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		HWND windowHandle = WindowHandle.OrLastFocusedWindow(ctx);
 		if (windowHandle == default)
