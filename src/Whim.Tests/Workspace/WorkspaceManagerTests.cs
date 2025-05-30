@@ -31,7 +31,7 @@ public class WorkspaceManagerTests
 #pragma warning restore IDE0017 // Simplify object initialization
 
 		// Then
-		ctx.Store.Received(1).Dispatch(Arg.Any<SetCreateLayoutEnginesTransform>());
+		ctx.Store.Received(1).WhimDispatch(Arg.Any<SetCreateLayoutEnginesTransform>());
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -70,7 +70,7 @@ public class WorkspaceManagerTests
 		var _ = sut.Add();
 
 		// Then
-		ctx.Store.Received(1).Dispatch(Arg.Any<AddWorkspaceTransform>());
+		ctx.Store.Received(1).WhimDispatch(Arg.Any<AddWorkspaceTransform>());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -83,7 +83,7 @@ public class WorkspaceManagerTests
 		var _ = sut.Add("test", []);
 
 		// Then
-		ctx.Store.Received(1).Dispatch(Arg.Any<AddWorkspaceTransform>());
+		ctx.Store.Received(1).WhimDispatch(Arg.Any<AddWorkspaceTransform>());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -96,7 +96,7 @@ public class WorkspaceManagerTests
 		sut.AddProxyLayoutEngine(Substitute.For<ProxyLayoutEngineCreator>());
 
 		// Then
-		ctx.Store.Received(1).Dispatch(Arg.Any<AddProxyLayoutEngineTransform>());
+		ctx.Store.Received(1).WhimDispatch(Arg.Any<AddProxyLayoutEngineTransform>());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -295,7 +295,7 @@ public class WorkspaceManagerTests
 		sut.Remove("foo");
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new RemoveWorkspaceByNameTransform("foo"));
+		ctx.Store.Received(1).WhimDispatch(new RemoveWorkspaceByNameTransform("foo"));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -308,7 +308,7 @@ public class WorkspaceManagerTests
 		sut.Remove(workspace);
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new RemoveWorkspaceByIdTransform(workspace.Id));
+		ctx.Store.Received(1).WhimDispatch(new RemoveWorkspaceByIdTransform(workspace.Id));
 	}
 
 	[Theory, AutoSubstituteData]

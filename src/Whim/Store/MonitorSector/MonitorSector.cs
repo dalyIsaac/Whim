@@ -22,7 +22,7 @@ internal class MonitorSector(IContext ctx, IInternalContext internalCtx)
 	public override void Initialize()
 	{
 		Logger.Information("Initializing MonitorSector");
-		_ctx.Store.Dispatch(new MonitorsChangedTransform());
+		_ctx.Store.WhimDispatch(new MonitorsChangedTransform());
 		_listener.Initialize();
 	}
 

@@ -111,7 +111,7 @@ public class UpdaterPlugin : IUpdaterPlugin
 	public void SkipRelease(string? tagName = null)
 	{
 		SkippedReleaseTagName = tagName ?? _releaseManager.NextRelease?.TagName;
-		_ctx.Store.Dispatch(new SaveStateTransform());
+		_ctx.Store.WhimDispatch(new SaveStateTransform());
 	}
 
 	/// <inheritdoc />

@@ -14,19 +14,19 @@ namespace Whim;
 /// <param name="context"></param>
 internal class MonitorManager(IContext context) : IInternalMonitorManager, IMonitorManager
 {
-	private readonly IContext _context = context;
+	private readonly IContext _ctx = context;
 
 	private bool _disposedValue;
 
-	public IMonitor ActiveMonitor => _context.Store.Pick(PickActiveMonitor());
+	public IMonitor ActiveMonitor => _ctx.Store.Pick(PickActiveMonitor());
 
-	public IMonitor PrimaryMonitor => _context.Store.Pick(PickPrimaryMonitor());
+	public IMonitor PrimaryMonitor => _ctx.Store.Pick(PickPrimaryMonitor());
 
-	public IMonitor LastWhimActiveMonitor => _context.Store.Pick(PickLastWhimActiveMonitor());
+	public IMonitor LastWhimActiveMonitor => _ctx.Store.Pick(PickLastWhimActiveMonitor());
 
-	public int Length => _context.Store.Pick(PickAllMonitors()).Count;
+	public int Length => _ctx.Store.Pick(PickAllMonitors()).Count;
 
-	public IEnumerator<IMonitor> GetEnumerator() => _context.Store.Pick(PickAllMonitors()).GetEnumerator();
+	public IEnumerator<IMonitor> GetEnumerator() => _ctx.Store.Pick(PickAllMonitors()).GetEnumerator();
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -34,26 +34,26 @@ internal class MonitorManager(IContext context) : IInternalMonitorManager, IMoni
 
 	public void Initialize()
 	{
-		_context.Store.MonitorEvents.MonitorsChanged += MonitorSector_MonitorsChanged;
+		_ctx.Store.MonitorEvents.MonitorsChanged += MonitorSector_MonitorsChanged;
 	}
 
 	private void MonitorSector_MonitorsChanged(object? sender, MonitorsChangedEventArgs e) =>
 		MonitorsChanged?.Invoke(sender, e);
 
 	public void ActivateEmptyMonitor(IMonitor monitor) =>
-		_context.Store.Dispatch(new ActivateEmptyMonitorTransform(monitor.Handle));
+		_ctx.Store.WhimDispatch(new ActivateEmptyMonitorTransform(monitor.Handle));
 
 	public IMonitor GetMonitorAtPoint(IPoint<int> point) =>
-		_context.Store.Pick(PickMonitorAtPoint(point, getFirst: true)).Value;
+		_ctx.Store.Pick(PickMonitorAtPoint(point, getFirst: true)).Value;
 
 	public IMonitor GetPreviousMonitor(IMonitor monitor) =>
-		_context.Store.Pick(PickAdjacentMonitor(monitor.Handle, reverse: true, getFirst: true)).Value;
+		_ctx.Store.Pick(PickAdjacentMonitor(monitor.Handle, reverse: true, getFirst: true)).Value;
 
 	public IMonitor GetNextMonitor(IMonitor monitor) =>
-		_context.Store.Pick(PickAdjacentMonitor(monitor.Handle, reverse: false, getFirst: true)).Value;
+		_ctx.Store.Pick(PickAdjacentMonitor(monitor.Handle, reverse: false, getFirst: true)).Value;
 
 	public IMonitor? GetMonitorByHandle(HMONITOR hmonitor) =>
-		_context.Store.Pick(PickMonitorByHandle(hmonitor)).ValueOrDefault;
+		_ctx.Store.Pick(PickMonitorByHandle(hmonitor)).ValueOrDefault;
 
 	protected virtual void Dispose(bool disposing)
 	{
@@ -64,7 +64,7 @@ internal class MonitorManager(IContext context) : IInternalMonitorManager, IMoni
 				Logger.Debug("Disposing monitor manager");
 
 				// dispose managed state (managed objects)
-				_context.Store.MonitorEvents.MonitorsChanged -= MonitorSector_MonitorsChanged;
+				_ctx.Store.MonitorEvents.MonitorsChanged -= MonitorSector_MonitorsChanged;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

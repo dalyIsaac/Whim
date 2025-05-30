@@ -12,7 +12,7 @@ public class AddProxyLayoutEngineTransformTests
 		AddProxyLayoutEngineTransform sut = new(proxyLayoutEngineCreator);
 
 		// When
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then
 		Assert.True(result.IsSuccessful);

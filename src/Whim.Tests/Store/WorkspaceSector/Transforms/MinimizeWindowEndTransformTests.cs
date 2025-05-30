@@ -32,7 +32,7 @@ public class MinimizeWindowEndTransformTests
 		engine2.MinimizeWindowEnd(Arg.Any<IWindow>()).Returns(engine2);
 
 		// When we execute the transform
-		var result = ctx.Store.Dispatch(new MinimizeWindowEndTransform(workspace.Id, handle));
+		var result = ctx.Store.WhimDispatch(new MinimizeWindowEndTransform(workspace.Id, handle));
 
 		// Then it succeeds
 		Assert.True(result.IsSuccessful);
@@ -71,7 +71,7 @@ public class MinimizeWindowEndTransformTests
 		);
 
 		// When we execute the transform
-		var result = ctx.Store.Dispatch(new MinimizeWindowEndTransform(workspace.Id, handle));
+		var result = ctx.Store.WhimDispatch(new MinimizeWindowEndTransform(workspace.Id, handle));
 
 		// Then it succeeds
 		Assert.True(result.IsSuccessful);

@@ -230,7 +230,7 @@ public class WindowManagerTests
 		sut.AddWindow(hwnd);
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new WindowAddedTransform(hwnd));
+		ctx.Store.Received(1).WhimDispatch(new WindowAddedTransform(hwnd));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -243,7 +243,7 @@ public class WindowManagerTests
 		sut.OnWindowFocused(window);
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new WindowFocusedTransform(window));
+		ctx.Store.Received(1).WhimDispatch(new WindowFocusedTransform(window));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -256,7 +256,7 @@ public class WindowManagerTests
 		sut.OnWindowRemoved(window);
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new WindowRemovedTransform(window));
+		ctx.Store.Received(1).WhimDispatch(new WindowRemovedTransform(window));
 	}
 
 	[Theory, AutoSubstituteData]

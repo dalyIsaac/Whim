@@ -84,7 +84,7 @@ public class MonitorManagerTests
 		Assert.Raises<MonitorsChangedEventArgs>(
 			h => sut.MonitorsChanged += h,
 			h => sut.MonitorsChanged -= h,
-			() => ctx.Store.Dispatch(new MonitorsChangedTransform())
+			() => ctx.Store.WhimDispatch(new MonitorsChangedTransform())
 		);
 	}
 
@@ -98,7 +98,7 @@ public class MonitorManagerTests
 		sut.ActivateEmptyMonitor(monitor);
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new ActivateEmptyMonitorTransform(monitor.Handle));
+		ctx.Store.Received(1).WhimDispatch(new ActivateEmptyMonitorTransform(monitor.Handle));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -129,7 +129,7 @@ public class MonitorManagerTests
 		CustomAssert.DoesNotRaise<MonitorsChangedEventArgs>(
 			h => sut.MonitorsChanged += h,
 			h => sut.MonitorsChanged -= h,
-			() => ctx.Store.Dispatch(new MonitorsChangedTransform())
+			() => ctx.Store.WhimDispatch(new MonitorsChangedTransform())
 		);
 	}
 }

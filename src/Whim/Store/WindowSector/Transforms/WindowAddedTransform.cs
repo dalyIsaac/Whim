@@ -1,8 +1,8 @@
 namespace Whim;
 
-internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOptions = null) : Transform<IWindow>()
+internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOptions = null) : WhimTransform<IWindow>()
 {
-	internal override Result<IWindow> Execute(
+	internal override WhimResult<IWindow> Execute(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector
@@ -111,11 +111,11 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 
 		if (window.IsMinimized)
 		{
-			ctx.Store.Dispatch(new MinimizeWindowStartTransform(workspace.Id, window.Handle));
+			ctx.Store.WhimDispatch(new MinimizeWindowStartTransform(workspace.Id, window.Handle));
 		}
 		else
 		{
-			ctx.Store.Dispatch(new AddWindowToWorkspaceTransform(workspace.Id, window));
+			ctx.Store.WhimDispatch(new AddWindowToWorkspaceTransform(workspace.Id, window));
 		}
 
 		mapSector.QueueEvent(RouteEventArgs.WindowAdded(window, workspace));

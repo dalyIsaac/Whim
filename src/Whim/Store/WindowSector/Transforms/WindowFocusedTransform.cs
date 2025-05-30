@@ -1,8 +1,8 @@
 namespace Whim;
 
-internal record WindowFocusedTransform(IWindow? Window) : Transform()
+internal record WindowFocusedTransform(IWindow? Window) : WhimTransform()
 {
-	internal override Result<Unit> Execute(
+	internal override WhimResult<Unit> Execute(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector

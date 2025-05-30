@@ -11,7 +11,7 @@ public class MouseLeftButtonDownTransformTests
 		MouseLeftButtonDownTransform sut = new();
 
 		// When
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then the left mouse button is longer down
 		Assert.True(result.IsSuccessful);

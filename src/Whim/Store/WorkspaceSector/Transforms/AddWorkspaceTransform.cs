@@ -27,9 +27,9 @@ public record AddWorkspaceTransform(
 	IEnumerable<CreateLeafLayoutEngine>? CreateLeafLayoutEngines = null,
 	WorkspaceId WorkspaceId = default,
 	IEnumerable<int>? MonitorIndices = null
-) : Transform<WorkspaceId>
+) : WhimTransform<WorkspaceId>
 {
-	internal override Result<WorkspaceId> Execute(
+	internal override WhimResult<WorkspaceId> Execute(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector

@@ -9,7 +9,7 @@ public class ActivateEmptyMonitorTransformTests
 		ActivateEmptyMonitorTransform sut = new((HMONITOR)123);
 
 		// When we execute the transform
-		ctx.Store.Dispatch(sut);
+		ctx.Store.WhimDispatch(sut);
 
 		// Then the ActiveMonitorIndex was not updated
 		Assert.Equal((HMONITOR)0, mutableRootSector.MonitorSector.ActiveMonitorHandle);
@@ -26,7 +26,7 @@ public class ActivateEmptyMonitorTransformTests
 		ActivateEmptyMonitorTransform sut = new(handle);
 
 		// When we execute the transform
-		ctx.Store.Dispatch(sut);
+		ctx.Store.WhimDispatch(sut);
 
 		// Then the ActiveMonitorIndex was updated
 		Assert.Equal(handle, mutableRootSector.MonitorSector.ActiveMonitorHandle);

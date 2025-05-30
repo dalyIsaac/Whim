@@ -16,7 +16,7 @@ public class WindowMinimizeStartedTransformTests
 		CustomAssert.DoesNotRaise<WindowMinimizeStartedEventArgs>(
 			h => mutableRootSector.WindowSector.WindowMinimizeStarted += h,
 			h => mutableRootSector.WindowSector.WindowMinimizeStarted -= h,
-			() => result = ctx.Store.Dispatch(sut)
+			() => result = ctx.Store.WhimDispatch(sut)
 		);
 
 		// Then
@@ -45,7 +45,7 @@ public class WindowMinimizeStartedTransformTests
 			h => rootSector.WindowSector.WindowMinimizeStarted -= h,
 			() =>
 			{
-				CustomAssert.Layout(rootSector, () => result = ctx.Store.Dispatch(sut), [workspace.Id]);
+				CustomAssert.Layout(rootSector, () => result = ctx.Store.WhimDispatch(sut), [workspace.Id]);
 			}
 		);
 

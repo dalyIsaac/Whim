@@ -31,7 +31,7 @@ public class RootEventListenerTests
 		);
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new MouseLeftButtonUpTransform(new Point<int>(1, 2)));
+		ctx.Store.Received(1).WhimDispatch(new MouseLeftButtonUpTransform(new Point<int>(1, 2)));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -48,7 +48,7 @@ public class RootEventListenerTests
 		);
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new MouseLeftButtonDownTransform());
+		ctx.Store.Received(1).WhimDispatch(new MouseLeftButtonDownTransform());
 	}
 
 	[Theory, AutoSubstituteData]

@@ -1,8 +1,8 @@
 namespace Whim;
 
-internal record MouseLeftButtonUpTransform(IPoint<int> Point) : Transform
+internal record MouseLeftButtonUpTransform(IPoint<int> Point) : WhimTransform
 {
-	internal override Result<Unit> Execute(
+	internal override WhimResult<Unit> Execute(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector

@@ -40,7 +40,7 @@ public class LayoutEngineCustomActionTransformTests
 		AddWorkspaceToManager(ctx, rootSector, workspace);
 
 		// When the action is performed
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then the action is not performed
 		Assert.True(result.IsSuccessful);
@@ -67,7 +67,7 @@ public class LayoutEngineCustomActionTransformTests
 		AddWorkspaceToManager(ctx, root, workspace);
 
 		// When the action is performed
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then the action is performed
 		Assert.True(result.IsSuccessful);

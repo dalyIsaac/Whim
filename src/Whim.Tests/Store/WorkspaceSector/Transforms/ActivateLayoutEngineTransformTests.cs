@@ -23,7 +23,7 @@ public class SetLayoutEngineFromIndexTransformTests
 		SetLayoutEngineFromIndexTransform transform = new(workspace.Id, 1);
 
 		// When the transform is dispatched
-		Result<bool> result = ctx.Store.Dispatch(transform);
+		Result<bool> result = ctx.Store.WhimDispatch(transform);
 
 		// Then the transform succeeded
 		Assert.True(result.IsSuccessful);
@@ -47,7 +47,7 @@ public class SetLayoutEngineFromIndexTransformTests
 		SetLayoutEngineFromIndexTransform transform = new(workspace.Id, 2);
 
 		// When the transform is dispatched
-		Result<bool> result = ctx.Store.Dispatch(transform);
+		Result<bool> result = ctx.Store.WhimDispatch(transform);
 
 		// Then the transform failed
 		Assert.False(result.IsSuccessful);
@@ -76,7 +76,7 @@ public class ActivatePreviouslyActiveLayoutEngineTransformTests
 		ActivatePreviouslyActiveLayoutEngineTransform sut = new(workspace.Id);
 
 		// When the transform is dispatched
-		Result<bool> result = ctx.Store.Dispatch(sut);
+		Result<bool> result = ctx.Store.WhimDispatch(sut);
 
 		// Then the transform succeeded
 		Assert.True(result.IsSuccessful);
@@ -101,7 +101,7 @@ public class ActivatePreviouslyActiveLayoutEngineTransformTests
 		ActivatePreviouslyActiveLayoutEngineTransform transform = new(workspace.Id);
 
 		// When the transform is dispatched
-		Result<bool> result = ctx.Store.Dispatch(transform);
+		Result<bool> result = ctx.Store.WhimDispatch(transform);
 
 		// Then the transform failed
 		Assert.False(result.IsSuccessful);
@@ -130,7 +130,7 @@ public class SetLayoutEngineFromNameTransformTests
 		SetLayoutEngineFromNameTransform transform = new(workspace.Id, "Engine 1");
 
 		// When the transform is dispatched
-		Result<bool> result = ctx.Store.Dispatch(transform);
+		Result<bool> result = ctx.Store.WhimDispatch(transform);
 
 		// Then the transform succeeded
 		Assert.True(result.IsSuccessful);
@@ -155,7 +155,7 @@ public class SetLayoutEngineFromNameTransformTests
 		SetLayoutEngineFromNameTransform transform = new(workspace.Id, "Engine 3");
 
 		// When the transform is dispatched
-		Result<bool> result = ctx.Store.Dispatch(transform);
+		Result<bool> result = ctx.Store.WhimDispatch(transform);
 
 		// Then the transform failed
 		Assert.False(result.IsSuccessful);

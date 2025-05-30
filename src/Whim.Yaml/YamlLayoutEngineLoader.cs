@@ -18,7 +18,7 @@ internal static class YamlLayoutEngineLoader
 
 		if (engineCreators is not null)
 		{
-			ctx.Store.Dispatch(new SetCreateLayoutEnginesTransform(() => engineCreators));
+			ctx.Store.WhimDispatch(new SetCreateLayoutEnginesTransform(() => engineCreators));
 		}
 	}
 

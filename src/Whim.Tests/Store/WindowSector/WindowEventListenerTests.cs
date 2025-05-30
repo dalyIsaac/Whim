@@ -114,15 +114,15 @@ public class WindowEventListenerTests
 		int windowMinimizeEndedTransformCount = 0
 	)
 	{
-		ctx.Store.Received(windowAddedTransformCount).Dispatch(Arg.Any<WindowAddedTransform>());
-		ctx.Store.Received(windowFocusedTransformCount).Dispatch(Arg.Any<WindowFocusedTransform>());
-		ctx.Store.Received(windowHiddenTransformCount).Dispatch(Arg.Any<WindowHiddenTransform>());
-		ctx.Store.Received(windowRemovedTransformCount).Dispatch(Arg.Any<WindowRemovedTransform>());
-		ctx.Store.Received(windowMoveStartedTransformCount).Dispatch(Arg.Any<WindowMoveStartedTransform>());
-		ctx.Store.Received(windowMoveEndedTransformCount).Dispatch(Arg.Any<WindowMoveEndedTransform>());
-		ctx.Store.Received(windowMovedTransformCount).Dispatch(Arg.Any<WindowMovedTransform>());
-		ctx.Store.Received(windowMinimizeStartedTransformCount).Dispatch(Arg.Any<WindowMinimizeStartedTransform>());
-		ctx.Store.Received(windowMinimizeEndedTransformCount).Dispatch(Arg.Any<WindowMinimizeEndedTransform>());
+		ctx.Store.Received(windowAddedTransformCount).WhimDispatch(Arg.Any<WindowAddedTransform>());
+		ctx.Store.Received(windowFocusedTransformCount).WhimDispatch(Arg.Any<WindowFocusedTransform>());
+		ctx.Store.Received(windowHiddenTransformCount).WhimDispatch(Arg.Any<WindowHiddenTransform>());
+		ctx.Store.Received(windowRemovedTransformCount).WhimDispatch(Arg.Any<WindowRemovedTransform>());
+		ctx.Store.Received(windowMoveStartedTransformCount).WhimDispatch(Arg.Any<WindowMoveStartedTransform>());
+		ctx.Store.Received(windowMoveEndedTransformCount).WhimDispatch(Arg.Any<WindowMoveEndedTransform>());
+		ctx.Store.Received(windowMovedTransformCount).WhimDispatch(Arg.Any<WindowMovedTransform>());
+		ctx.Store.Received(windowMinimizeStartedTransformCount).WhimDispatch(Arg.Any<WindowMinimizeStartedTransform>());
+		ctx.Store.Received(windowMinimizeEndedTransformCount).WhimDispatch(Arg.Any<WindowMinimizeEndedTransform>());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -205,8 +205,8 @@ public class WindowEventListenerTests
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		Setup_EmptyWindowSlice(ctx, internalCtx);
 
-		ctx.Store.Dispatch(Arg.Any<WindowAddedTransform>())
-			.Returns(Result.FromException<IWindow>(new WhimException("welp")));
+		ctx.Store.WhimDispatch(Arg.Any<WindowAddedTransform>())
+			.Returns(WhimResult.FromError<IWindow>(new WhimError("welp")));
 
 		WindowEventListener sut = new(ctx, internalCtx);
 		sut.Initialize();
@@ -226,7 +226,7 @@ public class WindowEventListenerTests
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 		Setup_EmptyWindowSlice(ctx, internalCtx);
 
-		ctx.Store.Dispatch(Arg.Any<WindowAddedTransform>()).Returns(Result.FromValue(window));
+		ctx.Store.WhimDispatch(Arg.Any<WindowAddedTransform>()).Returns(WhimResult.FromValue(window));
 
 		WindowEventListener sut = new(ctx, internalCtx);
 		sut.Initialize();
@@ -243,60 +243,60 @@ public class WindowEventListenerTests
 		yield return new object[]
 		{
 			PInvoke.EVENT_SYSTEM_FOREGROUND,
-			new Func<IWindow, Transform>(window => new WindowFocusedTransform(window)),
+			new Func<IWindow, WhimTransform>(window => new WindowFocusedTransform(window)),
 		};
 		yield return new object[]
 		{
 			PInvoke.EVENT_OBJECT_UNCLOAKED,
-			new Func<IWindow, Transform>(window => new WindowFocusedTransform(window)),
+			new Func<IWindow, WhimTransform>(window => new WindowFocusedTransform(window)),
 		};
 
 		yield return new object[]
 		{
 			PInvoke.EVENT_OBJECT_HIDE,
-			new Func<IWindow, Transform>(window => new WindowHiddenTransform(window)),
+			new Func<IWindow, WhimTransform>(window => new WindowHiddenTransform(window)),
 		};
 
 		yield return new object[]
 		{
 			PInvoke.EVENT_OBJECT_DESTROY,
-			new Func<IWindow, Transform>(window => new WindowRemovedTransform(window)),
+			new Func<IWindow, WhimTransform>(window => new WindowRemovedTransform(window)),
 		};
 
 		yield return new object[]
 		{
 			PInvoke.EVENT_OBJECT_CLOAKED,
-			new Func<IWindow, Transform>(window => new WindowRemovedTransform(window)),
+			new Func<IWindow, WhimTransform>(window => new WindowRemovedTransform(window)),
 		};
 
 		yield return new object[]
 		{
 			PInvoke.EVENT_SYSTEM_MOVESIZESTART,
-			new Func<IWindow, Transform>(window => new WindowMoveStartedTransform(window)),
+			new Func<IWindow, WhimTransform>(window => new WindowMoveStartedTransform(window)),
 		};
 
 		yield return new object[]
 		{
 			PInvoke.EVENT_SYSTEM_MOVESIZEEND,
-			new Func<IWindow, Transform>(window => new WindowMoveEndedTransform(window)),
+			new Func<IWindow, WhimTransform>(window => new WindowMoveEndedTransform(window)),
 		};
 
 		yield return new object[]
 		{
 			PInvoke.EVENT_OBJECT_LOCATIONCHANGE,
-			new Func<IWindow, Transform>(window => new WindowMovedTransform(window)),
+			new Func<IWindow, WhimTransform>(window => new WindowMovedTransform(window)),
 		};
 
 		yield return new object[]
 		{
 			PInvoke.EVENT_SYSTEM_MINIMIZESTART,
-			new Func<IWindow, Transform>(window => new WindowMinimizeStartedTransform(window)),
+			new Func<IWindow, WhimTransform>(window => new WindowMinimizeStartedTransform(window)),
 		};
 
 		yield return new object[]
 		{
 			PInvoke.EVENT_SYSTEM_MINIMIZEEND,
-			new Func<IWindow, Transform>(window => new WindowMinimizeEndedTransform(window)),
+			new Func<IWindow, WhimTransform>(window => new WindowMinimizeEndedTransform(window)),
 		};
 	}
 
@@ -304,7 +304,7 @@ public class WindowEventListenerTests
 	[Theory]
 	internal void WinEventProc_Dispatch(
 		uint ev,
-		Func<IWindow, Transform> createTransform,
+		Func<IWindow, WhimTransform> createTransform,
 		IContext ctx,
 		IInternalContext internalCtx
 	)
@@ -320,7 +320,7 @@ public class WindowEventListenerTests
 		capture.WinEventProc!.Invoke(new HWINEVENTHOOK(0), ev, window.Handle, 0, 0, 0, 0);
 
 		// Then a transform was dispatched
-		ctx.Store.Received(1).Dispatch(createTransform(window));
+		ctx.Store.Received(1).WhimDispatch(createTransform(window));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -370,7 +370,7 @@ public class WindowEventListenerTests
 		WindowEventListener sut = new(ctx, internalCtx);
 		sut.Initialize();
 
-		ctx.Store.Dispatch(Arg.Any<WindowMinimizeStartedTransform>()).Throws(new WhimException("welp"));
+		ctx.Store.WhimDispatch(Arg.Any<WindowMinimizeStartedTransform>()).Throws(new WhimException("welp"));
 
 		// When we send through the event
 		capture.WinEventProc!.Invoke(

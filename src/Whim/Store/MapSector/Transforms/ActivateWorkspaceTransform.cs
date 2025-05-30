@@ -81,7 +81,7 @@ public record ActivateWorkspaceTransform(
 			Logger.Debug($"Layouting workspace {oldWorkspace} in loser monitor {loserMonitor}");
 			mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(loserMonitor.Handle, oldWorkspace.Id);
 
-			ctx.Store.Dispatch(new DoWorkspaceLayoutTransform(oldWorkspace.Id));
+			ctx.Store.WhimDispatch(new DoWorkspaceLayoutTransform(oldWorkspace.Id));
 			mapSector.QueueEvent(
 				new MonitorWorkspaceChangedEventArgs()
 				{
@@ -95,7 +95,7 @@ public record ActivateWorkspaceTransform(
 		{
 			if (oldWorkspace is not null)
 			{
-				ctx.Store.Dispatch(new DeactivateWorkspaceTransform(oldWorkspace.Id));
+				ctx.Store.WhimDispatch(new DeactivateWorkspaceTransform(oldWorkspace.Id));
 			}
 
 			// Temporarily focus the monitor's desktop HWND, to prevent another window from being focused.
@@ -103,16 +103,16 @@ public record ActivateWorkspaceTransform(
 		}
 
 		// Layout the new workspace.
-		ctx.Store.Dispatch(new DoWorkspaceLayoutTransform(workspace.Id));
+		ctx.Store.WhimDispatch(new DoWorkspaceLayoutTransform(workspace.Id));
 
 		if (FocusWorkspaceWindow)
 		{
-			ctx.Store.Dispatch(new FocusWorkspaceTransform(workspace.Id));
+			ctx.Store.WhimDispatch(new FocusWorkspaceTransform(workspace.Id));
 		}
 		else
 		{
 			WorkspaceId activeWorkspaceId = ctx.Store.Pick(PickActiveWorkspaceId());
-			ctx.Store.Dispatch(new FocusWorkspaceTransform(activeWorkspaceId));
+			ctx.Store.WhimDispatch(new FocusWorkspaceTransform(activeWorkspaceId));
 		}
 
 		mapSector.QueueEvent(

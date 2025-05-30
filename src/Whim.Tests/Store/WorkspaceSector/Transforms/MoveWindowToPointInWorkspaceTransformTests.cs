@@ -31,7 +31,7 @@ public class MoveWindowToPointInWorkspaceTransformTests
 		MoveWindowToPointInWorkspaceTransform sut = new(workspace.Id, handle, point);
 
 		// When we execute the transform
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then it succeeds
 		Assert.True(result.IsSuccessful);
@@ -63,7 +63,7 @@ public class MoveWindowToPointInWorkspaceTransformTests
 		MoveWindowToPointInWorkspaceTransform sut = new(workspace.Id, handle, point);
 
 		// When we execute the transform
-		var result = ctx.Store.Dispatch(sut);
+		var result = ctx.Store.WhimDispatch(sut);
 
 		// Then it succeeds
 		Assert.True(result.IsSuccessful);

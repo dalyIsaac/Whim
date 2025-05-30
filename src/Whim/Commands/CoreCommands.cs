@@ -31,50 +31,57 @@ internal class CoreCommands : PluginCommands
 			.Add(
 				identifier: "focus_window_in_direction.left",
 				title: "Focus the window in the left direction",
-				callback: () => _context.Store.Dispatch(new FocusWindowInDirectionTransform(Direction: Direction.Left)),
+				callback: () =>
+					_context.Store.WhimDispatch(new FocusWindowInDirectionTransform(Direction: Direction.Left)),
 				keybind: new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_LEFT)
 			)
 			.Add(
 				identifier: "focus_window_in_direction.right",
 				title: "Focus the window in the right direction",
 				callback: () =>
-					_context.Store.Dispatch(new FocusWindowInDirectionTransform(Direction: Direction.Right)),
+					_context.Store.WhimDispatch(new FocusWindowInDirectionTransform(Direction: Direction.Right)),
 				keybind: new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_RIGHT)
 			)
 			.Add(
 				identifier: "focus_window_in_direction.up",
 				title: "Focus the window in the up direction",
-				callback: () => _context.Store.Dispatch(new FocusWindowInDirectionTransform(Direction: Direction.Up)),
+				callback: () =>
+					_context.Store.WhimDispatch(new FocusWindowInDirectionTransform(Direction: Direction.Up)),
 				keybind: new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_UP)
 			)
 			.Add(
 				identifier: "focus_window_in_direction.down",
 				title: "Focus the window in the down direction",
-				callback: () => _context.Store.Dispatch(new FocusWindowInDirectionTransform(Direction: Direction.Down)),
+				callback: () =>
+					_context.Store.WhimDispatch(new FocusWindowInDirectionTransform(Direction: Direction.Down)),
 				keybind: new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_DOWN)
 			)
 			.Add(
 				identifier: "swap_window_in_direction.left",
 				title: "Swap the window with the window to the left",
-				callback: () => _context.Store.Dispatch(new SwapWindowInDirectionTransform(Direction: Direction.Left)),
+				callback: () =>
+					_context.Store.WhimDispatch(new SwapWindowInDirectionTransform(Direction: Direction.Left)),
 				keybind: new Keybind(IKeybind.Win, VIRTUAL_KEY.VK_LEFT)
 			)
 			.Add(
 				identifier: "swap_window_in_direction.right",
 				title: "Swap the window with the window to the right",
-				callback: () => _context.Store.Dispatch(new SwapWindowInDirectionTransform(Direction: Direction.Right)),
+				callback: () =>
+					_context.Store.WhimDispatch(new SwapWindowInDirectionTransform(Direction: Direction.Right)),
 				keybind: new Keybind(IKeybind.Win, VIRTUAL_KEY.VK_RIGHT)
 			)
 			.Add(
 				identifier: "swap_window_in_direction.up",
 				title: "Swap the window with the window to the up",
-				callback: () => _context.Store.Dispatch(new SwapWindowInDirectionTransform(Direction: Direction.Up)),
+				callback: () =>
+					_context.Store.WhimDispatch(new SwapWindowInDirectionTransform(Direction: Direction.Up)),
 				keybind: new Keybind(IKeybind.Win, VIRTUAL_KEY.VK_UP)
 			)
 			.Add(
 				identifier: "swap_window_in_direction.down",
 				title: "Swap the window with the window to the down",
-				callback: () => _context.Store.Dispatch(new SwapWindowInDirectionTransform(Direction: Direction.Down)),
+				callback: () =>
+					_context.Store.WhimDispatch(new SwapWindowInDirectionTransform(Direction: Direction.Down)),
 				keybind: new Keybind(IKeybind.Win, VIRTUAL_KEY.VK_DOWN)
 			)
 			.Add(
@@ -230,12 +237,12 @@ internal class CoreCommands : PluginCommands
 			.Add(
 				identifier: "cycle_layout_engine.next",
 				title: "Cycle to the next layout engine",
-				callback: () => _context.Store.Dispatch(new CycleLayoutEngineTransform())
+				callback: () => _context.Store.WhimDispatch(new CycleLayoutEngineTransform())
 			)
 			.Add(
 				identifier: "cycle_layout_engine.previous",
 				title: "Cycle to the previous layout engine",
-				callback: () => _context.Store.Dispatch(new CycleLayoutEngineTransform(Reverse: true))
+				callback: () => _context.Store.WhimDispatch(new CycleLayoutEngineTransform(Reverse: true))
 			)
 			.Add(
 				identifier: "focus_previous_monitor",
@@ -273,7 +280,7 @@ internal class CoreCommands : PluginCommands
 						return;
 					}
 
-					_context.Store.Dispatch(
+					_context.Store.WhimDispatch(
 						new LayoutEngineCustomActionTransform(
 							workspace.Id,
 							new() { Name = $"{focusLayoutEngine.Name}.toggle_maximized", Window = null }
@@ -289,7 +296,7 @@ internal class CoreCommands : PluginCommands
 				callback: () =>
 				{
 					WorkspaceId activeWorkspaceId = _context.Store.Pick(PickActiveWorkspaceId());
-					_context.Store.Dispatch(new RemoveWorkspaceByIdTransform(activeWorkspaceId));
+					_context.Store.WhimDispatch(new RemoveWorkspaceByIdTransform(activeWorkspaceId));
 				},
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_W)
 			)
@@ -325,7 +332,7 @@ internal class CoreCommands : PluginCommands
 				return;
 			}
 
-			_context.Store.Dispatch(new FocusWorkspaceTransform(workspace.Id));
+			_context.Store.WhimDispatch(new FocusWorkspaceTransform(workspace.Id));
 		};
 
 	internal Action FocusWorkspaceOnCurrentMonitor(bool getNext) =>

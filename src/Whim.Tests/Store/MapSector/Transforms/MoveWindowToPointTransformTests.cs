@@ -121,7 +121,7 @@ public class MoveWindowToPointTransformTests
 
 		// When we execute the transform
 		Result<Unit>? result = null;
-		// var result = ctx.Store.Dispatch(sut);
+		// var result = ctx.Store.WhimDispatch(sut);
 		CustomAssert.Layout(rootSector, () => result = ctx.Store.WhimDispatch(sut), [sourceWorkspace.Id]);
 
 		// Then we succeed

@@ -18,7 +18,7 @@ public class SetWorkspaceNameTransformTests
 		SetWorkspaceNameTransform sut = new(workspace.Id, "test");
 
 		// When we execute the transform
-		Result<bool> result = ctx.Store.Dispatch(sut);
+		Result<bool> result = ctx.Store.WhimDispatch(sut);
 
 		// Then we get the same workspace
 		Assert.True(result.IsSuccessful);
@@ -39,7 +39,7 @@ public class SetWorkspaceNameTransformTests
 		SetWorkspaceNameTransform sut = new(workspace.Id, "test2");
 
 		// When we execute the transform
-		Result<bool> result = ctx.Store.Dispatch(sut);
+		Result<bool> result = ctx.Store.WhimDispatch(sut);
 
 		// Then we get a new workspace
 		Assert.True(result.IsSuccessful);

@@ -3,7 +3,7 @@ namespace Whim;
 /// <summary>
 /// Remove a workspace.
 /// </summary>
-public abstract record BaseRemoveWorkspaceTransform() : Transform
+public abstract record BaseRemoveWorkspaceTransform() : WhimTransform
 {
 	/// <summary>
 	/// Determines if the provided <paramref name="workspace"/> should be removed.
@@ -12,7 +12,7 @@ public abstract record BaseRemoveWorkspaceTransform() : Transform
 	/// <returns></returns>
 	public abstract bool ShouldRemove(Workspace workspace);
 
-	internal override Result<Unit> Execute(
+	internal override WhimResult<Unit> Execute(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector

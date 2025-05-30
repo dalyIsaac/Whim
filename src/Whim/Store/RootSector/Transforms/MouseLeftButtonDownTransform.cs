@@ -1,6 +1,6 @@
 namespace Whim;
 
-internal record MouseLeftButtonDownTransform : Transform
+internal record MouseLeftButtonDownTransform : WhimTransform
 {
 	/// <summary>
 	/// Set the active monitor based on the user's last mouse click.
@@ -8,7 +8,7 @@ internal record MouseLeftButtonDownTransform : Transform
 	/// <param name="ctx"></param>
 	/// <param name="internalCtx"></param>
 	/// <param name="mutableRootSector"></param>
-	internal override Result<Unit> Execute(
+	internal override WhimResult<Unit> Execute(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector

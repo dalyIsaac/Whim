@@ -1,8 +1,8 @@
 namespace Whim;
 
-internal record WindowMinimizeEndedTransform(IWindow Window) : Transform
+internal record WindowMinimizeEndedTransform(IWindow Window) : WhimTransform
 {
-	internal override Result<Unit> Execute(
+	internal override WhimResult<Unit> Execute(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector
@@ -14,8 +14,8 @@ internal record WindowMinimizeEndedTransform(IWindow Window) : Transform
 			return Result.FromException<Unit>(workspaceResult.Error!);
 		}
 
-		ctx.Store.Dispatch(new MinimizeWindowEndTransform(workspace.Id, Window.Handle));
-		ctx.Store.Dispatch(new DoWorkspaceLayoutTransform(workspace.Id));
+		ctx.Store.WhimDispatch(new MinimizeWindowEndTransform(workspace.Id, Window.Handle));
+		ctx.Store.WhimDispatch(new DoWorkspaceLayoutTransform(workspace.Id));
 
 		mutableRootSector.WindowSector.QueueEvent(new WindowMinimizeEndedEventArgs() { Window = Window });
 

@@ -159,7 +159,7 @@ public static class YamlLoader
 				}
 			}
 
-			ctx.Store.Dispatch(new AddWorkspaceTransform(workspaceName, engines, MonitorIndices: monitorIndices));
+			ctx.Store.WhimDispatch(new AddWorkspaceTransform(workspaceName, engines, MonitorIndices: monitorIndices));
 		}
 	}
 

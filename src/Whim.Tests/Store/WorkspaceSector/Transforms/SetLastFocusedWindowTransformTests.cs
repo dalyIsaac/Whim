@@ -17,7 +17,7 @@ public class SetLastFocusedWindowTransformTests
 		SetLastFocusedWindowTransform sut = new(workspace.Id, window.Handle);
 
 		// When we execute the transform
-		Result<bool> result = ctx.Store.Dispatch(sut);
+		Result<bool> result = ctx.Store.WhimDispatch(sut);
 
 		// Then there are no changes
 		Assert.True(result.IsSuccessful);
@@ -39,7 +39,7 @@ public class SetLastFocusedWindowTransformTests
 		SetLastFocusedWindowTransform sut = new(workspace.Id, window.Handle);
 
 		// When we execute the transform
-		Result<bool> result = ctx.Store.Dispatch(sut);
+		Result<bool> result = ctx.Store.WhimDispatch(sut);
 
 		// Then there are changes
 		Assert.True(result.IsSuccessful);

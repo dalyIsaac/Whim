@@ -11,7 +11,7 @@ namespace Whim.FloatingWindow;
 /// <param name="context"></param>
 public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin
 {
-	private readonly IContext _context = context;
+	private readonly IContext _ctx = context;
 
 	/// <summary>
 	/// <c>whim.floating_window</c>
@@ -26,10 +26,10 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
-		_context.Store.Dispatch(
-			new AddProxyLayoutEngineTransform(layout => new ProxyFloatingLayoutEngine(_context, this, layout))
+		_ctx.Store.WhimDispatch(
+			new AddProxyLayoutEngineTransform(layout => new ProxyFloatingLayoutEngine(_ctx, this, layout))
 		);
-		_context.Store.WindowEvents.WindowRemoved += WindowEvents_WindowRemoved;
+		_ctx.Store.WindowEvents.WindowRemoved += WindowEvents_WindowRemoved;
 	}
 
 	/// <inheritdoc />
@@ -44,7 +44,7 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin
 	/// <inheritdoc />
 	public void MarkWindowAsFloating(IWindow? window = null)
 	{
-		window ??= _context.Store.Pick(Pickers.PickLastFocusedWindow()).ValueOrDefault;
+		window ??= _ctx.Store.Pick(Pickers.PickLastFocusedWindow()).ValueOrDefault;
 
 		if (window == null)
 		{
@@ -52,20 +52,20 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin
 			return;
 		}
 
-		if (!_context.Store.Pick(Pickers.PickWindowPosition(window.Handle)).TryGet(out WindowPosition windowPosition))
+		if (!_ctx.Store.Pick(Pickers.PickWindowPosition(window.Handle)).TryGet(out WindowPosition windowPosition))
 		{
 			Logger.Error($"Could not obtain position for floating window {window}");
 			return;
 		}
 
 		_floatingWindows.Add(window.Handle);
-		_context.Store.WhimDispatch(new MoveWindowToPointTransform(window.Handle, windowPosition.LastWindowRectangle));
+		_ctx.Store.WhimDispatch(new MoveWindowToPointTransform(window.Handle, windowPosition.LastWindowRectangle));
 	}
 
 	/// <inheritdoc />
 	public void MarkWindowAsDocked(IWindow? window = null)
 	{
-		window ??= _context.Store.Pick(Pickers.PickLastFocusedWindow()).ValueOrDefault;
+		window ??= _ctx.Store.Pick(Pickers.PickLastFocusedWindow()).ValueOrDefault;
 
 		if (window == null)
 		{
@@ -73,7 +73,7 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin
 			return;
 		}
 
-		if (!_context.Store.Pick(Pickers.PickWindowPosition(window.Handle)).TryGet(out WindowPosition windowPosition))
+		if (!_ctx.Store.Pick(Pickers.PickWindowPosition(window.Handle)).TryGet(out WindowPosition windowPosition))
 		{
 			Logger.Error($"Could not obtain position for docked window {window}");
 			return;
@@ -81,7 +81,7 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin
 
 		if (_floatingWindows.Remove(window.Handle))
 		{
-			_context.Store.WhimDispatch(
+			_ctx.Store.WhimDispatch(
 				new MoveWindowToPointTransform(window.Handle, windowPosition.LastWindowRectangle)
 			);
 		}
@@ -90,7 +90,7 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin
 	/// <inheritdoc />
 	public void ToggleWindowFloating(IWindow? window = null)
 	{
-		window ??= _context.Store.Pick(Pickers.PickLastFocusedWindow()).ValueOrDefault;
+		window ??= _ctx.Store.Pick(Pickers.PickLastFocusedWindow()).ValueOrDefault;
 
 		if (window == null)
 		{

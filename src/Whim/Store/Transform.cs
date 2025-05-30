@@ -17,7 +17,7 @@ public abstract record Transform<TResult>
 }
 
 /// <inheritdoc/>
-public abstract record Transform : Transform<Unit> { }
+public abstract record Transform : WhimTransform<Unit> { }
 
 /// <summary>
 /// Operation describing how to update the state of the <see cref="IStore"/>.

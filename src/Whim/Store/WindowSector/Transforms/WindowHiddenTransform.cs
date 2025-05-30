@@ -12,7 +12,7 @@ namespace Whim;
 /// <param name="Window"></param>
 internal record WindowHiddenTransform(IWindow Window) : WindowRemovedTransform(Window)
 {
-	internal override Result<Unit> Execute(
+	internal override WhimResult<Unit> Execute(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector

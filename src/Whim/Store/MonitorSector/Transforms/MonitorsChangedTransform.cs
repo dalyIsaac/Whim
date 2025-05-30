@@ -5,9 +5,9 @@ namespace Whim;
 /// <summary>
 /// Transform for when the monitors have changed.
 /// </summary>
-internal record MonitorsChangedTransform : Transform
+internal record MonitorsChangedTransform : WhimTransform
 {
-	internal override Result<Unit> Execute(
+	internal override WhimResult<Unit> Execute(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector

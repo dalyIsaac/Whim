@@ -54,7 +54,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new FocusWindowInDirectionTransform(Direction: direction));
+		ctx.Store.Received(1).WhimDispatch(new FocusWindowInDirectionTransform(Direction: direction));
 	}
 
 	[InlineAutoSubstituteData("whim.core.swap_window_in_direction.left", Direction.Left)]
@@ -74,7 +74,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new SwapWindowInDirectionTransform(Direction: direction));
+		ctx.Store.Received(1).WhimDispatch(new SwapWindowInDirectionTransform(Direction: direction));
 	}
 
 	[InlineAutoSubstituteData("whim.core.move_window_left_edge_left", Direction.Left, -1, 0)]
@@ -242,7 +242,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new CycleLayoutEngineTransform());
+		ctx.Store.Received(1).WhimDispatch(new CycleLayoutEngineTransform());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -258,7 +258,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.Store.Received(1).Dispatch(new CycleLayoutEngineTransform(Reverse: true));
+		ctx.Store.Received(1).WhimDispatch(new CycleLayoutEngineTransform(Reverse: true));
 	}
 	#endregion
 

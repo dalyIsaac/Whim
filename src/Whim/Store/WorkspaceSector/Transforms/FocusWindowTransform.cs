@@ -17,9 +17,9 @@ namespace Whim;
 /// context.Store.Dispatch(new FocusWindowTransform());
 /// </code>
 /// </example>
-public record FocusWindowTransform(HWND WindowHandle = default) : Transform<Unit>
+public record FocusWindowTransform(HWND WindowHandle = default) : WhimTransform<Unit>
 {
-	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal override WhimResult<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		HWND windowHandle = WindowHandle;
 

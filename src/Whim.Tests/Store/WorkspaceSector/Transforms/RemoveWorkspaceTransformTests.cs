@@ -17,7 +17,7 @@ public class RemoveWorkspaceTransformTests
 		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)2), providedWorkspace);
 
 		// When we execute the transform
-		Result<Unit> result = ctx.Store.Dispatch(sut);
+		Result<Unit> result = ctx.Store.WhimDispatch(sut);
 
 		// Then we get an error
 		Assert.False(result.IsSuccessful);
@@ -43,7 +43,7 @@ public class RemoveWorkspaceTransformTests
 		AddWorkspacesToManager(ctx, root, providedWorkspace);
 
 		// When we execute the transform
-		Result<Unit> result = ctx.Store.Dispatch(sut);
+		Result<Unit> result = ctx.Store.WhimDispatch(sut);
 
 		// Then we get an error
 		Assert.False(result.IsSuccessful);
@@ -73,7 +73,7 @@ public class RemoveWorkspaceTransformTests
 		var raisedEvent = Assert.Raises<WorkspaceRemovedEventArgs>(
 			h => ctx.Store.WorkspaceEvents.WorkspaceRemoved += h,
 			h => ctx.Store.WorkspaceEvents.WorkspaceRemoved -= h,
-			() => result = ctx.Store.Dispatch(sut)
+			() => result = ctx.Store.WhimDispatch(sut)
 		);
 
 		// Then the workspace is removed

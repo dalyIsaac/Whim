@@ -6,9 +6,9 @@ namespace Whim;
 /// <param name="Handle">
 /// The handle of the monitor to activate.
 /// </param>
-internal record ActivateEmptyMonitorTransform(HMONITOR Handle) : Transform
+internal record ActivateEmptyMonitorTransform(HMONITOR Handle) : WhimTransform
 {
-	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
+	internal override WhimResult<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
 	{
 		Result<IMonitor> result = ctx.Store.Pick(PickMonitorByHandle(Handle));
 		if (result.Error is not null)

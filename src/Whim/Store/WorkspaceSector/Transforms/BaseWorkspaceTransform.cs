@@ -8,7 +8,7 @@ namespace Whim;
 /// Defaults to the active workspace.
 /// </param>
 /// <param name="SkipDoLayout"></param>
-public abstract record BaseWorkspaceTransform(WorkspaceId WorkspaceId, bool SkipDoLayout = false) : Transform<bool>
+public abstract record BaseWorkspaceTransform(WorkspaceId WorkspaceId, bool SkipDoLayout = false) : WhimTransform<bool>
 {
 	/// <summary>
 	/// The operation to execute.
@@ -27,7 +27,7 @@ public abstract record BaseWorkspaceTransform(WorkspaceId WorkspaceId, bool Skip
 		Workspace workspace
 	);
 
-	internal override Result<bool> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal override WhimResult<bool> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		WorkspaceSector sector = rootSector.WorkspaceSector;
 		WorkspaceId workspaceId = WorkspaceId.OrActiveWorkspace(ctx);
