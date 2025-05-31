@@ -106,6 +106,8 @@ public class MonitorManagerTests
 	{
 		// Given
 		MonitorManager sut = new(ctx);
+		ctx.Store.Pick(Pickers.PickMonitorAtPoint(point, true))
+			.Returns(WhimResult.FromValue<IMonitor>(Substitute.For<IMonitor>()));
 
 		// When
 		var _ = sut.GetMonitorAtPoint(point);

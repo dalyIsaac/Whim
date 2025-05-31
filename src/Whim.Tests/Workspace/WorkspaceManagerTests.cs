@@ -333,8 +333,8 @@ public class WorkspaceManagerTests
 		// Given
 		WorkspaceManager sut = new(ctx);
 
-		ctx.Store.Pick(Arg.Any<PurePicker<Result<IWorkspace>>>())
-			.Returns(Result.FromValue(Substitute.For<IWorkspace>()));
+		ctx.Store.Pick(Arg.Any<PurePicker<WhimResult<IWorkspace>>>())
+			.Returns(WhimResult.FromValue(Substitute.For<IWorkspace>()));
 
 		// When
 		IWorkspace? result = sut.TryGet("foo");

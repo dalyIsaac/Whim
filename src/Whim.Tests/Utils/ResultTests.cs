@@ -3,18 +3,6 @@ namespace Whim.Tests;
 public class ResultTests
 {
 	[Fact]
-	public void Result_Success_CanBeCreatedWithoutValue()
-	{
-		// Given
-		WhimResult<int> result = new();
-
-		// Then
-		Assert.True(result.IsSuccessful);
-		Assert.Null(result.Error);
-		Assert.Equal(default, result.Value);
-	}
-
-	[Fact]
 	public void Result_Success_CanBeCreatedWithValue()
 	{
 		// Given

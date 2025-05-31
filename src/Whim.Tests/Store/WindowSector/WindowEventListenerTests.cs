@@ -88,15 +88,15 @@ public class WindowEventListenerTests
 
 	private static void Setup_EmptyWindowSlice(IContext ctx, IInternalContext internalCtx) =>
 		ctx
-			.Store.Pick(Arg.Any<PurePicker<Result<IWindow>>>())
-			.Returns(Result.FromException<IWindow>(new WhimException("welp")));
+			.Store.Pick(Arg.Any<PurePicker<WhimResult<IWindow>>>())
+			.Returns(WhimResult.FromError<IWindow>(new WhimError("welp")));
 
 	private static IWindow Setup_FilledWindowSlice(IContext ctx, IInternalContext internalCtx)
 	{
 		IWindow window = Substitute.For<IWindow>();
 		window.Handle.Returns((HWND)1);
 
-		ctx.Store.Pick(Arg.Any<PurePicker<Result<IWindow>>>()).Returns(Result.FromValue(window));
+		ctx.Store.Pick(Arg.Any<PurePicker<WhimResult<IWindow>>>()).Returns(WhimResult.FromValue(window));
 
 		return window;
 	}
@@ -167,7 +167,7 @@ public class WindowEventListenerTests
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
 	[InlineAutoSubstituteData(PInvoke.CHILDID_SELF, 0, null)]
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
-	[Theory, AutoSubstituteData]
+	[Theory]
 	internal void IsEventWindowValid_Fail(
 		int idObject,
 		int idChild,
@@ -329,7 +329,7 @@ public class WindowEventListenerTests
 		// Given the window is a Firefox window
 		window.Handle.Returns((HWND)1);
 		window.ProcessFileName.Returns("firefox.exe");
-		ctx.Store.Pick(Arg.Any<PurePicker<Result<IWindow>>>()).Returns(Result.FromValue(window));
+		ctx.Store.Pick(Arg.Any<PurePicker<WhimResult<IWindow>>>()).Returns(WhimResult.FromValue(window));
 
 		CaptureWinEventProc capture = CaptureWinEventProc.Create(internalCtx);
 
