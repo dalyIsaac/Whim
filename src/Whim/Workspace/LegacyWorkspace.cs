@@ -10,7 +10,7 @@ public partial record Workspace : IInternalWorkspace
 	/// The latest instance of <see cref="IWorkspace"/> for the given <see cref="WorkspaceId"/>.
 	/// This is used for compatibility with the old <see cref="Workspace"/> implementation.
 	/// </summary>
-	private Workspace LatestWorkspace => (Workspace)_ctx.Store.Pick(PickWorkspaceById(Id)).Value;
+	private Workspace LatestWorkspace => (Workspace)_ctx.Store.Pick(PickWorkspaceById(Id)).Value!;
 
 	/// <inheritdoc/>
 	public string Name
@@ -133,7 +133,7 @@ public partial record Workspace : IInternalWorkspace
 	public void DoLayout() => _ctx.Store.Dispatch(new DoWorkspaceLayoutTransform(Id));
 
 	/// <inheritdoc/>
-	public bool ContainsWindow(IWindow window) => _ctx.Store.Pick(PickWorkspaceWindows(Id)).Value.Contains(window);
+	public bool ContainsWindow(IWindow window) => _ctx.Store.Pick(PickWorkspaceWindows(Id)).Value!.Contains(window);
 
 	/// <inheritdoc/>
 	public bool PerformCustomLayoutEngineAction(LayoutEngineCustomAction action) =>

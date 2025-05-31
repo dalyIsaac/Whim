@@ -186,7 +186,7 @@ internal interface ICoreNativeManager
 	/// Synthesizes keystrokes, mouse motions, and button clicks.
 	/// </summary>
 	/// <remarks>
-	/// This uses <see cref="PInvoke.SendInput(Span{INPUT}, int)"/> <br/>
+	/// This uses <see cref="PInvoke.SendInput(ReadOnlySpan{INPUT}, int)"/> <br/>
 	///
 	/// For more, see https://docs.microsoft.com/windows/win32/api/winuser/nf-winuser-sendinput
 	/// </remarks>

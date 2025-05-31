@@ -32,7 +32,7 @@ public static partial class Pickers
 	/// </param>
 	/// <returns>
 	/// The workspace shown on the monitor, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
-	/// If the monitor is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// If the monitor is not found, then an error will be returned.
 	/// </returns>
 	public static PurePicker<Result<IWorkspace>> PickWorkspaceByMonitor(HMONITOR monitorHandle) =>
 		rootSector =>
@@ -46,7 +46,7 @@ public static partial class Pickers
 	/// <param name="windowHandle"></param>
 	/// <returns>
 	/// The workspace for the window, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
-	/// If the window is not tracked or does not belong to any workspace, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// If the window is not tracked or does not belong to any workspace, then an error will be returned.
 	/// </returns>
 	public static PurePicker<Result<IWorkspace>> PickWorkspaceByWindow(HWND windowHandle) =>
 		rootSector =>
@@ -70,7 +70,7 @@ public static partial class Pickers
 	/// </param>
 	/// <returns>
 	/// The monitor for the workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
-	/// If the workspace is not found or does not appear on any monitor, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// If the workspace is not found or does not appear on any monitor, then an error will be returned.
 	/// </returns>
 	public static PurePicker<Result<IMonitor>> PickMonitorByWorkspace(WorkspaceId searchWorkspaceId) =>
 		rootSector =>
@@ -90,7 +90,7 @@ public static partial class Pickers
 	/// </param>
 	/// <returns>
 	/// The monitor for the window, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
-	/// If the window is not tracked or does not appear on any monitor, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// If the window is not tracked or does not appear on any monitor, then an error will be returned.
 	/// </returns>
 	public static PurePicker<Result<IMonitor>> PickMonitorByWindow(HWND windowHandle) =>
 		rootSector =>
@@ -112,7 +112,7 @@ public static partial class Pickers
 	/// </param>
 	/// <returns>
 	/// The adjacent workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
-	/// If the workspace is not found or there are no adjacent workspaces, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// If the workspace is not found or there are no adjacent workspaces, then an error will be returned.
 	/// </returns>
 	public static PurePicker<Result<IWorkspace>> PickAdjacentWorkspace(
 		WorkspaceId workspaceId,
@@ -160,18 +160,19 @@ public static partial class Pickers
 	/// The handle of the monitor to get the active layout engine for.
 	/// </param>
 	/// <returns>
-	/// The active layout engine for the workspace on the monitor, otherwise <see cref="Result{T, TError}.Error"/>.
+	/// The active layout engine for the workspace on the monitor, otherwise an error.
 	/// </returns>
 	public static PurePicker<Result<ILayoutEngine>> PickActiveLayoutEngineByMonitor(HMONITOR monitorHandle) =>
 		rootSector =>
 		{
 			Result<IWorkspace> workspaceResult = PickWorkspaceByMonitor(monitorHandle)(rootSector);
-			if (workspaceResult.TryGet(out IWorkspace workspace))
+
+			if (!workspaceResult.TryGet(out IWorkspace workspace))
 			{
-				return Result.FromValue(WorkspaceUtils.GetActiveLayoutEngine(workspace));
+				return Result.FromError<ILayoutEngine>(workspaceResult.Error!);
 			}
 
-			return Result.FromError<ILayoutEngine>(workspaceResult.Error!);
+			return Result.FromValue(WorkspaceUtils.GetActiveLayoutEngine(workspace));
 		};
 
 	/// <summary>
@@ -185,7 +186,7 @@ public static partial class Pickers
 	/// <returns>
 	/// The handles of the monitors which can show the workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
 	/// If there are no explicit monitors which can show the workspace, then all monitors will be returned.
-	/// If the workspace is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
+	/// If the workspace is not found, then an error will be returned.
 	/// </returns>
 	public static PurePicker<Result<IReadOnlyList<HMONITOR>>> PickStickyMonitorsByWorkspace(WorkspaceId workspaceId) =>
 		rootSector =>
@@ -386,13 +387,12 @@ public static partial class Pickers
 
 			// Verify the monitor exists.
 			Result<IMonitor> monitorResult = PickMonitorByHandle(monitorHandle)(rootSector);
-			if (!monitorResult.IsSuccessful)
+			if (!monitorResult.TryGet(out IMonitor monitor))
 			{
 				return Result.FromError<IReadOnlyList<IWorkspace>>(monitorResult.Error!);
 			}
 
 			// Get the index of the monitor.
-			IMonitor monitor = monitorResult.Value;
 			ImmutableArray<IMonitor> monitors = monitorSector.Monitors;
 			int monitorIndex = monitors.IndexOf(monitor);
 

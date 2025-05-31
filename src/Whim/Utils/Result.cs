@@ -26,7 +26,7 @@ public readonly struct Result<T> : IEquatable<Result<T>>
 	/// Gets the value if the operation was successful, otherwise throws an exception.
 	/// </summary>
 	/// <exception cref="InvalidOperationException">Thrown when the result represents a failure.</exception>
-	public T Value
+	public T? Value
 	{
 		get
 		{

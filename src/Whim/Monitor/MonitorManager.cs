@@ -44,13 +44,13 @@ internal class MonitorManager(IContext context) : IInternalMonitorManager, IMoni
 		_ctx.Store.Dispatch(new ActivateEmptyMonitorTransform(monitor.Handle));
 
 	public IMonitor GetMonitorAtPoint(IPoint<int> point) =>
-		_ctx.Store.Pick(PickMonitorAtPoint(point, getFirst: true)).Value;
+		_ctx.Store.Pick(PickMonitorAtPoint(point, getFirst: true)).Value!;
 
 	public IMonitor GetPreviousMonitor(IMonitor monitor) =>
-		_ctx.Store.Pick(PickAdjacentMonitor(monitor.Handle, reverse: true, getFirst: true)).Value;
+		_ctx.Store.Pick(PickAdjacentMonitor(monitor.Handle, reverse: true, getFirst: true)).Value!;
 
 	public IMonitor GetNextMonitor(IMonitor monitor) =>
-		_ctx.Store.Pick(PickAdjacentMonitor(monitor.Handle, reverse: false, getFirst: true)).Value;
+		_ctx.Store.Pick(PickAdjacentMonitor(monitor.Handle, reverse: false, getFirst: true)).Value!;
 
 	public IMonitor? GetMonitorByHandle(HMONITOR hmonitor) =>
 		_ctx.Store.Pick(PickMonitorByHandle(hmonitor)).ValueOrDefault;
