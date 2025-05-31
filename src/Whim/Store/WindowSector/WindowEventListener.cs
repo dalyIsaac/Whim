@@ -128,7 +128,7 @@ internal class WindowEventListener : IDisposable
 		{
 			Logger.Verbose($"Window {hwnd} is not added, event type 0x{eventType:X4}");
 
-			WhimResult<IWindow> windowResult = _ctx.Store.WhimDispatch(new WindowAddedTransform(hwnd));
+			Result<IWindow> windowResult = _ctx.Store.Dispatch(new WindowAddedTransform(hwnd));
 			if (!windowResult.TryGet(out window))
 			{
 				return;
@@ -159,29 +159,29 @@ internal class WindowEventListener : IDisposable
 				break;
 			case PInvoke.EVENT_SYSTEM_FOREGROUND:
 			case PInvoke.EVENT_OBJECT_UNCLOAKED:
-				_ctx.Store.WhimDispatch(new WindowFocusedTransform(window));
+				_ctx.Store.Dispatch(new WindowFocusedTransform(window));
 				break;
 			case PInvoke.EVENT_OBJECT_HIDE:
-				_ctx.Store.WhimDispatch(new WindowHiddenTransform(window));
+				_ctx.Store.Dispatch(new WindowHiddenTransform(window));
 				break;
 			case PInvoke.EVENT_OBJECT_DESTROY:
 			case PInvoke.EVENT_OBJECT_CLOAKED:
-				_ctx.Store.WhimDispatch(new WindowRemovedTransform(window));
+				_ctx.Store.Dispatch(new WindowRemovedTransform(window));
 				break;
 			case PInvoke.EVENT_SYSTEM_MOVESIZESTART:
-				_ctx.Store.WhimDispatch(new WindowMoveStartedTransform(window));
+				_ctx.Store.Dispatch(new WindowMoveStartedTransform(window));
 				break;
 			case PInvoke.EVENT_SYSTEM_MOVESIZEEND:
-				_ctx.Store.WhimDispatch(new WindowMoveEndedTransform(window));
+				_ctx.Store.Dispatch(new WindowMoveEndedTransform(window));
 				break;
 			case PInvoke.EVENT_OBJECT_LOCATIONCHANGE:
-				_ctx.Store.WhimDispatch(new WindowMovedTransform(window));
+				_ctx.Store.Dispatch(new WindowMovedTransform(window));
 				break;
 			case PInvoke.EVENT_SYSTEM_MINIMIZESTART:
-				_ctx.Store.WhimDispatch(new WindowMinimizeStartedTransform(window));
+				_ctx.Store.Dispatch(new WindowMinimizeStartedTransform(window));
 				break;
 			case PInvoke.EVENT_SYSTEM_MINIMIZEEND:
-				_ctx.Store.WhimDispatch(new WindowMinimizeEndedTransform(window));
+				_ctx.Store.Dispatch(new WindowMinimizeEndedTransform(window));
 				break;
 			default:
 				Logger.Error($"Unhandled event 0x{eventType:X4}");

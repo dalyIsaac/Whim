@@ -70,7 +70,7 @@ public class ButlerTests
 		sut.Activate(workspace);
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new ActivateWorkspaceTransform(workspace.Id, default));
+		ctx.Store.Received(1).Dispatch(new ActivateWorkspaceTransform(workspace.Id, default));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -83,7 +83,7 @@ public class ButlerTests
 		sut.ActivateAdjacent(monitor);
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new ActivateAdjacentWorkspaceTransform(monitor.Handle, false, false));
+		ctx.Store.Received(1).Dispatch(new ActivateAdjacentWorkspaceTransform(monitor.Handle, false, false));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -96,7 +96,7 @@ public class ButlerTests
 		sut.LayoutAllActiveWorkspaces();
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new LayoutAllActiveWorkspacesTransform());
+		ctx.Store.Received(1).Dispatch(new LayoutAllActiveWorkspacesTransform());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -109,7 +109,7 @@ public class ButlerTests
 		sut.FocusMonitorDesktop(monitor);
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new FocusMonitorDesktopTransform(monitor.Handle));
+		ctx.Store.Received(1).Dispatch(new FocusMonitorDesktopTransform(monitor.Handle));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -123,9 +123,7 @@ public class ButlerTests
 
 		// Then
 		ctx.Store.Received(1)
-			.WhimDispatch(
-				new MoveWindowEdgesInDirectionTransform(Direction.Down, new Point<int>(10, 10), window.Handle)
-			);
+			.Dispatch(new MoveWindowEdgesInDirectionTransform(Direction.Down, new Point<int>(10, 10), window.Handle));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -138,7 +136,7 @@ public class ButlerTests
 		sut.MoveWindowToAdjacentWorkspace(window);
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new MoveWindowToAdjacentWorkspaceTransform(window.Handle, false, false));
+		ctx.Store.Received(1).Dispatch(new MoveWindowToAdjacentWorkspaceTransform(window.Handle, false, false));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -151,7 +149,7 @@ public class ButlerTests
 		sut.MoveWindowToPoint(window, new Point<int>(10, 10));
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new MoveWindowToPointTransform(window.Handle, new Point<int>(10, 10)));
+		ctx.Store.Received(1).Dispatch(new MoveWindowToPointTransform(window.Handle, new Point<int>(10, 10)));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -164,7 +162,7 @@ public class ButlerTests
 		sut.MoveWindowToMonitor(monitor, window);
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new MoveWindowToMonitorTransform(monitor.Handle, window.Handle));
+		ctx.Store.Received(1).Dispatch(new MoveWindowToMonitorTransform(monitor.Handle, window.Handle));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -177,7 +175,7 @@ public class ButlerTests
 		sut.MoveWindowToPreviousMonitor(window);
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new MoveWindowToAdjacentMonitorTransform(window.Handle, Reverse: true));
+		ctx.Store.Received(1).Dispatch(new MoveWindowToAdjacentMonitorTransform(window.Handle, Reverse: true));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -190,7 +188,7 @@ public class ButlerTests
 		sut.MoveWindowToNextMonitor(window);
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new MoveWindowToAdjacentMonitorTransform(window.Handle, Reverse: false));
+		ctx.Store.Received(1).Dispatch(new MoveWindowToAdjacentMonitorTransform(window.Handle, Reverse: false));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -204,7 +202,7 @@ public class ButlerTests
 		sut.MoveWindowToWorkspace(workspace, window);
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new MoveWindowToWorkspaceTransform(workspace.Id, window.Handle));
+		ctx.Store.Received(1).Dispatch(new MoveWindowToWorkspaceTransform(workspace.Id, window.Handle));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -220,7 +218,7 @@ public class ButlerTests
 		sut.MergeWorkspaceWindows(source, target);
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new MergeWorkspaceWindowsTransform(source.Id, target.Id));
+		ctx.Store.Received(1).Dispatch(new MergeWorkspaceWindowsTransform(source.Id, target.Id));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -234,6 +232,6 @@ public class ButlerTests
 		sut.SwapWorkspaceWithAdjacentMonitor(workspace);
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new SwapWorkspaceWithAdjacentMonitorTransform(workspace.Id, false));
+		ctx.Store.Received(1).Dispatch(new SwapWorkspaceWithAdjacentMonitorTransform(workspace.Id, false));
 	}
 }

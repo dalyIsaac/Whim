@@ -10,7 +10,7 @@ public static partial class Pickers
 	/// The workspace with the provided <paramref name="workspaceId"/>, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
 	/// If the workspace is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
 	/// </returns>
-	public static PurePicker<WhimResult<IWorkspace>> PickWorkspaceById(WorkspaceId workspaceId) =>
+	public static PurePicker<Result<IWorkspace>> PickWorkspaceById(WorkspaceId workspaceId) =>
 		(IRootSector rootSector) => BaseWorkspacePicker(workspaceId, rootSector, workspace => workspace);
 
 	/// <summary>
@@ -38,18 +38,18 @@ public static partial class Pickers
 	/// The workspace with the provided <paramref name="name"/>, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
 	/// If the workspace is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
 	/// </returns>
-	public static PurePicker<WhimResult<IWorkspace>> PickWorkspaceByName(string name) =>
+	public static PurePicker<Result<IWorkspace>> PickWorkspaceByName(string name) =>
 		(IRootSector rootSector) =>
 		{
 			foreach (IWorkspace workspace in rootSector.WorkspaceSector.Workspaces.Values)
 			{
 				if (workspace.Name == name)
 				{
-					return WhimResult.FromValue(workspace);
+					return Result.FromValue(workspace);
 				}
 			}
 
-			return WhimResult.FromException<IWorkspace>(new WhimException($"Workspace with name {name} not found"));
+			return Result.FromError<IWorkspace>(new WhimError($"Workspace with name {name} not found"));
 		};
 
 	/// <summary>
@@ -59,7 +59,7 @@ public static partial class Pickers
 	/// <param name="rootSector">The root sector.</param>
 	/// <param name="operation">The operation to determine what to get.</param>
 	/// <typeparam name="TResult">The result.</typeparam>
-	private static WhimResult<TResult> BaseWorkspacePicker<TResult>(
+	private static Result<TResult> BaseWorkspacePicker<TResult>(
 		WorkspaceId workspaceId,
 		IRootSector rootSector,
 		Func<IWorkspace, TResult> operation
@@ -67,7 +67,7 @@ public static partial class Pickers
 	{
 		if (!rootSector.WorkspaceSector.Workspaces.TryGetValue(workspaceId, out Workspace? workspace))
 		{
-			return WhimResult.FromException<TResult>(StoreExceptions.WorkspaceNotFound(workspaceId));
+			return Result.FromError<TResult>(StoreErrors.WorkspaceNotFound(workspaceId));
 		}
 
 		return operation(workspace);
@@ -83,10 +83,10 @@ public static partial class Pickers
 	/// The operation to determine what to get. This operation returns a <see cref="Result{T}"/>.
 	/// </param>
 	/// <typeparam name="TResult">The result.</typeparam>
-	private static WhimResult<TResult> BaseWorkspacePicker<TResult>(
+	private static Result<TResult> BaseWorkspacePicker<TResult>(
 		WorkspaceId workspaceId,
 		IRootSector rootSector,
-		Func<IWorkspace, WhimResult<TResult>> operation
+		Func<IWorkspace, Result<TResult>> operation
 	)
 	{
 		if (workspaceId == default)
@@ -96,7 +96,7 @@ public static partial class Pickers
 
 		if (!rootSector.WorkspaceSector.Workspaces.TryGetValue(workspaceId, out Workspace? workspace))
 		{
-			return WhimResult.FromException<TResult>(StoreExceptions.WorkspaceNotFound(workspaceId));
+			return Result.FromError<TResult>(StoreErrors.WorkspaceNotFound(workspaceId));
 		}
 
 		return operation(workspace);
@@ -137,7 +137,7 @@ public static partial class Pickers
 	/// The active layout engine in the provided workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
 	/// If the workspace is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
 	/// </returns>
-	public static PurePicker<WhimResult<ILayoutEngine>> PickActiveLayoutEngine(WorkspaceId workspaceId) =>
+	public static PurePicker<Result<ILayoutEngine>> PickActiveLayoutEngine(WorkspaceId workspaceId) =>
 		(IRootSector rootSector) =>
 			BaseWorkspacePicker(workspaceId, rootSector, static workspace => workspace.GetActiveLayoutEngine());
 
@@ -158,7 +158,7 @@ public static partial class Pickers
 	/// All the windows in the provided workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
 	/// If the workspace is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
 	/// </returns>
-	public static PurePicker<WhimResult<IEnumerable<IWindow>>> PickWorkspaceWindows(WorkspaceId workspaceId) =>
+	public static PurePicker<Result<IEnumerable<IWindow>>> PickWorkspaceWindows(WorkspaceId workspaceId) =>
 		(IRootSector rootSector) =>
 			BaseWorkspacePicker(workspaceId, rootSector, workspace => GetWorkspaceWindows(rootSector, workspace));
 
@@ -190,7 +190,7 @@ public static partial class Pickers
 	/// The last focused window in the provided workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
 	/// If the workspace is not found or there is no last focused window, then <see cref="Result{T, TError}.Error"/> will be returned.
 	/// </returns>
-	public static PurePicker<WhimResult<IWindow>> PickLastFocusedWindow(WorkspaceId workspaceId = default) =>
+	public static PurePicker<Result<IWindow>> PickLastFocusedWindow(WorkspaceId workspaceId = default) =>
 		(IRootSector rootSector) =>
 			BaseWorkspacePicker(
 				workspaceId,
@@ -199,7 +199,7 @@ public static partial class Pickers
 				{
 					if (workspace.LastFocusedWindowHandle.IsNull)
 					{
-						return WhimResult.FromError<IWindow>(new WhimError("No last focused window in workspace"));
+						return Result.FromError<IWindow>(new WhimError("No last focused window in workspace"));
 					}
 
 					return PickWindowByHandle(workspace.LastFocusedWindowHandle)(rootSector);
@@ -213,7 +213,7 @@ public static partial class Pickers
 	/// <returns>
 	/// If the workspace is not found or there is no last focused window, then <see cref="Result{T, TError}.Error"/> will be returned.
 	/// </returns>
-	public static PurePicker<WhimResult<HWND>> PickLastFocusedWindowHandle(WorkspaceId workspaceId = default) =>
+	public static PurePicker<Result<HWND>> PickLastFocusedWindowHandle(WorkspaceId workspaceId = default) =>
 		(IRootSector rootSector) =>
 			BaseWorkspacePicker(
 				workspaceId,
@@ -222,10 +222,10 @@ public static partial class Pickers
 				{
 					if (workspace.LastFocusedWindowHandle.IsNull)
 					{
-						return WhimResult.FromError<HWND>(new WhimError("No last focused window in workspace"));
+						return Result.FromError<HWND>(new WhimError("No last focused window in workspace"));
 					}
 
-					return WhimResult.FromValue(workspace.LastFocusedWindowHandle);
+					return Result.FromValue(workspace.LastFocusedWindowHandle);
 				}
 			);
 
@@ -238,10 +238,7 @@ public static partial class Pickers
 	/// The window position in the provided workspace, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
 	/// If the workspace is not found or the window is not found in the workspace, then <see cref="Result{T, TError}.Error"/> will be returned.
 	/// </returns>
-	public static PurePicker<WhimResult<WindowPosition>> PickWindowPosition(
-		WorkspaceId workspaceId,
-		HWND windowHandle
-	) =>
+	public static PurePicker<Result<WindowPosition>> PickWindowPosition(WorkspaceId workspaceId, HWND windowHandle) =>
 		(IRootSector rootSector) =>
 			BaseWorkspacePicker(
 				workspaceId,
@@ -253,8 +250,8 @@ public static partial class Pickers
 						return position;
 					}
 
-					return WhimResult.FromException<WindowPosition>(
-						StoreExceptions.WindowNotFoundInWorkspace(windowHandle, workspaceId)
+					return Result.FromError<WindowPosition>(
+						StoreErrors.WindowNotFoundInWorkspace(windowHandle, workspaceId)
 					);
 				}
 			);
@@ -269,7 +266,7 @@ public static partial class Pickers
 	/// The window position for the given <paramref name="windowHandle"/>, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
 	/// If the window is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
 	/// </returns>
-	public static PurePicker<WhimResult<WindowPosition>> PickWindowPosition(HWND windowHandle) =>
+	public static PurePicker<Result<WindowPosition>> PickWindowPosition(HWND windowHandle) =>
 		(IRootSector rootSector) =>
 		{
 			Result<IWorkspace> workspaceResult = PickWorkspaceByWindow(windowHandle)(rootSector);
@@ -278,7 +275,7 @@ public static partial class Pickers
 				return PickWindowPosition(workspace.Id, windowHandle)(rootSector);
 			}
 
-			return WhimResult.FromException<WindowPosition>(workspaceResult.Error!);
+			return Result.FromError<WindowPosition>(workspaceResult.Error!);
 		};
 
 	/// <summary>

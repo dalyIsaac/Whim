@@ -41,7 +41,7 @@ internal class MonitorManager(IContext context) : IInternalMonitorManager, IMoni
 		MonitorsChanged?.Invoke(sender, e);
 
 	public void ActivateEmptyMonitor(IMonitor monitor) =>
-		_ctx.Store.WhimDispatch(new ActivateEmptyMonitorTransform(monitor.Handle));
+		_ctx.Store.Dispatch(new ActivateEmptyMonitorTransform(monitor.Handle));
 
 	public IMonitor GetMonitorAtPoint(IPoint<int> point) =>
 		_ctx.Store.Pick(PickMonitorAtPoint(point, getFirst: true)).Value;

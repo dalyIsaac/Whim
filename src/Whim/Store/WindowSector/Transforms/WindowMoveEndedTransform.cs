@@ -1,8 +1,8 @@
 namespace Whim;
 
-internal record WindowMoveEndedTransform(IWindow Window) : WhimTransform
+internal record WindowMoveEndedTransform(IWindow Window) : Transform
 {
-	internal override WhimResult<Unit> Execute(
+	internal override Result<Unit> Execute(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector

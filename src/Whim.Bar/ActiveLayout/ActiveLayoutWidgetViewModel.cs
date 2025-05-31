@@ -56,7 +56,7 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 
 			if (layoutEngine.Name != value)
 			{
-				_ctx.Store.WhimDispatch(new SetLayoutEngineFromNameTransform(workspace.Id, value));
+				_ctx.Store.Dispatch(new SetLayoutEngineFromNameTransform(workspace.Id, value));
 				OnPropertyChanged(nameof(ActiveLayoutEngine));
 			}
 		}

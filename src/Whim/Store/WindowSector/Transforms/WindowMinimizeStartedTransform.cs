@@ -1,8 +1,8 @@
 namespace Whim;
 
-internal record WindowMinimizeStartedTransform(IWindow Window) : WhimTransform
+internal record WindowMinimizeStartedTransform(IWindow Window) : Transform
 {
-	internal override WhimResult<Unit> Execute(
+	internal override Result<Unit> Execute(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector
@@ -11,7 +11,7 @@ internal record WindowMinimizeStartedTransform(IWindow Window) : WhimTransform
 		Result<IWorkspace> workspaceResult = ctx.Store.Pick(PickWorkspaceByWindow(Window.Handle));
 		if (!workspaceResult.TryGet(out IWorkspace workspace))
 		{
-			return Result.FromException<Unit>(workspaceResult.Error!);
+			return Result.FromError<Unit>(workspaceResult.Error!);
 		}
 
 		workspace.MinimizeWindowStart(Window);

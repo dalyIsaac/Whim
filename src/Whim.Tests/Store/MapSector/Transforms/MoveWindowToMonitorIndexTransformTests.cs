@@ -19,7 +19,7 @@ public class MoveWindowToMonitorIndexTransformTests
 		MoveWindowToMonitorIndexTransform sut = new(2, window.Handle);
 
 		// When
-		var result = ctx.Store.WhimDispatch(sut);
+		var result = ctx.Store.Dispatch(sut);
 
 		// Then
 		Assert.False(result.IsSuccessful);
@@ -43,7 +43,7 @@ public class MoveWindowToMonitorIndexTransformTests
 		MoveWindowToMonitorIndexTransform sut = new(1, window.Handle);
 
 		// When
-		var result = ctx.Store.WhimDispatch(sut);
+		var result = ctx.Store.Dispatch(sut);
 
 		// Then
 		Assert.True(result.IsSuccessful);

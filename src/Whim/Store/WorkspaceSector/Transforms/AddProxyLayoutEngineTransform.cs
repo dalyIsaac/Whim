@@ -8,9 +8,9 @@
 /// This should be used by <see cref="IPlugin"/>s.
 /// </summary>
 /// <param name="ProxyLayoutEngineCreator">The proxy layout engine creator to add.</param>
-public record AddProxyLayoutEngineTransform(ProxyLayoutEngineCreator ProxyLayoutEngineCreator) : WhimTransform<Unit>
+public record AddProxyLayoutEngineTransform(ProxyLayoutEngineCreator ProxyLayoutEngineCreator) : Transform<Unit>
 {
-	internal override WhimResult<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		rootSector.WorkspaceSector.ProxyLayoutEngineCreators = rootSector.WorkspaceSector.ProxyLayoutEngineCreators.Add(
 			ProxyLayoutEngineCreator

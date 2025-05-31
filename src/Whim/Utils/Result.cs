@@ -1,11 +1,13 @@
 namespace Whim;
 
 /// <summary>
-/// A custom WhimResult type that matches the interface of DotNext's WhimResult but uses WhimError for error handling.
-/// This provides a more functional approach to error handling without exceptions.
+/// <c>Result</c> is similar to Rust's <c>Result&lt;T, E&gt;</c> type, and DotNext's <c>Result&lt;T, Exception&gt;</c>.
+/// It represents the outcome of an operation that can either succeed with a value of type T or fail with an error.
+/// This type is used to encapsulate the result of operations in a way that allows for error handling without exceptions.
+/// It provides methods to check success, retrieve values, and handle errors.
 /// </summary>
 /// <typeparam name="T">The type of the value contained in the result.</typeparam>
-public readonly struct WhimResult<T>
+public readonly struct Result<T> : IEquatable<Result<T>>
 {
 	private readonly T? _value;
 	private readonly WhimError? _error;
@@ -47,7 +49,7 @@ public readonly struct WhimResult<T>
 	/// Creates a successful result with the specified value.
 	/// </summary>
 	/// <param name="value">The value to wrap in the result.</param>
-	public WhimResult(T value)
+	public Result(T value)
 	{
 		_value = value;
 		_error = null;
@@ -58,7 +60,7 @@ public readonly struct WhimResult<T>
 	/// Creates a failed result with the specified error.
 	/// </summary>
 	/// <param name="error">The error to wrap in the result.</param>
-	public WhimResult(WhimError error)
+	public Result(WhimError error)
 	{
 		_value = default;
 		_error = error;
@@ -98,59 +100,97 @@ public readonly struct WhimResult<T>
 	/// Implicitly converts a value to a successful result.
 	/// </summary>
 	/// <param name="value">The value to convert.</param>
-	public static implicit operator WhimResult<T>(T value) => new(value);
+	public static implicit operator Result<T>(T value) => new(value);
 
 	/// <summary>
 	/// Implicitly converts an error to a failed result.
 	/// </summary>
 	/// <param name="error">The error to convert.</param>
-	public static implicit operator WhimResult<T>(WhimError error) => new(error);
+	public static implicit operator Result<T>(WhimError error) => new(error);
 
 	/// <summary>
-	/// Implicitly converts a DotNext.Result&lt;T, Exception&gt; to a WhimResult&lt;T&gt;.
-	/// This assumes that DotNext.Result&lt;T, Exception&gt; has an IsSuccessful property,
-	/// a Value property (of type T) accessible when successful,
-	/// and an Error property (of type Exception) accessible when failed.
+	/// Determines whether the specified object is equal to the current result.
 	/// </summary>
-	/// <param name="sourceDotNextResult">The DotNext.Result&lt;T, Exception&gt; to convert.</param>
-	public static implicit operator WhimResult<T>(DotNext.Result<T> sourceDotNextResult)
+	/// <param name="obj">The object to compare with the current result.</param>
+	/// <returns>true if the specified object is equal to the current result; otherwise, false.</returns>
+	public override bool Equals(object? obj)
 	{
-		if (sourceDotNextResult.IsSuccessful)
+		if (obj is Result<T> other)
 		{
-			return new WhimResult<T>(sourceDotNextResult.Value);
+			return Equals(other);
+		}
+		return false;
+	}
+
+	/// <summary>
+	/// Determines whether the current result is equal to another result of the same type.
+	/// </summary>
+	/// <param name="other">The result to compare with the current result.</param>
+	public bool Equals(Result<T> other)
+	{
+		if (IsSuccessful != other.IsSuccessful)
+		{
+			return false;
+		}
+
+		if (IsSuccessful)
+		{
+			return EqualityComparer<T>.Default.Equals(_value!, other._value!);
+		}
+
+		return EqualityComparer<WhimError>.Default.Equals(_error, other._error);
+	}
+
+	/// <summary>
+	/// Returns the hash code for this result.
+	/// </summary>
+	/// <returns>A hash code for the current result.</returns>
+	public override int GetHashCode()
+	{
+		if (IsSuccessful)
+		{
+			return HashCode.Combine(IsSuccessful, _value);
 		}
 		else
 		{
-			return WhimResult.FromException<T>(sourceDotNextResult.Error);
+			return HashCode.Combine(IsSuccessful, _error);
 		}
 	}
 
 	/// <summary>
-	/// Implicitly converts a WhimResult&lt;T&gt; to a DotNext.Result&lt;T&gt;.
+	/// Determines whether two specified results are equal.
 	/// </summary>
-	/// <param name="whimResult">The WhimResult&lt;T&gt; to convert.</param>
-	public static implicit operator DotNext.Result<T>(WhimResult<T> whimResult)
+	/// <param name="left">The first result to compare.</param>
+	/// <param name="right">The second result to compare.</param>
+	/// <returns>true if the results are equal; otherwise, false.</returns>
+	public static bool operator ==(Result<T> left, Result<T> right)
 	{
-		if (whimResult.IsSuccessful)
-		{
-			// If WhimResult was created via default constructor WhimResult(), ValueOrDefault is default(T).
-			// DotNext.Result should be able to handle a successful result with a default(T) value.
-			return new DotNext.Result<T>(whimResult.ValueOrDefault!);
-		}
-		else
-		{
-			// whimResult.Error is guaranteed to be non-null if !IsSuccessful.
-			// WhimError ensures Message is non-null.
-			Exception ex = whimResult.Error!.InnerException ?? new Exception(whimResult.Error.Message);
-			return new DotNext.Result<T>(ex);
-		}
+		return left.Equals(right);
 	}
+
+	/// <summary>
+	/// Determines whether two specified results are not equal.
+	/// </summary>
+	/// <param name="left">The first result to compare.</param>
+	/// <param name="right">The second result to compare.</param>
+	/// <returns>true if the results are not equal; otherwise, false.</returns>
+	public static bool operator !=(Result<T> left, Result<T> right)
+	{
+		return !(left == right);
+	}
+
+	/// <summary>
+	/// Converts the result to a Result type without a value.
+	/// This is useful for cases where you want to handle the result without needing the value.
+	/// </summary>
+	/// <returns>A Result without a value, retaining the success or failure state.</returns>
+	public Result<T> ToResult() => this;
 }
 
 /// <summary>
-/// Provides static methods for creating WhimResult instances.
+/// Provides static methods for creating Result instances.
 /// </summary>
-public static class WhimResult
+public static class Result
 {
 	/// <summary>
 	/// Creates a successful result from a value.
@@ -158,7 +198,7 @@ public static class WhimResult
 	/// <typeparam name="T">The type of the value.</typeparam>
 	/// <param name="value">The value to wrap in the result.</param>
 	/// <returns>A successful result containing the value.</returns>
-	public static WhimResult<T> FromValue<T>(T value) => new(value);
+	public static Result<T> FromValue<T>(T value) => new(value);
 
 	/// <summary>
 	/// Creates a failed result from an error.
@@ -166,7 +206,7 @@ public static class WhimResult
 	/// <typeparam name="T">The type of the value.</typeparam>
 	/// <param name="error">The error to wrap in the result.</param>
 	/// <returns>A failed result containing the error.</returns>
-	public static WhimResult<T> FromError<T>(WhimError error) => new(error);
+	public static Result<T> FromError<T>(WhimError error) => new(error);
 
 	/// <summary>
 	/// Creates a failed result from an exception (for backward compatibility).
@@ -174,9 +214,9 @@ public static class WhimResult
 	/// <typeparam name="T">The type of the value.</typeparam>
 	/// <param name="exception">The exception to convert to an error.</param>
 	/// <returns>A failed result containing the error.</returns>
-	public static WhimResult<T> FromException<T>(Exception exception)
+	public static Result<T> FromException<T>(Exception exception)
 	{
 		WhimError error = new(exception.Message, exception);
-		return new WhimResult<T>(error);
+		return new Result<T>(error);
 	}
 }

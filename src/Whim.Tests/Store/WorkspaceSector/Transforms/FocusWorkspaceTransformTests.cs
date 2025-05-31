@@ -18,7 +18,7 @@ public class FocusWorkspaceTransformTests
 		internalCtx.CoreNativeManager.IsStaThread().Returns(false);
 
 		// When
-		var result = ctx.Store.WhimDispatch(new FocusWorkspaceTransform(workspace.Id));
+		var result = ctx.Store.Dispatch(new FocusWorkspaceTransform(workspace.Id));
 
 		// Then
 		Assert.True(result.IsSuccessful);
@@ -35,7 +35,7 @@ public class FocusWorkspaceTransformTests
 		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
 
 		// When
-		var result = ctx.Store.WhimDispatch(new FocusWorkspaceTransform(workspace.Id));
+		var result = ctx.Store.Dispatch(new FocusWorkspaceTransform(workspace.Id));
 
 		// Then
 		Assert.True(result.IsSuccessful);
@@ -50,7 +50,7 @@ public class FocusWorkspaceTransformTests
 		AddWorkspacesToManager(ctx, root, workspace);
 
 		// When
-		var result = ctx.Store.WhimDispatch(new FocusWorkspaceTransform(workspace.Id));
+		var result = ctx.Store.Dispatch(new FocusWorkspaceTransform(workspace.Id));
 
 		// Then
 		Assert.False(result.IsSuccessful);

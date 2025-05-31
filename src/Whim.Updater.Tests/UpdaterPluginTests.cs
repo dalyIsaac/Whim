@@ -86,7 +86,7 @@ public class UpdaterPluginTests
 
 		// Then
 		Assert.Equal(release.TagName, plugin.SkippedReleaseTagName);
-		ctx.Store.Received(1).WhimDispatch(Arg.Any<SaveStateTransform>());
+		ctx.Store.Received(1).Dispatch(Arg.Any<SaveStateTransform>());
 	}
 
 	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]

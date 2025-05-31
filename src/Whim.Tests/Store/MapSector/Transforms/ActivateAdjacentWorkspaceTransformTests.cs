@@ -12,7 +12,7 @@ public class ActivateAdjacentWorkspaceTransformTests
 		ActivateAdjacentWorkspaceTransform sut = new();
 
 		// When we activate the adjacent workspace
-		var result = ctx.Store.WhimDispatch(sut);
+		var result = ctx.Store.Dispatch(sut);
 
 		// Then we get an error
 		Assert.False(result.IsSuccessful);
@@ -30,7 +30,7 @@ public class ActivateAdjacentWorkspaceTransformTests
 		ActivateAdjacentWorkspaceTransform sut = new(monitor.Handle);
 
 		// When we activate the adjacent workspace
-		var result = ctx.Store.WhimDispatch(sut);
+		var result = ctx.Store.Dispatch(sut);
 
 		// Then we get an error
 		Assert.False(result.IsSuccessful);
@@ -51,7 +51,7 @@ public class ActivateAdjacentWorkspaceTransformTests
 		ActivateAdjacentWorkspaceTransform sut = new(monitor.Handle);
 
 		// When we activate the adjacent workspace
-		var result = ctx.Store.WhimDispatch(sut);
+		var result = ctx.Store.Dispatch(sut);
 
 		// Then we get success
 		Assert.True(result.IsSuccessful);

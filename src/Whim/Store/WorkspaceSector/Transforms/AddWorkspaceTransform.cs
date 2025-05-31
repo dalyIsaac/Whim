@@ -27,9 +27,9 @@ public record AddWorkspaceTransform(
 	IEnumerable<CreateLeafLayoutEngine>? CreateLeafLayoutEngines = null,
 	WorkspaceId WorkspaceId = default,
 	IEnumerable<int>? MonitorIndices = null
-) : WhimTransform<WorkspaceId>
+) : Transform<WorkspaceId>
 {
-	internal override WhimResult<WorkspaceId> Execute(
+	internal override Result<WorkspaceId> Execute(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector
@@ -50,7 +50,7 @@ public record AddWorkspaceTransform(
 
 		if (engineCreators.Length == 0)
 		{
-			return Result.FromException<WorkspaceId>(new WhimException("No engine creators were provided"));
+			return Result.FromError<WorkspaceId>(new WhimError("No engine creators were provided"));
 		}
 
 		// Create the layout engines.

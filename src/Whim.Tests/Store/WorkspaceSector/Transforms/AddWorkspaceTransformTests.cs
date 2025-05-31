@@ -14,7 +14,7 @@ public class AddWorkspaceTransformTests
 
 		AddWorkspaceTransform sut = new(name);
 
-		Result<Guid> result = ctx.Store.WhimDispatch(sut);
+		Result<Guid> result = ctx.Store.Dispatch(sut);
 		Assert.False(result.IsSuccessful);
 	}
 
@@ -28,7 +28,7 @@ public class AddWorkspaceTransformTests
 		CustomAssert.DoesNotRaise<WorkspaceAddedEventArgs>(
 			h => ctx.Store.WorkspaceEvents.WorkspaceAdded += h,
 			h => ctx.Store.WorkspaceEvents.WorkspaceAdded -= h,
-			() => result = ctx.Store.WhimDispatch(sut)
+			() => result = ctx.Store.Dispatch(sut)
 		);
 	}
 }
@@ -75,7 +75,7 @@ public class AddWorkspaceTransformTests_NotInitialized
 			WorkspaceId: id,
 			MonitorIndices: [1, 2]
 		);
-		Result<Guid> result = ctx.Store.WhimDispatch(sut);
+		Result<Guid> result = ctx.Store.Dispatch(sut);
 		AssertWorkspaceToCreate(root, result, id, null, createLeafLayoutEngines, [1, 2]);
 	}
 
@@ -84,7 +84,7 @@ public class AddWorkspaceTransformTests_NotInitialized
 	{
 		Guid id = Guid.NewGuid();
 		AddWorkspaceTransform sut = new("Test", WorkspaceId: id, MonitorIndices: [1, 2]);
-		Result<Guid> result = ctx.Store.WhimDispatch(sut);
+		Result<Guid> result = ctx.Store.Dispatch(sut);
 		AssertWorkspaceToCreate(root, result, id, "Test", null, [1, 2]);
 	}
 
@@ -93,7 +93,7 @@ public class AddWorkspaceTransformTests_NotInitialized
 	{
 		Guid id = Guid.NewGuid();
 		AddWorkspaceTransform sut = new("Test", CreateLeafLayoutEngines: createLeafLayoutEngines, WorkspaceId: id);
-		Result<Guid> result = ctx.Store.WhimDispatch(sut);
+		Result<Guid> result = ctx.Store.Dispatch(sut);
 		AssertWorkspaceToCreate(root, result, id, "Test", createLeafLayoutEngines, null);
 	}
 
@@ -101,7 +101,7 @@ public class AddWorkspaceTransformTests_NotInitialized
 	internal void AllDefaults(IContext ctx, MutableRootSector root)
 	{
 		AddWorkspaceTransform sut = new();
-		Result<Guid> result = ctx.Store.WhimDispatch(sut);
+		Result<Guid> result = ctx.Store.Dispatch(sut);
 		AssertWorkspaceToCreate(root, result, null, null, null, null);
 	}
 
@@ -110,7 +110,7 @@ public class AddWorkspaceTransformTests_NotInitialized
 	{
 		Guid id = Guid.NewGuid();
 		AddWorkspaceTransform sut = new(WorkspaceId: id);
-		Result<Guid> result = ctx.Store.WhimDispatch(sut);
+		Result<Guid> result = ctx.Store.Dispatch(sut);
 		AssertWorkspaceToCreate(root, result, id, null, null, null);
 	}
 
@@ -124,7 +124,7 @@ public class AddWorkspaceTransformTests_NotInitialized
 			WorkspaceId: id,
 			MonitorIndices: [1, 2]
 		);
-		Result<Guid> result = ctx.Store.WhimDispatch(sut);
+		Result<Guid> result = ctx.Store.Dispatch(sut);
 		AssertWorkspaceToCreate(root, result, id, "Test", createLeafLayoutEngines, [1, 2]);
 	}
 }
@@ -198,7 +198,7 @@ public class AddWorkspaceTransformTests_Initialized
 		var raisedEvent = Assert.Raises<WorkspaceAddedEventArgs>(
 			h => ctx.Store.WorkspaceEvents.WorkspaceAdded += h,
 			h => ctx.Store.WorkspaceEvents.WorkspaceAdded -= h,
-			() => result = ctx.Store.WhimDispatch(sut)
+			() => result = ctx.Store.Dispatch(sut)
 		);
 		return (result!.Value, raisedEvent.Arguments);
 	}

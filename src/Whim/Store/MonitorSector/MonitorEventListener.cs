@@ -20,7 +20,7 @@ internal class MonitorEventListener(IContext ctx, IInternalContext internalCtx, 
 
 	private void WindowMessageMonitor_MonitorsChanged(object? sender, WindowMessageMonitorEventArgs e)
 	{
-		_ctx.Store.WhimDispatch(new MonitorsChangedTransform());
+		_ctx.Store.Dispatch(new MonitorsChangedTransform());
 	}
 
 	private void WindowMessageMonitor_SessionChanged(object? sender, WindowMessageMonitorEventArgs e)

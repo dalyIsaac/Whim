@@ -32,7 +32,7 @@ public class SwapWindowInDirectionTransformTests
 		engine2.SwapWindowInDirection(Arg.Any<Direction>(), Arg.Any<IWindow>()).Returns(engine2);
 
 		// When we execute the transform
-		var result = ctx.Store.WhimDispatch(new SwapWindowInDirectionTransform(workspace.Id, Direction.Down, handle));
+		var result = ctx.Store.Dispatch(new SwapWindowInDirectionTransform(workspace.Id, Direction.Down, handle));
 
 		// Then it succeeds
 		Assert.True(result.IsSuccessful);
@@ -71,7 +71,7 @@ public class SwapWindowInDirectionTransformTests
 		);
 
 		// When we execute the transform
-		var result = ctx.Store.WhimDispatch(new SwapWindowInDirectionTransform(workspace.Id, Direction.Down, handle));
+		var result = ctx.Store.Dispatch(new SwapWindowInDirectionTransform(workspace.Id, Direction.Down, handle));
 
 		// Then it succeeds
 		Assert.True(result.IsSuccessful);

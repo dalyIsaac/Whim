@@ -35,7 +35,7 @@ public class MoveWindowEdgesInDirectionWorkspaceTransformTests
 			.Returns(engine2);
 
 		// When we execute the transform
-		var result = ctx.Store.WhimDispatch(
+		var result = ctx.Store.Dispatch(
 			new MoveWindowEdgesInDirectionWorkspaceTransform(workspace.Id, Direction.Down, point, handle)
 		);
 
@@ -79,7 +79,7 @@ public class MoveWindowEdgesInDirectionWorkspaceTransformTests
 		);
 
 		// When we execute the transform
-		var result = ctx.Store.WhimDispatch(
+		var result = ctx.Store.Dispatch(
 			new MoveWindowEdgesInDirectionWorkspaceTransform(workspace.Id, Direction.Down, point, handle)
 		);
 

@@ -27,6 +27,7 @@ public class WhimError
 	/// </summary>
 	/// <param name="message">The error message.</param>
 	public WhimError(string message)
+		: this(message, LogLevel.Debug)
 	{
 		Message = message;
 	}
@@ -37,8 +38,8 @@ public class WhimError
 	/// <param name="message">The error message.</param>
 	/// <param name="innerError">The inner error that caused this error.</param>
 	public WhimError(string message, WhimError innerError)
+		: this(message)
 	{
-		Message = message;
 		InnerError = innerError;
 	}
 
@@ -48,9 +49,46 @@ public class WhimError
 	/// <param name="message">The error message.</param>
 	/// <param name="innerException">The inner exception that caused this error.</param>
 	public WhimError(string message, Exception innerException)
+		: this(message)
+	{
+		InnerException = innerException;
+	}
+
+	/// <summary>
+	/// Creates a new WhimError with the specified message and log level.
+	/// </summary>
+	/// <param name="message">
+	/// The error message.
+	/// </param>
+	/// <param name="logLevel">
+	/// The log level to use when logging this error.
+	/// </param>
+	public WhimError(string message, LogLevel logLevel)
 	{
 		Message = message;
-		InnerException = innerException;
+
+		switch (logLevel)
+		{
+			case LogLevel.Verbose:
+				Logger.Verbose(message);
+				break;
+			case LogLevel.Debug:
+				Logger.Debug(message);
+				break;
+			case LogLevel.Information:
+				Logger.Information(message);
+				break;
+			case LogLevel.Warning:
+				Logger.Warning(message);
+				break;
+			case LogLevel.Error:
+			default:
+				Logger.Error(message);
+				break;
+			case LogLevel.Fatal:
+				Logger.Fatal(message);
+				break;
+		}
 	}
 
 	/// <summary>

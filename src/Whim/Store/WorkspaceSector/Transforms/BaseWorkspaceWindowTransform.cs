@@ -42,7 +42,7 @@ public abstract record BaseWorkspaceWindowTransform(
 		);
 		if (!result.TryGet(out IWindow validWindow))
 		{
-			return Result.FromException<Workspace>(result.Error!);
+			return Result.FromError<Workspace>(result.Error!);
 		}
 
 		return WindowOperation(ctx, internalCtx, rootSector, workspace, validWindow);

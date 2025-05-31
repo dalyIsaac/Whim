@@ -1,8 +1,8 @@
 namespace Whim;
 
-internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOptions = null) : WhimTransform<IWindow>()
+internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOptions = null) : Transform<IWindow>()
 {
-	internal override WhimResult<IWindow> Execute(
+	internal override Result<IWindow> Execute(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector
@@ -26,29 +26,27 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 		// Filter the handle.
 		if (internalCtx.CoreNativeManager.IsSplashScreen(Handle))
 		{
-			return Result.FromException<IWindow>(
-				new WhimException($"Window {Handle} is a splash screen, ignoring", LogLevel.Verbose)
+			return Result.FromError<IWindow>(
+				new WhimError($"Window {Handle} is a splash screen, ignoring", LogLevel.Verbose)
 			);
 		}
 
 		if (internalCtx.CoreNativeManager.IsCloakedWindow(Handle))
 		{
-			return Result.FromException<IWindow>(
-				new WhimException($"Window {Handle} is cloaked, ignoring", LogLevel.Verbose)
-			);
+			return Result.FromError<IWindow>(new WhimError($"Window {Handle} is cloaked, ignoring", LogLevel.Verbose));
 		}
 
 		if (!internalCtx.CoreNativeManager.IsStandardWindow(Handle))
 		{
-			return Result.FromException<IWindow>(
-				new WhimException($"Window {Handle} is not a standard window, ignoring", LogLevel.Verbose)
+			return Result.FromError<IWindow>(
+				new WhimError($"Window {Handle} is not a standard window, ignoring", LogLevel.Verbose)
 			);
 		}
 
 		if (!internalCtx.CoreNativeManager.HasNoVisibleOwner(Handle))
 		{
-			return Result.FromException<IWindow>(
-				new WhimException($"Window {Handle} has a visible owner, ignoring", LogLevel.Verbose)
+			return Result.FromError<IWindow>(
+				new WhimError($"Window {Handle} has a visible owner, ignoring", LogLevel.Verbose)
 			);
 		}
 
@@ -61,7 +59,7 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 		// Filter the window.
 		if (ctx.FilterManager.ShouldBeIgnored(window))
 		{
-			return Result.FromException<IWindow>(new WhimException("Window was ignored by filter"));
+			return Result.FromError<IWindow>(new WhimError("Window was ignored by filter"));
 		}
 
 		return Result.FromValue(window);
@@ -111,11 +109,11 @@ internal record WindowAddedTransform(HWND Handle, RouterOptions? CustomRouterOpt
 
 		if (window.IsMinimized)
 		{
-			ctx.Store.WhimDispatch(new MinimizeWindowStartTransform(workspace.Id, window.Handle));
+			ctx.Store.Dispatch(new MinimizeWindowStartTransform(workspace.Id, window.Handle));
 		}
 		else
 		{
-			ctx.Store.WhimDispatch(new AddWindowToWorkspaceTransform(workspace.Id, window));
+			ctx.Store.Dispatch(new AddWindowToWorkspaceTransform(workspace.Id, window));
 		}
 
 		mapSector.QueueEvent(RouteEventArgs.WindowAdded(window, workspace));

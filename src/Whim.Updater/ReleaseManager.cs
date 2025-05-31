@@ -130,7 +130,7 @@ internal class ReleaseManager(IContext context, UpdaterPlugin plugin)
 		Logger.Debug("Getting not installed releases");
 
 		_plugin.LastCheckedForUpdates = DateTime.Now;
-		_ctx.Store.WhimDispatch(new SaveStateTransform());
+		_ctx.Store.Dispatch(new SaveStateTransform());
 
 		Version currentVersion = Version.ParseProductVersion(_ctx.NativeManager.GetWhimVersion())!;
 

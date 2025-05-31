@@ -5,9 +5,9 @@ namespace Whim;
 /// <summary>
 /// Transform for when the monitors have changed.
 /// </summary>
-internal record MonitorsChangedTransform : WhimTransform
+internal record MonitorsChangedTransform : Transform
 {
-	internal override WhimResult<Unit> Execute(
+	internal override Result<Unit> Execute(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector
@@ -179,7 +179,7 @@ internal record MonitorsChangedTransform : WhimTransform
 
 			// For each workspace which is active in a monitor, do a layout.
 			// This will handle cases when the monitor's properties have changed.
-			ctx.Store.WhimDispatch(new LayoutAllActiveWorkspacesTransform());
+			ctx.Store.Dispatch(new LayoutAllActiveWorkspacesTransform());
 		});
 	}
 }

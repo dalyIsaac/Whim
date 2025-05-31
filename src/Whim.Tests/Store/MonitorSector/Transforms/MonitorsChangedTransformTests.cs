@@ -52,7 +52,7 @@ public class MonitorsChangedTransformTests
 			() =>
 				CustomAssert.Layout(
 					rootSector,
-					() => ctx.Store.WhimDispatch(new MonitorsChangedTransform()),
+					() => ctx.Store.Dispatch(new MonitorsChangedTransform()),
 					layoutWorkspaceIds,
 					notLayoutWorkspaceIds
 				)
@@ -148,7 +148,7 @@ public class MonitorsChangedTransformTests
 		rootSector.WorkspaceSector.HasInitialized = false;
 
 		// When something happens
-		ctx.Store.WhimDispatch(new MonitorsChangedTransform());
+		ctx.Store.Dispatch(new MonitorsChangedTransform());
 
 		// Then no workspaces are created
 		Assert.Empty(rootSector.WorkspaceSector.WorkspaceOrder);
@@ -164,7 +164,7 @@ public class MonitorsChangedTransformTests
 
 		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup });
 
-		ctx.Store.WhimDispatch(new MonitorsChangedTransform());
+		ctx.Store.Dispatch(new MonitorsChangedTransform());
 
 		// When a monitor is removed
 		Setup_TryEnqueue(internalCtx);
@@ -203,7 +203,7 @@ public class MonitorsChangedTransformTests
 		IWorkspace[] workspaces = PopulateWorkspaces(ctx, rootSector);
 
 		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup });
-		ctx.Store.WhimDispatch(new MonitorsChangedTransform());
+		ctx.Store.Dispatch(new MonitorsChangedTransform());
 
 		// When a monitor is added
 		Setup_TryEnqueue(internalCtx);
@@ -241,7 +241,7 @@ public class MonitorsChangedTransformTests
 		IWorkspace[] workspaces = PopulateWorkspaces(ctx, rootSector);
 
 		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup });
-		ctx.Store.WhimDispatch(new MonitorsChangedTransform());
+		ctx.Store.Dispatch(new MonitorsChangedTransform());
 
 		// When a monitor is added, and the new monitor changes to become the primary monitor
 		Setup_TryEnqueue(internalCtx);
@@ -339,7 +339,7 @@ public class MonitorsChangedTransformTests
 		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup });
 
 		// When we dispatch the same transform twice, the first from a clean store
-		ctx.Store.WhimDispatch(new MonitorsChangedTransform());
+		ctx.Store.Dispatch(new MonitorsChangedTransform());
 
 		// Then the second dispatch should receive all monitors as unchanged.
 		Setup_TryEnqueue(internalCtx);

@@ -16,10 +16,10 @@ internal class RootEventListener(IContext ctx, IInternalContext internalCtx) : I
 	}
 
 	private void MouseHook_MouseLeftButtonUp(object? sender, MouseEventArgs e) =>
-		_ctx.Store.WhimDispatch(new MouseLeftButtonUpTransform(e.Point));
+		_ctx.Store.Dispatch(new MouseLeftButtonUpTransform(e.Point));
 
 	private void MouseHook_MouseLeftButtonDown(object? sender, MouseEventArgs e) =>
-		_ctx.Store.WhimDispatch(new MouseLeftButtonDownTransform());
+		_ctx.Store.Dispatch(new MouseLeftButtonDownTransform());
 
 	protected virtual void Dispose(bool disposing)
 	{

@@ -27,7 +27,7 @@ public class WindowMovedTransformTests
 		ev = Assert.Raises<WindowMovedEventArgs>(
 			h => ctx.Store.WindowEvents.WindowMoved += h,
 			h => ctx.Store.WindowEvents.WindowMoved -= h,
-			() => result = ctx.Store.WhimDispatch(sut)
+			() => result = ctx.Store.Dispatch(sut)
 		);
 
 		return (result, ev);
@@ -44,7 +44,7 @@ public class WindowMovedTransformTests
 		CustomAssert.DoesNotRaise<WindowMovedEventArgs>(
 			h => ctx.Store.WindowEvents.WindowMoved += h,
 			h => ctx.Store.WindowEvents.WindowMoved -= h,
-			() => result = ctx.Store.WhimDispatch(sut)
+			() => result = ctx.Store.Dispatch(sut)
 		);
 
 		return result!.Value;

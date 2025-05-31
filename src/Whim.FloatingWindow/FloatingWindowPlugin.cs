@@ -26,7 +26,7 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
-		_ctx.Store.WhimDispatch(
+		_ctx.Store.Dispatch(
 			new AddProxyLayoutEngineTransform(layout => new ProxyFloatingLayoutEngine(_ctx, this, layout))
 		);
 		_ctx.Store.WindowEvents.WindowRemoved += WindowEvents_WindowRemoved;
@@ -59,7 +59,7 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin
 		}
 
 		_floatingWindows.Add(window.Handle);
-		_ctx.Store.WhimDispatch(new MoveWindowToPointTransform(window.Handle, windowPosition.LastWindowRectangle));
+		_ctx.Store.Dispatch(new MoveWindowToPointTransform(window.Handle, windowPosition.LastWindowRectangle));
 	}
 
 	/// <inheritdoc />
@@ -81,7 +81,7 @@ public class FloatingWindowPlugin(IContext context) : IFloatingWindowPlugin
 
 		if (_floatingWindows.Remove(window.Handle))
 		{
-			_ctx.Store.WhimDispatch(new MoveWindowToPointTransform(window.Handle, windowPosition.LastWindowRectangle));
+			_ctx.Store.Dispatch(new MoveWindowToPointTransform(window.Handle, windowPosition.LastWindowRectangle));
 		}
 	}
 

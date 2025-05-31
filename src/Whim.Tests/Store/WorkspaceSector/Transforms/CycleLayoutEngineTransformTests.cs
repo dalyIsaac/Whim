@@ -34,7 +34,7 @@ public class CycleLayoutEngineTransformTests
 		CycleLayoutEngineTransform sut = new(workspace.Id, reverse);
 
 		// When
-		var result = ctx.Store.WhimDispatch(sut);
+		var result = ctx.Store.Dispatch(sut);
 
 		// Then
 		Workspace resultWorkspace = rootSector.WorkspaceSector.Workspaces[workspace.Id];

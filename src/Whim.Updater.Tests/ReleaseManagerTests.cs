@@ -24,7 +24,7 @@ public class ReleaseManagerTests
 
 		// Then
 		ctx.NativeManager.DidNotReceive().TryEnqueue(Arg.Any<DispatcherQueueHandler>());
-		ctx.Store.Received(1).WhimDispatch(Arg.Any<SaveStateTransform>());
+		ctx.Store.Received(1).Dispatch(Arg.Any<SaveStateTransform>());
 		Assert.NotNull(plugin.LastCheckedForUpdates);
 	}
 
@@ -46,7 +46,7 @@ public class ReleaseManagerTests
 
 		// Then
 		ctx.NativeManager.DidNotReceive().TryEnqueue(Arg.Any<DispatcherQueueHandler>());
-		ctx.Store.Received(1).WhimDispatch(Arg.Any<SaveStateTransform>());
+		ctx.Store.Received(1).Dispatch(Arg.Any<SaveStateTransform>());
 		Assert.NotNull(plugin.LastCheckedForUpdates);
 	}
 
@@ -65,7 +65,7 @@ public class ReleaseManagerTests
 
 		// Then
 		ctx.NativeManager.Received(1).TryEnqueue(Arg.Any<DispatcherQueueHandler>());
-		ctx.Store.Received(1).WhimDispatch(Arg.Any<SaveStateTransform>());
+		ctx.Store.Received(1).Dispatch(Arg.Any<SaveStateTransform>());
 		Assert.NotNull(plugin.LastCheckedForUpdates);
 	}
 	#endregion

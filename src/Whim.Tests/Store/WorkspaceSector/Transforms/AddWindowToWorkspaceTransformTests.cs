@@ -17,7 +17,7 @@ public class AddWindowToWorkspaceTransformTests
 		AddWindowToWorkspaceTransform transform = new(workspace.Id, CreateWindow((HWND)1));
 
 		// When
-		Result<bool> result = ctx.Store.WhimDispatch(transform);
+		Result<bool> result = ctx.Store.Dispatch(transform);
 
 		// Then
 		Assert.True(result.IsSuccessful);

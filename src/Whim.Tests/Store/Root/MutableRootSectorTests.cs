@@ -17,7 +17,7 @@ public class MutableRootSectorTests
 
 		rootSector.WorkspaceSector.CreateLayoutEngines = () => [(id) => engine1, (id) => engine2];
 
-		ctx.Store.WhimDispatch(new AddWorkspaceTransform());
+		ctx.Store.Dispatch(new AddWorkspaceTransform());
 
 		// When we initialize and dispose the root sector
 		sut.Initialize();

@@ -17,9 +17,9 @@ namespace Whim;
 /// context.Store.Dispatch(new FocusWindowTransform());
 /// </code>
 /// </example>
-public record FocusWindowTransform(HWND WindowHandle = default) : WhimTransform<Unit>
+public record FocusWindowTransform(HWND WindowHandle = default) : Transform<Unit>
 {
-	internal override WhimResult<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		HWND windowHandle = WindowHandle;
 
@@ -29,7 +29,7 @@ public record FocusWindowTransform(HWND WindowHandle = default) : WhimTransform<
 			{
 				Logger.Debug("No last focused window to focus, focusing desktop");
 				HMONITOR activeMonitor = ctx.Store.Pick(PickActiveMonitor()).Handle;
-				return ctx.Store.WhimDispatch(new FocusMonitorDesktopTransform(activeMonitor));
+				return ctx.Store.Dispatch(new FocusMonitorDesktopTransform(activeMonitor));
 			}
 
 			windowHandle = lastFocusedWindowHandle;

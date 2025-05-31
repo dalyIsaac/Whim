@@ -3,7 +3,7 @@ namespace Whim;
 /// <summary>
 /// Remove a workspace.
 /// </summary>
-public abstract record BaseRemoveWorkspaceTransform() : WhimTransform
+public abstract record BaseRemoveWorkspaceTransform() : Transform
 {
 	/// <summary>
 	/// Determines if the provided <paramref name="workspace"/> should be removed.
@@ -12,7 +12,7 @@ public abstract record BaseRemoveWorkspaceTransform() : WhimTransform
 	/// <returns></returns>
 	public abstract bool ShouldRemove(Workspace workspace);
 
-	internal override WhimResult<Unit> Execute(
+	internal override Result<Unit> Execute(
 		IContext ctx,
 		IInternalContext internalCtx,
 		MutableRootSector mutableRootSector
@@ -22,7 +22,7 @@ public abstract record BaseRemoveWorkspaceTransform() : WhimTransform
 
 		if (sector.Workspaces.Count - 1 < mutableRootSector.MonitorSector.Monitors.Length)
 		{
-			return Result.FromException<Unit>(new WhimException("There must be a workspace for each monitor"));
+			return Result.FromError<Unit>(new WhimError("There must be a workspace for each monitor"));
 		}
 
 		Workspace? workspaceToRemove = null;
@@ -37,7 +37,7 @@ public abstract record BaseRemoveWorkspaceTransform() : WhimTransform
 
 		if (workspaceToRemove is null)
 		{
-			return Result.FromException<Unit>(new WhimException("No matching workspace found"));
+			return Result.FromError<Unit>(new WhimError("No matching workspace found"));
 		}
 
 		// Remove the workspace
@@ -46,8 +46,8 @@ public abstract record BaseRemoveWorkspaceTransform() : WhimTransform
 
 		// Queue events
 		WorkspaceId targetWorkspaceId = sector.WorkspaceOrder[^1];
-		ctx.Store.WhimDispatch(new MergeWorkspaceWindowsTransform(workspaceToRemove.Id, targetWorkspaceId));
-		ctx.Store.WhimDispatch(new ActivateWorkspaceTransform(targetWorkspaceId));
+		ctx.Store.Dispatch(new MergeWorkspaceWindowsTransform(workspaceToRemove.Id, targetWorkspaceId));
+		ctx.Store.Dispatch(new ActivateWorkspaceTransform(targetWorkspaceId));
 
 		sector.QueueEvent(new WorkspaceRemovedEventArgs() { Workspace = workspaceToRemove });
 		sector.WorkspacesToLayout.Remove(workspaceToRemove.Id);

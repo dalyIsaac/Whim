@@ -33,7 +33,7 @@ public class LegacyWorkspaceTests
 		workspace.Name = "Bob";
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new SetWorkspaceNameTransform(workspace.Id, "Bob"));
+		ctx.Store.Received(1).Dispatch(new SetWorkspaceNameTransform(workspace.Id, "Bob"));
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -116,7 +116,7 @@ public class LegacyWorkspaceTests
 		workspace.MinimizeWindowStart(window);
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new MinimizeWindowStartTransform(workspace.Id, window.Handle));
+		ctx.Store.Received(1).Dispatch(new MinimizeWindowStartTransform(workspace.Id, window.Handle));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -130,7 +130,7 @@ public class LegacyWorkspaceTests
 		workspace.MinimizeWindowEnd(window);
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new MinimizeWindowEndTransform(workspace.Id, window.Handle));
+		ctx.Store.Received(1).Dispatch(new MinimizeWindowEndTransform(workspace.Id, window.Handle));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -143,7 +143,7 @@ public class LegacyWorkspaceTests
 		workspace.FocusLastFocusedWindow();
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new FocusWorkspaceTransform(workspace.Id));
+		ctx.Store.Received(1).Dispatch(new FocusWorkspaceTransform(workspace.Id));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -156,7 +156,7 @@ public class LegacyWorkspaceTests
 		workspace.TrySetLayoutEngineFromIndex(1);
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(Arg.Any<ActivateLayoutEngineTransform>());
+		ctx.Store.Received(1).Dispatch(Arg.Any<ActivateLayoutEngineTransform>());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -169,7 +169,7 @@ public class LegacyWorkspaceTests
 		workspace.CycleLayoutEngine();
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new CycleLayoutEngineTransform(workspace.Id));
+		ctx.Store.Received(1).Dispatch(new CycleLayoutEngineTransform(workspace.Id));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -182,7 +182,7 @@ public class LegacyWorkspaceTests
 		workspace.ActivatePreviouslyActiveLayoutEngine();
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(Arg.Any<ActivateLayoutEngineTransform>());
+		ctx.Store.Received(1).Dispatch(Arg.Any<ActivateLayoutEngineTransform>());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -195,7 +195,7 @@ public class LegacyWorkspaceTests
 		workspace.TrySetLayoutEngineFromName("test");
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(Arg.Any<ActivateLayoutEngineTransform>());
+		ctx.Store.Received(1).Dispatch(Arg.Any<ActivateLayoutEngineTransform>());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -209,7 +209,7 @@ public class LegacyWorkspaceTests
 		workspace.AddWindow(window);
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new AddWindowToWorkspaceTransform(workspace.Id, window));
+		ctx.Store.Received(1).Dispatch(new AddWindowToWorkspaceTransform(workspace.Id, window));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -223,7 +223,7 @@ public class LegacyWorkspaceTests
 		workspace.RemoveWindow(window);
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new RemoveWindowFromWorkspaceTransform(workspace.Id, window));
+		ctx.Store.Received(1).Dispatch(new RemoveWindowFromWorkspaceTransform(workspace.Id, window));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -238,7 +238,7 @@ public class LegacyWorkspaceTests
 
 		// Then
 		ctx.Store.Received(1)
-			.WhimDispatch(new FocusWindowInDirectionTransform(workspace.Id, Direction.Left, window.Handle));
+			.Dispatch(new FocusWindowInDirectionTransform(workspace.Id, Direction.Left, window.Handle));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -253,7 +253,7 @@ public class LegacyWorkspaceTests
 
 		// Then
 		ctx.Store.Received(1)
-			.WhimDispatch(new SwapWindowInDirectionTransform(workspace.Id, Direction.Left, window.Handle));
+			.Dispatch(new SwapWindowInDirectionTransform(workspace.Id, Direction.Left, window.Handle));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -268,7 +268,7 @@ public class LegacyWorkspaceTests
 
 		// Then
 		ctx.Store.Received(1)
-			.WhimDispatch(
+			.Dispatch(
 				new MoveWindowEdgesInDirectionWorkspaceTransform(
 					workspace.Id,
 					Direction.Left,
@@ -290,7 +290,7 @@ public class LegacyWorkspaceTests
 
 		// Then
 		ctx.Store.Received(1)
-			.WhimDispatch(new MoveWindowToPointInWorkspaceTransform(workspace.Id, window.Handle, new Point<double>()));
+			.Dispatch(new MoveWindowToPointInWorkspaceTransform(workspace.Id, window.Handle, new Point<double>()));
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -320,7 +320,7 @@ public class LegacyWorkspaceTests
 		workspace.Deactivate();
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new DeactivateWorkspaceTransform(workspace.Id));
+		ctx.Store.Received(1).Dispatch(new DeactivateWorkspaceTransform(workspace.Id));
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -363,7 +363,7 @@ public class LegacyWorkspaceTests
 		workspace.DoLayout();
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new DoWorkspaceLayoutTransform(workspace.Id));
+		ctx.Store.Received(1).Dispatch(new DoWorkspaceLayoutTransform(workspace.Id));
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -391,7 +391,7 @@ public class LegacyWorkspaceTests
 		Workspace workspace = CreateWorkspace(ctx);
 		LayoutEngineCustomAction action = new() { Name = "Test", Window = window };
 
-		ctx.Store.WhimDispatch(new LayoutEngineCustomActionTransform(workspace.Id, action)).Returns(isChanged);
+		ctx.Store.Dispatch(new LayoutEngineCustomActionTransform(workspace.Id, action)).Returns(isChanged);
 
 		// When
 		bool result = workspace.PerformCustomLayoutEngineAction(action);
@@ -414,7 +414,7 @@ public class LegacyWorkspaceTests
 			Payload = window,
 		};
 
-		ctx.Store.WhimDispatch(new LayoutEngineCustomActionWithPayloadTransform<IWindow>(workspace.Id, action))
+		ctx.Store.Dispatch(new LayoutEngineCustomActionWithPayloadTransform<IWindow>(workspace.Id, action))
 			.Returns(isChanged);
 
 		// When

@@ -18,7 +18,7 @@ public class RemoveWindowFromWorkspaceTransformTests
 		RemoveWindowFromWorkspaceTransform sut = new(workspace.Id, window);
 
 		// When we execute the transform
-		Result<bool> result = ctx.Store.WhimDispatch(sut);
+		Result<bool> result = ctx.Store.Dispatch(sut);
 
 		// Then we get false
 		Assert.True(result.IsSuccessful);
@@ -40,7 +40,7 @@ public class RemoveWindowFromWorkspaceTransformTests
 		RemoveWindowFromWorkspaceTransform sut = new(workspace.Id, window);
 
 		// When we execute the transform
-		Result<bool> result = ctx.Store.WhimDispatch(sut);
+		Result<bool> result = ctx.Store.Dispatch(sut);
 
 		// Then we get true
 		Assert.True(result.IsSuccessful);
@@ -64,7 +64,7 @@ public class RemoveWindowFromWorkspaceTransformTests
 		RemoveWindowFromWorkspaceTransform sut = new(workspace.Id, window);
 
 		// When we execute the transform
-		Result<bool> result = ctx.Store.WhimDispatch(sut);
+		Result<bool> result = ctx.Store.Dispatch(sut);
 
 		// Then we get true
 		Assert.True(result.IsSuccessful);
@@ -97,7 +97,7 @@ public class RemoveWindowFromWorkspaceTransformTests
 		RemoveWindowFromWorkspaceTransform sut = new(workspace.Id, window);
 
 		// When we execute the transform
-		Result<bool> result = ctx.Store.WhimDispatch(sut);
+		Result<bool> result = ctx.Store.Dispatch(sut);
 
 		// Then we get true
 		Assert.True(result.IsSuccessful);

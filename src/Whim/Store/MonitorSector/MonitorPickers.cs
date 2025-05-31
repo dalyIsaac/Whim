@@ -10,18 +10,18 @@ public static partial class Pickers
 	/// The monitor with the given handle, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
 	/// If the monitor is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
 	/// </returns>
-	public static PurePicker<WhimResult<IMonitor>> PickMonitorByHandle(HMONITOR handle) =>
+	public static PurePicker<Result<IMonitor>> PickMonitorByHandle(HMONITOR handle) =>
 		(rootSector) =>
 		{
 			foreach (IMonitor m in rootSector.MonitorSector.Monitors)
 			{
 				if (m.Handle == handle)
 				{
-					return WhimResult.FromValue(m);
+					return Result.FromValue(m);
 				}
 			}
 
-			return WhimResult.FromException<IMonitor>(StoreExceptions.MonitorNotFound(handle));
+			return Result.FromError<IMonitor>(StoreErrors.MonitorNotFound(handle));
 		};
 
 	/// <summary>
@@ -78,7 +78,7 @@ public static partial class Pickers
 	/// The monitor adjacent to the given monitor, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
 	/// If the monitor is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
 	/// </returns>
-	public static PurePicker<WhimResult<IMonitor>> PickAdjacentMonitor(
+	public static PurePicker<Result<IMonitor>> PickAdjacentMonitor(
 		HMONITOR handle = default,
 		bool reverse = false,
 		bool getFirst = false
@@ -102,14 +102,14 @@ public static partial class Pickers
 			{
 				if (getFirst)
 				{
-					return WhimResult.FromValue(monitors[0]);
+					return Result.FromValue(monitors[0]);
 				}
 
-				return WhimResult.FromException<IMonitor>(StoreExceptions.MonitorNotFound(handle));
+				return Result.FromError<IMonitor>(StoreErrors.MonitorNotFound(handle));
 			}
 
 			int delta = reverse ? -1 : 1;
-			return WhimResult.FromValue(monitors[(monitorIdx + delta).Mod(monitors.Length)]);
+			return Result.FromValue(monitors[(monitorIdx + delta).Mod(monitors.Length)]);
 		};
 
 	/// <summary>
@@ -122,16 +122,16 @@ public static partial class Pickers
 	/// The monitor at the given index, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
 	/// If the monitor is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
 	/// </returns>
-	public static PurePicker<WhimResult<IMonitor>> PickMonitorByIndex(int index) =>
+	public static PurePicker<Result<IMonitor>> PickMonitorByIndex(int index) =>
 		(rootSector) =>
 		{
 			ImmutableArray<IMonitor> monitors = rootSector.MonitorSector.Monitors;
 			if (index < 0 || index >= monitors.Length)
 			{
-				return WhimResult.FromException<IMonitor>(StoreExceptions.InvalidMonitorIndex(index));
+				return Result.FromError<IMonitor>(StoreErrors.InvalidMonitorIndex(index));
 			}
 
-			return WhimResult.FromValue(monitors[index]);
+			return Result.FromValue(monitors[index]);
 		};
 
 	/// <summary>
@@ -148,13 +148,13 @@ public static partial class Pickers
 	/// The monitor at the given point, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
 	/// If the monitor is not found, then <see cref="Result{T, TError}.Error"/> will be returned.
 	/// </returns>
-	public static Picker<WhimResult<IMonitor>> PickMonitorAtPoint(IPoint<int> point, bool getFirst = false) =>
+	public static Picker<Result<IMonitor>> PickMonitorAtPoint(IPoint<int> point, bool getFirst = false) =>
 		new GetMonitorAtPointPicker(point, getFirst);
 }
 
-internal record GetMonitorAtPointPicker(IPoint<int> Point, bool GetFirst = false) : Picker<WhimResult<IMonitor>>
+internal record GetMonitorAtPointPicker(IPoint<int> Point, bool GetFirst = false) : Picker<Result<IMonitor>>
 {
-	internal override WhimResult<IMonitor> Execute(IContext ctx, IInternalContext internalCtx, IRootSector rootSector)
+	internal override Result<IMonitor> Execute(IContext ctx, IInternalContext internalCtx, IRootSector rootSector)
 	{
 		IMonitorSector sector = rootSector.MonitorSector;
 
@@ -168,15 +168,15 @@ internal record GetMonitorAtPointPicker(IPoint<int> Point, bool GetFirst = false
 			IMonitor m = sector.Monitors[idx];
 			if (m.Handle == hmonitor)
 			{
-				return WhimResult.FromValue(m);
+				return Result.FromValue(m);
 			}
 		}
 
 		if (GetFirst)
 		{
-			return WhimResult.FromValue(sector.Monitors[0]);
+			return Result.FromValue(sector.Monitors[0]);
 		}
 
-		return WhimResult.FromException<IMonitor>(StoreExceptions.NoMonitorFoundAtPoint(Point));
+		return Result.FromError<IMonitor>(StoreErrors.NoMonitorFoundAtPoint(Point));
 	}
 }

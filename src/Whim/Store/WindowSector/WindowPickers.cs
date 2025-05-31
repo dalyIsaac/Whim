@@ -14,12 +14,12 @@ public static partial class Pickers
 	/// </summary>
 	/// <param name="handle"></param>
 	/// <returns></returns>
-	public static PurePicker<WhimResult<IWindow>> PickWindowByHandle(HWND handle) =>
+	public static PurePicker<Result<IWindow>> PickWindowByHandle(HWND handle) =>
 		(rootSector) =>
 		{
 			return rootSector.WindowSector.Windows.TryGetValue(handle, out IWindow? w)
-				? WhimResult.FromValue(w)
-				: WhimResult.FromException<IWindow>(StoreExceptions.WindowNotFound(handle));
+				? Result.FromValue(w)
+				: Result.FromError<IWindow>(StoreErrors.WindowNotFound(handle));
 		};
 
 	/// <summary>

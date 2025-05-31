@@ -22,7 +22,7 @@ public class MinimizeWindowStartTransformTests
 		MinimizeWindowStartTransform sut = new(workspace.Id, window.Handle);
 
 		// When we execute the transform
-		Result<bool> result = ctx.Store.WhimDispatch(sut);
+		Result<bool> result = ctx.Store.Dispatch(sut);
 
 		// Then it succeeds
 		Assert.True(result.IsSuccessful);
@@ -49,7 +49,7 @@ public class MinimizeWindowStartTransformTests
 		MinimizeWindowStartTransform sut = new(workspace.Id, window.Handle);
 
 		// When we execute the transform
-		Result<bool> result = ctx.Store.WhimDispatch(sut);
+		Result<bool> result = ctx.Store.Dispatch(sut);
 
 		// Then it succeeds
 		Assert.True(result.IsSuccessful);

@@ -53,9 +53,6 @@ internal class Store : IStore
 	protected virtual Result<TResult> DispatchFn<TResult>(Transform<TResult> transform) =>
 		transform.Execute(_ctx, _internalCtx, _root.MutableRootSector);
 
-	protected virtual Result<TResult> WhimDispatchFn<TResult>(WhimTransform<TResult> transform) =>
-		transform.Execute(_ctx, _internalCtx, _root.MutableRootSector);
-
 	public Result<TResult> Dispatch<TResult>(Transform<TResult> transform)
 	{
 		if (_internalCtx.CoreNativeManager.IsStaThread())
@@ -89,31 +86,6 @@ internal class Store : IStore
 
 		Logger.Debug($"Executing transform {transform}");
 		return DispatchFn(transform);
-	}
-
-	public WhimResult<TResult> WhimDispatch<TResult>(WhimTransform<TResult> transform)
-	{
-		if (_internalCtx.CoreNativeManager.IsStaThread())
-		{
-			return Task.Run(() =>
-			{
-				Logger.Verbose($"Entering task, executing transform {transform}");
-				try
-				{
-					_lock.EnterWriteLock();
-					return WhimDispatchFn(transform);
-				}
-				finally
-				{
-					_root.DoLayout();
-					_root.DispatchEvents();
-					_lock.ExitWriteLock();
-				}
-			}).Result;
-		}
-
-		Logger.Verbose($"Executing transform {transform}");
-		return WhimDispatchFn(transform);
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]

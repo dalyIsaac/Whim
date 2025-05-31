@@ -56,7 +56,7 @@ public class MonitorEventListenerTests
 		);
 
 		// Then a dispatch to the store was triggered
-		ctx.Store.Received(1).WhimDispatch(new MonitorsChangedTransform());
+		ctx.Store.Received(1).Dispatch(new MonitorsChangedTransform());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -73,7 +73,7 @@ public class MonitorEventListenerTests
 		);
 
 		// Then a dispatch to the store was triggered
-		ctx.Store.Received(1).WhimDispatch(new MonitorsChangedTransform());
+		ctx.Store.Received(1).Dispatch(new MonitorsChangedTransform());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -90,7 +90,7 @@ public class MonitorEventListenerTests
 		);
 
 		// Then a dispatch to the store was triggered
-		ctx.Store.Received(1).WhimDispatch(new MonitorsChangedTransform());
+		ctx.Store.Received(1).Dispatch(new MonitorsChangedTransform());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -110,7 +110,7 @@ public class MonitorEventListenerTests
 		await Task.Delay(2000);
 
 		// Then a dispatch to the store was triggered
-		ctx.Store.Received(1).WhimDispatch(new MonitorsChangedTransform());
+		ctx.Store.Received(1).Dispatch(new MonitorsChangedTransform());
 	}
 
 	[SuppressMessage("Usage", "NS5000:Received check.")]

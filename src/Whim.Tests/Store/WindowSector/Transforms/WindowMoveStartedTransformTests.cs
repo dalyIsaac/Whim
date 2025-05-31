@@ -14,7 +14,7 @@ public class WindowMoveStartedTransformTests
 		ev = Assert.Raises<WindowMoveStartedEventArgs>(
 			h => mutableRootSector.WindowSector.WindowMoveStarted += h,
 			h => mutableRootSector.WindowSector.WindowMoveStarted -= h,
-			() => result = ctx.Store.WhimDispatch(sut)
+			() => result = ctx.Store.Dispatch(sut)
 		);
 
 		return (result!.Value, ev);

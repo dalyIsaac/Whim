@@ -4,13 +4,13 @@ namespace Whim;
 /// Triggers all active workspaces to update their layout.
 /// Active workspaces are those that are visible on a monitor.
 /// </summary>
-public record LayoutAllActiveWorkspacesTransform() : WhimTransform
+public record LayoutAllActiveWorkspacesTransform() : Transform
 {
-	internal override WhimResult<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		if (ctx.Store.IsDisposing)
 		{
-			return Result.FromException<Unit>(new WhimException("Whim is shutting down"));
+			return Result.FromError<Unit>(new WhimError("Whim is shutting down"));
 		}
 
 		foreach (IWorkspace workspace in ctx.Store.Pick(PickAllActiveWorkspaces()))

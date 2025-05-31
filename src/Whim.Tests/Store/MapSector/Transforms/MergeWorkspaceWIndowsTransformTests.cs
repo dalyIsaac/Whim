@@ -15,7 +15,7 @@ public class MergeWorkspaceWindowsTransformTests
 		MergeWorkspaceWindowsTransform sut = new(sourceWorkspaceId, targetWorkspaceId);
 
 		// When
-		var result = ctx.Store.WhimDispatch(sut);
+		var result = ctx.Store.Dispatch(sut);
 
 		// Then
 		Assert.False(result.IsSuccessful);
@@ -33,7 +33,7 @@ public class MergeWorkspaceWindowsTransformTests
 		MergeWorkspaceWindowsTransform sut = new(workspace.Id, targetWorkspaceId);
 
 		// When
-		var result = ctx.Store.WhimDispatch(sut);
+		var result = ctx.Store.Dispatch(sut);
 
 		// Then
 		Assert.False(result.IsSuccessful);
@@ -64,7 +64,7 @@ public class MergeWorkspaceWindowsTransformTests
 		MergeWorkspaceWindowsTransform sut = new(sourceWorkspace.Id, targetWorkspace.Id);
 
 		// When
-		var result = ctx.Store.WhimDispatch(sut);
+		var result = ctx.Store.Dispatch(sut);
 
 		// Then
 		Assert.True(result.IsSuccessful);

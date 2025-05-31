@@ -19,76 +19,69 @@ internal class CoreCommands : PluginCommands
 		_ = Add(
 				identifier: "activate_previous_workspace",
 				title: "Activate the previous workspace",
-				callback: () => _context.Store.WhimDispatch(new ActivateAdjacentWorkspaceTransform(Reverse: true)),
+				callback: () => _context.Store.Dispatch(new ActivateAdjacentWorkspaceTransform(Reverse: true)),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_LEFT)
 			)
 			.Add(
 				identifier: "activate_next_workspace",
 				title: "Activate the next workspace",
-				callback: () => _context.Store.WhimDispatch(new ActivateAdjacentWorkspaceTransform()),
+				callback: () => _context.Store.Dispatch(new ActivateAdjacentWorkspaceTransform()),
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_RIGHT)
 			)
 			.Add(
 				identifier: "focus_window_in_direction.left",
 				title: "Focus the window in the left direction",
-				callback: () =>
-					_context.Store.WhimDispatch(new FocusWindowInDirectionTransform(Direction: Direction.Left)),
+				callback: () => _context.Store.Dispatch(new FocusWindowInDirectionTransform(Direction: Direction.Left)),
 				keybind: new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_LEFT)
 			)
 			.Add(
 				identifier: "focus_window_in_direction.right",
 				title: "Focus the window in the right direction",
 				callback: () =>
-					_context.Store.WhimDispatch(new FocusWindowInDirectionTransform(Direction: Direction.Right)),
+					_context.Store.Dispatch(new FocusWindowInDirectionTransform(Direction: Direction.Right)),
 				keybind: new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_RIGHT)
 			)
 			.Add(
 				identifier: "focus_window_in_direction.up",
 				title: "Focus the window in the up direction",
-				callback: () =>
-					_context.Store.WhimDispatch(new FocusWindowInDirectionTransform(Direction: Direction.Up)),
+				callback: () => _context.Store.Dispatch(new FocusWindowInDirectionTransform(Direction: Direction.Up)),
 				keybind: new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_UP)
 			)
 			.Add(
 				identifier: "focus_window_in_direction.down",
 				title: "Focus the window in the down direction",
-				callback: () =>
-					_context.Store.WhimDispatch(new FocusWindowInDirectionTransform(Direction: Direction.Down)),
+				callback: () => _context.Store.Dispatch(new FocusWindowInDirectionTransform(Direction: Direction.Down)),
 				keybind: new Keybind(IKeybind.WinAlt, VIRTUAL_KEY.VK_DOWN)
 			)
 			.Add(
 				identifier: "swap_window_in_direction.left",
 				title: "Swap the window with the window to the left",
-				callback: () =>
-					_context.Store.WhimDispatch(new SwapWindowInDirectionTransform(Direction: Direction.Left)),
+				callback: () => _context.Store.Dispatch(new SwapWindowInDirectionTransform(Direction: Direction.Left)),
 				keybind: new Keybind(IKeybind.Win, VIRTUAL_KEY.VK_LEFT)
 			)
 			.Add(
 				identifier: "swap_window_in_direction.right",
 				title: "Swap the window with the window to the right",
-				callback: () =>
-					_context.Store.WhimDispatch(new SwapWindowInDirectionTransform(Direction: Direction.Right)),
+				callback: () => _context.Store.Dispatch(new SwapWindowInDirectionTransform(Direction: Direction.Right)),
 				keybind: new Keybind(IKeybind.Win, VIRTUAL_KEY.VK_RIGHT)
 			)
 			.Add(
 				identifier: "swap_window_in_direction.up",
 				title: "Swap the window with the window to the up",
-				callback: () =>
-					_context.Store.WhimDispatch(new SwapWindowInDirectionTransform(Direction: Direction.Up)),
+				callback: () => _context.Store.Dispatch(new SwapWindowInDirectionTransform(Direction: Direction.Up)),
 				keybind: new Keybind(IKeybind.Win, VIRTUAL_KEY.VK_UP)
 			)
 			.Add(
 				identifier: "swap_window_in_direction.down",
 				title: "Swap the window with the window to the down",
-				callback: () =>
-					_context.Store.WhimDispatch(new SwapWindowInDirectionTransform(Direction: Direction.Down)),
+				callback: () => _context.Store.Dispatch(new SwapWindowInDirectionTransform(Direction: Direction.Down)),
 				keybind: new Keybind(IKeybind.Win, VIRTUAL_KEY.VK_DOWN)
 			)
 			.Add(
 				identifier: "move_window_left_edge_left",
 				title: "Move the current window's left edge to the left",
 				callback: () =>
-					_context.Store.WhimDispatch(
+					_context.Store.Dispatch(
 						new MoveWindowEdgesInDirectionTransform(
 							Direction.Left,
 							new Point<int>() { X = -MoveWindowEdgeDelta, Y = 0 }
@@ -100,7 +93,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_left_edge_right",
 				title: "Move the current window's left edge to the right",
 				callback: () =>
-					_context.Store.WhimDispatch(
+					_context.Store.Dispatch(
 						new MoveWindowEdgesInDirectionTransform(
 							Direction.Left,
 							new Point<int>() { X = MoveWindowEdgeDelta, Y = 0 }
@@ -112,7 +105,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_right_edge_left",
 				title: "Move the current window's right edge to the left",
 				callback: () =>
-					_context.Store.WhimDispatch(
+					_context.Store.Dispatch(
 						new MoveWindowEdgesInDirectionTransform(
 							Direction.Right,
 							new Point<int>() { X = -MoveWindowEdgeDelta, Y = 0 }
@@ -124,7 +117,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_right_edge_right",
 				title: "Move the current window's right edge to the right",
 				callback: () =>
-					_context.Store.WhimDispatch(
+					_context.Store.Dispatch(
 						new MoveWindowEdgesInDirectionTransform(
 							Direction.Right,
 							new Point<int>() { X = MoveWindowEdgeDelta, Y = 0 }
@@ -136,7 +129,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_top_edge_up",
 				title: "Move the current window's top edge up",
 				callback: () =>
-					_context.Store.WhimDispatch(
+					_context.Store.Dispatch(
 						new MoveWindowEdgesInDirectionTransform(
 							Direction.Up,
 							new Point<int>() { Y = -MoveWindowEdgeDelta }
@@ -148,7 +141,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_top_edge_down",
 				title: "Move the current window's top edge down",
 				callback: () =>
-					_context.Store.WhimDispatch(
+					_context.Store.Dispatch(
 						new MoveWindowEdgesInDirectionTransform(
 							Direction.Up,
 							new Point<int>() { Y = MoveWindowEdgeDelta }
@@ -160,7 +153,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_bottom_edge_up",
 				title: "Move the current window's bottom edge up",
 				callback: () =>
-					_context.Store.WhimDispatch(
+					_context.Store.Dispatch(
 						new MoveWindowEdgesInDirectionTransform(
 							Direction.Down,
 							new Point<int>() { Y = -MoveWindowEdgeDelta }
@@ -172,7 +165,7 @@ internal class CoreCommands : PluginCommands
 				identifier: "move_window_bottom_edge_down",
 				title: "Move the current window's bottom edge down",
 				callback: () =>
-					_context.Store.WhimDispatch(
+					_context.Store.Dispatch(
 						new MoveWindowEdgesInDirectionTransform(
 							Direction.Down,
 							new Point<int>() { Y = MoveWindowEdgeDelta }
@@ -183,13 +176,13 @@ internal class CoreCommands : PluginCommands
 			.Add(
 				identifier: "move_window_to_previous_monitor",
 				title: "Move the window to the previous monitor",
-				callback: () => _context.Store.WhimDispatch(new MoveWindowToAdjacentMonitorTransform(Reverse: true)),
+				callback: () => _context.Store.Dispatch(new MoveWindowToAdjacentMonitorTransform(Reverse: true)),
 				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_LEFT)
 			)
 			.Add(
 				identifier: "move_window_to_next_monitor",
 				title: "Move the window to the next monitor",
-				callback: () => _context.Store.WhimDispatch(new MoveWindowToAdjacentMonitorTransform()),
+				callback: () => _context.Store.Dispatch(new MoveWindowToAdjacentMonitorTransform()),
 				keybind: new Keybind(IKeybind.WinShift, VIRTUAL_KEY.VK_RIGHT)
 			)
 			.Add(
@@ -237,12 +230,12 @@ internal class CoreCommands : PluginCommands
 			.Add(
 				identifier: "cycle_layout_engine.next",
 				title: "Cycle to the next layout engine",
-				callback: () => _context.Store.WhimDispatch(new CycleLayoutEngineTransform())
+				callback: () => _context.Store.Dispatch(new CycleLayoutEngineTransform())
 			)
 			.Add(
 				identifier: "cycle_layout_engine.previous",
 				title: "Cycle to the previous layout engine",
-				callback: () => _context.Store.WhimDispatch(new CycleLayoutEngineTransform(Reverse: true))
+				callback: () => _context.Store.Dispatch(new CycleLayoutEngineTransform(Reverse: true))
 			)
 			.Add(
 				identifier: "focus_previous_monitor",
@@ -280,7 +273,7 @@ internal class CoreCommands : PluginCommands
 						return;
 					}
 
-					_context.Store.WhimDispatch(
+					_context.Store.Dispatch(
 						new LayoutEngineCustomActionTransform(
 							workspace.Id,
 							new() { Name = $"{focusLayoutEngine.Name}.toggle_maximized", Window = null }
@@ -296,7 +289,7 @@ internal class CoreCommands : PluginCommands
 				callback: () =>
 				{
 					WorkspaceId activeWorkspaceId = _context.Store.Pick(PickActiveWorkspaceId());
-					_context.Store.WhimDispatch(new RemoveWorkspaceByIdTransform(activeWorkspaceId));
+					_context.Store.Dispatch(new RemoveWorkspaceByIdTransform(activeWorkspaceId));
 				},
 				keybind: new Keybind(IKeybind.WinCtrl, VIRTUAL_KEY.VK_W)
 			)
@@ -332,7 +325,7 @@ internal class CoreCommands : PluginCommands
 				return;
 			}
 
-			_context.Store.WhimDispatch(new FocusWorkspaceTransform(workspace.Id));
+			_context.Store.Dispatch(new FocusWorkspaceTransform(workspace.Id));
 		};
 
 	internal Action FocusWorkspaceOnCurrentMonitor(bool getNext) =>
@@ -359,7 +352,7 @@ internal class CoreCommands : PluginCommands
 			int nextIndex = (currentIndex + delta).Mod(workspaces.Count);
 
 			// Focus the next/previous workspace
-			_context.Store.WhimDispatch(new ActivateWorkspaceTransform(workspaces[nextIndex].Id));
+			_context.Store.Dispatch(new ActivateWorkspaceTransform(workspaces[nextIndex].Id));
 		};
 
 	internal Action MoveWindowToWorkspaceOnCurrentMonitor(bool getNext) =>
@@ -391,7 +384,7 @@ internal class CoreCommands : PluginCommands
 			int nextIndex = (currentIndex + delta).Mod(workspaces.Count);
 
 			// Move the window to the next/previous workspace
-			_context.Store.WhimDispatch(new MoveWindowToWorkspaceTransform(workspaces[nextIndex].Id, window.Handle));
+			_context.Store.Dispatch(new MoveWindowToWorkspaceTransform(workspaces[nextIndex].Id, window.Handle));
 		};
 
 	// This record is necessary, otherwise the index captured is the last one (11)
@@ -403,7 +396,7 @@ internal class CoreCommands : PluginCommands
 			IWorkspace[] workspaces = [.. context.Store.Pick(PickWorkspaces())];
 			if (Index <= workspaces.Length)
 			{
-				context.Store.WhimDispatch(new ActivateWorkspaceTransform(workspaces[Index - 1].Id));
+				context.Store.Dispatch(new ActivateWorkspaceTransform(workspaces[Index - 1].Id));
 			}
 		}
 	}

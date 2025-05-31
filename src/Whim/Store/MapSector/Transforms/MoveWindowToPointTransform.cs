@@ -10,28 +10,28 @@ namespace Whim;
 /// The point to move the window to. The point is in the coordinate space of the monitors,
 /// not the unit square.
 /// </param>
-public record MoveWindowToPointTransform(HWND WindowHandle, IPoint<int> Point) : WhimTransform
+public record MoveWindowToPointTransform(HWND WindowHandle, IPoint<int> Point) : Transform
 {
-	internal override WhimResult<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		// Get the monitor.
 		if (!ctx.Store.Pick(PickMonitorAtPoint(Point)).TryGet(out IMonitor targetMonitor))
 		{
-			return Result.FromException<Unit>(StoreExceptions.NoMonitorFoundAtPoint(Point));
+			return Result.FromError<Unit>(StoreErrors.NoMonitorFoundAtPoint(Point));
 		}
 
 		// Get the target workspace.
 		Result<IWorkspace> targetWorkspaceResult = ctx.Store.Pick(PickWorkspaceByMonitor(targetMonitor.Handle));
 		if (!targetWorkspaceResult.TryGet(out IWorkspace targetWorkspace))
 		{
-			return Result.FromException<Unit>(targetWorkspaceResult.Error!);
+			return Result.FromError<Unit>(targetWorkspaceResult.Error!);
 		}
 
 		// Get the old workspace.
 		Result<IWorkspace> oldWorkspaceResult = ctx.Store.Pick(PickWorkspaceByWindow(WindowHandle));
 		if (!oldWorkspaceResult.TryGet(out IWorkspace oldWorkspace))
 		{
-			return Result.FromException<Unit>(oldWorkspaceResult.Error!);
+			return Result.FromError<Unit>(oldWorkspaceResult.Error!);
 		}
 
 		// Normalize `point` into the unit square.
@@ -51,10 +51,10 @@ public record MoveWindowToPointTransform(HWND WindowHandle, IPoint<int> Point) :
 				targetWorkspace.Id
 			);
 
-			ctx.Store.WhimDispatch(new RemoveWindowFromWorkspaceTransform(oldWorkspace.Id, window));
+			ctx.Store.Dispatch(new RemoveWindowFromWorkspaceTransform(oldWorkspace.Id, window));
 		}
 
-		ctx.Store.WhimDispatch(new MoveWindowToPointInWorkspaceTransform(targetWorkspace.Id, WindowHandle, normalized));
+		ctx.Store.Dispatch(new MoveWindowToPointInWorkspaceTransform(targetWorkspace.Id, WindowHandle, normalized));
 
 		rootSector.WorkspaceSector.WindowHandleToFocus = window.Handle;
 

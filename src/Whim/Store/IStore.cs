@@ -53,8 +53,6 @@ public interface IStore : IDisposable
 	/// </example>
 	Result<TResult> Dispatch<TResult>(Transform<TResult> transform);
 
-	WhimResult<TResult> WhimDispatch<TResult>(WhimTransform<TResult> transform);
-
 	/// <summary>
 	/// Entry-point to pick from Whim's state.
 	/// </summary>

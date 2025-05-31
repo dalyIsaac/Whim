@@ -22,7 +22,7 @@ internal class WorkspaceManager(IContext context) : IWorkspaceManager
 	public Func<CreateLeafLayoutEngine[]> CreateLayoutEngines
 	{
 		get => _ctx.Store.Pick(PickCreateLeafLayoutEngines());
-		set => _ctx.Store.WhimDispatch(new SetCreateLayoutEnginesTransform(value));
+		set => _ctx.Store.Dispatch(new SetCreateLayoutEnginesTransform(value));
 	}
 
 	public IWorkspace? this[string workspaceName] => TryGet(workspaceName);
@@ -38,12 +38,12 @@ internal class WorkspaceManager(IContext context) : IWorkspaceManager
 	}
 
 	public WorkspaceId? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null) =>
-		_ctx.Store.WhimDispatch(new AddWorkspaceTransform(name, createLayoutEngines)).TryGet(out WorkspaceId id)
+		_ctx.Store.Dispatch(new AddWorkspaceTransform(name, createLayoutEngines)).TryGet(out WorkspaceId id)
 			? id
 			: null;
 
 	public void AddProxyLayoutEngine(ProxyLayoutEngineCreator proxyLayoutEngineCreator) =>
-		_ctx.Store.WhimDispatch(new AddProxyLayoutEngineTransform(proxyLayoutEngineCreator));
+		_ctx.Store.Dispatch(new AddProxyLayoutEngineTransform(proxyLayoutEngineCreator));
 
 	public bool Contains(IWorkspace workspace) => _ctx.Store.Pick(PickWorkspaces()).Any(w => w.Id == workspace.Id);
 
@@ -78,10 +78,10 @@ internal class WorkspaceManager(IContext context) : IWorkspaceManager
 		WorkspaceLayoutCompleted?.Invoke(sender, args);
 
 	public bool Remove(IWorkspace workspace) =>
-		_ctx.Store.WhimDispatch(new RemoveWorkspaceByIdTransform(workspace.Id)).IsSuccessful;
+		_ctx.Store.Dispatch(new RemoveWorkspaceByIdTransform(workspace.Id)).IsSuccessful;
 
 	public bool Remove(string workspaceName) =>
-		_ctx.Store.WhimDispatch(new RemoveWorkspaceByNameTransform(workspaceName)).IsSuccessful;
+		_ctx.Store.Dispatch(new RemoveWorkspaceByNameTransform(workspaceName)).IsSuccessful;
 
 	public IWorkspace? TryGet(string workspaceName) =>
 		_ctx.Store.Pick(PickWorkspaceByName(workspaceName)).TryGet(out IWorkspace workspace) ? workspace : null;

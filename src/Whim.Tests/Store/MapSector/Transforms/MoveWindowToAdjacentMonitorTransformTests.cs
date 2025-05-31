@@ -17,7 +17,7 @@ public class MoveWindowToAdjacentMonitorTransformTests
 		MoveWindowToAdjacentMonitorTransform sut = new(window.Handle);
 
 		// When we dispatch the transform
-		var result = ctx.Store.WhimDispatch(sut);
+		var result = ctx.Store.Dispatch(sut);
 
 		// Then
 		Assert.False(result.IsSuccessful);
@@ -52,7 +52,7 @@ public class MoveWindowToAdjacentMonitorTransformTests
 		MoveWindowToAdjacentMonitorTransform sut = new(window.Handle, reverse);
 
 		// When we dispatch the transform
-		var result = ctx.Store.WhimDispatch(sut);
+		var result = ctx.Store.Dispatch(sut);
 
 		// Then
 		Assert.True(result.IsSuccessful);

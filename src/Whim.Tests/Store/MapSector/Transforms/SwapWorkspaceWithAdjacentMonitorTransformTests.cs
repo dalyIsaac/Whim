@@ -11,7 +11,7 @@ public class SwapWorkspaceWithAdjacentMonitorTransformTests
 		SwapWorkspaceWithAdjacentMonitorTransform sut = new(workspaceId);
 
 		// When we execute the transform
-		var result = ctx.Store.WhimDispatch(sut);
+		var result = ctx.Store.Dispatch(sut);
 
 		// Then we fail
 		Assert.False(result.IsSuccessful);
@@ -33,7 +33,7 @@ public class SwapWorkspaceWithAdjacentMonitorTransformTests
 		SwapWorkspaceWithAdjacentMonitorTransform sut = new(workspace.Id, reverse);
 
 		// When we execute the transform
-		var result = ctx.Store.WhimDispatch(sut);
+		var result = ctx.Store.Dispatch(sut);
 
 		// Then we succeed
 		Assert.True(result.IsSuccessful);
@@ -53,7 +53,7 @@ public class SwapWorkspaceWithAdjacentMonitorTransformTests
 		SwapWorkspaceWithAdjacentMonitorTransform sut = new(workspace1.Id);
 
 		// When we execute the transform
-		var result = ctx.Store.WhimDispatch(sut);
+		var result = ctx.Store.Dispatch(sut);
 
 		// Then we fail
 		Assert.False(result.IsSuccessful);
@@ -91,7 +91,7 @@ public class SwapWorkspaceWithAdjacentMonitorTransformTests
 		SwapWorkspaceWithAdjacentMonitorTransform sut = new(workspaces[workspaceIndex].Id, reverse);
 
 		// When we execute the transform
-		var result = ctx.Store.WhimDispatch(sut);
+		var result = ctx.Store.Dispatch(sut);
 
 		// Then the workspaces are swapped
 		Assert.True(result.IsSuccessful);

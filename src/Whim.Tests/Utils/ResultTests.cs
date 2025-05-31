@@ -7,7 +7,7 @@ public class ResultTests
 	{
 		// Given
 		int expectedValue = 42;
-		WhimResult<int> result = new(expectedValue);
+		Result<int> result = new(expectedValue);
 
 		// Then
 		Assert.True(result.IsSuccessful);
@@ -20,7 +20,7 @@ public class ResultTests
 	{
 		// Given
 		WhimError error = new("Test error");
-		WhimResult<int> result = new(error);
+		Result<int> result = new(error);
 
 		// Then
 		Assert.False(result.IsSuccessful);
@@ -33,7 +33,7 @@ public class ResultTests
 	{
 		// Given
 		int expectedValue = 42;
-		WhimResult<int> result = new(expectedValue);
+		Result<int> result = new(expectedValue);
 
 		// When
 		bool success = result.TryGet(out int value);
@@ -48,7 +48,7 @@ public class ResultTests
 	{
 		// Given
 		WhimError error = new("Test error");
-		WhimResult<int> result = new(error);
+		Result<int> result = new(error);
 
 		// When
 		bool success = result.TryGet(out int value);
@@ -63,7 +63,7 @@ public class ResultTests
 	{
 		// Given
 		WhimError error = new("Test error");
-		WhimResult<int> result = new(error);
+		Result<int> result = new(error);
 
 		// Then
 		Assert.Throws<InvalidOperationException>(() => _ = result.Value);
@@ -73,7 +73,7 @@ public class ResultTests
 	public void Result_Error_ReturnsNullForSuccessfulResult()
 	{
 		// Given
-		WhimResult<int> result = new(42);
+		Result<int> result = new(42);
 
 		// Then
 		Assert.Null(result.Error);
@@ -84,7 +84,7 @@ public class ResultTests
 	{
 		// Given
 		WhimError error = new("Test error");
-		WhimResult<int> result = new(error);
+		Result<int> result = new(error);
 
 		// Then
 		Assert.Equal(error, result.Error);
@@ -95,7 +95,7 @@ public class ResultTests
 	{
 		// Given
 		int expectedValue = 42;
-		WhimResult<int> result = new(expectedValue);
+		Result<int> result = new(expectedValue);
 
 		// When
 		int value = result.OrInvoke(() => 0);
@@ -109,7 +109,7 @@ public class ResultTests
 	{
 		// Given
 		WhimError error = new("Test error");
-		WhimResult<int> result = new(error);
+		Result<int> result = new(error);
 		int fallbackValue = 0;
 
 		// When
@@ -126,7 +126,7 @@ public class ResultTests
 		int expectedValue = 42;
 
 		// When
-		WhimResult<int> result = expectedValue;
+		Result<int> result = expectedValue;
 
 		// Then
 		Assert.True(result.IsSuccessful);
@@ -140,7 +140,7 @@ public class ResultTests
 		WhimError error = new("Test error");
 
 		// When
-		WhimResult<int> result = error;
+		Result<int> result = error;
 
 		// Then
 		Assert.False(result.IsSuccessful);
@@ -154,7 +154,7 @@ public class ResultTests
 		int expectedValue = 42;
 
 		// When
-		WhimResult<int> result = WhimResult.FromValue(expectedValue);
+		Result<int> result = Result.FromValue(expectedValue);
 
 		// Then
 		Assert.True(result.IsSuccessful);
@@ -168,7 +168,7 @@ public class ResultTests
 		WhimError error = new("Test error");
 
 		// When
-		WhimResult<int> result = WhimResult.FromError<int>(error);
+		Result<int> result = Result.FromError<int>(error);
 
 		// Then
 		Assert.False(result.IsSuccessful);
@@ -182,7 +182,7 @@ public class ResultTests
 		Exception exception = new("Test exception");
 
 		// When
-		WhimResult<int> result = WhimResult.FromException<int>(exception);
+		Result<int> result = Result.FromException<int>(exception);
 
 		// Then
 		Assert.False(result.IsSuccessful);

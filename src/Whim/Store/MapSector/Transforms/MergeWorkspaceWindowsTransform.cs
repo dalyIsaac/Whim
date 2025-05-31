@@ -5,10 +5,9 @@ namespace Whim;
 /// </summary>
 /// <param name="SourceWorkspaceId">The id of the workspace to remove.</param>
 /// <param name="TargetWorkspaceId">The id of the workspace to merge the windows into.</param>
-public record MergeWorkspaceWindowsTransform(WorkspaceId SourceWorkspaceId, WorkspaceId TargetWorkspaceId)
-	: WhimTransform
+public record MergeWorkspaceWindowsTransform(WorkspaceId SourceWorkspaceId, WorkspaceId TargetWorkspaceId) : Transform
 {
-	internal override WhimResult<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		MapSector sector = rootSector.MapSector;
 
@@ -16,13 +15,13 @@ public record MergeWorkspaceWindowsTransform(WorkspaceId SourceWorkspaceId, Work
 		Result<IWorkspace> sourceWorkspace = ctx.Store.Pick(PickWorkspaceById(SourceWorkspaceId));
 		if (!sourceWorkspace.TryGet(out IWorkspace Source))
 		{
-			return Result.FromException<Unit>(sourceWorkspace.Error!);
+			return Result.FromError<Unit>(sourceWorkspace.Error!);
 		}
 
 		Result<IWorkspace> targetWorkspace = ctx.Store.Pick(PickWorkspaceById(TargetWorkspaceId));
 		if (!targetWorkspace.TryGet(out IWorkspace Target))
 		{
-			return Result.FromException<Unit>(targetWorkspace.Error!);
+			return Result.FromError<Unit>(targetWorkspace.Error!);
 		}
 
 		// Remove the workspace from the monitor map.

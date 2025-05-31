@@ -29,7 +29,7 @@ public class MouseLeftButtonUpTransformTests
 		MouseLeftButtonUpTransform sut = new(point);
 
 		// When we execute the transform
-		ctx.Store.WhimDispatch(sut);
+		ctx.Store.Dispatch(sut);
 
 		// The active monitor didn't update
 		Assert.Equal((HMONITOR)0, mutableRootSector.MonitorSector.ActiveMonitorHandle);
@@ -53,7 +53,7 @@ public class MouseLeftButtonUpTransformTests
 		MouseLeftButtonUpTransform sut = new(point);
 
 		// When we execute the transform
-		ctx.Store.WhimDispatch(sut);
+		ctx.Store.Dispatch(sut);
 
 		// The active monitor updated
 		Assert.Equal(monitor.Handle, mutableRootSector.MonitorSector.ActiveMonitorHandle);

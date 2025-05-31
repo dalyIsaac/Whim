@@ -12,7 +12,7 @@ public class MoveWindowToPointTransformTests
 		MoveWindowToPointTransform sut = new((HWND)10, point);
 
 		// When we execute the transform
-		var result = ctx.Store.WhimDispatch(sut);
+		var result = ctx.Store.Dispatch(sut);
 
 		// Then we fail
 		Assert.False(result.IsSuccessful);
@@ -29,7 +29,7 @@ public class MoveWindowToPointTransformTests
 		MoveWindowToPointTransform sut = new((HWND)10, point);
 
 		// When we execute the transform
-		var result = ctx.Store.WhimDispatch(sut);
+		var result = ctx.Store.Dispatch(sut);
 
 		// Then we fail
 		Assert.False(result.IsSuccessful);
@@ -51,7 +51,7 @@ public class MoveWindowToPointTransformTests
 		MoveWindowToPointTransform sut = new(window.Handle, point);
 
 		// When we execute the transform
-		var result = ctx.Store.WhimDispatch(sut);
+		var result = ctx.Store.Dispatch(sut);
 
 		// Then we fail
 		Assert.False(result.IsSuccessful);
@@ -77,7 +77,7 @@ public class MoveWindowToPointTransformTests
 		MoveWindowToPointTransform sut = new(window.Handle, point);
 
 		// When we execute the transform
-		var result = ctx.Store.WhimDispatch(sut);
+		var result = ctx.Store.Dispatch(sut);
 
 		// Then we succeed
 		Assert.True(result.IsSuccessful);
@@ -121,8 +121,8 @@ public class MoveWindowToPointTransformTests
 
 		// When we execute the transform
 		Result<Unit>? result = null;
-		// var result = ctx.Store.WhimDispatch(sut);
-		CustomAssert.Layout(rootSector, () => result = ctx.Store.WhimDispatch(sut), [sourceWorkspace.Id]);
+		// var result = ctx.Store.Dispatch(sut);
+		CustomAssert.Layout(rootSector, () => result = ctx.Store.Dispatch(sut), [sourceWorkspace.Id]);
 
 		// Then we succeed
 		Assert.True(result!.Value.IsSuccessful);

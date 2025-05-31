@@ -15,7 +15,7 @@ public class WindowAddedTransformTests
 		CustomAssert.DoesNotRaise<RouteEventArgs>(
 			h => rootSector.MapSector.WindowRouted += h,
 			h => rootSector.MapSector.WindowRouted -= h,
-			() => result = ctx.Store.WhimDispatch(sut)
+			() => result = ctx.Store.Dispatch(sut)
 		);
 		return result!.Value;
 	}
@@ -32,7 +32,7 @@ public class WindowAddedTransformTests
 		CustomAssert.Raises<RouteEventArgs>(
 			h => rootSector.MapSector.WindowRouted += h,
 			h => rootSector.MapSector.WindowRouted -= h,
-			() => CustomAssert.Layout(rootSector, () => result = ctx.Store.WhimDispatch(sut)),
+			() => CustomAssert.Layout(rootSector, () => result = ctx.Store.Dispatch(sut)),
 			(sender, args) => evs.Add(args)
 		);
 

@@ -55,7 +55,7 @@ internal class WorkspaceSector(IContext ctx, IInternalContext internalCtx)
 	public override void Initialize()
 	{
 		Logger.Information("Initializing WorkspaceSector");
-		_ctx.Store.WhimDispatch(new InitializeWorkspacesTransform());
+		_ctx.Store.Dispatch(new InitializeWorkspacesTransform());
 	}
 
 	public override void DispatchEvents()
@@ -96,7 +96,7 @@ internal class WorkspaceSector(IContext ctx, IInternalContext internalCtx)
 				WorkspacesToLayout = WorkspacesToLayout.Add(workspace.Id);
 
 				// Force the window to not be minimized.
-				_ctx.Store.WhimDispatch(new MinimizeWindowEndTransform(workspace.Id, WindowHandleToFocus));
+				_ctx.Store.Dispatch(new MinimizeWindowEndTransform(workspace.Id, WindowHandleToFocus));
 			}
 		}
 
@@ -115,7 +115,7 @@ internal class WorkspaceSector(IContext ctx, IInternalContext internalCtx)
 			}
 
 			Logger.Debug($"Window {window.Handle} is no longer a window.");
-			_ctx.Store.WhimDispatch(new WindowRemovedTransform(window));
+			_ctx.Store.Dispatch(new WindowRemovedTransform(window));
 		}
 	}
 
@@ -152,7 +152,7 @@ internal class WorkspaceSector(IContext ctx, IInternalContext internalCtx)
 			WindowHandleToFocus.Focus(_internalCtx);
 		}
 
-		_ctx.Store.WhimDispatch(new WindowFocusedTransform(window));
+		_ctx.Store.Dispatch(new WindowFocusedTransform(window));
 		WindowHandleToFocus = default;
 	}
 

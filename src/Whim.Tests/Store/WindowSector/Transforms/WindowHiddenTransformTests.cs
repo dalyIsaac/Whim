@@ -16,7 +16,7 @@ public class WindowHiddenTransformTests
 		CustomAssert.DoesNotRaise<WindowRemovedEventArgs>(
 			h => mutableRootSector.WindowSector.WindowRemoved += h,
 			h => mutableRootSector.WindowSector.WindowRemoved -= h,
-			() => result = ctx.Store.WhimDispatch(sut)
+			() => result = ctx.Store.Dispatch(sut)
 		);
 
 		return result!.Value;
@@ -34,7 +34,7 @@ public class WindowHiddenTransformTests
 		ev = Assert.Raises<WindowRemovedEventArgs>(
 			h => mutableRootSector.WindowSector.WindowRemoved += h,
 			h => mutableRootSector.WindowSector.WindowRemoved -= h,
-			() => result = ctx.Store.WhimDispatch(sut)
+			() => result = ctx.Store.Dispatch(sut)
 		);
 
 		return (result!.Value, ev);

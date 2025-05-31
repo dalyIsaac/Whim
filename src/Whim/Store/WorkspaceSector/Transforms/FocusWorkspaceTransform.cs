@@ -29,10 +29,10 @@ public record FocusWorkspaceTransform(WorkspaceId WorkspaceId) : BaseWorkspaceTr
 		Result<IMonitor> monitorResult = ctx.Store.Pick(PickMonitorByWorkspace(workspace.Id));
 		if (!monitorResult.TryGet(out IMonitor monitor))
 		{
-			return Result.FromException<Workspace>(monitorResult.Error!);
+			return Result.FromError<Workspace>(monitorResult.Error!);
 		}
 
-		ctx.Store.WhimDispatch(new FocusMonitorDesktopTransform(monitor.Handle));
+		ctx.Store.Dispatch(new FocusMonitorDesktopTransform(monitor.Handle));
 		return workspace;
 	}
 }

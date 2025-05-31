@@ -14,7 +14,7 @@ public class SetCreateLayoutEnginesTransformTests
 		Func<CreateLeafLayoutEngine[]> createLayoutEnginesFn = () => [(id) => engine1, (id) => engine2];
 
 		// When
-		var result = ctx.Store.WhimDispatch(new SetCreateLayoutEnginesTransform(createLayoutEnginesFn));
+		var result = ctx.Store.Dispatch(new SetCreateLayoutEnginesTransform(createLayoutEnginesFn));
 
 		// Then
 		Assert.True(result.IsSuccessful);

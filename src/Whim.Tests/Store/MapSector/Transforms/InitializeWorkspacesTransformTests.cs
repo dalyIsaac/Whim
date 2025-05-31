@@ -15,7 +15,7 @@ public class InitializeWorkspacesTransformTests
 		CustomAssert.DoesNotRaise<WindowAddedEventArgs>(
 			h => rootSector.WindowSector.WindowAdded += h,
 			h => rootSector.WindowSector.WindowAdded -= h,
-			() => result = ctx.Store.WhimDispatch(sut)
+			() => result = ctx.Store.Dispatch(sut)
 		);
 		return result!.Value;
 	}
@@ -31,7 +31,7 @@ public class InitializeWorkspacesTransformTests
 		CustomAssert.Raises<WindowAddedEventArgs>(
 			h => rootSector.WindowSector.WindowAdded += h,
 			h => rootSector.WindowSector.WindowAdded -= h,
-			() => result = ctx.Store.WhimDispatch(sut),
+			() => result = ctx.Store.Dispatch(sut),
 			(sender, args) => evs.Add(args)
 		);
 		return (result!.Value, evs);

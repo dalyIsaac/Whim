@@ -41,7 +41,7 @@ public class WindowFocusedTransformTests
 		WindowFocusedTransform sut = new(window);
 
 		// When we dispatch the transform
-		ctx.Store.WhimDispatch(sut);
+		ctx.Store.Dispatch(sut);
 
 		// Then the active monitor indices are updated.
 		Assert.Equal(HMONITOR_2, rootSector.MonitorSector.ActiveMonitorHandle);
@@ -64,7 +64,7 @@ public class WindowFocusedTransformTests
 		WindowFocusedTransform sut = new(window);
 
 		// When we dispatch the transform
-		ctx.Store.WhimDispatch(sut);
+		ctx.Store.Dispatch(sut);
 
 		// Then the active monitor index is updated based on MonitorFromWindow
 		Assert.Equal(HMONITOR_3, rootSector.MonitorSector.ActiveMonitorHandle);
@@ -87,7 +87,7 @@ public class WindowFocusedTransformTests
 		WindowFocusedTransform sut = new(null);
 
 		// When we dispatch the transform
-		ctx.Store.WhimDispatch(sut);
+		ctx.Store.Dispatch(sut);
 
 		// Then the active monitor index is not updated, and stays the same uninitialized value.
 		Assert.Equal((HMONITOR)0, rootSector.MonitorSector.ActiveMonitorHandle);
@@ -107,7 +107,7 @@ public class WindowFocusedTransformTests
 		WindowFocusedTransform sut = new(null);
 
 		// When we dispatch the transform
-		ctx.Store.WhimDispatch(sut);
+		ctx.Store.Dispatch(sut);
 
 		// Then the active monitor index is updated, but the LastWhimActiveMonitorHandle doesn't' update because
 		// the window isn't tracked.
@@ -130,7 +130,7 @@ public class WindowFocusedTransformTests
 		WindowFocusedTransform sut = new(window);
 
 		// When we dispatch the transform
-		ctx.Store.WhimDispatch(sut);
+		ctx.Store.Dispatch(sut);
 
 		// Then the active monitor index is updated based on MonitorFromWindow
 		Assert.Equal(HMONITOR_3, rootSector.MonitorSector.ActiveMonitorHandle);
@@ -163,7 +163,7 @@ public class WindowFocusedTransformTests
 		// When we dispatch the transform
 		CustomAssert.Layout(
 			rootSector,
-			() => ctx.Store.WhimDispatch(sut),
+			() => ctx.Store.Dispatch(sut),
 			layoutWorkspaceIds: [workspace4.Id],
 			noLayoutWorkspaceIds: [workspace1.Id, workspace2.Id, workspace3.Id]
 		);

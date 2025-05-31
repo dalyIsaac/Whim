@@ -13,7 +13,7 @@ public class FocusWindowTransformTests
 		internalCtx.CoreNativeManager.IsStaThread().Returns(false);
 
 		// When
-		var result = ctx.Store.WhimDispatch(new FocusWindowTransform(handle));
+		var result = ctx.Store.Dispatch(new FocusWindowTransform(handle));
 
 		// Then
 		Assert.True(result.IsSuccessful);
@@ -30,7 +30,7 @@ public class FocusWindowTransformTests
 		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
 
 		// When
-		var result = ctx.Store.WhimDispatch(new FocusWindowTransform());
+		var result = ctx.Store.Dispatch(new FocusWindowTransform());
 
 		// Then
 		Assert.True(result.IsSuccessful);
@@ -54,7 +54,7 @@ public class FocusWindowTransformTests
 		internalCtx.CoreNativeManager.IsStaThread().Returns(false);
 
 		// When
-		var result = ctx.Store.WhimDispatch(new FocusWindowTransform());
+		var result = ctx.Store.Dispatch(new FocusWindowTransform());
 
 		// Then
 		Assert.True(result.IsSuccessful);

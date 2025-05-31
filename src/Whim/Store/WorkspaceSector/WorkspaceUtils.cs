@@ -53,7 +53,7 @@ public static class WorkspaceUtils
 	/// When <see langword="true"/>, the window must be in the workspace.
 	/// </param>
 	/// <returns></returns>
-	internal static WhimResult<IWindow> GetValidWorkspaceWindow(
+	internal static Result<IWindow> GetValidWorkspaceWindow(
 		IContext ctx,
 		Workspace workspace,
 		HWND windowHandle,
@@ -65,7 +65,7 @@ public static class WorkspaceUtils
 		{
 			if (!defaultToLastFocusedWindow)
 			{
-				return WhimResult.FromError<IWindow>(new WhimError("No window provided"));
+				return Result.FromError<IWindow>(new WhimError("No window provided"));
 			}
 
 			windowHandle = workspace.LastFocusedWindowHandle;
@@ -73,12 +73,12 @@ public static class WorkspaceUtils
 
 		if (windowHandle.IsNull)
 		{
-			return WhimResult.FromError<IWindow>(new WhimError("No windows in workspace"));
+			return Result.FromError<IWindow>(new WhimError("No windows in workspace"));
 		}
 
 		if (isWindowRequiredInWorkspace && !workspace.WindowPositions.ContainsKey(windowHandle))
 		{
-			return WhimResult.FromError<IWindow>(new WhimError("Window not in workspace"));
+			return Result.FromError<IWindow>(new WhimError("Window not in workspace"));
 		}
 
 		return ctx.Store.Pick(PickWindowByHandle(windowHandle));

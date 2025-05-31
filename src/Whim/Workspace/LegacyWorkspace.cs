@@ -16,7 +16,7 @@ public partial record Workspace : IInternalWorkspace
 	public string Name
 	{
 		get => LatestWorkspace.BackingName;
-		set => _ctx.Store.WhimDispatch(new SetWorkspaceNameTransform(Id, value));
+		set => _ctx.Store.Dispatch(new SetWorkspaceNameTransform(Id, value));
 	}
 
 	private bool _disposedValue;
@@ -41,53 +41,53 @@ public partial record Workspace : IInternalWorkspace
 	{
 		if (window != null && Windows.Contains(window))
 		{
-			_ctx.Store.WhimDispatch(new SetLastFocusedWindowTransform(Id, window.Handle));
+			_ctx.Store.Dispatch(new SetLastFocusedWindowTransform(Id, window.Handle));
 		}
 	}
 
 	/// <inheritdoc/>
 	public void MinimizeWindowStart(IWindow window) =>
-		_ctx.Store.WhimDispatch(new MinimizeWindowStartTransform(Id, window.Handle));
+		_ctx.Store.Dispatch(new MinimizeWindowStartTransform(Id, window.Handle));
 
 	/// <inheritdoc/>
 	public void MinimizeWindowEnd(IWindow window) =>
-		_ctx.Store.WhimDispatch(new MinimizeWindowEndTransform(Id, window.Handle));
+		_ctx.Store.Dispatch(new MinimizeWindowEndTransform(Id, window.Handle));
 
 	/// <inheritdoc/>
-	public void FocusLastFocusedWindow() => _ctx.Store.WhimDispatch(new FocusWorkspaceTransform(Id));
+	public void FocusLastFocusedWindow() => _ctx.Store.Dispatch(new FocusWorkspaceTransform(Id));
 
 	/// <inheritdoc/>
 	public bool TrySetLayoutEngineFromIndex(int nextIdx) =>
-		_ctx.Store.WhimDispatch(new SetLayoutEngineFromIndexTransform(Id, nextIdx)).IsSuccessful;
+		_ctx.Store.Dispatch(new SetLayoutEngineFromIndexTransform(Id, nextIdx)).IsSuccessful;
 
 	/// <inheritdoc/>
 	public void CycleLayoutEngine(bool reverse = false) =>
-		_ctx.Store.WhimDispatch(new CycleLayoutEngineTransform(Id, reverse));
+		_ctx.Store.Dispatch(new CycleLayoutEngineTransform(Id, reverse));
 
 	/// <inheritdoc/>
 	public void ActivatePreviouslyActiveLayoutEngine() =>
-		_ctx.Store.WhimDispatch(new ActivatePreviouslyActiveLayoutEngineTransform(Id));
+		_ctx.Store.Dispatch(new ActivatePreviouslyActiveLayoutEngineTransform(Id));
 
 	/// <inheritdoc/>
 	public bool TrySetLayoutEngineFromName(string name) =>
-		_ctx.Store.WhimDispatch(new SetLayoutEngineFromNameTransform(Id, name)).IsSuccessful;
+		_ctx.Store.Dispatch(new SetLayoutEngineFromNameTransform(Id, name)).IsSuccessful;
 
 	/// <inheritdoc/>
 	public bool AddWindow(IWindow window) =>
-		_ctx.Store.WhimDispatch(new AddWindowToWorkspaceTransform(Id, window)).IsSuccessful;
+		_ctx.Store.Dispatch(new AddWindowToWorkspaceTransform(Id, window)).IsSuccessful;
 
 	/// <inheritdoc/>
 	public bool RemoveWindow(IWindow window) =>
-		_ctx.Store.WhimDispatch(new RemoveWindowFromWorkspaceTransform(Id, window)).IsSuccessful;
+		_ctx.Store.Dispatch(new RemoveWindowFromWorkspaceTransform(Id, window)).IsSuccessful;
 
 	/// <inheritdoc/>
 	public bool FocusWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false) =>
-		_ctx.Store.WhimDispatch(new FocusWindowInDirectionTransform(Id, direction, window?.Handle ?? default))
+		_ctx.Store.Dispatch(new FocusWindowInDirectionTransform(Id, direction, window?.Handle ?? default))
 			.TryGet(out bool isChanged) && isChanged;
 
 	/// <inheritdoc/>
 	public bool SwapWindowInDirection(Direction direction, IWindow? window = null, bool deferLayout = false) =>
-		_ctx.Store.WhimDispatch(new SwapWindowInDirectionTransform(Id, direction, window?.Handle ?? default))
+		_ctx.Store.Dispatch(new SwapWindowInDirectionTransform(Id, direction, window?.Handle ?? default))
 			.TryGet(out bool isChanged) && isChanged;
 
 	/// <inheritdoc/>
@@ -97,21 +97,21 @@ public partial record Workspace : IInternalWorkspace
 		IWindow? window = null,
 		bool deferLayout = false
 	) =>
-		_ctx.Store.WhimDispatch(
+		_ctx.Store.Dispatch(
 				new MoveWindowEdgesInDirectionWorkspaceTransform(Id, edges, deltas, window?.Handle ?? default)
 			)
 			.TryGet(out bool isChanged) && isChanged;
 
 	/// <inheritdoc/>
 	public bool MoveWindowToPoint(IWindow window, IPoint<double> point, bool deferLayout = false) =>
-		_ctx.Store.WhimDispatch(new MoveWindowToPointInWorkspaceTransform(Id, window.Handle, point))
+		_ctx.Store.Dispatch(new MoveWindowToPointInWorkspaceTransform(Id, window.Handle, point))
 			.TryGet(out bool isChanged) && isChanged;
 
 	/// <inheritdoc/>
 	public override string ToString() => Name;
 
 	/// <inheritdoc/>
-	public void Deactivate() => _ctx.Store.WhimDispatch(new DeactivateWorkspaceTransform(Id));
+	public void Deactivate() => _ctx.Store.Dispatch(new DeactivateWorkspaceTransform(Id));
 
 	/// <inheritdoc/>
 	public IWindowState? TryGetWindowState(IWindow window)
@@ -130,20 +130,19 @@ public partial record Workspace : IInternalWorkspace
 	}
 
 	/// <inheritdoc/>
-	public void DoLayout() => _ctx.Store.WhimDispatch(new DoWorkspaceLayoutTransform(Id));
+	public void DoLayout() => _ctx.Store.Dispatch(new DoWorkspaceLayoutTransform(Id));
 
 	/// <inheritdoc/>
 	public bool ContainsWindow(IWindow window) => _ctx.Store.Pick(PickWorkspaceWindows(Id)).Value.Contains(window);
 
 	/// <inheritdoc/>
 	public bool PerformCustomLayoutEngineAction(LayoutEngineCustomAction action) =>
-		_ctx.Store.WhimDispatch(new LayoutEngineCustomActionTransform(Id, action)).TryGet(out bool isChanged)
-		&& isChanged;
+		_ctx.Store.Dispatch(new LayoutEngineCustomActionTransform(Id, action)).TryGet(out bool isChanged) && isChanged;
 
 	/// <inheritdoc/>
 	public bool PerformCustomLayoutEngineAction<T>(LayoutEngineCustomAction<T> action) =>
-		_ctx.Store.WhimDispatch(new LayoutEngineCustomActionWithPayloadTransform<T>(Id, action))
-			.TryGet(out bool isChanged) && isChanged;
+		_ctx.Store.Dispatch(new LayoutEngineCustomActionWithPayloadTransform<T>(Id, action)).TryGet(out bool isChanged)
+		&& isChanged;
 
 	/// <inheritdoc/>
 	public void Dispose()

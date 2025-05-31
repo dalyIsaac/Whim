@@ -94,10 +94,7 @@ public static class YamlLoader
 
 			sb.AppendFormat("Error {0}:\n", idx + 1);
 			sb.AppendLine(error.Message);
-			sb.AppendFormat(
-				"Violated {0}\n",
-				error.Location.TryGetValue(out var location) ? location.ValidationLocation.ToString() : "unknown schema"
-			);
+			sb.AppendFormat("Violated {0}\n", error.Location?.ValidationLocation.ToString() ?? "unknown schema");
 			idx += 1;
 		}
 		string errors = sb.ToString();
@@ -159,7 +156,7 @@ public static class YamlLoader
 				}
 			}
 
-			ctx.Store.WhimDispatch(new AddWorkspaceTransform(workspaceName, engines, MonitorIndices: monitorIndices));
+			ctx.Store.Dispatch(new AddWorkspaceTransform(workspaceName, engines, MonitorIndices: monitorIndices));
 		}
 	}
 

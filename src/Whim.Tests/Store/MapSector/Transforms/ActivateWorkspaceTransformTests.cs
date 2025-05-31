@@ -13,7 +13,7 @@ public class ActivateWorkspaceTransformTests
 		CustomAssert.DoesNotRaise<MonitorWorkspaceChangedEventArgs>(
 			h => rootSector.MapSector.MonitorWorkspaceChanged += h,
 			h => rootSector.MapSector.MonitorWorkspaceChanged -= h,
-			() => result = ctx.Store.WhimDispatch(sut)
+			() => result = ctx.Store.Dispatch(sut)
 		);
 		return result!.Value;
 	}
@@ -30,7 +30,7 @@ public class ActivateWorkspaceTransformTests
 		CustomAssert.Raises<MonitorWorkspaceChangedEventArgs>(
 			h => rootSector.MapSector.MonitorWorkspaceChanged += h,
 			h => rootSector.MapSector.MonitorWorkspaceChanged -= h,
-			() => result = ctx.Store.WhimDispatch(sut),
+			() => result = ctx.Store.Dispatch(sut),
 			(sender, args) => evs.Add(args)
 		);
 

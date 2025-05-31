@@ -18,7 +18,7 @@ public class DeactivateWorkspaceTransformTests
 		DeactivateWorkspaceTransform sut = new(workspace.Id);
 
 		// When
-		var result = ctx.Store.WhimDispatch(sut);
+		var result = ctx.Store.Dispatch(sut);
 
 		// Then
 		Workspace resultWorkspace = rootSector.WorkspaceSector.Workspaces[workspace.Id];

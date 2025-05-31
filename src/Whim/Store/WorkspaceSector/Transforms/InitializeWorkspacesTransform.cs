@@ -5,9 +5,9 @@ namespace Whim;
 /// <summary>
 /// Initializes the state with the saved workspaces, and adds windows.
 /// </summary>
-internal record InitializeWorkspacesTransform : WhimTransform
+internal record InitializeWorkspacesTransform : Transform
 {
-	internal override WhimResult<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		CreatePreInitializationWorkspaces(ctx, rootSector);
 		PopulatedSavedWorkspaces(ctx, internalCtx, rootSector);
@@ -27,7 +27,7 @@ internal record InitializeWorkspacesTransform : WhimTransform
 		workspaceSector.HasInitialized = true;
 		foreach (WorkspaceToCreate w in workspaceSector.WorkspacesToCreate)
 		{
-			ctx.Store.WhimDispatch(
+			ctx.Store.Dispatch(
 				new AddWorkspaceTransform(w.Name, w.CreateLeafLayoutEngines, w.WorkspaceId, w.MonitorIndices)
 			);
 		}
@@ -87,7 +87,7 @@ internal record InitializeWorkspacesTransform : WhimTransform
 				continue;
 			}
 
-			ctx.Store.WhimDispatch(new WindowAddedTransform(hwnd, RouterOptions.RouteToLaunchedWorkspace));
+			ctx.Store.Dispatch(new WindowAddedTransform(hwnd, RouterOptions.RouteToLaunchedWorkspace));
 		}
 	}
 
@@ -113,7 +113,7 @@ internal record InitializeWorkspacesTransform : WhimTransform
 			mapSector.WindowWorkspaceMap = mapSector.WindowWorkspaceMap.SetItem(window.Handle, workspace.Id);
 			windowSector.Windows = windowSector.Windows.Add(window.Handle, window);
 
-			ctx.Store.WhimDispatch(
+			ctx.Store.Dispatch(
 				new MoveWindowToPointInWorkspaceTransform(workspace.Id, window.Handle, savedWindow.Rectangle.Center)
 			);
 
@@ -145,7 +145,7 @@ internal record InitializeWorkspacesTransform : WhimTransform
 				if (!processedMonitors.Contains(monitor))
 				{
 					processedMonitors.Add(monitor);
-					ctx.Store.WhimDispatch(new ActivateWorkspaceTransform(workspaceId, monitor));
+					ctx.Store.Dispatch(new ActivateWorkspaceTransform(workspaceId, monitor));
 					break;
 				}
 			}
@@ -158,8 +158,8 @@ internal record InitializeWorkspacesTransform : WhimTransform
 
 		foreach (HMONITOR monitor in unprocessedMonitors)
 		{
-			ctx.Store.WhimDispatch(new AddWorkspaceTransform($"Workspace {workspaceSector.Workspaces.Count + 1}"));
-			ctx.Store.WhimDispatch(new ActivateWorkspaceTransform(workspaceSector.WorkspaceOrder[^1], monitor));
+			ctx.Store.Dispatch(new AddWorkspaceTransform($"Workspace {workspaceSector.Workspaces.Count + 1}"));
+			ctx.Store.Dispatch(new ActivateWorkspaceTransform(workspaceSector.WorkspaceOrder[^1], monitor));
 		}
 	}
 }

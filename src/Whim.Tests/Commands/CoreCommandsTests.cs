@@ -18,7 +18,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new ActivateAdjacentWorkspaceTransform(Reverse: true));
+		ctx.Store.Received(1).Dispatch(new ActivateAdjacentWorkspaceTransform(Reverse: true));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -34,7 +34,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new ActivateAdjacentWorkspaceTransform());
+		ctx.Store.Received(1).Dispatch(new ActivateAdjacentWorkspaceTransform());
 	}
 
 	[InlineAutoSubstituteData("whim.core.focus_window_in_direction.left", Direction.Left)]
@@ -54,7 +54,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new FocusWindowInDirectionTransform(Direction: direction));
+		ctx.Store.Received(1).Dispatch(new FocusWindowInDirectionTransform(Direction: direction));
 	}
 
 	[InlineAutoSubstituteData("whim.core.swap_window_in_direction.left", Direction.Left)]
@@ -74,7 +74,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new SwapWindowInDirectionTransform(Direction: direction));
+		ctx.Store.Received(1).Dispatch(new SwapWindowInDirectionTransform(Direction: direction));
 	}
 
 	[InlineAutoSubstituteData("whim.core.move_window_left_edge_left", Direction.Left, -1, 0)]
@@ -103,7 +103,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new MoveWindowEdgesInDirectionTransform(direction, pixelsDeltas));
+		ctx.Store.Received(1).Dispatch(new MoveWindowEdgesInDirectionTransform(direction, pixelsDeltas));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -119,7 +119,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new MoveWindowToAdjacentMonitorTransform(Reverse: true));
+		ctx.Store.Received(1).Dispatch(new MoveWindowToAdjacentMonitorTransform(Reverse: true));
 	}
 
 	[Theory, AutoSubstituteData]
@@ -135,7 +135,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new MoveWindowToAdjacentMonitorTransform());
+		ctx.Store.Received(1).Dispatch(new MoveWindowToAdjacentMonitorTransform());
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -242,7 +242,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new CycleLayoutEngineTransform());
+		ctx.Store.Received(1).Dispatch(new CycleLayoutEngineTransform());
 	}
 
 	[Theory, AutoSubstituteData]
@@ -258,7 +258,7 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then
-		ctx.Store.Received(1).WhimDispatch(new CycleLayoutEngineTransform(Reverse: true));
+		ctx.Store.Received(1).Dispatch(new CycleLayoutEngineTransform(Reverse: true));
 	}
 	#endregion
 

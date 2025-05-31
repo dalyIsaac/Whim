@@ -2,22 +2,18 @@ namespace Whim.Tests;
 
 public class StoreTests
 {
-	private record EmptyTransform : WhimTransform
+	private record EmptyTransform : Transform
 	{
-		internal override WhimResult<Unit> Execute(
+		internal override Result<Unit> Execute(
 			IContext ctx,
 			IInternalContext internalCtx,
 			MutableRootSector rootSector
 		) => Unit.Result;
 	}
 
-	private record PopulatedTransform : WhimTransform
+	private record PopulatedTransform : Transform
 	{
-		internal override WhimResult<Unit> Execute(
-			IContext ctx,
-			IInternalContext internalCtx,
-			MutableRootSector rootSector
-		)
+		internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 		{
 			rootSector.WorkspaceSector.QueueEvent(
 				new WorkspaceAddedEventArgs() { Workspace = Substitute.For<IWorkspace>() }
@@ -36,7 +32,7 @@ public class StoreTests
 		CustomAssert.DoesNotRaise<WorkspaceAddedEventArgs>(
 			h => ctx.Store.WorkspaceEvents.WorkspaceAdded += h,
 			h => ctx.Store.WorkspaceEvents.WorkspaceAdded -= h,
-			() => ctx.Store.WhimDispatch(new EmptyTransform())
+			() => ctx.Store.Dispatch(new EmptyTransform())
 		);
 	}
 
@@ -49,7 +45,7 @@ public class StoreTests
 		Assert.Raises<WorkspaceAddedEventArgs>(
 			h => ctx.Store.WorkspaceEvents.WorkspaceAdded += h,
 			h => ctx.Store.WorkspaceEvents.WorkspaceAdded -= h,
-			() => ctx.Store.WhimDispatch(new PopulatedTransform())
+			() => ctx.Store.Dispatch(new PopulatedTransform())
 		);
 	}
 
@@ -64,7 +60,7 @@ public class StoreTests
 		CustomAssert.DoesNotRaise<WorkspaceAddedEventArgs>(
 			h => ctx.Store.WorkspaceEvents.WorkspaceAdded += h,
 			h => ctx.Store.WorkspaceEvents.WorkspaceAdded -= h,
-			() => ctx.Store.WhimDispatch(new EmptyTransform())
+			() => ctx.Store.Dispatch(new EmptyTransform())
 		);
 	}
 
@@ -79,7 +75,7 @@ public class StoreTests
 		CustomAssert.DoesNotRaise<WorkspaceAddedEventArgs>(
 			h => ctx.Store.WorkspaceEvents.WorkspaceAdded += h,
 			h => ctx.Store.WorkspaceEvents.WorkspaceAdded -= h,
-			() => ctx.Store.WhimDispatch(new PopulatedTransform())
+			() => ctx.Store.Dispatch(new PopulatedTransform())
 		);
 	}
 }

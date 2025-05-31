@@ -48,7 +48,7 @@ internal class WindowProcessorManager
 			case WindowProcessorResult.Ignore:
 				return true;
 			case WindowProcessorResult.IgnoreAndLayout:
-				_ctx.Store.WhimDispatch(new LayoutAllActiveWorkspacesTransform());
+				_ctx.Store.Dispatch(new LayoutAllActiveWorkspacesTransform());
 				return true;
 			case WindowProcessorResult.Process:
 				return false;

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
-using DotNext;
 using NSubstitute;
 using Windows.Win32.Foundation;
 
@@ -18,12 +17,6 @@ internal class StoreWrapper(IContext ctx, IInternalContext internalCtx) : Store(
 	{
 		Transforms.Add(transform);
 		return base.DispatchFn(transform);
-	}
-
-	protected override Result<TResult> WhimDispatchFn<TResult>(WhimTransform<TResult> transform)
-	{
-		Transforms.Add(transform);
-		return base.WhimDispatchFn(transform);
 	}
 }
 

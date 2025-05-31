@@ -34,7 +34,7 @@ public class WindowMoveEndedTransformTests
 		ev = Assert.Raises<WindowMoveEndedEventArgs>(
 			h => mutableRootSector.WindowSector.WindowMoveEnded += h,
 			h => mutableRootSector.WindowSector.WindowMoveEnded -= h,
-			() => result = ctx.Store.WhimDispatch(sut)
+			() => result = ctx.Store.Dispatch(sut)
 		);
 
 		return (result!.Value, ev);
@@ -50,7 +50,7 @@ public class WindowMoveEndedTransformTests
 		CustomAssert.DoesNotRaise<WindowMoveEndedEventArgs>(
 			h => mutableRootSector.WindowSector.WindowMoveEnded += h,
 			h => mutableRootSector.WindowSector.WindowMoveEnded -= h,
-			() => result = ctx.Store.WhimDispatch(sut)
+			() => result = ctx.Store.Dispatch(sut)
 		);
 		return result!.Value;
 	}

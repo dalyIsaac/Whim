@@ -17,7 +17,7 @@ public class WindowRemovedTransformTests
 		ev = Assert.Raises<WindowRemovedEventArgs>(
 			h => mutableRootSector.WindowSector.WindowRemoved += h,
 			h => mutableRootSector.WindowSector.WindowRemoved -= h,
-			() => result = ctx.Store.WhimDispatch(sut)
+			() => result = ctx.Store.Dispatch(sut)
 		);
 
 		return (result!.Value, ev);
@@ -33,7 +33,7 @@ public class WindowRemovedTransformTests
 		CustomAssert.DoesNotRaise<WindowRemovedEventArgs>(
 			h => mutableRootSector.WindowSector.WindowRemoved += h,
 			h => mutableRootSector.WindowSector.WindowRemoved -= h,
-			() => result = ctx.Store.WhimDispatch(sut)
+			() => result = ctx.Store.Dispatch(sut)
 		);
 		return result!.Value;
 	}

@@ -118,7 +118,7 @@ public class WorkspaceUtilsTests
 
 		bool isWindowRequiredInWorkspace = true;
 		// When
-		WhimResult<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(
+		Result<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(
 			ctx,
 			CreateWorkspace(ctx),
 			windowHandle,
@@ -140,7 +140,7 @@ public class WorkspaceUtilsTests
 		bool isWindowRequiredInWorkspace = true;
 
 		// When there are no windows
-		WhimResult<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(
+		Result<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(
 			ctx,
 			CreateWorkspace(ctx),
 			windowHandle,
@@ -162,7 +162,7 @@ public class WorkspaceUtilsTests
 		bool isWindowRequiredInWorkspace = true;
 
 		// When the window is not in the workspace
-		WhimResult<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(
+		Result<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(
 			ctx,
 			workspace,
 			windowHandle,
@@ -184,7 +184,7 @@ public class WorkspaceUtilsTests
 		bool isWindowRequiredInWorkspace = false;
 
 		// When the window is not in the workspace
-		WhimResult<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(
+		Result<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(
 			ctx,
 			workspace,
 			windowHandle,
@@ -210,7 +210,7 @@ public class WorkspaceUtilsTests
 		bool isWindowRequiredInWorkspace = true;
 
 		// When the window is in the workspace
-		WhimResult<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(
+		Result<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(
 			ctx,
 			workspace,
 			window.Handle,

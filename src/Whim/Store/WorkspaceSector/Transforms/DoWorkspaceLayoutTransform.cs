@@ -10,9 +10,9 @@
 /// context.Store.Dispatch(new DoWorkspaceLayoutTransform(workspaceId));
 /// </code>
 /// </example>
-public record DoWorkspaceLayoutTransform(WorkspaceId WorkspaceId) : WhimTransform
+public record DoWorkspaceLayoutTransform(WorkspaceId WorkspaceId) : Transform
 {
-	internal override WhimResult<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
 		WorkspaceSector sector = rootSector.WorkspaceSector;
 		sector.WorkspacesToLayout = sector.WorkspacesToLayout.Add(WorkspaceId);
