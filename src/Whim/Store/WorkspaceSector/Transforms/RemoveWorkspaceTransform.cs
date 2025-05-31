@@ -22,7 +22,7 @@ public abstract record BaseRemoveWorkspaceTransform() : Transform
 
 		if (sector.Workspaces.Count - 1 < mutableRootSector.MonitorSector.Monitors.Length)
 		{
-			return Result.FromException<Unit>(new WhimException("There must be a workspace for each monitor"));
+			return Result.FromError<Unit>(new WhimError("There must be a workspace for each monitor"));
 		}
 
 		Workspace? workspaceToRemove = null;
@@ -37,7 +37,7 @@ public abstract record BaseRemoveWorkspaceTransform() : Transform
 
 		if (workspaceToRemove is null)
 		{
-			return Result.FromException<Unit>(new WhimException("No matching workspace found"));
+			return Result.FromError<Unit>(new WhimError("No matching workspace found"));
 		}
 
 		// Remove the workspace

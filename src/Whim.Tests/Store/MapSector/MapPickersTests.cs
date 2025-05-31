@@ -55,7 +55,7 @@ public class MapPickersTests
 
 		// Then we get the workspace
 		Assert.True(result.IsSuccessful);
-		Assert.Same(workspace1, result.Value);
+		Assert.Same(workspace1, result.Value!);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -72,7 +72,7 @@ public class MapPickersTests
 
 		// Then we get the workspace
 		Assert.True(result.IsSuccessful);
-		Assert.Same(workspace, result.Value);
+		Assert.Same(workspace, result.Value!);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -87,7 +87,7 @@ public class MapPickersTests
 
 		// Then we get the workspace
 		Assert.True(result.IsSuccessful);
-		Assert.Same(workspace, result.Value);
+		Assert.Same(workspace, result.Value!);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -120,7 +120,7 @@ public class MapPickersTests
 
 		// Then we get the monitor
 		Assert.True(result.IsSuccessful);
-		Assert.Same(monitor, result.Value);
+		Assert.Same(monitor, result.Value!);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -157,7 +157,7 @@ public class MapPickersTests
 
 		// Then we get the monitor
 		Assert.True(result.IsSuccessful);
-		Assert.Same(monitor1, result.Value);
+		Assert.Same(monitor1, result.Value!);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -246,7 +246,7 @@ public class MapPickersTests
 
 		// Then we get the workspace
 		Assert.True(result.IsSuccessful);
-		Assert.Equal(workspaceOrder[expected], result.Value.Id);
+		Assert.Equal(workspaceOrder[expected], result.Value!.Id);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -294,7 +294,7 @@ public class MapPickersTests
 
 		// Then we get the layout engine
 		Assert.True(result.IsSuccessful);
-		Assert.Same(layoutEngine, result.Value);
+		Assert.Same(layoutEngine, result.Value!);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -334,8 +334,8 @@ public class MapPickersTests
 
 		// Then we get the monitors
 		Assert.True(result.IsSuccessful);
-		Assert.Equal(2, result.Value.Count);
-		result.Value.Should().BeEquivalentTo([(HMONITOR)0, (HMONITOR)1]);
+		Assert.Equal(2, result.Value!.Count);
+		result.Value!.Should().BeEquivalentTo([(HMONITOR)0, (HMONITOR)1]);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -357,8 +357,8 @@ public class MapPickersTests
 
 		// Then we get all the monitors
 		Assert.True(result.IsSuccessful);
-		Assert.Equal(3, result.Value.Count);
-		result.Value.Should().BeEquivalentTo([(HMONITOR)0, (HMONITOR)1, (HMONITOR)2]);
+		Assert.Equal(3, result.Value!.Count);
+		result.Value!.Should().BeEquivalentTo([(HMONITOR)0, (HMONITOR)1, (HMONITOR)2]);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -385,8 +385,8 @@ public class MapPickersTests
 
 		// Then we get all the monitors
 		Assert.True(result.IsSuccessful);
-		Assert.Equal(3, result.Value.Count);
-		result.Value.Should().BeEquivalentTo([(HMONITOR)0, (HMONITOR)1, (HMONITOR)2]);
+		Assert.Equal(3, result.Value!.Count);
+		result.Value!.Should().BeEquivalentTo([(HMONITOR)0, (HMONITOR)1, (HMONITOR)2]);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -417,8 +417,8 @@ public class MapPickersTests
 
 		// Then we get the monitor indices
 		Assert.True(result.IsSuccessful);
-		Assert.Equal(2, result.Value.Count);
-		result.Value.Should().BeEquivalentTo([0, 1]);
+		Assert.Equal(2, result.Value!.Count);
+		result.Value!.Should().BeEquivalentTo([0, 1]);
 	}
 }
 
@@ -442,7 +442,7 @@ public class PickValidMonitorByWorkspaceTests
 
 		// Then we get the target monitor
 		Assert.True(result.IsSuccessful);
-		Assert.Equal((HMONITOR)1, result.Value);
+		Assert.Equal((HMONITOR)1, result.Value!);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -468,7 +468,7 @@ public class PickValidMonitorByWorkspaceTests
 
 		// Then we get monitor 2 since it's the last valid monitor used
 		Assert.True(result.IsSuccessful);
-		Assert.Equal((HMONITOR)2, result.Value);
+		Assert.Equal((HMONITOR)2, result.Value!);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -494,7 +494,7 @@ public class PickValidMonitorByWorkspaceTests
 
 		// Then we get monitor 1 as it's the first valid monitor
 		Assert.True(result.IsSuccessful);
-		Assert.Equal((HMONITOR)1, result.Value);
+		Assert.Equal((HMONITOR)1, result.Value!);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -535,7 +535,7 @@ public class PickValidMonitorByWorkspaceTests
 
 		// Then we get the active monitor
 		Assert.True(result.IsSuccessful);
-		Assert.Equal((HMONITOR)2, result.Value);
+		Assert.Equal((HMONITOR)2, result.Value!);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -590,10 +590,10 @@ public class PickStickyWorkspacesByMonitorTests
 
 		// Then we get the sticky workspaces in workspace order
 		Assert.True(result.IsSuccessful);
-		Assert.Equal(3, result.Value.Count); // All workspaces (2 sticky + 1 non-sticky)
-		Assert.Equal(workspace1, result.Value[0]); // First in workspace order
-		Assert.Equal(workspace2, result.Value[1]); // Second in workspace order
-		Assert.Equal(workspace3, result.Value[2]); // Non-sticky workspace
+		Assert.Equal(3, result.Value!.Count); // All workspaces (2 sticky + 1 non-sticky)
+		Assert.Equal(workspace1, result.Value![0]); // First in workspace order
+		Assert.Equal(workspace2, result.Value![1]); // Second in workspace order
+		Assert.Equal(workspace3, result.Value![2]); // Non-sticky workspace
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -613,10 +613,10 @@ public class PickStickyWorkspacesByMonitorTests
 
 		// Then we get all workspaces in workspace order
 		Assert.True(result.IsSuccessful);
-		Assert.Equal(3, result.Value.Count);
-		Assert.Equal(workspace1, result.Value[0]);
-		Assert.Equal(workspace2, result.Value[1]);
-		Assert.Equal(workspace3, result.Value[2]);
+		Assert.Equal(3, result.Value!.Count);
+		Assert.Equal(workspace1, result.Value![0]);
+		Assert.Equal(workspace2, result.Value![1]);
+		Assert.Equal(workspace3, result.Value![2]);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -640,15 +640,15 @@ public class PickStickyWorkspacesByMonitorTests
 
 		// Then the workspace is included because index 0 is valid, ignoring invalid indices
 		Assert.True(result.IsSuccessful);
-		Assert.Single(result.Value);
-		Assert.Equal(workspace, result.Value[0]);
+		Assert.Single(result.Value!);
+		Assert.Equal(workspace, result.Value![0]);
 
 		// And when we get workspaces for monitor2 (index 1)
 		result = ctx.Store.Pick(Pickers.PickStickyWorkspacesByMonitor(monitor2.Handle));
 
 		// Then the workspace is included because index 1 is valid, ignoring invalid indices
 		Assert.True(result.IsSuccessful);
-		Assert.Single(result.Value);
-		Assert.Equal(workspace, result.Value[0]);
+		Assert.Single(result.Value!);
+		Assert.Equal(workspace, result.Value![0]);
 	}
 }

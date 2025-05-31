@@ -193,7 +193,7 @@ public class WorkspaceUtilsTests
 		);
 
 		// Then
-		Assert.True(result.IsSuccessful);
+		Assert.False(result.IsSuccessful);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]

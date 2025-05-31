@@ -42,7 +42,7 @@ public abstract record ActivateLayoutEngineTransform(WorkspaceId WorkspaceId) : 
 			}
 		}
 
-		return Result.FromException<Workspace>(new WhimException("Provided layout engine not found"));
+		return Result.FromError<Workspace>(new WhimError("Provided layout engine not found"));
 	}
 }
 

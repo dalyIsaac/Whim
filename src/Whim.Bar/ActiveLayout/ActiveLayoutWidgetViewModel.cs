@@ -11,7 +11,7 @@ namespace Whim.Bar;
 /// </summary>
 internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 {
-	private readonly IContext _context;
+	private readonly IContext _ctx;
 
 	/// <summary>
 	/// The monitor that the widget is displayed on.
@@ -35,7 +35,7 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 		get
 		{
 			if (
-				_context
+				_ctx
 					.Store.Pick(Pickers.PickActiveLayoutEngineByMonitor(Monitor.Handle))
 					.TryGet(out ILayoutEngine layoutEngine)
 			)
@@ -47,7 +47,7 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 		}
 		set
 		{
-			if (!_context.Store.Pick(Pickers.PickWorkspaceByMonitor(Monitor.Handle)).TryGet(out IWorkspace workspace))
+			if (!_ctx.Store.Pick(Pickers.PickWorkspaceByMonitor(Monitor.Handle)).TryGet(out IWorkspace workspace))
 			{
 				return;
 			}
@@ -56,7 +56,7 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 
 			if (layoutEngine.Name != value)
 			{
-				_context.Store.Dispatch(new SetLayoutEngineFromNameTransform(workspace.Id, value));
+				_ctx.Store.Dispatch(new SetLayoutEngineFromNameTransform(workspace.Id, value));
 				OnPropertyChanged(nameof(ActiveLayoutEngine));
 			}
 		}
@@ -84,12 +84,12 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 	/// <param name="monitor"></param>
 	public ActiveLayoutWidgetViewModel(IContext context, IMonitor monitor)
 	{
-		_context = context;
+		_ctx = context;
 		Monitor = monitor;
 
-		_context.Store.WorkspaceEvents.ActiveLayoutEngineChanged += Store_ActiveLayoutEngineChanged;
-		_context.Store.MapEvents.MonitorWorkspaceChanged += Store_MonitorWorkspaceChanged;
-		_context.Store.WindowEvents.WindowFocused += WindowEvents_WindowFocused;
+		_ctx.Store.WorkspaceEvents.ActiveLayoutEngineChanged += Store_ActiveLayoutEngineChanged;
+		_ctx.Store.MapEvents.MonitorWorkspaceChanged += Store_MonitorWorkspaceChanged;
+		_ctx.Store.WindowEvents.WindowFocused += WindowEvents_WindowFocused;
 	}
 
 	private void Store_ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs e)
@@ -130,9 +130,9 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_context.Store.WorkspaceEvents.ActiveLayoutEngineChanged -= Store_ActiveLayoutEngineChanged;
-				_context.Store.MapEvents.MonitorWorkspaceChanged -= Store_MonitorWorkspaceChanged;
-				_context.Store.WindowEvents.WindowFocused -= WindowEvents_WindowFocused;
+				_ctx.Store.WorkspaceEvents.ActiveLayoutEngineChanged -= Store_ActiveLayoutEngineChanged;
+				_ctx.Store.MapEvents.MonitorWorkspaceChanged -= Store_MonitorWorkspaceChanged;
+				_ctx.Store.WindowEvents.WindowFocused -= WindowEvents_WindowFocused;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

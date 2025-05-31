@@ -1,7 +1,6 @@
 global using System;
 global using System.Collections.Generic;
 global using System.Collections.Immutable;
-global using DotNext;
 global using NSubstitute;
 global using NSubstitute.ExceptionExtensions;
 global using NSubstitute.ReturnsExtensions;

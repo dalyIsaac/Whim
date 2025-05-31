@@ -27,7 +27,7 @@ public record ActivateWorkspaceTransform(
 		Result<IWorkspace> workspaceResult = ctx.Store.Pick(PickWorkspaceById(WorkspaceId));
 		if (!workspaceResult.TryGet(out IWorkspace workspace))
 		{
-			return Result.FromException<Unit>(workspaceResult.Error!);
+			return Result.FromError<Unit>(workspaceResult.Error!);
 		}
 
 		Result<HMONITOR> targetMonitorHandleResult = ctx.Store.Pick(
@@ -35,13 +35,13 @@ public record ActivateWorkspaceTransform(
 		);
 		if (!targetMonitorHandleResult.TryGet(out HMONITOR targetMonitorHandle))
 		{
-			return Result.FromException<Unit>(targetMonitorHandleResult.Error!);
+			return Result.FromError<Unit>(targetMonitorHandleResult.Error!);
 		}
 
 		Result<IMonitor> targetMonitorResult = ctx.Store.Pick(PickMonitorByHandle(targetMonitorHandle));
 		if (!targetMonitorResult.TryGet(out IMonitor targetMonitor))
 		{
-			return Result.FromException<Unit>(targetMonitorHandleResult.Error!);
+			return Result.FromError<Unit>(targetMonitorHandleResult.Error!);
 		}
 
 		return ActivateWorkspaceOnTargetMonitor(ctx, mapSector, workspace, targetMonitor);

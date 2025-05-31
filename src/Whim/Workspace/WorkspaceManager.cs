@@ -5,7 +5,7 @@ namespace Whim;
 
 internal class WorkspaceManager(IContext context) : IWorkspaceManager
 {
-	private readonly IContext _context = context;
+	private readonly IContext _ctx = context;
 
 	public event EventHandler<WorkspaceAddedEventArgs>? WorkspaceAdded;
 
@@ -21,8 +21,8 @@ internal class WorkspaceManager(IContext context) : IWorkspaceManager
 
 	public Func<CreateLeafLayoutEngine[]> CreateLayoutEngines
 	{
-		get => _context.Store.Pick(PickCreateLeafLayoutEngines());
-		set => _context.Store.Dispatch(new SetCreateLayoutEnginesTransform(value));
+		get => _ctx.Store.Pick(PickCreateLeafLayoutEngines());
+		set => _ctx.Store.Dispatch(new SetCreateLayoutEnginesTransform(value));
 	}
 
 	public IWorkspace? this[string workspaceName] => TryGet(workspaceName);
@@ -31,32 +31,32 @@ internal class WorkspaceManager(IContext context) : IWorkspaceManager
 	{
 		get
 		{
-			IMonitor activeMonitor = _context.MonitorManager.ActiveMonitor;
+			IMonitor activeMonitor = _ctx.MonitorManager.ActiveMonitor;
 			Logger.Debug($"Getting active workspace for monitor {activeMonitor}");
-			return _context.Store.Pick(PickActiveWorkspace());
+			return _ctx.Store.Pick(PickActiveWorkspace());
 		}
 	}
 
 	public WorkspaceId? Add(string? name = null, IEnumerable<CreateLeafLayoutEngine>? createLayoutEngines = null) =>
-		_context.Store.Dispatch(new AddWorkspaceTransform(name, createLayoutEngines)).TryGet(out WorkspaceId id)
+		_ctx.Store.Dispatch(new AddWorkspaceTransform(name, createLayoutEngines)).TryGet(out WorkspaceId id)
 			? id
 			: null;
 
 	public void AddProxyLayoutEngine(ProxyLayoutEngineCreator proxyLayoutEngineCreator) =>
-		_context.Store.Dispatch(new AddProxyLayoutEngineTransform(proxyLayoutEngineCreator));
+		_ctx.Store.Dispatch(new AddProxyLayoutEngineTransform(proxyLayoutEngineCreator));
 
-	public bool Contains(IWorkspace workspace) => _context.Store.Pick(PickWorkspaces()).Any(w => w.Id == workspace.Id);
+	public bool Contains(IWorkspace workspace) => _ctx.Store.Pick(PickWorkspaces()).Any(w => w.Id == workspace.Id);
 
-	public IEnumerator<IWorkspace> GetEnumerator() => _context.Store.Pick(PickWorkspaces()).GetEnumerator();
+	public IEnumerator<IWorkspace> GetEnumerator() => _ctx.Store.Pick(PickWorkspaces()).GetEnumerator();
 
 	public void Initialize()
 	{
-		_context.Store.WorkspaceEvents.WorkspaceAdded += WorkspaceSector_WorkspaceAdded;
-		_context.Store.WorkspaceEvents.WorkspaceRemoved += WorkspaceSector_WorkspaceRemoved;
-		_context.Store.WorkspaceEvents.ActiveLayoutEngineChanged += WorkspaceSector_ActiveLayoutEngineChanged;
-		_context.Store.WorkspaceEvents.WorkspaceRenamed += WorkspaceSector_WorkspaceRenamed;
-		_context.Store.WorkspaceEvents.WorkspaceLayoutStarted += WorkspaceSector_WorkspaceLayoutStarted;
-		_context.Store.WorkspaceEvents.WorkspaceLayoutCompleted += WorkspaceSector_WorkspaceLayoutCompleted;
+		_ctx.Store.WorkspaceEvents.WorkspaceAdded += WorkspaceSector_WorkspaceAdded;
+		_ctx.Store.WorkspaceEvents.WorkspaceRemoved += WorkspaceSector_WorkspaceRemoved;
+		_ctx.Store.WorkspaceEvents.ActiveLayoutEngineChanged += WorkspaceSector_ActiveLayoutEngineChanged;
+		_ctx.Store.WorkspaceEvents.WorkspaceRenamed += WorkspaceSector_WorkspaceRenamed;
+		_ctx.Store.WorkspaceEvents.WorkspaceLayoutStarted += WorkspaceSector_WorkspaceLayoutStarted;
+		_ctx.Store.WorkspaceEvents.WorkspaceLayoutCompleted += WorkspaceSector_WorkspaceLayoutCompleted;
 	}
 
 	private void WorkspaceSector_WorkspaceAdded(object? sender, WorkspaceAddedEventArgs args) =>
@@ -78,23 +78,23 @@ internal class WorkspaceManager(IContext context) : IWorkspaceManager
 		WorkspaceLayoutCompleted?.Invoke(sender, args);
 
 	public bool Remove(IWorkspace workspace) =>
-		_context.Store.Dispatch(new RemoveWorkspaceByIdTransform(workspace.Id)).IsSuccessful;
+		_ctx.Store.Dispatch(new RemoveWorkspaceByIdTransform(workspace.Id)).IsSuccessful;
 
 	public bool Remove(string workspaceName) =>
-		_context.Store.Dispatch(new RemoveWorkspaceByNameTransform(workspaceName)).IsSuccessful;
+		_ctx.Store.Dispatch(new RemoveWorkspaceByNameTransform(workspaceName)).IsSuccessful;
 
 	public IWorkspace? TryGet(string workspaceName) =>
-		_context.Store.Pick(PickWorkspaceByName(workspaceName)).TryGet(out IWorkspace workspace) ? workspace : null;
+		_ctx.Store.Pick(PickWorkspaceByName(workspaceName)).TryGet(out IWorkspace workspace) ? workspace : null;
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 	public void Dispose()
 	{
-		_context.Store.WorkspaceEvents.WorkspaceAdded -= WorkspaceSector_WorkspaceAdded;
-		_context.Store.WorkspaceEvents.WorkspaceRemoved -= WorkspaceSector_WorkspaceRemoved;
-		_context.Store.WorkspaceEvents.ActiveLayoutEngineChanged -= WorkspaceSector_ActiveLayoutEngineChanged;
-		_context.Store.WorkspaceEvents.WorkspaceRenamed -= WorkspaceSector_WorkspaceRenamed;
-		_context.Store.WorkspaceEvents.WorkspaceLayoutStarted -= WorkspaceSector_WorkspaceLayoutStarted;
-		_context.Store.WorkspaceEvents.WorkspaceLayoutCompleted -= WorkspaceSector_WorkspaceLayoutCompleted;
+		_ctx.Store.WorkspaceEvents.WorkspaceAdded -= WorkspaceSector_WorkspaceAdded;
+		_ctx.Store.WorkspaceEvents.WorkspaceRemoved -= WorkspaceSector_WorkspaceRemoved;
+		_ctx.Store.WorkspaceEvents.ActiveLayoutEngineChanged -= WorkspaceSector_ActiveLayoutEngineChanged;
+		_ctx.Store.WorkspaceEvents.WorkspaceRenamed -= WorkspaceSector_WorkspaceRenamed;
+		_ctx.Store.WorkspaceEvents.WorkspaceLayoutStarted -= WorkspaceSector_WorkspaceLayoutStarted;
+		_ctx.Store.WorkspaceEvents.WorkspaceLayoutCompleted -= WorkspaceSector_WorkspaceLayoutCompleted;
 	}
 }

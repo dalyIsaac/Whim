@@ -11,7 +11,7 @@ internal record WindowMinimizeEndedTransform(IWindow Window) : Transform
 		Result<IWorkspace> workspaceResult = ctx.Store.Pick(PickWorkspaceByWindow(Window.Handle));
 		if (!workspaceResult.TryGet(out IWorkspace workspace))
 		{
-			return Result.FromException<Unit>(workspaceResult.Error!);
+			return Result.FromError<Unit>(workspaceResult.Error!);
 		}
 
 		ctx.Store.Dispatch(new MinimizeWindowEndTransform(workspace.Id, Window.Handle));

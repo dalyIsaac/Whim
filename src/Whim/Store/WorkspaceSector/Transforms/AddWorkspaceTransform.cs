@@ -50,7 +50,7 @@ public record AddWorkspaceTransform(
 
 		if (engineCreators.Length == 0)
 		{
-			return Result.FromException<WorkspaceId>(new WhimException("No engine creators were provided"));
+			return Result.FromError<WorkspaceId>(new WhimError("No engine creators were provided"));
 		}
 
 		// Create the layout engines.

@@ -17,21 +17,21 @@ public record MoveWindowToPointTransform(HWND WindowHandle, IPoint<int> Point) :
 		// Get the monitor.
 		if (!ctx.Store.Pick(PickMonitorAtPoint(Point)).TryGet(out IMonitor targetMonitor))
 		{
-			return Result.FromException<Unit>(StoreExceptions.NoMonitorFoundAtPoint(Point));
+			return Result.FromError<Unit>(StoreErrors.NoMonitorFoundAtPoint(Point));
 		}
 
 		// Get the target workspace.
 		Result<IWorkspace> targetWorkspaceResult = ctx.Store.Pick(PickWorkspaceByMonitor(targetMonitor.Handle));
 		if (!targetWorkspaceResult.TryGet(out IWorkspace targetWorkspace))
 		{
-			return Result.FromException<Unit>(targetWorkspaceResult.Error!);
+			return Result.FromError<Unit>(targetWorkspaceResult.Error!);
 		}
 
 		// Get the old workspace.
 		Result<IWorkspace> oldWorkspaceResult = ctx.Store.Pick(PickWorkspaceByWindow(WindowHandle));
 		if (!oldWorkspaceResult.TryGet(out IWorkspace oldWorkspace))
 		{
-			return Result.FromException<Unit>(oldWorkspaceResult.Error!);
+			return Result.FromError<Unit>(oldWorkspaceResult.Error!);
 		}
 
 		// Normalize `point` into the unit square.

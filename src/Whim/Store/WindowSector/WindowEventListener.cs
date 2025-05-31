@@ -208,7 +208,7 @@ internal class WindowEventListener : IDisposable
 	/// event. For example, the mouse pointer is not associated with a window.
 	/// </param>
 	/// <returns></returns>
-	private static bool IsEventWindowValid(int idObject, int idChild, HWND? hwnd) =>
+	private static bool IsEventWindowValid(int idObject, int idChild, HWND hwnd) =>
 		// When idChild is CHILDID_SELF (0), the event was triggered
 		// by the object.
 		idChild == PInvoke.CHILDID_SELF
@@ -216,7 +216,7 @@ internal class WindowEventListener : IDisposable
 		// associated with the window (not a child object).
 		&& idObject == (int)OBJECT_IDENTIFIER.OBJID_WINDOW
 		// The handle is not null.
-		&& hwnd != null;
+		&& !hwnd.IsNull;
 
 	protected virtual void Dispose(bool disposing)
 	{

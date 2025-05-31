@@ -25,27 +25,27 @@ public record MoveWindowEdgesInDirectionTransform(
 		HWND windowHandle = WindowHandle.OrLastFocusedWindow(ctx);
 		if (windowHandle == default)
 		{
-			return Result.FromException<Unit>(StoreExceptions.NoValidWindow());
+			return Result.FromError<Unit>(StoreErrors.NoValidWindow());
 		}
 
 		Result<IWindow> windowResult = ctx.Store.Pick(PickWindowByHandle(windowHandle));
 		if (!windowResult.TryGet(out IWindow window))
 		{
-			return Result.FromException<Unit>(windowResult.Error!);
+			return Result.FromError<Unit>(windowResult.Error!);
 		}
 
 		// Get the containing workspace.
 		Result<IWorkspace> workspaceResult = ctx.Store.Pick(PickWorkspaceByWindow(windowHandle));
 		if (!workspaceResult.TryGet(out IWorkspace workspace))
 		{
-			return Result.FromException<Unit>(workspaceResult.Error!);
+			return Result.FromError<Unit>(workspaceResult.Error!);
 		}
 
 		// Get the containing monitor.
 		Result<IMonitor> monitorResult = ctx.Store.Pick(PickMonitorByWindow(windowHandle));
 		if (!monitorResult.TryGet(out IMonitor monitor))
 		{
-			return Result.FromException<Unit>(monitorResult.Error!);
+			return Result.FromError<Unit>(monitorResult.Error!);
 		}
 
 		Logger.Debug($"Moving window {windowHandle} to workspace {workspace}");

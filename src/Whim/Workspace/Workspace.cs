@@ -33,7 +33,7 @@ public sealed partial record Workspace : IWorkspace
 	/// <param name="workspace"></param>
 	internal Workspace(Workspace workspace)
 	{
-		_context = workspace._context;
+		_ctx = workspace._ctx;
 		Id = workspace.Id;
 		BackingName = workspace.BackingName;
 		ActiveLayoutEngineIndex = workspace.ActiveLayoutEngineIndex;

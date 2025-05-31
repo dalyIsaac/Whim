@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
-using DotNext;
 using NSubstitute;
 using Windows.Win32.Foundation;
 

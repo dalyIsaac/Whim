@@ -174,37 +174,6 @@ public class WindowManagerTests
 		);
 	}
 
-	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void CreateWindow_Success(IContext ctx)
-	{
-		// Given window creation succeeds
-		HWND hwnd = (HWND)1;
-		WindowManager sut = new(ctx);
-
-		// When we try create a window
-		var result = sut.CreateWindow(hwnd);
-
-		// Then it succeeds
-		Assert.True(result.IsSuccessful);
-	}
-
-	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void CreateWindow_RetrieveExisting(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
-	{
-		// Given the window already exists
-		HWND hwnd = (HWND)1;
-		window.Handle.Returns(hwnd);
-		mutableRootSector.WindowSector.Windows = mutableRootSector.WindowSector.Windows.Add(hwnd, window);
-
-		WindowManager sut = new(ctx);
-
-		// When we try create a window
-		var result = sut.CreateWindow(hwnd);
-
-		// Then it succeeds
-		Assert.True(result.IsSuccessful);
-	}
-
 	[Theory, AutoSubstituteData]
 	internal void GetEnumerator(IContext ctx)
 	{

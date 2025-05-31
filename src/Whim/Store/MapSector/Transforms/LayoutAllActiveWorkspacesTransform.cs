@@ -10,7 +10,7 @@ public record LayoutAllActiveWorkspacesTransform() : Transform
 	{
 		if (ctx.Store.IsDisposing)
 		{
-			return Result.FromException<Unit>(new WhimException("Whim is shutting down"));
+			return Result.FromError<Unit>(new WhimError("Whim is shutting down"));
 		}
 
 		foreach (IWorkspace workspace in ctx.Store.Pick(PickAllActiveWorkspaces()))

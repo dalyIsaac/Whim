@@ -28,8 +28,8 @@ Sometimes an operation does not return a value, but the caller still needs to kn
 Result<IMonitor> oldMonitorResult = context.Store.Pick(PickMonitorByWindow(windowHandle));
 if (!oldMonitorResult.TryGet(out IMonitor oldMonitor))
 {
-    // Forward the exception to the caller.
-    return Result.FromException<Unit>(oldMonitorResult.Error!);
+    // Forward the error to the caller.
+    return Result.FromError<Unit>(oldMonitorResult.Error!);
 }
 
 if (oldMonitor.Handle == MonitorHandle)
