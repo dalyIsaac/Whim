@@ -23,13 +23,13 @@ public record MoveWindowToAdjacentWorkspaceTransform(
 		HWND windowHandle = WindowHandle.OrLastFocusedWindow(ctx);
 		if (windowHandle == default)
 		{
-			return Result.FromException<Unit>(StoreExceptions.NoValidWindow());
+			return Result.FromError<Unit>(StoreErrors.NoValidWindow());
 		}
 
 		Result<IWindow> windowResult = ctx.Store.Pick(PickWindowByHandle(windowHandle));
 		if (!windowResult.TryGet(out IWindow window))
 		{
-			return Result.FromException<Unit>(windowResult.Error!);
+			return Result.FromError<Unit>(windowResult.Error!);
 		}
 
 		MapSector sector = rootSector.MapSector;
@@ -40,7 +40,7 @@ public record MoveWindowToAdjacentWorkspaceTransform(
 			|| !ctx.Store.Pick(PickWorkspaceById(currentWorkspaceId)).TryGet(out IWorkspace currentWorkspace)
 		)
 		{
-			return Result.FromException<Unit>(StoreExceptions.NoWorkspaceFoundForWindow(windowHandle));
+			return Result.FromError<Unit>(StoreErrors.NoWorkspaceFoundForWindow(windowHandle));
 		}
 
 		// Get the adjacent workspace for the current workspace.

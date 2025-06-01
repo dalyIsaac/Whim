@@ -15,13 +15,13 @@ public record MergeWorkspaceWindowsTransform(WorkspaceId SourceWorkspaceId, Work
 		Result<IWorkspace> sourceWorkspace = ctx.Store.Pick(PickWorkspaceById(SourceWorkspaceId));
 		if (!sourceWorkspace.TryGet(out IWorkspace Source))
 		{
-			return Result.FromException<Unit>(sourceWorkspace.Error!);
+			return Result.FromError<Unit>(sourceWorkspace.Error!);
 		}
 
 		Result<IWorkspace> targetWorkspace = ctx.Store.Pick(PickWorkspaceById(TargetWorkspaceId));
 		if (!targetWorkspace.TryGet(out IWorkspace Target))
 		{
-			return Result.FromException<Unit>(targetWorkspace.Error!);
+			return Result.FromError<Unit>(targetWorkspace.Error!);
 		}
 
 		// Remove the workspace from the monitor map.

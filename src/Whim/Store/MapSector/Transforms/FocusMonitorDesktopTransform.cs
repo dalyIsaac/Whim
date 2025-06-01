@@ -11,7 +11,7 @@ public record FocusMonitorDesktopTransform(HMONITOR MonitorHandle) : Transform
 		Result<IMonitor> monitorResult = ctx.Store.Pick(PickMonitorByHandle(MonitorHandle));
 		if (!monitorResult.TryGet(out IMonitor monitor))
 		{
-			return Result.FromException<Unit>(monitorResult.Error!);
+			return Result.FromError<Unit>(monitorResult.Error!);
 		}
 
 		rootSector.WorkspaceSector.WindowHandleToFocus = internalCtx.CoreNativeManager.GetDesktopWindow();

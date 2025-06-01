@@ -17,7 +17,7 @@ public record MoveWindowToMonitorIndexTransform(int MonitorIndex, HWND WindowHan
 		Result<IMonitor> monitorResult = ctx.Store.Pick(PickMonitorByIndex(MonitorIndex));
 		if (!monitorResult.TryGet(out IMonitor monitor))
 		{
-			return Result.FromException<Unit>(monitorResult.Error!);
+			return Result.FromError<Unit>(monitorResult.Error!);
 		}
 
 		return ctx.Store.Dispatch(new MoveWindowToMonitorTransform(monitor.Handle, WindowHandle));

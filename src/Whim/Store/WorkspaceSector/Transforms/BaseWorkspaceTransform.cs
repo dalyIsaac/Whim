@@ -34,13 +34,13 @@ public abstract record BaseWorkspaceTransform(WorkspaceId WorkspaceId, bool Skip
 
 		if (!sector.Workspaces.TryGetValue(workspaceId, out Workspace? workspace))
 		{
-			return Result.FromException<bool>(StoreExceptions.WorkspaceNotFound(workspaceId));
+			return Result.FromError<bool>(StoreErrors.WorkspaceNotFound(workspaceId));
 		}
 
 		Result<Workspace> newWorkspaceResult = WorkspaceOperation(ctx, internalCtx, rootSector, workspace);
 		if (!newWorkspaceResult.TryGet(out Workspace newWorkspace))
 		{
-			return Result.FromException<bool>(newWorkspaceResult.Error!);
+			return Result.FromError<bool>(newWorkspaceResult.Error!);
 		}
 
 		if (newWorkspace == workspace)

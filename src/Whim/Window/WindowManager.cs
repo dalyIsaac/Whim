@@ -4,7 +4,7 @@ namespace Whim;
 
 internal class WindowManager(IContext context) : IWindowManager, IInternalWindowManager
 {
-	private readonly IContext _context = context;
+	private readonly IContext _ctx = context;
 
 	public event EventHandler<WindowAddedEventArgs>? WindowAdded;
 	public event EventHandler<WindowFocusedEventArgs>? WindowFocused;
@@ -22,14 +22,14 @@ internal class WindowManager(IContext context) : IWindowManager, IInternalWindow
 
 	public void Initialize()
 	{
-		_context.Store.WindowEvents.WindowAdded += WindowSector_WindowAdded;
-		_context.Store.WindowEvents.WindowFocused += WindowSector_WindowFocused;
-		_context.Store.WindowEvents.WindowRemoved += WindowSector_WindowRemoved;
-		_context.Store.WindowEvents.WindowMoveStarted += WindowSector_WindowMoveStarted;
-		_context.Store.WindowEvents.WindowMoved += WindowSector_WindowMoved;
-		_context.Store.WindowEvents.WindowMoveEnded += WindowSector_WindowMoveEnd;
-		_context.Store.WindowEvents.WindowMinimizeStarted += WindowSector_WindowMinimizeStarted;
-		_context.Store.WindowEvents.WindowMinimizeEnded += WindowSector_WindowMinimizeEnded;
+		_ctx.Store.WindowEvents.WindowAdded += WindowSector_WindowAdded;
+		_ctx.Store.WindowEvents.WindowFocused += WindowSector_WindowFocused;
+		_ctx.Store.WindowEvents.WindowRemoved += WindowSector_WindowRemoved;
+		_ctx.Store.WindowEvents.WindowMoveStarted += WindowSector_WindowMoveStarted;
+		_ctx.Store.WindowEvents.WindowMoved += WindowSector_WindowMoved;
+		_ctx.Store.WindowEvents.WindowMoveEnded += WindowSector_WindowMoveEnd;
+		_ctx.Store.WindowEvents.WindowMinimizeStarted += WindowSector_WindowMinimizeStarted;
+		_ctx.Store.WindowEvents.WindowMinimizeEnded += WindowSector_WindowMinimizeEnded;
 	}
 
 	private void WindowSector_WindowAdded(object? sender, WindowAddedEventArgs ev) => WindowAdded?.Invoke(sender, ev);
@@ -54,15 +54,15 @@ internal class WindowManager(IContext context) : IWindowManager, IInternalWindow
 	private void WindowSector_WindowMinimizeEnded(object? sender, WindowMinimizeEndedEventArgs ev) =>
 		WindowMinimizeEnd?.Invoke(sender, ev);
 
-	public Result<IWindow> CreateWindow(HWND hwnd) => _context.CreateWindow(hwnd);
+	public Result<IWindow> CreateWindow(HWND hwnd) => _ctx.CreateWindow(hwnd);
 
-	public IWindow? AddWindow(HWND hwnd) => _context.Store.Dispatch(new WindowAddedTransform(hwnd)).ValueOrDefault;
+	public IWindow? AddWindow(HWND hwnd) => _ctx.Store.Dispatch(new WindowAddedTransform(hwnd)).ValueOrDefault;
 
-	public void OnWindowFocused(IWindow? window) => _context.Store.Dispatch(new WindowFocusedTransform(window));
+	public void OnWindowFocused(IWindow? window) => _ctx.Store.Dispatch(new WindowFocusedTransform(window));
 
-	public void OnWindowRemoved(IWindow window) => _context.Store.Dispatch(new WindowRemovedTransform(window));
+	public void OnWindowRemoved(IWindow window) => _ctx.Store.Dispatch(new WindowRemovedTransform(window));
 
-	public IEnumerator<IWindow> GetEnumerator() => _context.Store.Pick(PickAllWindows()).GetEnumerator();
+	public IEnumerator<IWindow> GetEnumerator() => _ctx.Store.Pick(PickAllWindows()).GetEnumerator();
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -73,14 +73,14 @@ internal class WindowManager(IContext context) : IWindowManager, IInternalWindow
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_context.Store.WindowEvents.WindowAdded -= WindowSector_WindowAdded;
-				_context.Store.WindowEvents.WindowFocused -= WindowSector_WindowFocused;
-				_context.Store.WindowEvents.WindowRemoved -= WindowSector_WindowRemoved;
-				_context.Store.WindowEvents.WindowMoveStarted -= WindowSector_WindowMoveStarted;
-				_context.Store.WindowEvents.WindowMoved -= WindowSector_WindowMoved;
-				_context.Store.WindowEvents.WindowMoveEnded -= WindowSector_WindowMoveEnd;
-				_context.Store.WindowEvents.WindowMinimizeStarted -= WindowSector_WindowMinimizeStarted;
-				_context.Store.WindowEvents.WindowMinimizeEnded -= WindowSector_WindowMinimizeEnded;
+				_ctx.Store.WindowEvents.WindowAdded -= WindowSector_WindowAdded;
+				_ctx.Store.WindowEvents.WindowFocused -= WindowSector_WindowFocused;
+				_ctx.Store.WindowEvents.WindowRemoved -= WindowSector_WindowRemoved;
+				_ctx.Store.WindowEvents.WindowMoveStarted -= WindowSector_WindowMoveStarted;
+				_ctx.Store.WindowEvents.WindowMoved -= WindowSector_WindowMoved;
+				_ctx.Store.WindowEvents.WindowMoveEnded -= WindowSector_WindowMoveEnd;
+				_ctx.Store.WindowEvents.WindowMinimizeStarted -= WindowSector_WindowMinimizeStarted;
+				_ctx.Store.WindowEvents.WindowMinimizeEnded -= WindowSector_WindowMinimizeEnded;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

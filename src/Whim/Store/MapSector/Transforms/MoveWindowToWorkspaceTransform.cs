@@ -17,20 +17,20 @@ public record MoveWindowToWorkspaceTransform(WorkspaceId TargetWorkspaceId, HWND
 		Result<IWorkspace> targetWorkspaceResult = ctx.Store.Pick(PickWorkspaceById(TargetWorkspaceId));
 		if (!targetWorkspaceResult.TryGet(out IWorkspace targetWorkspace))
 		{
-			return Result.FromException<Unit>(targetWorkspaceResult.Error!);
+			return Result.FromError<Unit>(targetWorkspaceResult.Error!);
 		}
 
 		// Get the window.
 		HWND windowHandle = WindowHandle.OrLastFocusedWindow(ctx);
 		if (windowHandle == default)
 		{
-			return Result.FromException<Unit>(StoreExceptions.NoValidWindow());
+			return Result.FromError<Unit>(StoreErrors.NoValidWindow());
 		}
 
 		Result<IWindow> windowResult = ctx.Store.Pick(PickWindowByHandle(windowHandle));
 		if (!windowResult.TryGet(out IWindow window))
 		{
-			return Result.FromException<Unit>(windowResult.Error!);
+			return Result.FromError<Unit>(windowResult.Error!);
 		}
 
 		Logger.Debug($"Moving window {windowHandle} to workspace {TargetWorkspaceId}");
@@ -39,7 +39,7 @@ public record MoveWindowToWorkspaceTransform(WorkspaceId TargetWorkspaceId, HWND
 		Result<IWorkspace> oldWorkspaceResult = ctx.Store.Pick(PickWorkspaceByWindow(windowHandle));
 		if (!oldWorkspaceResult.TryGet(out IWorkspace oldWorkspace))
 		{
-			return Result.FromException<Unit>(oldWorkspaceResult.Error!);
+			return Result.FromError<Unit>(oldWorkspaceResult.Error!);
 		}
 
 		if (oldWorkspace.Id == TargetWorkspaceId)

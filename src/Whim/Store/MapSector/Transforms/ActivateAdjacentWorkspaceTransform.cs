@@ -25,7 +25,7 @@ public record ActivateAdjacentWorkspaceTransform(
 
 		if (!mapSector.MonitorWorkspaceMap.TryGetValue(targetMonitorHandle, out WorkspaceId currentWorkspaceId))
 		{
-			return Result.FromException<Unit>(StoreExceptions.NoWorkspaceFoundForMonitor(targetMonitorHandle));
+			return new(StoreErrors.NoWorkspaceFoundForMonitor(targetMonitorHandle));
 		}
 
 		Result<IWorkspace> nextWorkspaceResult = ctx.Store.Pick(
@@ -33,7 +33,7 @@ public record ActivateAdjacentWorkspaceTransform(
 		);
 		if (!nextWorkspaceResult.TryGet(out IWorkspace? nextWorkspace))
 		{
-			return Result.FromException<Unit>(nextWorkspaceResult.Error!);
+			return Result.FromError<Unit>(nextWorkspaceResult.Error!);
 		}
 
 		return ctx.Store.Dispatch(new ActivateWorkspaceTransform(nextWorkspace.Id, targetMonitorHandle));

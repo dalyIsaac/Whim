@@ -40,12 +40,10 @@ public abstract record BaseWorkspaceWindowTransform(
 			DefaultToLastFocusedWindow,
 			IsWindowRequiredInWorkspace
 		);
-		if (!result.TryGet(out IWindow validWindow))
-		{
-			return Result.FromException<Workspace>(result.Error!);
-		}
 
-		return WindowOperation(ctx, internalCtx, rootSector, workspace, validWindow);
+		return result.TryGet(out IWindow validWindow)
+			? WindowOperation(ctx, internalCtx, rootSector, workspace, validWindow)
+			: Result.FromError<Workspace>(result.Error!);
 	}
 
 	/// <summary>

@@ -18,7 +18,7 @@ public record MoveWindowToMonitorTransform(HMONITOR MonitorHandle, HWND WindowHa
 		HWND windowHandle = WindowHandle.OrLastFocusedWindow(ctx);
 		if (windowHandle == default)
 		{
-			return Result.FromException<Unit>(StoreExceptions.NoValidWindow());
+			return Result.FromError<Unit>(StoreErrors.NoValidWindow());
 		}
 
 		Logger.Debug($"Moving window {windowHandle} to monitor {MonitorHandle}");
@@ -26,13 +26,13 @@ public record MoveWindowToMonitorTransform(HMONITOR MonitorHandle, HWND WindowHa
 		Result<IWorkspace> workspaceResult = ctx.Store.Pick(PickWorkspaceByMonitor(MonitorHandle));
 		if (!workspaceResult.TryGet(out IWorkspace workspace))
 		{
-			return Result.FromException<Unit>(workspaceResult.Error!);
+			return Result.FromError<Unit>(workspaceResult.Error!);
 		}
 
 		Result<IMonitor> oldMonitorResult = ctx.Store.Pick(PickMonitorByWindow(windowHandle));
 		if (!oldMonitorResult.TryGet(out IMonitor oldMonitor))
 		{
-			return Result.FromException<Unit>(oldMonitorResult.Error!);
+			return Result.FromError<Unit>(oldMonitorResult.Error!);
 		}
 
 		if (oldMonitor.Handle == MonitorHandle)
