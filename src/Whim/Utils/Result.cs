@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Whim;
 
 /// <summary>
@@ -100,12 +102,14 @@ public readonly struct Result<T> : IEquatable<Result<T>>
 	/// Implicitly converts a value to a successful result.
 	/// </summary>
 	/// <param name="value">The value to convert.</param>
+	[SuppressMessage("Usage", "CA2225:Operator overloads have named alternates")]
 	public static implicit operator Result<T>(T value) => new(value);
 
 	/// <summary>
 	/// Implicitly converts an error to a failed result.
 	/// </summary>
 	/// <param name="error">The error to convert.</param>
+	[SuppressMessage("Usage", "CA2225:Operator overloads have named alternates")]
 	public static implicit operator Result<T>(WhimError error) => new(error);
 
 	/// <summary>
@@ -178,13 +182,6 @@ public readonly struct Result<T> : IEquatable<Result<T>>
 	{
 		return !(left == right);
 	}
-
-	/// <summary>
-	/// Converts the result to a Result type without a value.
-	/// This is useful for cases where you want to handle the result without needing the value.
-	/// </summary>
-	/// <returns>A Result without a value, retaining the success or failure state.</returns>
-	public Result<T> ToResult() => this;
 }
 
 /// <summary>

@@ -13,11 +13,6 @@ public class WhimError
 	public string Message { get; }
 
 	/// <summary>
-	/// An optional inner error that caused this error.
-	/// </summary>
-	public WhimError? InnerError { get; }
-
-	/// <summary>
 	/// An optional exception that caused this error (for interop with existing exception-based code).
 	/// </summary>
 	public Exception? InnerException { get; }
@@ -30,17 +25,6 @@ public class WhimError
 		: this(message, LogLevel.Debug)
 	{
 		Message = message;
-	}
-
-	/// <summary>
-	/// Creates a new WhimError with the specified message and inner error.
-	/// </summary>
-	/// <param name="message">The error message.</param>
-	/// <param name="innerError">The inner error that caused this error.</param>
-	public WhimError(string message, WhimError innerError)
-		: this(message)
-	{
-		InnerError = innerError;
 	}
 
 	/// <summary>
@@ -97,10 +81,6 @@ public class WhimError
 	public override string ToString()
 	{
 		string result = Message;
-		if (InnerError != null)
-		{
-			result += $" -> {InnerError}";
-		}
 		if (InnerException != null)
 		{
 			result += $" -> {InnerException.Message}";
