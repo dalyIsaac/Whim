@@ -32,6 +32,11 @@ public interface ILayoutEngine
 	int Count { get; }
 
 	/// <summary>
+	/// Whether the layout engine supports stacking windows.
+	/// </summary>
+	bool SupportsStacking { get; }
+
+	/// <summary>
 	/// The identity of the layout engine.
 	/// </summary>
 	LayoutEngineIdentity Identity { get; }
