@@ -75,8 +75,7 @@ public class MoveWindowToWorkspaceTransformTests
 	{
 		// Given a random window id
 		Workspace workspace = CreateWorkspace(ctx);
-
-		AddWorkspacesToManager(ctx, rootSector, workspace);
+		AddActiveWorkspace(ctx, rootSector, workspace);
 
 		MoveWindowToWorkspaceTransform sut = new(workspace.Id);
 

@@ -86,7 +86,16 @@ internal static class WindowUtils
 	{
 		if (handle == default)
 		{
-			return ctx.WorkspaceManager.ActiveWorkspace.LastFocusedWindow?.Handle ?? default;
+			IWorkspace workspace = ctx.Store.Pick(PickActiveWorkspace());
+
+			Result<IWindow> windowResult = ctx.Store.Pick(PickLastFocusedWindow(workspace.Id));
+			if (!windowResult.TryGet(out IWindow? window))
+			{
+				Logger.Error("Could not get last focused window, returning default HWND");
+				return default;
+			}
+
+			handle = window.Handle;
 		}
 
 		return handle;
