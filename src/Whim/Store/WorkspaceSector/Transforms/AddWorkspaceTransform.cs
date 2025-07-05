@@ -84,7 +84,7 @@ public record AddWorkspaceTransform(
 			mutableRootSector.MapSector.StickyWorkspaceMonitorIndexMap =
 				mutableRootSector.MapSector.StickyWorkspaceMonitorIndexMap.Add(
 					workspace.Id,
-					MonitorIndices.ToImmutableArray()
+					[.. MonitorIndices]
 				);
 		}
 
