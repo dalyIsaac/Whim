@@ -8,15 +8,13 @@ public record FocusMonitorDesktopTransform(HMONITOR MonitorHandle) : Transform
 {
 	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
 	{
-		Result<IMonitor> monitorResult = ctx.Store.Pick(PickMonitorByHandle(MonitorHandle));
-		if (!monitorResult.TryGet(out IMonitor monitor))
+		Result<Unit> result = ctx.Store.Dispatch(new ActivateEmptyMonitorTransform(MonitorHandle));
+		if (!result.IsSuccessful)
 		{
-			return Result.FromError<Unit>(monitorResult.Error!);
+			return result;
 		}
 
 		rootSector.WorkspaceSector.WindowHandleToFocus = internalCtx.CoreNativeManager.GetDesktopWindow();
-		internalCtx.MonitorManager.ActivateEmptyMonitor(monitor);
-
-		return Unit.Result;
+		return result;
 	}
 }
