@@ -14,8 +14,6 @@ internal class InternalContext : IInternalContext, IDisposable
 
 	public IInternalMonitorManager MonitorManager => (IInternalMonitorManager)_context.MonitorManager;
 
-	public IInternalWindowManager WindowManager => (IInternalWindowManager)_context.WindowManager;
-
 	public IKeybindHook KeybindHook { get; }
 
 	public IMouseHook MouseHook { get; }

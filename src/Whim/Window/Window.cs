@@ -61,9 +61,9 @@ internal class Window : IWindow
 		Logger.Debug(ToString());
 		Handle.Focus(_internalContext);
 
-		// We manually call OnWindowFocused as an already focused window may have switched to a
+		// We manually call WindowFocused as an already focused window may have switched to a
 		// different workspace.
-		_internalContext.WindowManager.OnWindowFocused(this);
+		_context.Store.Dispatch(new WindowFocusedTransform(this));
 	}
 
 	public void Hide()
