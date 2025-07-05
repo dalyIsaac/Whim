@@ -109,6 +109,11 @@ internal static class StoreTestUtils
 		monitors.AddRange(newMonitors);
 
 		rootSector.MonitorSector.Monitors = [.. newMonitors];
+
+		if (rootSector.MonitorSector.ActiveMonitorHandle == default)
+		{
+			rootSector.MonitorSector.ActiveMonitorHandle = newMonitors[0].Handle;
+		}
 	}
 
 	public static void AddWindowToSector(MutableRootSector rootSector, IWindow window)
