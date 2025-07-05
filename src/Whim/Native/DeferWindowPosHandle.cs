@@ -122,7 +122,7 @@ public sealed class DeferWindowPosHandle : IDisposable
 		// Check to see if any monitors have non-100% scaling.
 		// If so, we need to set the window position twice.
 		int numPasses = 1;
-		foreach (IMonitor monitor in _context.MonitorManager)
+		foreach (IMonitor monitor in _context.Store.Pick(PickAllMonitors()))
 		{
 			if (monitor.ScaleFactor != 100 || _forceTwoPasses)
 			{

@@ -53,8 +53,8 @@ public record MoveWindowToWorkspaceTransform(WorkspaceId TargetWorkspaceId, HWND
 			TargetWorkspaceId
 		);
 
-		oldWorkspace.RemoveWindow(window);
-		targetWorkspace.AddWindow(window);
+		ctx.Store.Dispatch(new RemoveWindowFromWorkspaceTransform(oldWorkspace.Id, window) { SkipDoLayout = true });
+		ctx.Store.Dispatch(new AddWindowToWorkspaceTransform(TargetWorkspaceId, window) { SkipDoLayout = true });
 
 		// If both workspaces are visible, activate both
 		// Otherwise, only layout the new workspace.
@@ -63,8 +63,8 @@ public record MoveWindowToWorkspaceTransform(WorkspaceId TargetWorkspaceId, HWND
 			&& ctx.Store.Pick(PickMonitorByWorkspace(targetWorkspace.Id)).IsSuccessful
 		)
 		{
-			targetWorkspace.DoLayout();
-			oldWorkspace.DoLayout();
+			ctx.Store.Dispatch(new DoWorkspaceLayoutTransform(TargetWorkspaceId));
+			ctx.Store.Dispatch(new DoWorkspaceLayoutTransform(oldWorkspace.Id));
 		}
 		else
 		{

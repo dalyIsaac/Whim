@@ -57,7 +57,7 @@ public interface INativeManager
 	bool RestoreWindow(HWND hwnd);
 
 	/// <summary>
-	/// Safe wrapper around <see cref="PInvoke.GetClassName"/>.
+	/// Safe wrapper around <see cref="PInvoke.GetClassName(HWND, PWSTR, int)"/>.
 	/// </summary>
 	/// <param name="hwnd"></param>
 	/// <returns></returns>

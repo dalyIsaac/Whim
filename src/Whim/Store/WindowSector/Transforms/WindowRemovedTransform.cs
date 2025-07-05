@@ -24,7 +24,7 @@ internal record WindowRemovedTransform(IWindow Window) : Transform
 		}
 
 		UpdateWindowSector(mutableRootSector.WindowSector);
-		UpdateMapSector(mapSector, workspace);
+		UpdateMapSector(ctx, mapSector, workspace);
 
 		return Unit.Result;
 	}
@@ -35,12 +35,10 @@ internal record WindowRemovedTransform(IWindow Window) : Transform
 		windowSector.QueueEvent(new WindowRemovedEventArgs() { Window = Window });
 	}
 
-	private void UpdateMapSector(MapSector mapSector, IWorkspace workspace)
+	private void UpdateMapSector(IContext ctx, MapSector mapSector, IWorkspace workspace)
 	{
 		mapSector.WindowWorkspaceMap = mapSector.WindowWorkspaceMap.Remove(Window.Handle);
-		workspace.RemoveWindow(Window);
-
+		ctx.Store.Dispatch(new RemoveWindowFromWorkspaceTransform(workspace.Id, Window));
 		mapSector.QueueEvent(RouteEventArgs.WindowRemoved(Window, workspace));
-		workspace.DoLayout();
 	}
 }

@@ -51,7 +51,7 @@ internal record InitializeWorkspacesTransform : Transform
 		WindowSector windowSector = rootSector.WindowSector;
 		MapSector mapSector = rootSector.MapSector;
 
-		windowSector.StartupWindows = internalCtx.CoreNativeManager.GetAllWindows().ToImmutableHashSet();
+		windowSector.StartupWindows = [.. internalCtx.CoreNativeManager.GetAllWindows()];
 
 		// Add the saved windows at their saved locations inside their saved workspaces.
 		// Other windows are routed to the monitor they're on.

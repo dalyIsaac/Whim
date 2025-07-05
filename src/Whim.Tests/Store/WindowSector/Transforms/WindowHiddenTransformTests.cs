@@ -44,7 +44,6 @@ public class WindowHiddenTransformTests
 	internal void Failed(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
 	{
 		// Given
-		ctx.Butler.Pantry.GetMonitorForWindow(window).ReturnsNull();
 		WindowHiddenTransform sut = new(window);
 
 		// When

@@ -45,7 +45,7 @@ public class WindowMinimizeStartedTransformTests
 			h => rootSector.WindowSector.WindowMinimizeStarted -= h,
 			() =>
 			{
-				CustomAssert.Layout(rootSector, () => result = ctx.Store.Dispatch(sut), [workspace.Id]);
+				result = ctx.Store.Dispatch(sut);
 			}
 		);
 

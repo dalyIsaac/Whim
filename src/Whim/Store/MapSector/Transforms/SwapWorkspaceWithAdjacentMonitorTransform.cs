@@ -22,9 +22,14 @@ public record SwapWorkspaceWithAdjacentMonitorTransform(WorkspaceId WorkspaceId 
 		}
 
 		// Get the next monitor.
-		IMonitor nextMonitor = Reverse
-			? ctx.MonitorManager.GetPreviousMonitor(currentMonitor)
-			: ctx.MonitorManager.GetNextMonitor(currentMonitor);
+		Result<IMonitor> nextMonitorResult = Reverse
+			? ctx.Store.Pick(PickAdjacentMonitor(currentMonitor.Handle, reverse: true))
+			: ctx.Store.Pick(PickAdjacentMonitor(currentMonitor.Handle, reverse: false));
+
+		if (!nextMonitorResult.TryGet(out IMonitor nextMonitor))
+		{
+			return Result.FromError<Unit>(nextMonitorResult.Error!);
+		}
 
 		if (currentMonitor.Equals(nextMonitor))
 		{

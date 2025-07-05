@@ -47,7 +47,7 @@ public class MonitorPickersTests
 
 		// Then we get the monitor
 		Assert.True(result.IsSuccessful);
-		Assert.Equal(monitorHandle, result.Value.Handle);
+		Assert.Equal(monitorHandle, result.Value!.Handle);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -106,7 +106,7 @@ public class MonitorPickersTests
 		Result<IMonitor> result = ctx.Store.Pick(Pickers.PickAdjacentMonitor(unknownHandle, reverse, getFirst: true));
 
 		// Then
-		Assert.Equal(root.MonitorSector.Monitors[0].Handle, result.Value.Handle);
+		Assert.Equal(root.MonitorSector.Monitors[0].Handle, result.Value!.Handle);
 	}
 
 	[InlineAutoSubstituteData<StoreCustomization>(true, 0, 3)]
@@ -131,7 +131,7 @@ public class MonitorPickersTests
 		);
 
 		// Then
-		Assert.Equal(root.MonitorSector.Monitors[endIdx].Handle, result.Value.Handle);
+		Assert.Equal(root.MonitorSector.Monitors[endIdx].Handle, result.Value!.Handle);
 	}
 	#endregion
 
@@ -164,7 +164,7 @@ public class MonitorPickersTests
 
 		// Then
 		Assert.True(result.IsSuccessful);
-		Assert.Equal(root.MonitorSector.Monitors[index].Handle, result.Value.Handle);
+		Assert.Equal(root.MonitorSector.Monitors[index].Handle, result.Value!.Handle);
 	}
 	#endregion
 }

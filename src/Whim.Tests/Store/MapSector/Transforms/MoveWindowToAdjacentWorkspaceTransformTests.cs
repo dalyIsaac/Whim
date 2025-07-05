@@ -4,9 +4,10 @@ namespace Whim.Tests;
 public class MoveWindowToAdjacentWorkspaceTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void NoValidWindows(IContext ctx)
+	internal void NoValidWindows(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given there is no valid windows
+		AddActiveWorkspace(ctx, rootSector, CreateWorkspace(ctx));
 		MoveWindowToAdjacentWorkspaceTransform sut = new();
 
 		// When

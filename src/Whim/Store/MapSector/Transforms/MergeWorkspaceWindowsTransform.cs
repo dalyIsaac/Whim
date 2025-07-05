@@ -5,23 +5,23 @@ namespace Whim;
 /// </summary>
 /// <param name="SourceWorkspaceId">The id of the workspace to remove.</param>
 /// <param name="TargetWorkspaceId">The id of the workspace to merge the windows into.</param>
-public record MergeWorkspaceWindowsTransform(WorkspaceId SourceWorkspaceId, WorkspaceId TargetWorkspaceId) : Transform
+public record MergeWorkspaceWindowsTransform(WorkspaceId SourceWorkspaceId, WorkspaceId TargetWorkspaceId)
+	: BaseWorkspaceTransform(TargetWorkspaceId)
 {
-	internal override Result<Unit> Execute(IContext ctx, IInternalContext internalCtx, MutableRootSector rootSector)
+	private protected override Result<Workspace> WorkspaceOperation(
+		IContext ctx,
+		IInternalContext internalCtx,
+		MutableRootSector rootSector,
+		Workspace targetWorkspace
+	)
 	{
 		MapSector sector = rootSector.MapSector;
 
-		// Get the workspaces.
-		Result<IWorkspace> sourceWorkspace = ctx.Store.Pick(PickWorkspaceById(SourceWorkspaceId));
-		if (!sourceWorkspace.TryGet(out IWorkspace Source))
+		// Get the source workspace's windows.
+		Result<IEnumerable<IWindow>> sourceWindowsResult = ctx.Store.Pick(PickWorkspaceWindows(SourceWorkspaceId));
+		if (!sourceWindowsResult.TryGet(out IEnumerable<IWindow> sourceWindows))
 		{
-			return Result.FromError<Unit>(sourceWorkspace.Error!);
-		}
-
-		Result<IWorkspace> targetWorkspace = ctx.Store.Pick(PickWorkspaceById(TargetWorkspaceId));
-		if (!targetWorkspace.TryGet(out IWorkspace Target))
-		{
-			return Result.FromError<Unit>(targetWorkspace.Error!);
+			return Result.FromError<Workspace>(sourceWindowsResult.Error!);
 		}
 
 		// Remove the workspace from the monitor map.
@@ -31,17 +31,20 @@ public record MergeWorkspaceWindowsTransform(WorkspaceId SourceWorkspaceId, Work
 			sector.MonitorWorkspaceMap = sector.MonitorWorkspaceMap.SetItem(monitor, TargetWorkspaceId);
 		}
 
-		// Remap windows to the first workspace which isn't active.
-		foreach (IWindow window in Source.Windows)
+		// Remap windows to the target workspace.
+		foreach (IWindow window in sourceWindows)
 		{
 			sector.WindowWorkspaceMap = sector.WindowWorkspaceMap.SetItem(window.Handle, TargetWorkspaceId);
+
+			Result<bool> addWindowResult = ctx.Store.Dispatch(
+				new AddWindowToWorkspaceTransform(TargetWorkspaceId, window)
+			);
+			if (!addWindowResult.IsSuccessful)
+			{
+				return Result.FromError<Workspace>(addWindowResult.Error!);
+			}
 		}
 
-		foreach (IWindow window in Source.Windows)
-		{
-			Target.AddWindow(window);
-		}
-
-		return Unit.Result;
+		return targetWorkspace;
 	}
 }

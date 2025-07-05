@@ -214,6 +214,7 @@ public class ActivateWorkspaceTransformTests
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor1, workspace1);
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor2, workspace2);
 		AddWorkspacesToManager(ctx, rootSector, workspace3);
+		AddActiveWorkspace(ctx, rootSector, workspace1);
 
 		ActivateWorkspaceTransform sut = new(workspace3.Id, monitor2.Handle, FocusWorkspaceWindow: false);
 

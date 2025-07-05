@@ -43,7 +43,7 @@ public static partial class Pickers
 		{
 			foreach (IWorkspace workspace in rootSector.WorkspaceSector.Workspaces.Values)
 			{
-				if (workspace.Name == name)
+				if (workspace.BackingName == name)
 				{
 					return Result.FromValue(workspace);
 				}

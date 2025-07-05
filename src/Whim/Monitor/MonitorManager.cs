@@ -12,7 +12,7 @@ namespace Whim;
 /// When no monitors are found, or there is no primary monitor.
 /// </exception>
 /// <param name="context"></param>
-internal class MonitorManager(IContext context) : IInternalMonitorManager, IMonitorManager
+internal class MonitorManager(IContext context) : IMonitorManager
 {
 	private readonly IContext _ctx = context;
 

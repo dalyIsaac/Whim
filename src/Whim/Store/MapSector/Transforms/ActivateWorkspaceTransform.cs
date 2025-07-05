@@ -76,6 +76,9 @@ public record ActivateWorkspaceTransform(
 		// visible workspace when it receives the EVENT_OBJECT_HIDE event.
 		mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(targetMonitor.Handle, WorkspaceId);
 
+		// Store the active workspace id in case we need to reset back to it after a temporary focus.
+		WorkspaceId activeWorkspaceId = ctx.Store.Pick(PickActiveWorkspaceId());
+
 		if (loserMonitor != null && oldWorkspace != null && loserMonitor.Handle != targetMonitor.Handle)
 		{
 			Logger.Debug($"Layouting workspace {oldWorkspace} in loser monitor {loserMonitor}");
@@ -111,7 +114,6 @@ public record ActivateWorkspaceTransform(
 		}
 		else
 		{
-			WorkspaceId activeWorkspaceId = ctx.Store.Pick(PickActiveWorkspaceId());
 			ctx.Store.Dispatch(new FocusWorkspaceTransform(activeWorkspaceId));
 		}
 

@@ -2,7 +2,7 @@ using System.Collections;
 
 namespace Whim;
 
-internal class WindowManager(IContext context) : IWindowManager, IInternalWindowManager
+internal class WindowManager(IContext context) : IWindowManager
 {
 	private readonly IContext _ctx = context;
 
@@ -55,12 +55,6 @@ internal class WindowManager(IContext context) : IWindowManager, IInternalWindow
 		WindowMinimizeEnd?.Invoke(sender, ev);
 
 	public Result<IWindow> CreateWindow(HWND hwnd) => _ctx.CreateWindow(hwnd);
-
-	public IWindow? AddWindow(HWND hwnd) => _ctx.Store.Dispatch(new WindowAddedTransform(hwnd)).ValueOrDefault;
-
-	public void OnWindowFocused(IWindow? window) => _ctx.Store.Dispatch(new WindowFocusedTransform(window));
-
-	public void OnWindowRemoved(IWindow window) => _ctx.Store.Dispatch(new WindowRemovedTransform(window));
 
 	public IEnumerator<IWindow> GetEnumerator() => _ctx.Store.Pick(PickAllWindows()).GetEnumerator();
 

@@ -4,17 +4,11 @@ internal class InternalContext : IInternalContext, IDisposable
 {
 	private bool _disposedValue;
 
-	private readonly IContext _context;
-
 	public ICoreSavedStateManager CoreSavedStateManager { get; }
 
 	public ICoreNativeManager CoreNativeManager { get; }
 
 	public IWindowMessageMonitor WindowMessageMonitor { get; }
-
-	public IInternalMonitorManager MonitorManager => (IInternalMonitorManager)_context.MonitorManager;
-
-	public IInternalWindowManager WindowManager => (IInternalWindowManager)_context.WindowManager;
 
 	public IKeybindHook KeybindHook { get; }
 
@@ -22,7 +16,6 @@ internal class InternalContext : IInternalContext, IDisposable
 
 	public InternalContext(IContext context)
 	{
-		_context = context;
 		CoreSavedStateManager = new CoreSavedStateManager(context);
 		CoreNativeManager = new CoreNativeManager(context);
 		WindowMessageMonitor = new WindowMessageMonitor(context, this);

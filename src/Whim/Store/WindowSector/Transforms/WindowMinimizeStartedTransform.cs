@@ -14,8 +14,7 @@ internal record WindowMinimizeStartedTransform(IWindow Window) : Transform
 			return Result.FromError<Unit>(workspaceResult.Error!);
 		}
 
-		workspace.MinimizeWindowStart(Window);
-		workspace.DoLayout();
+		ctx.Store.Dispatch(new MinimizeWindowStartTransform(workspace.Id, Window.Handle));
 
 		mutableRootSector.WindowSector.QueueEvent(new WindowMinimizeStartedEventArgs() { Window = Window });
 

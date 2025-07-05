@@ -27,9 +27,6 @@ public class SwapWorkspaceWithAdjacentMonitorTransformTests
 		Workspace workspace = CreateWorkspace(ctx);
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, workspace);
 
-		ctx.MonitorManager.GetPreviousMonitor(monitor).Returns(monitor);
-		ctx.MonitorManager.GetNextMonitor(monitor).Returns(monitor);
-
 		SwapWorkspaceWithAdjacentMonitorTransform sut = new(workspace.Id, reverse);
 
 		// When we execute the transform
@@ -48,7 +45,7 @@ public class SwapWorkspaceWithAdjacentMonitorTransformTests
 		Workspace workspace1 = CreateWorkspace(ctx);
 
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor1, workspace1);
-		ctx.MonitorManager.GetNextMonitor(monitor1).Returns(monitor2);
+		AddMonitorsToManager(ctx, rootSector, monitor2);
 
 		SwapWorkspaceWithAdjacentMonitorTransform sut = new(workspace1.Id);
 
@@ -80,9 +77,6 @@ public class SwapWorkspaceWithAdjacentMonitorTransformTests
 		IMonitor monitor2 = CreateMonitor((HMONITOR)2);
 		IMonitor monitor3 = CreateMonitor((HMONITOR)3);
 		IMonitor[] monitors = [monitor1, monitor2, monitor3];
-
-		ctx.MonitorManager.GetPreviousMonitor(monitor1).Returns(monitor3);
-		ctx.MonitorManager.GetNextMonitor(monitor1).Returns(monitor2);
 
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor1, workspace1);
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor2, workspace2);

@@ -56,11 +56,8 @@ public record MoveWindowToAdjacentWorkspaceTransform(
 
 		sector.WindowWorkspaceMap = sector.WindowWorkspaceMap.SetItem(windowHandle, nextWorkspace.Id);
 
-		currentWorkspace.RemoveWindow(window);
-		nextWorkspace.AddWindow(window);
-
-		currentWorkspace.DoLayout();
-		nextWorkspace.DoLayout();
+		ctx.Store.Dispatch(new RemoveWindowFromWorkspaceTransform(currentWorkspace.Id, window));
+		ctx.Store.Dispatch(new AddWindowToWorkspaceTransform(nextWorkspace.Id, window));
 
 		rootSector.WorkspaceSector.WindowHandleToFocus = windowHandle;
 		return Unit.Result;

@@ -189,46 +189,6 @@ public class WindowManagerTests
 	}
 
 	[Theory, AutoSubstituteData]
-	internal void AddWindow(IContext ctx)
-	{
-		// Given
-		HWND hwnd = (HWND)2;
-		WindowManager sut = new(ctx);
-
-		// When
-		sut.AddWindow(hwnd);
-
-		// Then
-		ctx.Store.Received(1).Dispatch(new WindowAddedTransform(hwnd));
-	}
-
-	[Theory, AutoSubstituteData]
-	internal void OnWindowFocused(IContext ctx, IWindow window)
-	{
-		// Given
-		WindowManager sut = new(ctx);
-
-		// When
-		sut.OnWindowFocused(window);
-
-		// Then
-		ctx.Store.Received(1).Dispatch(new WindowFocusedTransform(window));
-	}
-
-	[Theory, AutoSubstituteData]
-	internal void OnWindowRemoved(IContext ctx, IWindow window)
-	{
-		// Given
-		WindowManager sut = new(ctx);
-
-		// When
-		sut.OnWindowRemoved(window);
-
-		// Then
-		ctx.Store.Received(1).Dispatch(new WindowRemovedTransform(window));
-	}
-
-	[Theory, AutoSubstituteData]
 	internal void Initialize_Dispose(IContext ctx)
 	{
 		// Given
