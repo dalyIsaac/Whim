@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
@@ -6,6 +7,12 @@ using Windows.Win32.Foundation;
 
 namespace Whim.TestUtils;
 
+public record DispatchInterceptor(
+	Func<object, bool> ShouldIntercept,
+	Func<object, object> Interceptor,
+	bool KeepAfterMatched
+);
+
 internal class StoreWrapper(IContext ctx, IInternalContext internalCtx) : Store(ctx, internalCtx)
 {
 	/// <summary>
@@ -13,10 +20,43 @@ internal class StoreWrapper(IContext ctx, IInternalContext internalCtx) : Store(
 	/// </summary>
 	public List<object> Transforms { get; } = [];
 
+	public List<DispatchInterceptor> Interceptors { get; } = [];
+
 	protected override Result<TResult> DispatchFn<TResult>(Transform<TResult> transform)
 	{
+		foreach (DispatchInterceptor interceptor in Interceptors)
+		{
+			if (!interceptor.ShouldIntercept(transform))
+			{
+				continue;
+			}
+
+			object result = interceptor.Interceptor(transform);
+			if (result is not TResult typedResult)
+			{
+				continue;
+			}
+
+			if (!interceptor.KeepAfterMatched)
+			{
+				Interceptors.Remove(interceptor);
+			}
+
+			return Result.FromValue(typedResult);
+		}
+
 		Transforms.Add(transform);
 		return base.DispatchFn(transform);
+	}
+
+	public StoreWrapper AddInterceptor(
+		Func<object, bool> shouldIntercept,
+		Func<object, object> interceptor,
+		bool keepAfterMatched = false
+	)
+	{
+		Interceptors.Add(new DispatchInterceptor(shouldIntercept, interceptor, keepAfterMatched));
+		return this;
 	}
 }
 

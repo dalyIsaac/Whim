@@ -26,10 +26,7 @@ internal static class MonitorTestUtils
 		else
 		{
 			// Get the primary rect.
-			RECT[] potentialPrimaryMonitors = monitors
-				.Select(m => m.Rect)
-				.Where(r => r.left == 0 && r.top == 0)
-				.ToArray();
+			RECT[] potentialPrimaryMonitors = [.. monitors.Select(m => m.Rect).Where(r => r.left == 0 && r.top == 0)];
 
 			if (potentialPrimaryMonitors.Length != 1)
 			{

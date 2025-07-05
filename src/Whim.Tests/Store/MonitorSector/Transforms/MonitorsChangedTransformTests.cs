@@ -7,17 +7,6 @@ namespace Whim.Tests;
 [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class MonitorsChangedTransformTests
 {
-	private static readonly (RECT Rect, HMONITOR Handle) RightMonitorSetup = (
-		new RECT()
-		{
-			left = 1920,
-			top = 0,
-			right = 3840,
-			bottom = 1080,
-		},
-		(HMONITOR)3
-	);
-
 	private static readonly (RECT Rect, HMONITOR Handle) LeftTopMonitorSetup = (
 		new RECT()
 		{
@@ -38,6 +27,17 @@ public class MonitorsChangedTransformTests
 			bottom = 2160,
 		},
 		(HMONITOR)2
+	);
+
+	private static readonly (RECT Rect, HMONITOR Handle) RightMonitorSetup = (
+		new RECT()
+		{
+			left = 1920,
+			top = 0,
+			right = 3840,
+			bottom = 1080,
+		},
+		(HMONITOR)3
 	);
 
 	private static Assert.RaisedEvent<MonitorsChangedEventArgs> DispatchTransformEvent(
@@ -88,24 +88,33 @@ public class MonitorsChangedTransformTests
 		Workspace workspace1 = CreateWorkspace(ctx);
 		Workspace workspace2 = CreateWorkspace(ctx);
 		Workspace workspace3 = CreateWorkspace(ctx);
-		ctx.WorkspaceManager.Add()
-			.Returns(
-				_ =>
+
+		((StoreWrapper)ctx.Store)
+			.AddInterceptor(
+				t => t is AddWorkspaceTransform,
+				t =>
 				{
 					AddWorkspaceToManager(ctx, rootSector, workspace1);
 					return workspace1.Id;
-				},
-				_ =>
+				}
+			)
+			.AddInterceptor(
+				t => t is AddWorkspaceTransform,
+				t =>
 				{
 					AddWorkspaceToManager(ctx, rootSector, workspace2);
 					return workspace2.Id;
-				},
-				_ =>
+				}
+			)
+			.AddInterceptor(
+				t => t is AddWorkspaceTransform,
+				t =>
 				{
 					AddWorkspaceToManager(ctx, rootSector, workspace3);
 					return workspace3.Id;
 				}
 			);
+
 		rootSector.WorkspaceSector.HasInitialized = true;
 		return [workspace1, workspace2, workspace3];
 	}
@@ -143,7 +152,7 @@ public class MonitorsChangedTransformTests
 	{
 		// Given we've populated monitors
 		SetupAddWorkspaces(ctx, rootSector);
-		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup });
+		SetupMultipleMonitors(internalCtx, [RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup]);
 
 		rootSector.WorkspaceSector.HasInitialized = false;
 
@@ -162,13 +171,13 @@ public class MonitorsChangedTransformTests
 		Setup_TryEnqueue(internalCtx);
 		IWorkspace[] workspaces = PopulateWorkspaces(ctx, rootSector);
 
-		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup });
+		SetupMultipleMonitors(internalCtx, [RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup]);
 
 		ctx.Store.Dispatch(new MonitorsChangedTransform());
 
 		// When a monitor is removed
 		Setup_TryEnqueue(internalCtx);
-		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup });
+		SetupMultipleMonitors(internalCtx, [RightMonitorSetup, LeftTopMonitorSetup]);
 
 		// Then the resulting event will have a monitor removed
 		var raisedEvent = DispatchTransformEvent(
@@ -202,12 +211,12 @@ public class MonitorsChangedTransformTests
 		Setup_TryEnqueue(internalCtx);
 		IWorkspace[] workspaces = PopulateWorkspaces(ctx, rootSector);
 
-		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup });
+		SetupMultipleMonitors(internalCtx, [RightMonitorSetup, LeftTopMonitorSetup]);
 		ctx.Store.Dispatch(new MonitorsChangedTransform());
 
 		// When a monitor is added
 		Setup_TryEnqueue(internalCtx);
-		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup });
+		SetupMultipleMonitors(internalCtx, [RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup]);
 
 		// Then the resulting event will have a monitor added
 		var raisedEvent = DispatchTransformEvent(
@@ -240,14 +249,14 @@ public class MonitorsChangedTransformTests
 		Setup_TryEnqueue(internalCtx);
 		IWorkspace[] workspaces = PopulateWorkspaces(ctx, rootSector);
 
-		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup });
+		SetupMultipleMonitors(internalCtx, [RightMonitorSetup, LeftTopMonitorSetup]);
 		ctx.Store.Dispatch(new MonitorsChangedTransform());
 
 		// When a monitor is added, and the new monitor changes to become the primary monitor
 		Setup_TryEnqueue(internalCtx);
 		SetupMultipleMonitors(
 			internalCtx,
-			new[] { RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup },
+			[RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup],
 			LeftBottomMonitorSetup.Handle
 		);
 
@@ -284,7 +293,7 @@ public class MonitorsChangedTransformTests
 		IWorkspace[] workspaces = PopulateWorkspaces(ctx, rootSector);
 
 		// When we add monitors
-		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup });
+		SetupMultipleMonitors(internalCtx, [RightMonitorSetup, LeftTopMonitorSetup]);
 		var raisedEvent = DispatchTransformEvent(ctx, rootSector, [workspaces[0].Id, workspaces[1].Id]);
 
 		// Then the resulting event will have a monitor added, and the other monitors in the sector will be set.
@@ -312,7 +321,7 @@ public class MonitorsChangedTransformTests
 		IWorkspace[] workspaces = SetupAddWorkspaces(ctx, rootSector);
 
 		// When we add monitors
-		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup });
+		SetupMultipleMonitors(internalCtx, [RightMonitorSetup, LeftTopMonitorSetup]);
 		var raisedEvent = DispatchTransformEvent(ctx, rootSector, [workspaces[0].Id, workspaces[1].Id]);
 
 		// Then the resulting event will have a monitor added, and the other monitors in the sector will be set.
@@ -336,7 +345,7 @@ public class MonitorsChangedTransformTests
 		Setup_TryEnqueue(internalCtx);
 		IWorkspace[] workspaces = PopulateWorkspaces(ctx, rootSector);
 
-		SetupMultipleMonitors(internalCtx, new[] { RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup });
+		SetupMultipleMonitors(internalCtx, [RightMonitorSetup, LeftTopMonitorSetup, LeftBottomMonitorSetup]);
 
 		// When we dispatch the same transform twice, the first from a clean store
 		ctx.Store.Dispatch(new MonitorsChangedTransform());
