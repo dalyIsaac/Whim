@@ -153,11 +153,21 @@ public class MoveWindowToWorkspaceTransformTests
 			ctx.GetTransforms(),
 			t =>
 				(t as RemoveWindowFromWorkspaceTransform)
-				== new RemoveWindowFromWorkspaceTransform(workspace1.Id, window)
+				== new RemoveWindowFromWorkspaceTransform(workspace1.Id, window) { SkipDoLayout = true }
 		);
 		Assert.Contains(
 			ctx.GetTransforms(),
-			t => (t as AddWindowToWorkspaceTransform) == new AddWindowToWorkspaceTransform(workspace2.Id, window)
+			t =>
+				(t as AddWindowToWorkspaceTransform)
+				== new AddWindowToWorkspaceTransform(workspace2.Id, window) { SkipDoLayout = true }
+		);
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t => (t as DoWorkspaceLayoutTransform) == new DoWorkspaceLayoutTransform(workspace1.Id)
+		);
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t => (t as DoWorkspaceLayoutTransform) == new DoWorkspaceLayoutTransform(workspace2.Id)
 		);
 
 		window.Received().Focus();
@@ -190,11 +200,17 @@ public class MoveWindowToWorkspaceTransformTests
 			ctx.GetTransforms(),
 			t =>
 				(t as RemoveWindowFromWorkspaceTransform)
-				== new RemoveWindowFromWorkspaceTransform(workspace1.Id, window)
+				== new RemoveWindowFromWorkspaceTransform(workspace1.Id, window) { SkipDoLayout = true }
 		);
 		Assert.Contains(
 			ctx.GetTransforms(),
-			t => (t as AddWindowToWorkspaceTransform) == new AddWindowToWorkspaceTransform(workspace2.Id, window)
+			t =>
+				(t as AddWindowToWorkspaceTransform)
+				== new AddWindowToWorkspaceTransform(workspace2.Id, window) { SkipDoLayout = true }
+		);
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t => (t as ActivateWorkspaceTransform) == new ActivateWorkspaceTransform(workspace2.Id)
 		);
 
 		Assert.Single(evs);
