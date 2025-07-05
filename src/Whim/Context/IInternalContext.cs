@@ -11,8 +11,6 @@ internal interface IInternalContext
 
 	IWindowMessageMonitor WindowMessageMonitor { get; }
 
-	IInternalMonitorManager MonitorManager { get; }
-
 	IKeybindHook KeybindHook { get; }
 
 	IMouseHook MouseHook { get; }
