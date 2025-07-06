@@ -36,48 +36,6 @@ public class CommandPaletteCommandsTests
 		public static InterceptConfig<TConfig> Create(ICommandPalettePlugin plugin) => new(plugin);
 	}
 
-	private class Wrapper
-	{
-		public IContext Context { get; }
-		public IWorkspace Workspace { get; }
-		public IWorkspace OtherWorkspace { get; }
-		public ICommandPalettePlugin Plugin { get; }
-		public IWindow[] Windows { get; }
-		public CommandPaletteCommands Commands { get; }
-
-		public Wrapper()
-		{
-			Context = Substitute.For<IContext>();
-
-			Workspace = Substitute.For<IWorkspace>();
-			Workspace.Name.Returns("Workspace");
-
-			OtherWorkspace = Substitute.For<IWorkspace>();
-			OtherWorkspace.Name.Returns("Other workspace");
-
-			Context.WorkspaceManager.ActiveWorkspace.Returns(Workspace);
-			Context
-				.WorkspaceManager.GetEnumerator()
-				.Returns(_ => new List<IWorkspace> { Workspace, OtherWorkspace }.GetEnumerator());
-
-			Plugin = Substitute.For<ICommandPalettePlugin>();
-			Plugin.Name.Returns("whim.command_palette");
-
-			Windows = new IWindow[3];
-			Windows[0] = Substitute.For<IWindow>();
-			Windows[0].Title.Returns("Window 0");
-			Windows[1] = Substitute.For<IWindow>();
-			Windows[1].Title.Returns("Window 1");
-			Windows[2] = Substitute.For<IWindow>();
-			Windows[2].Title.Returns("Window 2");
-
-			Workspace.Windows.Returns(_ => [Windows[0], Windows[1]]);
-			OtherWorkspace.Windows.Returns(_ => [Windows[2]]);
-
-			Commands = new(Context, Plugin);
-		}
-	}
-
 	private record WorkspaceWindowState(Workspace ActiveWorkspace, Workspace OtherWorkspace, IWindow[] Windows);
 
 	private static WorkspaceWindowState SetupWorkspaces(
@@ -136,18 +94,17 @@ public class CommandPaletteCommandsTests
 		);
 	}
 
-	[Fact]
-	public void ToggleCommandPalette()
+	[Theory, AutoSubstituteData<Customization>]
+	internal void ToggleCommandPalette(ICommandPalettePlugin plugin, CommandPaletteCommands commands)
 	{
 		// Given
-		Wrapper wrapper = new();
-		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand("whim.command_palette.toggle");
+		ICommand command = new PluginCommandsTestUtils(commands).GetCommand("whim.command_palette.toggle");
 
 		// When
 		command.TryExecute();
 
 		// Then
-		wrapper.Plugin.Received(1).Toggle();
+		plugin.Received(1).Toggle();
 	}
 
 	[Theory, AutoSubstituteData<Customization>]
@@ -259,62 +216,77 @@ public class CommandPaletteCommandsTests
 		options.Should().OnlyContain(x => !x.IsSelected);
 	}
 
-	[Fact]
-	public void MoveMultipleWindowsToWorkspaceCreator()
+	[Theory, AutoSubstituteData<Customization>]
+	internal void MoveMultipleWindowsToWorkspaceCreator(
+		IContext ctx,
+		MutableRootSector root,
+		ICommandPalettePlugin plugin
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
+		WorkspaceWindowState state = SetupWorkspaces(ctx, root, plugin);
+		CommandPaletteCommands commands = new(ctx, plugin);
+		ICommand command = commands.MoveMultipleWindowsToWorkspaceCreator(state.Windows, state.OtherWorkspace);
 
 		// When
-		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
-		ICommand command = commands.MoveMultipleWindowsToWorkspaceCreator(wrapper.Windows, wrapper.Workspace);
+		command.TryExecute();
 
 		// Then
-		command.TryExecute();
-		wrapper.Context.Butler.Received(1).MoveWindowToWorkspace(wrapper.Workspace, wrapper.Windows[0]);
-		wrapper.Context.Butler.Received(1).MoveWindowToWorkspace(wrapper.Workspace, wrapper.Windows[1]);
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t =>
+				(t as MoveWindowToWorkspaceTransform)
+				== new MoveWindowToWorkspaceTransform(state.OtherWorkspace.Id, state.Windows[0].Handle)
+		);
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t =>
+				(t as MoveWindowToWorkspaceTransform)
+				== new MoveWindowToWorkspaceTransform(state.OtherWorkspace.Id, state.Windows[1].Handle)
+		);
 	}
 
-	[Fact]
-	public void MoveMultipleWindowsToWorkspaceCallback()
+	[Theory, AutoSubstituteData<Customization>]
+	internal void MoveMultipleWindowsToWorkspaceCallback(
+		IContext ctx,
+		MutableRootSector root,
+		ICommandPalettePlugin plugin,
+		CommandPaletteCommands commands
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
 		List<SelectOption> options =
 		[
 			new SelectOption
 			{
 				Id = "0",
-				Title = "Window 0",
+				Title = "Window 1",
 				IsSelected = true,
 			},
 			new SelectOption
 			{
 				Id = "1",
-				Title = "Window 1",
+				Title = "Window 2",
 				IsSelected = false,
 			},
 			new SelectOption
 			{
 				Id = "2",
-				Title = "Window 2",
+				Title = "Window 3",
 				IsSelected = true,
 			},
 		];
+		InterceptConfig<MenuVariantConfig> wrapper = InterceptConfig<MenuVariantConfig>.Create(plugin);
+		SetupWorkspaces(ctx, root, plugin);
 
 		// When
-		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
 		commands.MoveMultipleWindowsToWorkspaceCallback(options);
 
 		// Then
 		string[] expectedWorkspaces = ["Workspace", "Other workspace"];
-		wrapper
-			.Plugin.Received(1)
-			.Activate(
-				Arg.Is<MenuVariantConfig>(c =>
-					c.Hint == "Select workspace" && c.Commands.Select(c => c.Title).SequenceEqual(expectedWorkspaces)
-				)
-			);
+		Assert.Equal("Select workspace", wrapper.Config.Hint);
+		Assert.Equal(2, wrapper.Config.Commands.Count());
+		wrapper.Config.Commands.Select(c => c.Title).Should().Equal(expectedWorkspaces);
 	}
 
 	[Theory, AutoSubstituteData<Customization>]
@@ -338,7 +310,7 @@ public class CommandPaletteCommandsTests
 		// Then
 		Assert.Equal("Select windows", interceptor.Config.Hint);
 		Assert.Equal(3, interceptor.Config.Options.Count());
-		interceptor.Config.Options.Select(o => o.Title).Should().BeEquivalentTo(["Window 1", "Window 2", "Window 3"]);
+		interceptor.Config.Options.Select(o => o.Title).Should().Equal(["Window 1", "Window 2", "Window 3"]);
 	}
 
 	[Theory, AutoSubstituteData<Customization>]
