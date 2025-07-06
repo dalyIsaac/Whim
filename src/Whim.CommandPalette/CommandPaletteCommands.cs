@@ -179,20 +179,20 @@ public class CommandPaletteCommands : PluginCommands
 	public SelectOption[] CreateMoveWindowsToWorkspaceOptions()
 	{
 		// All the windows in all the workspaces.
-		IEnumerable<IWindow> windows = _ctx
-			.WorkspaceManager.Select(w => w.Windows)
-			.SelectMany(w => w)
-			.OrderBy(w => w.Title);
-
-		return windows
-			.Select(w => new SelectOption()
-			{
-				Id = $"{PluginName}.move_multiple_windows_to_workspace.{w.Title}",
-				Title = w.Title,
-				IsEnabled = true,
-				IsSelected = false,
-			})
-			.ToArray();
+		return
+		[
+			.. _ctx
+				.Store.Pick(Pickers.PickAllWindows())
+				.OrderBy(w => w.Title)
+				.Select(w => new SelectOption()
+				{
+					Id = $"{PluginName}.move_multiple_windows_to_workspace.{w.Title}",
+					Title = w.Title,
+					IsEnabled = true,
+					IsSelected = false,
+				}),
+		];
+		;
 	}
 
 	/// <summary>

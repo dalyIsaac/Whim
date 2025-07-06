@@ -236,21 +236,25 @@ public class CommandPaletteCommandsTests
 		);
 	}
 
-	[Fact]
-	public void CreateMoveWindowsToWorkspaceOptions()
+	[Theory, AutoSubstituteData<Customization>]
+	internal void CreateMoveWindowsToWorkspaceOptions(
+		IContext ctx,
+		MutableRootSector root,
+		ICommandPalettePlugin plugin,
+		CommandPaletteCommands commands
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
+		SetupWorkspaces(ctx, root, plugin);
 
 		// When
-		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
 		SelectOption[] options = commands.CreateMoveWindowsToWorkspaceOptions();
 
 		// Then
 		Assert.Equal(3, options.Length);
-		Assert.Equal("Window 0", options[0].Title);
-		Assert.Equal("Window 1", options[1].Title);
-		Assert.Equal("Window 2", options[2].Title);
+		Assert.Equal("Window 1", options[0].Title);
+		Assert.Equal("Window 2", options[1].Title);
+		Assert.Equal("Window 3", options[2].Title);
 		options.Should().OnlyContain(x => x.IsEnabled);
 		options.Should().OnlyContain(x => !x.IsSelected);
 	}
@@ -313,27 +317,28 @@ public class CommandPaletteCommandsTests
 			);
 	}
 
-	[Fact]
-	public void MoveMultipleWindowsToWorkspace()
+	[Theory, AutoSubstituteData<Customization>]
+	internal void MoveMultipleWindowsToWorkspace(
+		IContext ctx,
+		MutableRootSector root,
+		ICommandPalettePlugin plugin,
+		CommandPaletteCommands commands
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
+		SetupWorkspaces(ctx, root, plugin);
+		ICommand command = new PluginCommandsTestUtils(commands).GetCommand(
 			"whim.command_palette.move_multiple_windows_to_workspace"
 		);
+		InterceptConfig<SelectVariantConfig> interceptor = InterceptConfig<SelectVariantConfig>.Create(plugin);
 
 		// When
 		command.TryExecute();
 
 		// Then
-		wrapper
-			.Plugin.Received(1)
-			.Activate(
-				Arg.Is<SelectVariantConfig>(c =>
-					c.Hint == "Select windows"
-					&& c.Options.Select(y => y.Title).SequenceEqual(new[] { "Window 0", "Window 1", "Window 2" })
-				)
-			);
+		Assert.Equal("Select windows", interceptor.Config.Hint);
+		Assert.Equal(3, interceptor.Config.Options.Count());
+		interceptor.Config.Options.Select(o => o.Title).Should().BeEquivalentTo(["Window 1", "Window 2", "Window 3"]);
 	}
 
 	[Theory, AutoSubstituteData<Customization>]
