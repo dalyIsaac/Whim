@@ -2,6 +2,7 @@ using AutoFixture;
 using FluentAssertions;
 using NSubstitute;
 using Whim.TestUtils;
+using Windows.Win32.Foundation;
 using Xunit;
 using static Whim.TestUtils.StoreTestUtils;
 
@@ -77,7 +78,9 @@ public class CommandPaletteCommandsTests
 		}
 	}
 
-	private static (IWorkspace, IWorkspace) SetupWorkspaces(
+	private record WorkspaceWindowState(Workspace ActiveWorkspace, Workspace OtherWorkspace, IWindow[] Windows);
+
+	private static WorkspaceWindowState SetupWorkspaces(
 		IContext ctx,
 		MutableRootSector root,
 		ICommandPalettePlugin plugin
@@ -86,10 +89,24 @@ public class CommandPaletteCommandsTests
 		Workspace activeWorkspace = StoreTestUtils.CreateWorkspace(ctx) with { BackingName = "Workspace" };
 		Workspace otherWorkspace = StoreTestUtils.CreateWorkspace(ctx) with { BackingName = "Other workspace" };
 
-		AddWorkspacesToManager(ctx, root, activeWorkspace, otherWorkspace);
+		// Create windows for the workspaces.
+		IWindow[] windows = new IWindow[3];
+		windows[0] = CreateWindow(new HWND(1));
+		windows[0].Title.Returns("Window 1");
+
+		windows[1] = CreateWindow(new HWND(2));
+		windows[1].Title.Returns("Window 2");
+
+		windows[2] = CreateWindow(new HWND(3));
+		windows[2].Title.Returns("Window 3");
+
+		activeWorkspace = PopulateWindowWorkspaceMap(ctx, root, windows[0], activeWorkspace);
+		activeWorkspace = PopulateWindowWorkspaceMap(ctx, root, windows[1], activeWorkspace);
+		otherWorkspace = PopulateWindowWorkspaceMap(ctx, root, windows[2], otherWorkspace);
+
 		AddActiveWorkspace(ctx, root, activeWorkspace);
 
-		return (activeWorkspace, otherWorkspace);
+		return new WorkspaceWindowState(activeWorkspace, otherWorkspace, windows);
 	}
 
 	[Theory, AutoSubstituteData<Customization>]
@@ -104,7 +121,7 @@ public class CommandPaletteCommandsTests
 		ICommand command = new PluginCommandsTestUtils(commands).GetCommand("whim.command_palette.activate_workspace");
 		InterceptConfig<MenuVariantConfig> interceptor = InterceptConfig<MenuVariantConfig>.Create(plugin);
 
-		(_, IWorkspace otherWorkspace) = SetupWorkspaces(ctx, root, plugin);
+		WorkspaceWindowState state = SetupWorkspaces(ctx, root, plugin);
 
 		command.TryExecute();
 
@@ -115,7 +132,7 @@ public class CommandPaletteCommandsTests
 		// Verify that the workspace was activated.
 		Assert.Contains(
 			ctx.GetTransforms(),
-			t => (t as ActivateWorkspaceTransform) == new ActivateWorkspaceTransform(otherWorkspace.Id)
+			t => (t as ActivateWorkspaceTransform) == new ActivateWorkspaceTransform(state.OtherWorkspace.Id)
 		);
 	}
 
@@ -145,7 +162,7 @@ public class CommandPaletteCommandsTests
 		ICommand command = new PluginCommandsTestUtils(commands).GetCommand("whim.command_palette.rename_workspace");
 		InterceptConfig<FreeTextVariantConfig> interceptor = InterceptConfig<FreeTextVariantConfig>.Create(plugin);
 
-		(IWorkspace activeWorkspace, _) = SetupWorkspaces(ctx, root, plugin);
+		SetupWorkspaces(ctx, root, plugin);
 
 		command.TryExecute();
 
@@ -176,7 +193,7 @@ public class CommandPaletteCommandsTests
 		ICommand command = new PluginCommandsTestUtils(commands).GetCommand("whim.command_palette.create_workspace");
 		InterceptConfig<FreeTextVariantConfig> interceptor = InterceptConfig<FreeTextVariantConfig>.Create(plugin);
 
-		(IWorkspace activeWorkspace, _) = SetupWorkspaces(ctx, root, plugin);
+		WorkspaceWindowState state = SetupWorkspaces(ctx, root, plugin);
 
 		command.TryExecute();
 
@@ -203,7 +220,7 @@ public class CommandPaletteCommandsTests
 			"whim.command_palette.move_window_to_workspace"
 		);
 		InterceptConfig<MenuVariantConfig> interceptor = InterceptConfig<MenuVariantConfig>.Create(plugin);
-		(IWorkspace activeWorkspace, IWorkspace otherWorkspace) = SetupWorkspaces(ctx, root, plugin);
+		WorkspaceWindowState state = SetupWorkspaces(ctx, root, plugin);
 
 		// When
 		command.TryExecute();
@@ -215,7 +232,7 @@ public class CommandPaletteCommandsTests
 		// Verify that MoveWindowToWorkspace was called with the workspace.
 		Assert.Contains(
 			ctx.GetTransforms(),
-			t => (t as MoveWindowToWorkspaceTransform) == new MoveWindowToWorkspaceTransform(otherWorkspace.Id)
+			t => (t as MoveWindowToWorkspaceTransform) == new MoveWindowToWorkspaceTransform(state.OtherWorkspace.Id)
 		);
 	}
 
@@ -319,44 +336,33 @@ public class CommandPaletteCommandsTests
 			);
 	}
 
-	[Fact]
-	public void RemoveWindow()
+	[Theory, AutoSubstituteData<Customization>]
+	internal void RemoveWindow(
+		IContext ctx,
+		MutableRootSector mutableRootSector,
+		ICommandPalettePlugin plugin,
+		CommandPaletteCommands commands
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
-			"whim.command_palette.remove_window"
+		ICommand command = new PluginCommandsTestUtils(commands).GetCommand("whim.command_palette.remove_window");
+		InterceptConfig<MenuVariantConfig> interceptor = InterceptConfig<MenuVariantConfig>.Create(plugin);
+		WorkspaceWindowState state = SetupWorkspaces(ctx, mutableRootSector, plugin);
+
+		// When
+		command.TryExecute();
+
+		// Call the callback.
+		ICommand removeWindowCommand = interceptor.Config!.Commands.First();
+		removeWindowCommand.TryExecute();
+
+		// Verify that the window was removed from the workspace.
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t =>
+				(t as RemoveWindowFromWorkspaceTransform)
+				== new RemoveWindowFromWorkspaceTransform(state.ActiveWorkspace.Id, state.Windows[0])
 		);
-
-		// When
-		command.TryExecute();
-
-		// Then
-		wrapper
-			.Plugin.Received(1)
-			.Activate(
-				Arg.Is<MenuVariantConfig>(c =>
-					c.Hint == "Select window"
-					&& c.ConfirmButtonText == "Remove"
-					&& c.Commands.Select(c => c.Title).SequenceEqual(new[] { "Window 0", "Window 1" })
-				)
-			);
-	}
-
-	[Fact]
-	public void RemoveWindowCommandCreator()
-	{
-		// Given
-		Wrapper wrapper = new();
-		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
-
-		// When
-		ICommand command = commands.RemoveWindowCommandCreator(wrapper.Windows[0]);
-		command.TryExecute();
-
-		// Then
-		wrapper.Workspace.Received(1).RemoveWindow(wrapper.Windows[0]);
-		wrapper.Workspace.Received(1).DoLayout();
 	}
 
 	[Fact]

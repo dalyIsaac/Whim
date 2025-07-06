@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.UI.Xaml;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim.CommandPalette;
@@ -98,16 +99,34 @@ public class CommandPaletteCommands : PluginCommands
 				identifier: "remove_window",
 				title: "Select window to remove from Whim",
 				callback: () =>
+				{
+					Guid activeWorkspaceId = _ctx.Store.Pick(Pickers.PickActiveWorkspaceId());
+					Result<IEnumerable<IWindow>> windowsResult = _ctx.Store.Pick(
+						Pickers.PickWorkspaceWindows(activeWorkspaceId)
+					);
+					if (!windowsResult.TryGet(out IEnumerable<IWindow> windows))
+					{
+						return;
+					}
+
+					IEnumerable<Command> selectWindowCommands = windows
+						.OrderBy(w => w.Title)
+						.Select(w => new Command(
+							identifier: $"{PluginName}.remove_window.{w.Title}",
+							title: w.Title,
+							callback: () =>
+								_ctx.Store.Dispatch(new RemoveWindowFromWorkspaceTransform(activeWorkspaceId, w))
+						));
+
 					_commandPalettePlugin.Activate(
 						new MenuVariantConfig()
 						{
 							Hint = "Select window",
-							Commands = _ctx.WorkspaceManager.ActiveWorkspace.Windows.Select(w =>
-								RemoveWindowCommandCreator(w)
-							),
+							Commands = selectWindowCommands,
 							ConfirmButtonText = "Remove",
 						}
-					)
+					);
+				}
 			)
 			.Add(
 				identifier: "find_focus_window",
@@ -223,28 +242,6 @@ public class CommandPaletteCommands : PluginCommands
 			identifier: $"{PluginName}.move_window_to_workspace.{workspace.BackingName}",
 			title: $"Move window to workspace \"{workspace.BackingName}\"",
 			callback: () => _ctx.Store.Dispatch(new MoveWindowToWorkspaceTransform(workspace.Id))
-		);
-
-	/// <summary>
-	/// Untrack window command creator.
-	/// </summary>
-	/// <remarks>
-	/// Creates a command to remove a window from the active workspace. This is useful as Whim can
-	/// sometimes not realise that a window has been closed in niche cases.
-	/// For example, when waking/closing from sleep.
-	/// </remarks>
-	/// <param name="window">The window to untrack.</param>
-	/// <returns>The untrack window command.</returns>
-	internal ICommand RemoveWindowCommandCreator(IWindow window) =>
-		new Command(
-			identifier: $"{PluginName}.remove_window.{window.Title}",
-			title: window.Title,
-			callback: () =>
-			{
-				IWorkspace workspace = _ctx.WorkspaceManager.ActiveWorkspace;
-				workspace.RemoveWindow(window);
-				workspace.DoLayout();
-			}
 		);
 
 	/// <summary>
