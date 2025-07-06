@@ -55,7 +55,7 @@ public class CommandPaletteCommands : PluginCommands
 					_commandPalettePlugin.Activate(
 						new FreeTextVariantConfig()
 						{
-							Callback = (name) => _ctx.WorkspaceManager.Add(name),
+							Callback = (name) => _ctx.Store.Dispatch(new AddWorkspaceTransform(name)),
 							Hint = "Enter new workspace name",
 							Prompt = "Create workspace",
 						}

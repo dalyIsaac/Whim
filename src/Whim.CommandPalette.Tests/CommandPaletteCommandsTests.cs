@@ -164,28 +164,30 @@ public class CommandPaletteCommandsTests
 		);
 	}
 
-	[Fact]
-	public void CreateWorkspace()
+	[Theory, AutoSubstituteData<Customization>]
+	internal void CreateWorkspace(
+		IContext ctx,
+		MutableRootSector root,
+		ICommandPalettePlugin plugin,
+		CommandPaletteCommands commands
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
-			"whim.command_palette.create_workspace"
-		);
+		ICommand command = new PluginCommandsTestUtils(commands).GetCommand("whim.command_palette.create_workspace");
+		InterceptConfig<FreeTextVariantConfig> interceptor = InterceptConfig<FreeTextVariantConfig>.Create(plugin);
 
-		FreeTextVariantConfig? config = null;
-		wrapper.Plugin.Activate(Arg.Do<FreeTextVariantConfig>(c => config = c));
+		(IWorkspace activeWorkspace, _) = SetupWorkspaces(ctx, root, plugin);
 
 		command.TryExecute();
 
-		// Verify that the plugin was activated.
-		wrapper.Plugin.Activate(Arg.Any<FreeTextVariantConfig>());
-
 		// Call the callback.
-		config!.Callback("New workspace name");
+		interceptor.Config!.Callback("New workspace name");
 
 		// Verify that the workspace was created.
-		wrapper.Context.WorkspaceManager.Received(1).Add("New workspace name");
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t => (t as AddWorkspaceTransform) == new AddWorkspaceTransform("New workspace name")
+		);
 	}
 
 	[Fact]
