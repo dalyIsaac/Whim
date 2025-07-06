@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
@@ -35,9 +36,14 @@ public class CommandPaletteCommands : PluginCommands
 					_commandPalettePlugin.Activate(
 						new FreeTextVariantConfig()
 						{
-							Callback = (text) => _ctx.WorkspaceManager.ActiveWorkspace.Name = text,
+							Callback = (text) =>
+							{
+								Guid activeWorkspaceId = _ctx.Store.Pick(Pickers.PickActiveWorkspaceId());
+								_ctx.Store.Dispatch(new SetWorkspaceNameTransform(activeWorkspaceId, text));
+							},
 							Hint = "Enter new workspace name",
-							InitialText = _ctx.WorkspaceManager.ActiveWorkspace.Name,
+
+							InitialText = _ctx.Store.Pick(Pickers.PickActiveWorkspace()).BackingName,
 							Prompt = "Rename workspace",
 						}
 					)

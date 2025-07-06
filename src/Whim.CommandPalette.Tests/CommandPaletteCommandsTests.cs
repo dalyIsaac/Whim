@@ -133,28 +133,35 @@ public class CommandPaletteCommandsTests
 		wrapper.Plugin.Received(1).Toggle();
 	}
 
-	[Fact]
-	public void RenameWorkspace()
+	[Theory, AutoSubstituteData<Customization>]
+	internal void RenameWorkspace(
+		IContext ctx,
+		MutableRootSector root,
+		ICommandPalettePlugin plugin,
+		CommandPaletteCommands commands
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
-			"whim.command_palette.rename_workspace"
-		);
+		ICommand command = new PluginCommandsTestUtils(commands).GetCommand("whim.command_palette.rename_workspace");
+		InterceptConfig<FreeTextVariantConfig> interceptor = InterceptConfig<FreeTextVariantConfig>.Create(plugin);
 
-		FreeTextVariantConfig? config = null;
-		wrapper.Plugin.Activate(Arg.Do<FreeTextVariantConfig>(c => config = c));
+		(IWorkspace activeWorkspace, _) = SetupWorkspaces(ctx, root, plugin);
 
 		command.TryExecute();
 
 		// Verify that the plugin was activated
-		wrapper.Plugin.Received(1).Activate(Arg.Any<FreeTextVariantConfig>());
+		plugin.Received(1).Activate(Arg.Any<FreeTextVariantConfig>());
 
 		// Call the callback
-		config!.Callback("New workspace name");
+		interceptor.Config!.Callback("New workspace name");
 
 		// Verify that the workspace was renamed
-		wrapper.Context.WorkspaceManager.ActiveWorkspace.Received(1).Name = "New workspace name";
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t =>
+				(t as SetWorkspaceNameTransform)
+				== new SetWorkspaceNameTransform(ctx.Store.Pick(Pickers.PickActiveWorkspaceId()), "New workspace name")
+		);
 	}
 
 	[Fact]
