@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.UI.Xaml;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Whim.CommandPalette;
@@ -137,8 +136,9 @@ public class CommandPaletteCommands : PluginCommands
 						{
 							Hint = "Find window",
 							ConfirmButtonText = "Focus",
+
 							Commands = _ctx
-								.WorkspaceManager.SelectMany(w => w.Windows)
+								.Store.Pick(Pickers.PickAllWindows())
 								.Select(w => FocusWindowCommandCreator(w)),
 						}
 					)
@@ -255,16 +255,16 @@ public class CommandPaletteCommands : PluginCommands
 			title: window.Title,
 			callback: () =>
 			{
-				IWorkspace? workspace = _ctx.Butler.Pantry.GetWorkspaceForWindow(window);
+				IWorkspace? workspace = _ctx.Store.Pick(Pickers.PickWorkspaceByWindow(window.Handle)).ValueOrDefault;
 				if (workspace == null)
 				{
 					return;
 				}
 
-				if (_ctx.Butler.Pantry.GetMonitorForWorkspace(workspace) is null)
+				if (_ctx.Store.Pick(Pickers.PickMonitorByWorkspace(workspace.Id)).ValueOrDefault is null)
 				{
 					// The workspace is not active, and is not visible.
-					_ctx.Butler.Activate(workspace);
+					_ctx.Store.Dispatch(new ActivateWorkspaceTransform(workspace.Id));
 				}
 
 				FocusWindow(window);

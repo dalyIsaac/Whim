@@ -365,63 +365,83 @@ public class CommandPaletteCommandsTests
 		);
 	}
 
-	[Fact]
-	public void FindFocusWindow()
+	[Theory, AutoSubstituteData<Customization>]
+	internal void FindFocusWindow(
+		IContext ctx,
+		MutableRootSector root,
+		ICommandPalettePlugin plugin,
+		CommandPaletteCommands commands
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
-			"whim.command_palette.find_focus_window"
-		);
+		ICommand command = new PluginCommandsTestUtils(commands).GetCommand("whim.command_palette.find_focus_window");
+		InterceptConfig<MenuVariantConfig> wrapper = InterceptConfig<MenuVariantConfig>.Create(plugin);
+		WorkspaceWindowState state = SetupWorkspaces(ctx, root, plugin);
 
 		// When
 		command.TryExecute();
 
+		// Call the callback.
+		ICommand findFocusWindowCommand = wrapper.Config!.Commands.First();
+		findFocusWindowCommand.TryExecute();
+
 		// Then
-		wrapper
-			.Plugin.Received(1)
+		plugin
+			.Received(1)
 			.Activate(
 				Arg.Is<MenuVariantConfig>(c =>
 					c.Hint == "Find window"
 					&& c.ConfirmButtonText == "Focus"
-					&& c.Commands.Select(c => c.Title).SequenceEqual(new[] { "Window 0", "Window 1", "Window 2" })
+					&& c.Commands.Select(c => c.Title).SequenceEqual(state.Windows.Select(w => w.Title))
 				)
 			);
 	}
 
-	[Fact]
-	public void FocusWindowCommandCreator_CannotFindWorkspace()
+	[Theory, AutoSubstituteData<Customization>]
+	internal void FocusWindowCommandCreator_CannotFindWorkspace(
+		IContext ctx,
+		MutableRootSector root,
+		ICommandPalettePlugin plugin,
+		CommandPaletteCommands commands
+	)
 	{
 		// Given the window is not in a workspace.
-		Wrapper wrapper = new();
-		IWindow window = wrapper.Windows[0];
-		wrapper.Context.Butler.Pantry.GetWorkspaceForWindow(window).Returns((IWorkspace?)null);
-
-		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
+		WorkspaceWindowState state = SetupWorkspaces(ctx, root, plugin);
+		IWindow window = CreateWindow(new HWND(99));
 
 		// When the command is executed.
 		ICommand command = commands.FocusWindowCommandCreator(window);
 		command.TryExecute();
 
 		// Then the window is not focused.
-		wrapper.Workspace.DidNotReceive().DoLayout();
+		Assert.DoesNotContain(
+			ctx.GetTransforms(),
+			t => (t as DoWorkspaceLayoutTransform) == new DoWorkspaceLayoutTransform(state.ActiveWorkspace.Id)
+		);
+		window.DidNotReceive().Restore();
 		window.DidNotReceive().Focus();
 	}
 
 	[Theory]
-	[InlineAutoSubstituteData(false, 0, 1)]
-	[InlineAutoSubstituteData(true, 1, 1)]
-	public void FocusWindowCommandCreator_WorkspaceIsVisible(bool isMinimized, int restoredCount, int focusedCount)
+	[InlineAutoSubstituteData<Customization>(false, 0, 1)]
+	[InlineAutoSubstituteData<Customization>(true, 1, 1)]
+	internal void FocusWindowCommandCreator_WorkspaceIsVisible(
+		bool isMinimized,
+		int restoredCount,
+		int focusedCount,
+		IContext ctx,
+		MutableRootSector root,
+		ICommandPalettePlugin plugin,
+		CommandPaletteCommands commands
+	)
 	{
 		// Given the window is in a workspace.
-		Wrapper wrapper = new();
-		IWindow window = wrapper.Windows[0];
-		wrapper.Context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(wrapper.Workspace);
-		wrapper.Context.Butler.Pantry.GetMonitorForWorkspace(wrapper.Workspace).Returns(Substitute.For<IMonitor>());
+		WorkspaceWindowState state = SetupWorkspaces(ctx, root, plugin);
 
+		IWindow window = state.Windows[0];
 		window.IsMinimized.Returns(isMinimized);
 
-		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
+		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor(), state.ActiveWorkspace);
 
 		// When the command is executed.
 		ICommand command = commands.FocusWindowCommandCreator(window);
@@ -433,19 +453,24 @@ public class CommandPaletteCommandsTests
 	}
 
 	[Theory]
-	[InlineAutoSubstituteData(false, 0, 1)]
-	[InlineAutoSubstituteData(true, 1, 1)]
-	public void FocusWindowCommandCreator_WorkspaceIsNotVisible(bool isMinimized, int restoredCount, int focusedCount)
+	[InlineAutoSubstituteData<Customization>(false, 0, 1)]
+	[InlineAutoSubstituteData<Customization>(true, 1, 1)]
+	internal void FocusWindowCommandCreator_WorkspaceIsNotVisible(
+		bool isMinimized,
+		int restoredCount,
+		int focusedCount,
+		IContext ctx,
+		MutableRootSector root,
+		ICommandPalettePlugin plugin,
+		CommandPaletteCommands commands
+	)
 	{
 		// Given the window is in a workspace.
-		Wrapper wrapper = new();
-		IWindow window = wrapper.Windows[0];
-		wrapper.Context.Butler.Pantry.GetWorkspaceForWindow(window).Returns(wrapper.Workspace);
-		wrapper.Context.Butler.Pantry.GetMonitorForWorkspace(wrapper.Workspace).Returns((IMonitor?)null);
+		WorkspaceWindowState state = SetupWorkspaces(ctx, root, plugin);
 
+		// Get the window from the not visible workspace (the third window, which is in the other workspace).
+		IWindow window = state.Windows[2];
 		window.IsMinimized.Returns(isMinimized);
-
-		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
 
 		// When the command is executed.
 		ICommand command = commands.FocusWindowCommandCreator(window);
