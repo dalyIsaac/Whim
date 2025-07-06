@@ -35,7 +35,8 @@ internal sealed partial class CommandPaletteWindow : Microsoft.UI.Xaml.Window, I
 	{
 		Logger.Debug("Hiding command palette");
 		_window.Hide();
-		_context.WorkspaceManager.ActiveWorkspace.FocusLastFocusedWindow();
+		Guid activeWorkspaceId = _context.Store.Pick(Pickers.PickActiveWorkspaceId());
+		_context.Store.Dispatch(new FocusWorkspaceTransform(activeWorkspaceId));
 	}
 
 	private void ViewModel_FocusTextBoxRequested(object? sender, EventArgs e)

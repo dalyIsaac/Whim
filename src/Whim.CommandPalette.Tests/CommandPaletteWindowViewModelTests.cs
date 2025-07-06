@@ -1,3 +1,4 @@
+using AutoFixture;
 using Microsoft.UI.Xaml;
 using NSubstitute;
 using Whim.TestUtils;
@@ -8,74 +9,59 @@ namespace Whim.CommandPalette.Tests;
 
 public record UnknownConfig : BaseVariantConfig { }
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class CommandPaletteWindowViewModelTests
 {
-	private class Wrapper
+	private class Customization : StoreCustomization
 	{
-		public IContext Context { get; } = Substitute.For<IContext>();
-		public CommandPalettePlugin Plugin { get; }
-		public IVariantControl MenuVariant { get; } = Substitute.For<IVariantControl>();
-		public IVariantControl FreeTextVariant { get; } = Substitute.For<IVariantControl>();
-		public IVariantControl SelectVariant { get; } = Substitute.For<IVariantControl>();
-		public IVariantViewModel VariantViewModel { get; } = Substitute.For<IVariantViewModel>();
-
-		public Wrapper()
+		protected override void PostCustomize(IFixture fixture)
 		{
-			IMonitor monitor = Substitute.For<IMonitor>();
-			monitor.WorkingArea.Returns(new Rectangle<int>() { Height = 1080, Width = 1920 });
+			IMonitor monitor = StoreTestUtils.CreateMonitor();
+			fixture.Inject(monitor);
 
-			Context.MonitorManager.ActiveMonitor.Returns(monitor);
+			StoreTestUtils.AddMonitorsToManager(_ctx, _store._root.MutableRootSector, monitor);
 
-			Plugin = new(Context, new CommandPaletteConfig(Context));
+			fixture.Inject(new CommandPalettePlugin(_ctx, new CommandPaletteConfig(_ctx)));
+
+			IVariantViewModel variantViewModel = Substitute.For<IVariantViewModel>();
+			variantViewModel.ConfirmButtonText.Returns("Save");
+			fixture.Inject(variantViewModel);
 
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-			MenuVariant.Control.Returns((UIElement)null);
-			MenuVariant.ViewModel.Returns(VariantViewModel);
+			IVariantControl menuVariant = Substitute.For<IVariantControl>();
+			menuVariant.Control.Returns((UIElement)null);
+			menuVariant.ViewModel.Returns(variantViewModel);
 
-			FreeTextVariant.Control.Returns((UIElement)null);
-			FreeTextVariant.ViewModel.Returns(VariantViewModel);
+			IVariantControl freeTextVariant = Substitute.For<IVariantControl>();
+			freeTextVariant.Control.Returns((UIElement)null);
+			freeTextVariant.ViewModel.Returns(variantViewModel);
 
-			VariantViewModel.ConfirmButtonText.Returns("Save");
-
-			SelectVariant.Control.Returns((UIElement)null);
-			SelectVariant.ViewModel.Returns(VariantViewModel);
+			IVariantControl selectVariant = Substitute.For<IVariantControl>();
+			selectVariant.Control.Returns((UIElement)null);
+			selectVariant.ViewModel.Returns(variantViewModel);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+			fixture.Inject(
+				new CommandPaletteWindowViewModel(
+					_ctx,
+					fixture.Create<CommandPalettePlugin>(),
+					menuVariant,
+					freeTextVariant,
+					selectVariant
+				)
+			);
 		}
 	}
 
-	[Fact]
-	public void RequestHide()
+	[Theory, AutoSubstituteData<Customization>]
+	internal void RequestHide(CommandPaletteWindowViewModel vm)
 	{
-		// Given
-		Wrapper wrapper = new();
-		CommandPaletteWindowViewModel vm = new(
-			wrapper.Context,
-			wrapper.Plugin,
-			wrapper.MenuVariant,
-			wrapper.FreeTextVariant,
-			wrapper.SelectVariant
-		);
-
-		// When
-		// Then
 		Assert.Raises<EventArgs>(h => vm.HideRequested += h, h => vm.HideRequested -= h, vm.RequestHide);
 	}
 
-	[Fact]
-	public void OnKeyDown_Escape()
+	[Theory, AutoSubstituteData<Customization>]
+	internal void OnKeyDown_Escape(CommandPaletteWindowViewModel vm)
 	{
-		// Given
-		Wrapper wrapper = new();
-		CommandPaletteWindowViewModel vm = new(
-			wrapper.Context,
-			wrapper.Plugin,
-			wrapper.MenuVariant,
-			wrapper.FreeTextVariant,
-			wrapper.SelectVariant
-		);
-
-		// When
-		// Then
 		Assert.Raises<EventArgs>(
 			h => vm.HideRequested += h,
 			h => vm.HideRequested -= h,
@@ -83,41 +69,22 @@ public class CommandPaletteWindowViewModelTests
 		);
 	}
 
-	[Fact]
-	public void OnKeyDown_OtherKeys()
+	[Theory, AutoSubstituteData<Customization>]
+	internal void OnKeyDown_OtherKeys(CommandPaletteWindowViewModel vm, IVariantViewModel variantViewModel)
 	{
 		// Given
-		Wrapper wrapper = new();
-		CommandPaletteWindowViewModel vm = new(
-			wrapper.Context,
-			wrapper.Plugin,
-			wrapper.MenuVariant,
-			wrapper.FreeTextVariant,
-			wrapper.SelectVariant
-		);
-
 		vm.Activate(new MenuVariantConfig() { Commands = [] }, null);
 
 		// When
 		vm.OnKeyDown(VirtualKey.Space);
 
 		// Then
-		// mocks.VariantViewModel.Verify(x => x.OnKeyDown(VirtualKey.Space), Times.Once);
+		variantViewModel.Received(1).OnKeyDown(VirtualKey.Space);
 	}
 
-	[Fact]
-	public void Activate_UseDefaults()
+	[Theory, AutoSubstituteData<Customization>]
+	internal void Activate_UseDefaults(CommandPaletteWindowViewModel vm)
 	{
-		// Given
-		Wrapper wrapper = new();
-		CommandPaletteWindowViewModel vm = new(
-			wrapper.Context,
-			wrapper.Plugin,
-			wrapper.MenuVariant,
-			wrapper.FreeTextVariant,
-			wrapper.SelectVariant
-		);
-
 		// When
 		Assert.Raises<EventArgs>(
 			h => vm.SetWindowPosRequested += h,
@@ -131,19 +98,10 @@ public class CommandPaletteWindowViewModelTests
 		Assert.Equal((int)(1080 * 0.4), vm.MaxHeight);
 	}
 
-	[Fact]
-	public void Activate_DefineItems()
+	[Theory, AutoSubstituteData<Customization>]
+	internal void Activate_DefineItems(CommandPaletteWindowViewModel vm)
 	{
 		// Given
-		Wrapper wrapper = new();
-		CommandPaletteWindowViewModel vm = new(
-			wrapper.Context,
-			wrapper.Plugin,
-			wrapper.MenuVariant,
-			wrapper.FreeTextVariant,
-			wrapper.SelectVariant
-		);
-
 		IMonitor monitor = Substitute.For<IMonitor>();
 		monitor.WorkingArea.Returns(
 			new Rectangle<int>()
@@ -204,19 +162,14 @@ public class CommandPaletteWindowViewModelTests
 		};
 
 	[Theory]
-	[MemberAutoSubstituteData(nameof(ActivateData))]
-	public void Activate_Variant(BaseVariantConfig config, bool expected, string confirmButtonText)
+	[MemberAutoSubstituteData<Customization>(nameof(ActivateData))]
+	internal void Activate_Variant(
+		BaseVariantConfig config,
+		bool expected,
+		string confirmButtonText,
+		CommandPaletteWindowViewModel vm
+	)
 	{
-		// Given
-		Wrapper wrapper = new();
-		CommandPaletteWindowViewModel vm = new(
-			wrapper.Context,
-			wrapper.Plugin,
-			wrapper.MenuVariant,
-			wrapper.FreeTextVariant,
-			wrapper.SelectVariant
-		);
-
 		// When
 		vm.Activate(config, null);
 
@@ -225,19 +178,10 @@ public class CommandPaletteWindowViewModelTests
 		Assert.Equal(confirmButtonText, vm.ConfirmButtonText);
 	}
 
-	[Fact]
-	public void Update()
+	[Theory, AutoSubstituteData<Customization>]
+	internal void Update(CommandPaletteWindowViewModel vm, IVariantViewModel variantViewModel)
 	{
 		// Given
-		Wrapper wrapper = new();
-		CommandPaletteWindowViewModel vm = new(
-			wrapper.Context,
-			wrapper.Plugin,
-			wrapper.MenuVariant,
-			wrapper.FreeTextVariant,
-			wrapper.SelectVariant
-		);
-
 		MenuVariantConfig config = new() { Commands = [] };
 
 		vm.Activate(config, null);
@@ -246,22 +190,13 @@ public class CommandPaletteWindowViewModelTests
 		Assert.Raises<EventArgs>(h => vm.SetWindowPosRequested += h, h => vm.SetWindowPosRequested -= h, vm.Update);
 
 		// Then
-		wrapper.VariantViewModel.Received(1).Update();
+		variantViewModel.Received(1).Update();
 	}
 
-	[Fact]
-	public void IsVisible_True()
+	[Theory, AutoSubstituteData<Customization>]
+	internal void IsVisible_True(CommandPaletteWindowViewModel vm)
 	{
 		// Given
-		Wrapper wrapper = new();
-		CommandPaletteWindowViewModel vm = new(
-			wrapper.Context,
-			wrapper.Plugin,
-			wrapper.MenuVariant,
-			wrapper.FreeTextVariant,
-			wrapper.SelectVariant
-		);
-
 		MenuVariantConfig config = new() { Commands = [] };
 
 		vm.Activate(config, null);
@@ -273,19 +208,9 @@ public class CommandPaletteWindowViewModelTests
 		Assert.True(result);
 	}
 
-	[Fact]
-	public void IsVisible_False()
+	[Theory, AutoSubstituteData<Customization>]
+	internal void IsVisible_False(CommandPaletteWindowViewModel vm)
 	{
-		// Given
-		Wrapper wrapper = new();
-		CommandPaletteWindowViewModel vm = new(
-			wrapper.Context,
-			wrapper.Plugin,
-			wrapper.MenuVariant,
-			wrapper.FreeTextVariant,
-			wrapper.SelectVariant
-		);
-
 		// When
 		bool result = vm.IsVisible;
 
@@ -293,19 +218,9 @@ public class CommandPaletteWindowViewModelTests
 		Assert.False(result);
 	}
 
-	[Fact]
-	public void RequestFocusTextBox()
+	[Theory, AutoSubstituteData<Customization>]
+	internal void RequestFocusTextBox(CommandPaletteWindowViewModel vm)
 	{
-		// Given
-		Wrapper wrapper = new();
-		CommandPaletteWindowViewModel vm = new(
-			wrapper.Context,
-			wrapper.Plugin,
-			wrapper.MenuVariant,
-			wrapper.FreeTextVariant,
-			wrapper.SelectVariant
-		);
-
 		// When
 		// Then
 		Assert.Raises<EventArgs>(
