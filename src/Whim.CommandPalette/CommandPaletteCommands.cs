@@ -9,7 +9,7 @@ namespace Whim.CommandPalette;
 /// </summary>
 public class CommandPaletteCommands : PluginCommands
 {
-	private readonly IContext _context;
+	private readonly IContext _ctx;
 	private readonly ICommandPalettePlugin _commandPalettePlugin;
 
 	/// <summary>
@@ -18,7 +18,7 @@ public class CommandPaletteCommands : PluginCommands
 	public CommandPaletteCommands(IContext context, ICommandPalettePlugin commandPalettePlugin)
 		: base(commandPalettePlugin.Name)
 	{
-		_context = context;
+		_ctx = context;
 		_commandPalettePlugin = commandPalettePlugin;
 
 		_ = Add(
@@ -35,9 +35,9 @@ public class CommandPaletteCommands : PluginCommands
 					_commandPalettePlugin.Activate(
 						new FreeTextVariantConfig()
 						{
-							Callback = (text) => _context.WorkspaceManager.ActiveWorkspace.Name = text,
+							Callback = (text) => _ctx.WorkspaceManager.ActiveWorkspace.Name = text,
 							Hint = "Enter new workspace name",
-							InitialText = _context.WorkspaceManager.ActiveWorkspace.Name,
+							InitialText = _ctx.WorkspaceManager.ActiveWorkspace.Name,
 							Prompt = "Rename workspace",
 						}
 					)
@@ -49,7 +49,7 @@ public class CommandPaletteCommands : PluginCommands
 					_commandPalettePlugin.Activate(
 						new FreeTextVariantConfig()
 						{
-							Callback = (name) => _context.WorkspaceManager.Add(name),
+							Callback = (name) => _ctx.WorkspaceManager.Add(name),
 							Hint = "Enter new workspace name",
 							Prompt = "Create workspace",
 						}
@@ -60,9 +60,9 @@ public class CommandPaletteCommands : PluginCommands
 				title: "Move window to workspace",
 				callback: () =>
 				{
-					IWorkspace activeWorkspace = _context.WorkspaceManager.ActiveWorkspace;
+					IWorkspace activeWorkspace = _ctx.WorkspaceManager.ActiveWorkspace;
 					List<ICommand> items = [];
-					foreach (IWorkspace workspace in _context.WorkspaceManager)
+					foreach (IWorkspace workspace in _ctx.WorkspaceManager)
 					{
 						if (workspace != activeWorkspace)
 						{
@@ -96,7 +96,7 @@ public class CommandPaletteCommands : PluginCommands
 						new MenuVariantConfig()
 						{
 							Hint = "Select window",
-							Commands = _context.WorkspaceManager.ActiveWorkspace.Windows.Select(w =>
+							Commands = _ctx.WorkspaceManager.ActiveWorkspace.Windows.Select(w =>
 								RemoveWindowCommandCreator(w)
 							),
 							ConfirmButtonText = "Remove",
@@ -112,7 +112,7 @@ public class CommandPaletteCommands : PluginCommands
 						{
 							Hint = "Find window",
 							ConfirmButtonText = "Focus",
-							Commands = _context
+							Commands = _ctx
 								.WorkspaceManager.SelectMany(w => w.Windows)
 								.Select(w => FocusWindowCommandCreator(w)),
 						}
@@ -122,17 +122,17 @@ public class CommandPaletteCommands : PluginCommands
 
 	private void ActivateWorkspaceCallback()
 	{
-		IWorkspace activeWorkspace = _context.WorkspaceManager.ActiveWorkspace;
+		IWorkspace activeWorkspace = _ctx.Store.Pick(Pickers.PickActiveWorkspace());
 		List<ICommand> items = [];
-		foreach (IWorkspace workspace in _context.WorkspaceManager)
+		foreach (IWorkspace workspace in _ctx.Store.Pick(Pickers.PickWorkspaces()))
 		{
 			if (workspace != activeWorkspace)
 			{
 				items.Add(
 					new Command(
-						identifier: $"{PluginName}.activate_workspace.{workspace.Name}",
-						title: workspace.Name,
-						callback: () => _context.Butler.Activate(workspace)
+						identifier: $"{PluginName}.activate_workspace.{workspace.BackingName}",
+						title: workspace.BackingName,
+						callback: () => _ctx.Store.Dispatch(new ActivateWorkspaceTransform(workspace.Id))
 					)
 				);
 			}
@@ -154,7 +154,7 @@ public class CommandPaletteCommands : PluginCommands
 	public SelectOption[] CreateMoveWindowsToWorkspaceOptions()
 	{
 		// All the windows in all the workspaces.
-		IEnumerable<IWindow> windows = _context
+		IEnumerable<IWindow> windows = _ctx
 			.WorkspaceManager.Select(w => w.Windows)
 			.SelectMany(w => w)
 			.OrderBy(w => w.Title);
@@ -184,7 +184,7 @@ public class CommandPaletteCommands : PluginCommands
 			{
 				foreach (IWindow window in windows)
 				{
-					_context.Butler.MoveWindowToWorkspace(workspace, window);
+					_ctx.Butler.MoveWindowToWorkspace(workspace, window);
 				}
 			}
 		);
@@ -196,7 +196,7 @@ public class CommandPaletteCommands : PluginCommands
 	{
 		IEnumerable<string> selectedWindowNames = options.Where(o => o.IsSelected).Select(o => o.Title);
 
-		IReadOnlyList<IWorkspace> workspaces = [.. _context.WorkspaceManager];
+		IReadOnlyList<IWorkspace> workspaces = [.. _ctx.WorkspaceManager];
 		IReadOnlyList<IWindow> windows = workspaces
 			.SelectMany(w => w.Windows)
 			.Where(w => selectedWindowNames.Contains(w.Title))
@@ -216,7 +216,7 @@ public class CommandPaletteCommands : PluginCommands
 		new Command(
 			identifier: $"{PluginName}.move_window_to_workspace.{workspace.Name}",
 			title: $"Move window to workspace \"{workspace.Name}\"",
-			callback: () => _context.Butler.MoveWindowToWorkspace(workspace)
+			callback: () => _ctx.Butler.MoveWindowToWorkspace(workspace)
 		);
 
 	/// <summary>
@@ -235,7 +235,7 @@ public class CommandPaletteCommands : PluginCommands
 			title: window.Title,
 			callback: () =>
 			{
-				IWorkspace workspace = _context.WorkspaceManager.ActiveWorkspace;
+				IWorkspace workspace = _ctx.WorkspaceManager.ActiveWorkspace;
 				workspace.RemoveWindow(window);
 				workspace.DoLayout();
 			}
@@ -252,16 +252,16 @@ public class CommandPaletteCommands : PluginCommands
 			title: window.Title,
 			callback: () =>
 			{
-				IWorkspace? workspace = _context.Butler.Pantry.GetWorkspaceForWindow(window);
+				IWorkspace? workspace = _ctx.Butler.Pantry.GetWorkspaceForWindow(window);
 				if (workspace == null)
 				{
 					return;
 				}
 
-				if (_context.Butler.Pantry.GetMonitorForWorkspace(workspace) is null)
+				if (_ctx.Butler.Pantry.GetMonitorForWorkspace(workspace) is null)
 				{
 					// The workspace is not active, and is not visible.
-					_context.Butler.Activate(workspace);
+					_ctx.Butler.Activate(workspace);
 				}
 
 				FocusWindow(window);

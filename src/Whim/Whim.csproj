@@ -49,6 +49,7 @@
 	<ItemGroup>
 		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
 		<InternalsVisibleTo Include="Whim.Bar.Tests" />
+		<InternalsVisibleTo Include="Whim.CommandPalette.Tests" />
 		<InternalsVisibleTo Include="Whim.FloatingWindow.Tests" />
 		<InternalsVisibleTo Include="Whim.Gaps.Tests" />
 		<InternalsVisibleTo Include="Whim.LayoutPreview.Tests" />
