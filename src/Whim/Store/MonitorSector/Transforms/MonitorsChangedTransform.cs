@@ -115,7 +115,7 @@ internal record MonitorsChangedTransform : Transform
 		// Deactivate all workspaces.
 		foreach (IWorkspace visibleWorkspace in ctx.Store.Pick(PickAllActiveWorkspaces()))
 		{
-			visibleWorkspace.Deactivate();
+			ctx.Store.Dispatch(new DeactivateWorkspaceTransform(visibleWorkspace.Id));
 		}
 
 		// If a monitor was removed, remove the workspace from the map.
@@ -126,7 +126,7 @@ internal record MonitorsChangedTransform : Transform
 				continue;
 			}
 
-			workspace.Deactivate();
+			ctx.Store.Dispatch(new DeactivateWorkspaceTransform(workspace.Id));
 			mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.Remove(monitor.Handle);
 		}
 
@@ -148,7 +148,8 @@ internal record MonitorsChangedTransform : Transform
 			// If there's no workspace, create one.
 			if (workspaceId == default)
 			{
-				if (ctx.WorkspaceManager.Add() is WorkspaceId newWorkspaceId)
+				Result<WorkspaceId> addWorkspaceResult = ctx.Store.Dispatch(new AddWorkspaceTransform());
+				if (addWorkspaceResult.TryGet(out WorkspaceId newWorkspaceId))
 				{
 					mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(
 						monitor.Handle,

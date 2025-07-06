@@ -4,9 +4,10 @@ namespace Whim.Tests;
 public class MoveWindowEdgesInDirectionTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void NoValidWindows(IContext ctx)
+	internal void NoValidWindows(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given there are no valid windows
+		AddActiveWorkspace(ctx, rootSector, CreateWorkspace(ctx));
 		MoveWindowEdgesInDirectionTransform sut = new(Direction.Down, new Point<int>());
 
 		// When

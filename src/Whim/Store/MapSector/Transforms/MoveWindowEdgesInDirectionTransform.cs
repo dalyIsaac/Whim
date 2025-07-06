@@ -54,7 +54,9 @@ public record MoveWindowEdgesInDirectionTransform(
 		IPoint<double> normalized = monitor.WorkingArea.NormalizeDeltaPoint(PixelsDeltas);
 
 		Logger.Debug($"Normalized point: {normalized}");
-		workspace.MoveWindowEdgesInDirection(Edges, normalized, window, deferLayout: false);
+		ctx.Store.Dispatch(
+			new MoveWindowEdgesInDirectionWorkspaceTransform(workspace.Id, Edges, normalized, windowHandle)
+		);
 		return Unit.Result;
 	}
 }

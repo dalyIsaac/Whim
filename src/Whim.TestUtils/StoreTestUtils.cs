@@ -64,10 +64,6 @@ internal static class StoreTestUtils
 			return;
 		}
 
-		List<IWorkspace> workspaces = [.. ctx.WorkspaceManager];
-		workspaces.Add(workspace);
-		ctx.WorkspaceManager.GetEnumerator().Returns(_ => workspaces.GetEnumerator());
-
 		workspaceSector.Workspaces = workspaceSector.Workspaces.Add(workspace.Id, workspace);
 		workspaceSector.WorkspaceOrder = workspaceSector.WorkspaceOrder.Add(workspace.Id);
 	}
@@ -112,8 +108,12 @@ internal static class StoreTestUtils
 		List<IMonitor> monitors = [.. rootSector.MonitorSector.Monitors];
 		monitors.AddRange(newMonitors);
 
-		ctx.MonitorManager.GetEnumerator().Returns(_ => monitors.GetEnumerator());
 		rootSector.MonitorSector.Monitors = [.. newMonitors];
+
+		if (rootSector.MonitorSector.ActiveMonitorHandle == default)
+		{
+			rootSector.MonitorSector.ActiveMonitorHandle = newMonitors[0].Handle;
+		}
 	}
 
 	public static void AddWindowToSector(MutableRootSector rootSector, IWindow window)

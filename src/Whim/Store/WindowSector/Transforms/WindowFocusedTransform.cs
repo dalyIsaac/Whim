@@ -71,7 +71,7 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 
 	private static void UpdateMapSector(IContext ctx, IWindow? window)
 	{
-		foreach (IWorkspace workspace in ctx.WorkspaceManager)
+		foreach (IWorkspace workspace in ctx.Store.Pick(PickWorkspaces()))
 		{
 			((IInternalWorkspace)workspace).WindowFocused(window);
 		}

@@ -59,71 +59,64 @@ public record ActivateWorkspaceTransform(
 			targetMonitor.Handle
 		);
 
-		// Get the old workspace for the event.
-		IWorkspace? oldWorkspace = ctx.Store.Pick(PickWorkspaceByMonitor(targetMonitor.Handle)).ValueOrDefault;
+		// We won't have an old workspace for the target monitor during startup.
+		IWorkspace? oldWorkspaceForTarget = ctx.Store.Pick(PickWorkspaceByMonitor(targetMonitor.Handle)).ValueOrDefault;
 
-		// Find the monitor which just lost `workspace`.
-		IMonitor? loserMonitor = ctx.Store.Pick(PickMonitorByWorkspace(WorkspaceId)).ValueOrDefault;
+		IMonitor? sourceMonitor = ctx.Store.Pick(PickMonitorByWorkspace(WorkspaceId)).ValueOrDefault;
 
-		if (targetMonitor.Handle == loserMonitor?.Handle)
+		if (targetMonitor.Handle == sourceMonitor?.Handle)
 		{
 			Logger.Debug("Workspace is already activated");
 			return Unit.Result;
 		}
 
-		// Update the active monitor. Having this line before the old workspace is deactivated
-		// is important, as WindowManager.OnWindowHidden() checks to see if a window is in a
-		// visible workspace when it receives the EVENT_OBJECT_HIDE event.
+		// We need to update the monitor workspace map for the target monitor before performing a layout on the loser monitor.
 		mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(targetMonitor.Handle, WorkspaceId);
 
-		if (loserMonitor != null && oldWorkspace != null && loserMonitor.Handle != targetMonitor.Handle)
+		if (sourceMonitor != null && oldWorkspaceForTarget != null)
 		{
-			Logger.Debug($"Layouting workspace {oldWorkspace} in loser monitor {loserMonitor}");
-			mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(loserMonitor.Handle, oldWorkspace.Id);
-
-			ctx.Store.Dispatch(new DoWorkspaceLayoutTransform(oldWorkspace.Id));
-			mapSector.QueueEvent(
-				new MonitorWorkspaceChangedEventArgs()
-				{
-					Monitor = loserMonitor,
-					PreviousWorkspace = workspace,
-					CurrentWorkspace = oldWorkspace,
-				}
-			);
+			LayoutWorkspaceOnLoserMonitor(ctx, mapSector, sourceMonitor, oldWorkspaceForTarget, workspace);
 		}
-		else
+		else if (oldWorkspaceForTarget != null)
 		{
-			if (oldWorkspace is not null)
-			{
-				ctx.Store.Dispatch(new DeactivateWorkspaceTransform(oldWorkspace.Id));
-			}
-
-			// Temporarily focus the monitor's desktop HWND, to prevent another window from being focused.
-			ctx.Store.Dispatch(new FocusMonitorDesktopTransform(targetMonitor.Handle));
+			ctx.Store.Dispatch(new DeactivateWorkspaceTransform(oldWorkspaceForTarget.Id));
 		}
 
-		// Layout the new workspace.
 		ctx.Store.Dispatch(new DoWorkspaceLayoutTransform(workspace.Id));
 
-		if (FocusWorkspaceWindow)
-		{
-			ctx.Store.Dispatch(new FocusWorkspaceTransform(workspace.Id));
-		}
-		else
-		{
-			WorkspaceId activeWorkspaceId = ctx.Store.Pick(PickActiveWorkspaceId());
-			ctx.Store.Dispatch(new FocusWorkspaceTransform(activeWorkspaceId));
-		}
+		WorkspaceId workspaceToFocus = FocusWorkspaceWindow ? workspace.Id : ctx.Store.Pick(PickActiveWorkspaceId());
+		ctx.Store.Dispatch(new FocusWorkspaceTransform(workspaceToFocus));
 
 		mapSector.QueueEvent(
 			new MonitorWorkspaceChangedEventArgs()
 			{
 				Monitor = targetMonitor,
-				PreviousWorkspace = oldWorkspace,
+				PreviousWorkspace = oldWorkspaceForTarget,
 				CurrentWorkspace = workspace,
 			}
 		);
 
 		return Unit.Result;
+	}
+
+	private static void LayoutWorkspaceOnLoserMonitor(
+		IContext ctx,
+		MapSector mapSector,
+		IMonitor monitor,
+		IWorkspace workspace,
+		IWorkspace oldWorkspace
+	)
+	{
+		Logger.Debug($"Performing layout for workspace {workspace} in loser monitor {monitor}");
+		mapSector.MonitorWorkspaceMap = mapSector.MonitorWorkspaceMap.SetItem(monitor.Handle, workspace.Id);
+		ctx.Store.Dispatch(new DoWorkspaceLayoutTransform(workspace.Id));
+		mapSector.QueueEvent(
+			new MonitorWorkspaceChangedEventArgs()
+			{
+				Monitor = monitor,
+				PreviousWorkspace = oldWorkspace,
+				CurrentWorkspace = workspace,
+			}
+		);
 	}
 }

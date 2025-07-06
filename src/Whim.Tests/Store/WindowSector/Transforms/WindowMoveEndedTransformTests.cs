@@ -2,23 +2,23 @@ namespace Whim.Tests;
 
 public class WindowMoveEndedTransformTests
 {
-	private static void Setup_GetMovedEdges(IContext ctx, MutableRootSector mutableRootSector, IWindow window)
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
+	private static void Setup_GetMovedEdges(IContext ctx, MutableRootSector rootSector, IWindow window)
 	{
 		IRectangle<int> originalRect = new Rectangle<int>() { Y = 4, Height = 4 };
 		IRectangle<int> newRect = new Rectangle<int>() { Y = 4, Height = 3 };
 
-		IWorkspace workspace = Substitute.For<IWorkspace>();
-		ctx.Butler.Pantry.GetWorkspaceForWindow(window).Returns(workspace);
-		workspace
-			.TryGetWindowState(window)
-			.Returns(
-				new WindowState()
-				{
-					Rectangle = originalRect,
-					Window = window,
-					WindowSize = WindowSize.Normal,
-				}
-			);
+		Workspace workspace = CreateWorkspace(ctx) with
+		{
+			WindowPositions = ImmutableDictionary<HWND, WindowPosition>.Empty.Add(
+				window.Handle,
+				new WindowPosition(WindowSize.Normal, originalRect)
+			),
+		};
+
+		PopulateWindowWorkspaceMap(ctx, rootSector, window, workspace);
+		AddActiveWorkspace(ctx, rootSector, workspace);
+
 		ctx.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns(newRect);
 	}
 
@@ -96,7 +96,6 @@ public class WindowMoveEndedTransformTests
 	{
 		// Given the window
 		mutableRootSector.WindowSector.IsMovingWindow = true;
-		ctx.Butler.Pantry.GetWorkspaceForWindow(window).ReturnsNull();
 
 		internalCtx
 			.CoreNativeManager.GetCursorPos(out _)

@@ -177,7 +177,7 @@ public class WorkspacePickersTests
 
 		// Then we get the windows
 		Assert.True(result.IsSuccessful);
-		Assert.Equal(3, result.Value.Count());
+		Assert.Equal(3, result.Value!.Count());
 	}
 
 	private static IWindow Setup_LastFocusedWindow(IContext ctx, MutableRootSector root, Workspace workspace)
