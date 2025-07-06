@@ -131,7 +131,7 @@ internal class CommandPaletteWindowViewModel : ICommandPaletteWindowViewModel
 		}
 
 		ActivationConfig = config;
-		Monitor = monitor ?? _context.MonitorManager.ActiveMonitor;
+		Monitor = monitor ?? _context.Store.Pick(Pickers.PickActiveMonitor());
 
 		ConfirmButtonText = ActivationConfig.ConfirmButtonText ?? "Confirm";
 		Text = ActivationConfig.InitialText ?? "";
