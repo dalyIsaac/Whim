@@ -190,24 +190,8 @@ public class CommandPaletteCommandsTests
 		);
 	}
 
-	[Fact]
-	public void MoveWindowToWorkspaceCommand()
-	{
-		// Given
-		Wrapper wrapper = new();
-		ICommand command = new PluginCommandsTestUtils(wrapper.Commands).GetCommand(
-			"whim.command_palette.move_window_to_workspace"
-		);
-
-		// When
-		command.TryExecute();
-
-		// Verify that the plugin was menu activated.
-		wrapper.Plugin.Received(1).Activate(Arg.Any<MenuVariantConfig>());
-	}
-
 	[Theory, AutoSubstituteData<Customization>]
-	internal void MoveWindowToWorkspaceCommandCreator(
+	internal void MoveWindowToWorkspaceCommand(
 		IContext ctx,
 		MutableRootSector root,
 		ICommandPalettePlugin plugin,
@@ -215,11 +199,18 @@ public class CommandPaletteCommandsTests
 	)
 	{
 		// Given
-		(_, IWorkspace otherWorkspace) = SetupWorkspaces(ctx, root, plugin);
+		ICommand command = new PluginCommandsTestUtils(commands).GetCommand(
+			"whim.command_palette.move_window_to_workspace"
+		);
+		InterceptConfig<MenuVariantConfig> interceptor = InterceptConfig<MenuVariantConfig>.Create(plugin);
+		(IWorkspace activeWorkspace, IWorkspace otherWorkspace) = SetupWorkspaces(ctx, root, plugin);
 
 		// When
-		ICommand command = commands.MoveWindowToWorkspaceCommandCreator(otherWorkspace);
 		command.TryExecute();
+
+		// Call the callback.
+		ICommand moveWindowCommand = interceptor.Config!.Commands.First();
+		moveWindowCommand.TryExecute();
 
 		// Verify that MoveWindowToWorkspace was called with the workspace.
 		Assert.Contains(

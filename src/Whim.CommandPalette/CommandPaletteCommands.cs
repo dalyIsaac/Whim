@@ -66,11 +66,11 @@ public class CommandPaletteCommands : PluginCommands
 				title: "Move window to workspace",
 				callback: () =>
 				{
-					IWorkspace activeWorkspace = _ctx.WorkspaceManager.ActiveWorkspace;
+					IWorkspace activeWorkspace = _ctx.Store.Pick(Pickers.PickActiveWorkspace());
 					List<ICommand> items = [];
-					foreach (IWorkspace workspace in _ctx.WorkspaceManager)
+					foreach (IWorkspace workspace in _ctx.Store.Pick(Pickers.PickWorkspaces()))
 					{
-						if (workspace != activeWorkspace)
+						if (workspace.Id != activeWorkspace.Id)
 						{
 							items.Add(MoveWindowToWorkspaceCommandCreator(workspace));
 						}
