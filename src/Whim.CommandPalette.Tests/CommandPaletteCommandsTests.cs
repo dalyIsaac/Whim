@@ -206,19 +206,26 @@ public class CommandPaletteCommandsTests
 		wrapper.Plugin.Received(1).Activate(Arg.Any<MenuVariantConfig>());
 	}
 
-	[Fact]
-	public void MoveWindowToWorkspaceCommandCreator()
+	[Theory, AutoSubstituteData<Customization>]
+	internal void MoveWindowToWorkspaceCommandCreator(
+		IContext ctx,
+		MutableRootSector root,
+		ICommandPalettePlugin plugin,
+		CommandPaletteCommands commands
+	)
 	{
 		// Given
-		Wrapper wrapper = new();
-		CommandPaletteCommands commands = new(wrapper.Context, wrapper.Plugin);
+		(_, IWorkspace otherWorkspace) = SetupWorkspaces(ctx, root, plugin);
 
 		// When
-		ICommand command = commands.MoveWindowToWorkspaceCommandCreator(wrapper.Workspace);
+		ICommand command = commands.MoveWindowToWorkspaceCommandCreator(otherWorkspace);
 		command.TryExecute();
 
 		// Verify that MoveWindowToWorkspace was called with the workspace.
-		wrapper.Context.Butler.Received(1).MoveWindowToWorkspace(wrapper.Workspace);
+		Assert.Contains(
+			ctx.GetTransforms(),
+			t => (t as MoveWindowToWorkspaceTransform) == new MoveWindowToWorkspaceTransform(otherWorkspace.Id)
+		);
 	}
 
 	[Fact]

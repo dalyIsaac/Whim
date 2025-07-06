@@ -220,9 +220,9 @@ public class CommandPaletteCommands : PluginCommands
 	/// <returns>The move window to workspace command.</returns>
 	internal ICommand MoveWindowToWorkspaceCommandCreator(IWorkspace workspace) =>
 		new Command(
-			identifier: $"{PluginName}.move_window_to_workspace.{workspace.Name}",
-			title: $"Move window to workspace \"{workspace.Name}\"",
-			callback: () => _ctx.Butler.MoveWindowToWorkspace(workspace)
+			identifier: $"{PluginName}.move_window_to_workspace.{workspace.BackingName}",
+			title: $"Move window to workspace \"{workspace.BackingName}\"",
+			callback: () => _ctx.Store.Dispatch(new MoveWindowToWorkspaceTransform(workspace.Id))
 		);
 
 	/// <summary>
