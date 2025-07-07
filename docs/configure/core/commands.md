@@ -34,6 +34,8 @@ Core commands have identifiers under the `whim.core` namespace.
 | `whim.core.move_window_bottom_edge_down`                 | Move the current window's bottom edge down                                      | <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>P</kbd>      |
 | `whim.core.move_window_to_previous_monitor`              | Move the window to the previous monitor                                         | <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>LEFT</kbd>  |
 | `whim.core.move_window_to_next_monitor`                  | Move the window to the next monitor                                             | <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>RIGHT</kbd> |
+| `whim.core.move_window_to_previous_workspace`            | Move window to previous workspace                                               | No default keybind                                   |
+| `whim.core.move_window_to_next_workspace`                | Move window to next workspace                                                   | No default keybind                                   |
 | `whim.core.move_window_to_next_workspace_on_monitor`     | Move window to next workspace on current monitor\*                              | No default keybind                                   |
 | `whim.core.move_window_to_previous_workspace_on_monitor` | Move window to previous workspace on current monitor\*                          | No default keybind                                   |
 | `whim.core.maximize_window`                              | Maximize the current window                                                     | No default keybind                                   |

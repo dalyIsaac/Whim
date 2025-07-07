@@ -658,4 +658,46 @@ public class CoreCommandsTests
 			t => t.Equals(new MoveWindowToWorkspaceTransform(expectedWorkspaceId, window.Handle))
 		);
 	}
+
+	[Theory]
+	[InlineAutoSubstituteData<StoreCustomization>("whim.core.move_window_to_next_workspace", false, 1)]
+	[InlineAutoSubstituteData<StoreCustomization>("whim.core.move_window_to_previous_workspace", true, 2)]
+	internal void MoveWindowToAdjacentWorkspace(
+		string commandName,
+		bool reverse,
+		int expectedWorkspaceIndex,
+		IContext ctx,
+		MutableRootSector root,
+		List<object> transforms
+	)
+	{
+		// Given we have three workspaces
+		IWindow window = CreateWindow((HWND)123);
+
+		var workspace1 = CreateWorkspace(ctx) with { LastFocusedWindowHandle = window.Handle };
+		var workspace2 = CreateWorkspace(ctx);
+		var workspace3 = CreateWorkspace(ctx);
+		Workspace[] workspaces = [workspace1, workspace2, workspace3];
+
+		Workspace sourceWorkspace = workspace1;
+		Workspace targetWorkspace = workspaces[expectedWorkspaceIndex];
+
+		var monitor = CreateMonitor((HMONITOR)1);
+
+		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace1);
+
+		PopulateWindowWorkspaceMap(ctx, root, window, workspace1);
+		AddWorkspacesToManager(ctx, root, workspace2, workspace3);
+
+		// When we move the window to the next/previous workspace
+		CoreCommands commands = new(ctx);
+		PluginCommandsTestUtils testUtils = new(commands);
+		ICommand command = testUtils.GetCommand(commandName);
+		command.TryExecute();
+
+		// Then the window is moved to the expected workspace
+		Assert.Contains(transforms, t => t.Equals(new MoveWindowToAdjacentWorkspaceTransform(Reverse: reverse)));
+		Assert.Contains(transforms, t => t.Equals(new RemoveWindowFromWorkspaceTransform(sourceWorkspace.Id, window)));
+		Assert.Contains(transforms, t => t.Equals(new AddWindowToWorkspaceTransform(targetWorkspace.Id, window)));
+	}
 }

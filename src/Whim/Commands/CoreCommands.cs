@@ -196,6 +196,16 @@ internal class CoreCommands : PluginCommands
 				callback: MoveWindowToWorkspaceOnCurrentMonitor(getNext: false)
 			)
 			.Add(
+				identifier: "move_window_to_previous_workspace",
+				title: "Move the window to the previous workspace",
+				callback: () => _context.Store.Dispatch(new MoveWindowToAdjacentWorkspaceTransform(Reverse: true))
+			)
+			.Add(
+				identifier: "move_window_to_next_workspace",
+				title: "Move the window to the next workspace",
+				callback: () => _context.Store.Dispatch(new MoveWindowToAdjacentWorkspaceTransform(Reverse: false))
+			)
+			.Add(
 				identifier: "maximize_window",
 				title: "Maximize the current window",
 				callback: () =>
