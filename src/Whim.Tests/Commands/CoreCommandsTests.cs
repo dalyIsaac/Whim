@@ -696,7 +696,6 @@ public class CoreCommandsTests
 		command.TryExecute();
 
 		// Then the window is moved to the expected workspace
-		Guid expectedWorkspaceId = root.WorkspaceSector.WorkspaceOrder[expectedWorkspaceIndex];
 		Assert.Contains(transforms, t => t.Equals(new MoveWindowToAdjacentWorkspaceTransform(Reverse: reverse)));
 		Assert.Contains(transforms, t => t.Equals(new RemoveWindowFromWorkspaceTransform(sourceWorkspace.Id, window)));
 		Assert.Contains(transforms, t => t.Equals(new AddWindowToWorkspaceTransform(targetWorkspace.Id, window)));
