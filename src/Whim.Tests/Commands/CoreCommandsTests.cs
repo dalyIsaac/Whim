@@ -445,6 +445,79 @@ public class CoreCommandsTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MoveActiveWindowToWorkspaceAtIndex_IndexDoesNotExist(
+		IContext ctx,
+		MutableRootSector root,
+		List<object> transforms
+	)
+	{
+		// Given
+		CoreCommands commands = new(ctx);
+		PluginCommandsTestUtils testUtils = new(commands);
+
+		for (int idx = 0; idx < 2; idx++)
+		{
+			AddWorkspaceToManager(ctx, root, CreateWorkspace(ctx));
+		}
+
+		int index = 3;
+
+		ICommand command = testUtils.GetCommand($"whim.core.move_active_window_to_workspace_{index}");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		Assert.DoesNotContain(transforms, t => t is MoveWindowToWorkspaceTransform);
+	}
+
+	[Theory]
+	[InlineAutoSubstituteData<StoreCustomization>(1)]
+	[InlineAutoSubstituteData<StoreCustomization>(2)]
+	[InlineAutoSubstituteData<StoreCustomization>(10)]
+	internal void MoveActiveWindowToWorkspaceAtIndex(
+		int index,
+		IContext ctx,
+		MutableRootSector root,
+		List<object> transforms
+	)
+	{
+		// Given
+		CoreCommands commands = new(ctx);
+		PluginCommandsTestUtils testUtils = new(commands);
+
+		IWindow window = CreateWindow((HWND)123);
+		for (int idx = 0; idx < 10; idx++)
+		{
+			Workspace w = CreateWorkspace(ctx) with { LastFocusedWindowHandle = window.Handle };
+			if (idx == 0)
+			{
+				w = w with { LastFocusedWindowHandle = window.Handle };
+				w = PopulateWindowWorkspaceMap(ctx, root, window, w);
+				AddActiveWorkspace(ctx, root, w);
+			}
+			else
+			{
+				AddWorkspaceToManager(ctx, root, w);
+			}
+		}
+
+		ICommand command = testUtils.GetCommand($"whim.core.move_active_window_to_workspace_{index}");
+
+		// When
+		command.TryExecute();
+
+		// Then
+		Assert.Contains(
+			transforms,
+			t =>
+				t.Equals(
+					new MoveWindowToWorkspaceTransform(root.WorkspaceSector.WorkspaceOrder[index - 1], window.Handle)
+				)
+		);
+	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void FocusLayoutToggleMaximized_NotFocusLayoutEngine(
 		IContext ctx,
 		MutableRootSector root,
