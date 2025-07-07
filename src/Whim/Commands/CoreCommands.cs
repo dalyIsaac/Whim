@@ -310,6 +310,16 @@ internal class CoreCommands : PluginCommands
 				keybind: new Keybind(KeyModifiers.LAlt | KeyModifiers.LShift, key: GetVirtualKeyForInt(idx))
 			);
 		}
+
+		for (int idx = 1; idx <= 10; idx++)
+		{
+			MoveActiveWindowToWorkspaceAtIndex moveActiveWindowToWorkspaceAtIndex = new(idx);
+			_ = Add(
+				identifier: $"move_active_window_to_workspace_{idx}",
+				title: $"Move active window to workspace {idx}",
+				callback: () => moveActiveWindowToWorkspaceAtIndex.Execute(context)
+			);
+		}
 	}
 
 	internal Action FocusMonitorInDirection(bool getNext) =>
@@ -397,6 +407,18 @@ internal class CoreCommands : PluginCommands
 			if (Index <= workspaces.Length)
 			{
 				context.Store.Dispatch(new ActivateWorkspaceTransform(workspaces[Index - 1].Id));
+			}
+		}
+	}
+
+	private record MoveActiveWindowToWorkspaceAtIndex(int Index)
+	{
+		public void Execute(IContext context)
+		{
+			IWorkspace[] workspaces = [.. context.Store.Pick(PickWorkspaces())];
+			if (Index <= workspaces.Length && context.Store.Pick(PickLastFocusedWindow()).TryGet(out IWindow window))
+			{
+				context.Store.Dispatch(new MoveWindowToWorkspaceTransform(workspaces[Index - 1].Id, window.Handle));
 			}
 		}
 	}
