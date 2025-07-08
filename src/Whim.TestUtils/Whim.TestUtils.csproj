@@ -45,5 +45,6 @@
 		<InternalsVisibleTo Include="Whim.Gaps.Tests" />
 		<InternalsVisibleTo Include="Whim.FloatingWindow.Tests" />
 		<InternalsVisibleTo Include="Whim.LayoutPreview.Tests" />
+		<InternalsVisibleTo Include="Whim.SliceLayout.Tests" />
 	</ItemGroup>
 </Project>
