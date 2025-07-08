@@ -338,7 +338,7 @@ public class DoLayoutTests
 		{
 			sliceLayoutEngine = sliceLayoutEngine.MinimizeWindowStart(expectedWindowStates[windowCount + i].Window);
 		}
-		IWindowState[] windowStates = sliceLayoutEngine.DoLayout(rectangle, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] windowStates = [.. sliceLayoutEngine.DoLayout(rectangle, Substitute.For<IMonitor>())];
 
 		// Then
 		Assert.Equal(windowCount + minimizedWindowCount, windowStates.Length);

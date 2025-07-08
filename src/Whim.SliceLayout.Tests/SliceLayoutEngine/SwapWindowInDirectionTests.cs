@@ -40,7 +40,7 @@ public class SwapWindowInDirectionTests
 	{
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, parentArea);
-		IWindow[] windows = Enumerable.Range(0, windowCount).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, windowCount).Select(_ => Substitute.For<IWindow>())];
 
 		// When
 		foreach (IWindow window in windows)
@@ -49,7 +49,7 @@ public class SwapWindowInDirectionTests
 		}
 
 		sut = sut.SwapWindowInDirection(direction, windows[focusedWindowIdx]);
-		IWindowState[] windowStates = sut.DoLayout(primaryMonitorBounds, ctx.MonitorManager.PrimaryMonitor).ToArray();
+		IWindowState[] windowStates = [.. sut.DoLayout(primaryMonitorBounds, ctx.MonitorManager.PrimaryMonitor)];
 
 		// Then
 		Assert.Equal(windows[focusedWindowIdx], windowStates[targetWindowIdx].Window);
@@ -88,7 +88,7 @@ public class SwapWindowInDirectionTests
 	{
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, parentArea);
-		IWindow[] windows = Enumerable.Range(0, windowCount).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, windowCount).Select(_ => Substitute.For<IWindow>())];
 
 		// When
 		foreach (IWindow window in windows)
@@ -98,7 +98,7 @@ public class SwapWindowInDirectionTests
 
 		plugin.WindowInsertionType.Returns(WindowInsertionType.Rotate);
 		sut = sut.SwapWindowInDirection(direction, windows[focusedWindowIdx]);
-		IWindowState[] windowStates = sut.DoLayout(primaryMonitorBounds, ctx.MonitorManager.PrimaryMonitor).ToArray();
+		IWindowState[] windowStates = [.. sut.DoLayout(primaryMonitorBounds, ctx.MonitorManager.PrimaryMonitor)];
 
 		// Then
 		Assert.Equal(windows[focusedWindowIdx], windowStates[targetWindowIdx].Window);
@@ -112,11 +112,11 @@ public class SwapWindowInDirectionTests
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
 
 		// When
-		IWindowState[] beforeStates = sut.DoLayout(primaryMonitorBounds, ctx.MonitorManager.PrimaryMonitor).ToArray();
+		IWindowState[] beforeStates = [.. sut.DoLayout(primaryMonitorBounds, ctx.MonitorManager.PrimaryMonitor)];
 
 		sut = sut.SwapWindowInDirection(Direction.Up, window);
 
-		IWindowState[] afterStates = sut.DoLayout(primaryMonitorBounds, ctx.MonitorManager.PrimaryMonitor).ToArray();
+		IWindowState[] afterStates = [.. sut.DoLayout(primaryMonitorBounds, ctx.MonitorManager.PrimaryMonitor)];
 
 		// Then
 		Assert.Equal(beforeStates, afterStates);

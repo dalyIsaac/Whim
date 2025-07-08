@@ -31,7 +31,7 @@ public class MoveWindowToPointTests
 	{
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, parentArea);
-		IWindow[] windows = Enumerable.Range(0, windowCount).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, windowCount).Select(_ => Substitute.For<IWindow>())];
 
 		// When
 		foreach (IWindow window in windows)
@@ -40,8 +40,7 @@ public class MoveWindowToPointTests
 		}
 
 		sut = sut.MoveWindowToPoint(windows[windowIdx], point);
-		IWindowState[] windowStates = sut.DoLayout(new Rectangle<int>(0, 0, 100, 100), Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] windowStates = [.. sut.DoLayout(new Rectangle<int>(0, 0, 100, 100), Substitute.For<IMonitor>())];
 
 		// Then
 		Assert.Equal(windows[expectedWindowIdx], windowStates[windowIdx].Window);
@@ -68,7 +67,7 @@ public class MoveWindowToPointTests
 	{
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, parentArea);
-		IWindow[] windows = Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>())];
 
 		// When
 		foreach (IWindow window in windows)
@@ -77,8 +76,7 @@ public class MoveWindowToPointTests
 		}
 
 		sut = sut.MoveWindowToPoint(windows[windowIdx], point);
-		IWindowState[] windowStates = sut.DoLayout(new Rectangle<int>(0, 0, 100, 100), Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] windowStates = [.. sut.DoLayout(new Rectangle<int>(0, 0, 100, 100), Substitute.For<IMonitor>())];
 
 		// Then the window should not have moved
 		Assert.Equal(windows[windowIdx], windowStates[windowIdx].Window);
@@ -106,7 +104,7 @@ public class MoveWindowToPointTests
 	{
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, parentArea);
-		IWindow[] windows = Enumerable.Range(0, windowCount).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, windowCount).Select(_ => Substitute.For<IWindow>())];
 
 		// When
 		foreach (IWindow window in windows)
@@ -115,8 +113,7 @@ public class MoveWindowToPointTests
 		}
 
 		sut = sut.MoveWindowToPoint(windows[windowIdx], point);
-		IWindowState[] windowStates = sut.DoLayout(new Rectangle<int>(0, 0, 100, 100), Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] windowStates = [.. sut.DoLayout(new Rectangle<int>(0, 0, 100, 100), Substitute.For<IMonitor>())];
 
 		// Then the window should not have moved
 		Assert.Equal(windows[windowIdx], windowStates[windowIdx].Window);
