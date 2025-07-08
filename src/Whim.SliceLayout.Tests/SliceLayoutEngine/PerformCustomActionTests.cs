@@ -16,7 +16,7 @@ public class PerformCustomActionTests
 	{
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
-		IWindow[] windows = Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>())];
 
 		// When
 		foreach (IWindow window in windows)
@@ -24,7 +24,7 @@ public class PerformCustomActionTests
 			sut = sut.AddWindow(window);
 		}
 
-		IWindowState[] beforeStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] beforeStates = [.. sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>())];
 
 		sut = sut.PerformCustomAction(
 			new LayoutEngineCustomAction<IWindow>()
@@ -35,7 +35,7 @@ public class PerformCustomActionTests
 			}
 		);
 
-		IWindowState[] afterStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] afterStates = [.. sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>())];
 
 		// Then
 		beforeStates.Should().BeEquivalentTo(afterStates);
@@ -65,7 +65,7 @@ public class PerformCustomActionTests
 	{
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
-		IWindow[] windows = Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>())];
 
 		// When
 		foreach (IWindow window in windows)
@@ -82,7 +82,7 @@ public class PerformCustomActionTests
 			}
 		);
 
-		IWindowState[] afterStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] afterStates = [.. sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>())];
 
 		// Then
 		Assert.Equal(windows[expectedWindowIdx], afterStates[focusedWindowIdx].Window);
@@ -96,7 +96,7 @@ public class PerformCustomActionTests
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
 
 		// When
-		IWindowState[] beforeStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] beforeStates = [.. sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>())];
 
 		sut = sut.PerformCustomAction(
 			new LayoutEngineCustomAction<IWindow>()
@@ -107,7 +107,7 @@ public class PerformCustomActionTests
 			}
 		);
 
-		IWindowState[] afterStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] afterStates = [.. sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>())];
 
 		// Then
 		beforeStates.Should().BeEquivalentTo(afterStates);
@@ -120,7 +120,7 @@ public class PerformCustomActionTests
 	{
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
-		IWindow[] windows = Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>())];
 
 		// When
 		foreach (IWindow window in windows)
@@ -128,7 +128,7 @@ public class PerformCustomActionTests
 			sut = sut.AddWindow(window);
 		}
 
-		IWindowState[] beforeStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] beforeStates = [.. sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>())];
 
 		sut = sut.PerformCustomAction(
 			new LayoutEngineCustomAction<IWindow>()
@@ -139,7 +139,7 @@ public class PerformCustomActionTests
 			}
 		);
 
-		IWindowState[] afterStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] afterStates = [.. sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>())];
 
 		// Then
 		beforeStates.Should().BeEquivalentTo(afterStates);
@@ -164,7 +164,7 @@ public class PerformCustomActionTests
 	{
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
-		IWindow[] windows = Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>())];
 
 		// When
 		foreach (IWindow window in windows)
@@ -181,7 +181,7 @@ public class PerformCustomActionTests
 			}
 		);
 
-		IWindowState[] afterStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] afterStates = [.. sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>())];
 
 		// Then
 		Assert.Equal(windows[expectedWindowIdx], afterStates[focusedWindowIdx].Window);
@@ -195,7 +195,7 @@ public class PerformCustomActionTests
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
 
 		// When
-		IWindowState[] beforeStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] beforeStates = [.. sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>())];
 
 		sut = sut.PerformCustomAction(
 			new LayoutEngineCustomAction<IWindow>()
@@ -206,7 +206,7 @@ public class PerformCustomActionTests
 			}
 		);
 
-		IWindowState[] afterStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] afterStates = [.. sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>())];
 
 		// Then
 		beforeStates.Should().BeEquivalentTo(afterStates);
@@ -233,7 +233,7 @@ public class PerformCustomActionTests
 	{
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
-		IWindow[] windows = Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>())];
 
 		// When
 		foreach (IWindow window in windows)
@@ -262,7 +262,7 @@ public class PerformCustomActionTests
 	{
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
-		IWindow[] windows = Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>())];
 
 		// When
 		foreach (IWindow window in windows)
@@ -270,7 +270,7 @@ public class PerformCustomActionTests
 			sut = sut.AddWindow(window);
 		}
 
-		IWindowState[] beforeStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] beforeStates = [.. sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>())];
 
 		sut = sut.PerformCustomAction(
 			new LayoutEngineCustomAction<IWindow>()
@@ -281,7 +281,7 @@ public class PerformCustomActionTests
 			}
 		);
 
-		IWindowState[] afterStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] afterStates = [.. sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>())];
 
 		// Then
 		beforeStates.Should().BeEquivalentTo(afterStates);

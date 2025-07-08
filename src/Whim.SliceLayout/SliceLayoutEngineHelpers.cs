@@ -15,7 +15,8 @@ public partial record SliceLayoutEngine
 
 		Rectangle<int> rectangle = new(0, 0, _cachedWindowStatesScale, _cachedWindowStatesScale);
 		int idx = 0;
-		foreach (IWindowState windowState in DoLayout(rectangle, _context.MonitorManager.PrimaryMonitor))
+		IMonitor primaryMonitor = _context.Store.Pick(Pickers.PickPrimaryMonitor());
+		foreach (IWindowState windowState in DoLayout(rectangle, primaryMonitor))
 		{
 			cachedWindowStates[idx] = windowState;
 			idx++;

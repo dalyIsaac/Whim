@@ -39,7 +39,7 @@ public class FocusWindowInDirectionTests
 	{
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, parentArea);
-		IWindow[] windows = Enumerable.Range(0, windowCount).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, windowCount).Select(_ => Substitute.For<IWindow>())];
 
 		// When
 		foreach (IWindow window in windows)
@@ -79,7 +79,7 @@ public class FocusWindowInDirectionTests
 	{
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, parentArea);
-		IWindow[] windows = Enumerable.Range(0, windowCount).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, windowCount).Select(_ => Substitute.For<IWindow>())];
 
 		// When
 		foreach (IWindow window in windows)

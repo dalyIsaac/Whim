@@ -59,29 +59,26 @@ public class SliceLayoutPlugin(IContext context) : ISliceLayoutPlugin
 			return;
 		}
 
-		workspace.PerformCustomLayoutEngineAction(
-			new LayoutEngineCustomAction()
-			{
-				Name = promote ? PromoteWindowActionName : DemoteWindowActionName,
-				Window = definedWindow,
-			}
-		);
+		LayoutEngineCustomAction action = new()
+		{
+			Name = promote ? PromoteWindowActionName : DemoteWindowActionName,
+			Window = definedWindow,
+		};
+		_context.Store.Dispatch(new LayoutEngineCustomActionTransform(workspace.Id, action));
 	}
 
 	private (IWindow, IWorkspace)? GetWindowWithRankDelta(IWindow? window, bool promote)
 	{
-		window ??= _context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow;
-
-		if (window is null)
+		if (window is null && !_context.Store.Pick(Pickers.PickLastFocusedWindow()).TryGet(out window))
 		{
 			Logger.Debug("No window to change rank for");
 			return null;
 		}
 
-		IWorkspace? workspace = _context.Butler.Pantry.GetWorkspaceForWindow(window);
-		if (workspace is null)
+		Result<IWorkspace> workspaceResult = _context.Store.Pick(Pickers.PickWorkspaceByWindow(window.Handle));
+		if (!workspaceResult.TryGet(out IWorkspace? workspace))
 		{
-			Logger.Debug("Window is not in a workspace");
+			Logger.Debug($"Window {window} is not in a workspace");
 			return null;
 		}
 
@@ -101,12 +98,11 @@ public class SliceLayoutPlugin(IContext context) : ISliceLayoutPlugin
 			return;
 		}
 
-		workspace.PerformCustomLayoutEngineAction(
-			new LayoutEngineCustomAction()
-			{
-				Name = promote ? PromoteFocusActionName : DemoteFocusActionName,
-				Window = definedWindow,
-			}
-		);
+		LayoutEngineCustomAction action = new()
+		{
+			Name = promote ? PromoteFocusActionName : DemoteFocusActionName,
+			Window = definedWindow,
+		};
+		_context.Store.Dispatch(new LayoutEngineCustomActionTransform(workspace.Id, action));
 	}
 }

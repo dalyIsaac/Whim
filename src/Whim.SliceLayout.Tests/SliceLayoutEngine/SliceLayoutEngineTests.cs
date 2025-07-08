@@ -180,7 +180,7 @@ public class SliceLayoutEngineTests
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
 
-		IWindow[] windows = Enumerable.Range(0, addCount).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, addCount).Select(_ => Substitute.For<IWindow>())];
 
 		foreach (IWindow window in windows)
 		{
@@ -286,7 +286,7 @@ public class SliceLayoutEngineTests
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
 
-		IWindow[] windows = Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>())];
 
 		foreach (IWindow window in windows)
 		{
@@ -319,7 +319,7 @@ public class SliceLayoutEngineTests
 		// Given
 		ILayoutEngine sut = new SliceLayoutEngine(ctx, plugin, identity, SampleSliceLayouts.CreateNestedLayout());
 
-		IWindow[] windows = Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>())];
 
 		foreach (IWindow window in windows)
 		{
@@ -327,9 +327,9 @@ public class SliceLayoutEngineTests
 		}
 
 		// When
-		IWindowState[] beforeStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] beforeStates = [.. sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>())];
 		sut = sut.MoveWindowEdgesInDirection(Direction.Right, new Point<double>(0.5, 0.5), windows[0]);
-		IWindowState[] afterStates = sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] afterStates = [.. sut.DoLayout(primaryMonitorBounds, Substitute.For<IMonitor>())];
 
 		// Then
 		beforeStates.Should().BeEquivalentTo(afterStates);
@@ -339,8 +339,8 @@ public class SliceLayoutEngineTests
 	public void DoLayout(IContext ctx, SliceLayoutPlugin plugin)
 	{
 		// Given
-		IWindow[] windows = Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>()).ToArray();
-		IWindow[] minimizedWindows = Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, 6).Select(_ => Substitute.For<IWindow>())];
+		IWindow[] minimizedWindows = [.. Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>())];
 
 		int third = 100 / 3;
 		IRectangle<int> rectangle = new Rectangle<int>(0, 0, 100, 100);
@@ -412,7 +412,7 @@ public class SliceLayoutEngineTests
 			sut = sut.MinimizeWindowStart(window);
 		}
 
-		IWindowState[] windowStates = sut.DoLayout(rectangle, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] windowStates = [.. sut.DoLayout(rectangle, Substitute.For<IMonitor>())];
 
 		// Then
 		windowStates.Should().BeEquivalentTo(expectedWindowStates);
