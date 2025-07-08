@@ -206,15 +206,11 @@ public class SliceLayoutPluginTests
 		plugin.DemoteWindowInStack(window);
 
 		// Then
-		Assert.Contains(
-			ctx.GetTransforms(),
-			t =>
-				(t as LayoutEngineCustomActionTransform)
-				== new LayoutEngineCustomActionTransform(
-					workspace.Id,
-					new LayoutEngineCustomAction { Name = plugin.DemoteWindowActionName, Window = window }
-				)
+		LayoutEngineCustomActionTransform expectedTransform = new(
+			workspace.Id,
+			new LayoutEngineCustomAction { Name = plugin.DemoteWindowActionName, Window = window }
 		);
+		Assert.Contains(ctx.GetTransforms(), t => (t as LayoutEngineCustomActionTransform) == expectedTransform);
 	}
 	#endregion
 
