@@ -20,7 +20,7 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 
 	private bool _disposedValue;
 
-	private ImmutableList<string> _layoutEngines = ImmutableList<string>.Empty;
+	private ImmutableList<string> _layoutEngines = [];
 
 	/// <summary>
 	/// The available layout engines.
@@ -104,7 +104,7 @@ internal class ActiveLayoutWidgetViewModel : INotifyPropertyChanged, IDisposable
 			return;
 		}
 
-		_layoutEngines = e.CurrentWorkspace.LayoutEngines.Select(engine => engine.Name).ToImmutableList();
+		_layoutEngines = [.. e.CurrentWorkspace.LayoutEngines.Select(engine => engine.Name)];
 
 		OnPropertyChanged(nameof(LayoutEngines));
 		OnPropertyChanged(nameof(ActiveLayoutEngine));
