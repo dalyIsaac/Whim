@@ -42,7 +42,7 @@ internal class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposabl
 		_context = context;
 		_monitor = monitor;
 		_getTitle = getTitle;
-		_context.WindowManager.WindowFocused += WindowManager_WindowFocused;
+		_context.Store.WindowEvents.WindowFocused += WindowEvents_WindowFocused;
 	}
 
 	/// <inheritdoc/>
@@ -60,7 +60,7 @@ internal class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposabl
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_context.WindowManager.WindowFocused -= WindowManager_WindowFocused;
+				_context.Store.WindowEvents.WindowFocused -= WindowEvents_WindowFocused;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
@@ -77,7 +77,7 @@ internal class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposabl
 		GC.SuppressFinalize(this);
 	}
 
-	private void WindowManager_WindowFocused(object? sender, WindowFocusedEventArgs e)
+	private void WindowEvents_WindowFocused(object? sender, WindowFocusedEventArgs e)
 	{
 		if (e.Window is null)
 		{
@@ -85,7 +85,7 @@ internal class FocusedWindowWidgetViewModel : INotifyPropertyChanged, IDisposabl
 			return;
 		}
 
-		IMonitor? monitor = _context.Butler.Pantry.GetMonitorForWindow(e.Window);
+		IMonitor? monitor = _context.Store.Pick(Pickers.PickMonitorByWindow(e.Window.Handle)).ValueOrDefault;
 		if (_monitor.Handle == monitor?.Handle)
 		{
 			Title = _getTitle(e.Window);
