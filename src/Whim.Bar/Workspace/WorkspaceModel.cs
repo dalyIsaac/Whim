@@ -7,6 +7,8 @@ namespace Whim.Bar;
 /// </summary>
 internal class WorkspaceModel : INotifyPropertyChanged
 {
+	private readonly IContext _ctx;
+
 	/// <summary>
 	/// The workspace.
 	/// </summary>
@@ -15,7 +17,7 @@ internal class WorkspaceModel : INotifyPropertyChanged
 	/// <summary>
 	/// The The name of the workspace.
 	/// </summary>
-	public string Name => Workspace.Name;
+	public string? Name => _ctx.Store.Pick(Pickers.PickWorkspaceById(Workspace.Id)).ValueOrDefault?.BackingName;
 
 	private bool _activeonMonitor;
 
@@ -40,20 +42,16 @@ internal class WorkspaceModel : INotifyPropertyChanged
 	/// <summary>
 	/// Initializes a new instance of the <see cref="WorkspaceModel"/> class.
 	/// </summary>
-	/// <param name="context"></param>
+	/// <param name="ctx"></param>
 	/// <param name="viewModel"></param>
 	/// <param name="workspace"></param>
 	/// <param name="activeOnMonitor"></param>
-	public WorkspaceModel(
-		IContext context,
-		WorkspaceWidgetViewModel viewModel,
-		IWorkspace workspace,
-		bool activeOnMonitor
-	)
+	public WorkspaceModel(IContext ctx, WorkspaceWidgetViewModel viewModel, IWorkspace workspace, bool activeOnMonitor)
 	{
+		_ctx = ctx;
 		Workspace = workspace;
 		ActiveOnMonitor = activeOnMonitor;
-		SwitchWorkspaceCommand = new SwitchWorkspaceCommand(context, viewModel, this);
+		SwitchWorkspaceCommand = new SwitchWorkspaceCommand(ctx, viewModel, this);
 	}
 
 	/// <inheritdoc/>

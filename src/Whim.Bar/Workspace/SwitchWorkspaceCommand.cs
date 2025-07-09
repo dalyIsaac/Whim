@@ -48,7 +48,7 @@ internal class SwitchWorkspaceCommand : System.Windows.Input.ICommand, IDisposab
 		if (parameter is WorkspaceModel)
 		{
 			Logger.Debug($"Activating workspace {_workspace.Workspace} on monitor {_viewModel.Monitor}");
-			_context.Butler.Activate(_workspace.Workspace, _viewModel.Monitor);
+			_context.Store.Dispatch(new ActivateWorkspaceTransform(_workspace.Workspace.Id, _viewModel.Monitor.Handle));
 		}
 	}
 

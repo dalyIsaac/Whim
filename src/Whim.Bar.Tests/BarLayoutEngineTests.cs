@@ -308,7 +308,7 @@ public class BarLayoutEngineTests
 		innerLayoutEngine.DoLayout(expectedGivenRect, monitor).Returns(expectedWindowStates);
 
 		// When
-		IWindowState[] layout = engine.DoLayout(new Rectangle<int>() { Width = 100, Height = 100 }, monitor).ToArray();
+		IWindowState[] layout = [.. engine.DoLayout(new Rectangle<int>() { Width = 100, Height = 100 }, monitor)];
 
 		// Then
 		Assert.Equal(2, layout.Length);

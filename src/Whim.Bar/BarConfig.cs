@@ -116,9 +116,9 @@ public class BarConfig(
 	/// <returns></returns>
 	internal void Initialize()
 	{
-		LeftComponents = new List<BarComponent>(LeftComponents);
-		CenterComponents = new List<BarComponent>(CenterComponents);
-		RightComponents = new List<BarComponent>(RightComponents);
+		LeftComponents = [.. LeftComponents];
+		CenterComponents = [.. CenterComponents];
+		RightComponents = [.. RightComponents];
 	}
 
 	private static int? GetHeightFromResourceDictionary()
