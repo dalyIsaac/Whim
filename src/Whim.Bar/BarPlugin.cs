@@ -29,9 +29,9 @@ public class BarPlugin(IContext context, BarConfig barConfig) : IBarPlugin
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
-		_context.MonitorManager.MonitorsChanged += MonitorManager_MonitorsChanged;
+		_context.Store.MonitorEvents.MonitorsChanged += MonitorManager_MonitorsChanged;
 		_context.FilterManager.AddTitleMatchFilter("Whim Bar");
-		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new BarLayoutEngine(Config, layout));
+		_context.Store.Dispatch(new AddProxyLayoutEngineTransform(layout => new BarLayoutEngine(Config, layout)));
 
 		Config.Initialize();
 	}
@@ -39,7 +39,7 @@ public class BarPlugin(IContext context, BarConfig barConfig) : IBarPlugin
 	/// <inheritdoc />
 	public void PostInitialize()
 	{
-		foreach (IMonitor monitor in _context.MonitorManager)
+		foreach (IMonitor monitor in _context.Store.Pick(Pickers.PickAllMonitors()))
 		{
 			BarWindow barWindow = new(_context, Config, monitor);
 			_monitorBarMap[monitor] = barWindow;
@@ -110,7 +110,7 @@ public class BarPlugin(IContext context, BarConfig barConfig) : IBarPlugin
 				}
 
 				_monitorBarMap.Clear();
-				_context.MonitorManager.MonitorsChanged -= MonitorManager_MonitorsChanged;
+				_context.Store.MonitorEvents.MonitorsChanged -= MonitorManager_MonitorsChanged;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
