@@ -68,6 +68,36 @@ public static class CustomAssert
 	}
 
 	/// <summary>
+	/// Asserts that an event is not raised.
+	/// </summary>
+	/// <param name="attach">The method to attach the event handler.</param>
+	/// <param name="detach">The method to detach the event handler.</param>
+	/// <param name="action">The action to perform.</param>
+	/// <exception cref="ShouldNotRaiseException">Thrown when the event is raised.</exception>
+	public static void DoesNotRaise(Action<EventHandler> attach, Action<EventHandler> detach, Action action)
+	{
+		bool raised = false;
+		void handler(object? sender, EventArgs e)
+		{
+			raised = true;
+		}
+		attach(handler);
+		try
+		{
+			action();
+		}
+		finally
+		{
+			detach(handler);
+		}
+
+		if (raised)
+		{
+			throw new ShouldNotRaiseException(typeof(EventArgs));
+		}
+	}
+
+	/// <summary>
 	/// Asserts that <see cref="INotifyPropertyChanged.PropertyChanged"/> is not raised.
 	/// </summary>
 	/// <param name="attach">The method to attach the event handler.</param>
