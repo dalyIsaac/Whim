@@ -1,15 +1,15 @@
+using Whim.TestUtils;
 using Xunit;
 
 namespace Whim.TreeLayout.Tests;
 
 public class PropertiesTests
 {
-	[Fact]
-	public void Name()
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void Name(IContext ctx, ITreeLayoutPlugin plugin, LayoutEngineIdentity identity)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-		TreeLayoutEngine engine = new(wrapper.Context, wrapper.Plugin, wrapper.Identity) { Name = "Test" };
+		TreeLayoutEngine engine = new(ctx, plugin, identity) { Name = "Test" };
 
 		// When
 		string result = engine.Name;

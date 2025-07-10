@@ -6,12 +6,16 @@ namespace Whim.TreeLayout.Tests;
 
 public class MoveWindowToPointTests
 {
-	[Theory, AutoSubstituteData]
-	public void MoveWindowToPoint_RootIsNull(IWindow window)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void MoveWindowToPoint_RootIsNull(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-		TreeLayoutEngine engine = new(wrapper.Context, wrapper.Plugin, wrapper.Identity);
+		TreeLayoutEngine engine = new(ctx, plugin, identity);
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.5 };
 
 		// When
@@ -23,14 +27,21 @@ public class MoveWindowToPointTests
 		Assert.Equal(1, result.Count);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void MoveWindowToPoint_RootIsWindowNode_Right(IWindow window1, IWindow window2, IMonitor monitor)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void MoveWindowToPoint_RootIsWindowNode_Right(
+		IContext ctx,
+		MutableRootSector root,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		Workspace workspace,
+		IWindow window1,
+		IWindow window2,
+		IMonitor monitor
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1);
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window1
-		);
+		TreeCustomization.SetAsLastFocusedWindow(ctx, root, workspace, window1);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1);
 
 		IPoint<double> point = new Point<double>() { X = 0.7, Y = 0.5 };
 
@@ -78,14 +89,21 @@ public class MoveWindowToPointTests
 			);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void MoveWindowToPoint_RootIsWindowNode_Down(IWindow window1, IWindow window2, IMonitor monitor)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void MoveWindowToPoint_RootIsWindowNode_Down(
+		IContext ctx,
+		MutableRootSector root,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		Workspace workspace,
+		IWindow window1,
+		IWindow window2,
+		IMonitor monitor
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1);
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window1
-		);
+		TreeCustomization.SetAsLastFocusedWindow(ctx, root, workspace, window1);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1);
 
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.7 };
 		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
@@ -132,14 +150,21 @@ public class MoveWindowToPointTests
 			);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void MoveWindowToPoint_RootIsWindowNode_Left(IWindow window1, IWindow window2, IMonitor monitor)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void MoveWindowToPoint_RootIsWindowNode_Left(
+		IContext ctx,
+		MutableRootSector root,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		Workspace workspace,
+		IWindow window1,
+		IWindow window2,
+		IMonitor monitor
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1);
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window1
-		);
+		TreeCustomization.SetAsLastFocusedWindow(ctx, root, workspace, window1);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1);
 
 		IPoint<double> point = new Point<double>() { X = 0.3, Y = 0.5 };
 		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
@@ -186,14 +211,21 @@ public class MoveWindowToPointTests
 			);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void MoveWindowToPoint_RootIsWindowNode_Up(IWindow window1, IWindow window2, IMonitor monitor)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void MoveWindowToPoint_RootIsWindowNode_Up(
+		IContext ctx,
+		MutableRootSector root,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		Workspace workspace,
+		IWindow window1,
+		IWindow window2,
+		IMonitor monitor
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1);
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window1
-		);
+		TreeCustomization.SetAsLastFocusedWindow(ctx, root, workspace, window1);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1);
 
 		IPoint<double> point = new Point<double>() { X = 0.5, Y = 0.3 };
 		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
@@ -240,14 +272,21 @@ public class MoveWindowToPointTests
 			);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void MoveWindowToPoint_RootIsSplitNode_DoesNotContainPoint(IWindow window1, IWindow window2, IWindow window3)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void MoveWindowToPoint_RootIsSplitNode_DoesNotContainPoint(
+		IContext ctx,
+		MutableRootSector root,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		Workspace workspace,
+		IWindow window1,
+		IWindow window2,
+		IWindow window3
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1);
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1)
-			.AddWindow(window2);
+		TreeCustomization.SetAsLastFocusedWindow(ctx, root, workspace, window1);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1).AddWindow(window2);
 
 		IPoint<double> point = new Point<double>() { X = 1.7, Y = 0.5 };
 
@@ -262,8 +301,13 @@ public class MoveWindowToPointTests
 		Assert.Equal(2, result.Count);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void MoveWindowToPoint_RootIsSplitNode_AddInDirection(
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void MoveWindowToPoint_RootIsSplitNode_AddInDirection(
+		IContext ctx,
+		MutableRootSector root,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		Workspace workspace,
 		IWindow window1,
 		IWindow window2,
 		IWindow window3,
@@ -271,10 +315,8 @@ public class MoveWindowToPointTests
 	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1);
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1)
-			.AddWindow(window2);
+		TreeCustomization.SetAsLastFocusedWindow(ctx, root, workspace, window1);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1).AddWindow(window2);
 
 		IPoint<double> point = new Point<double>() { X = 0.7, Y = 0.5 };
 
@@ -335,8 +377,13 @@ public class MoveWindowToPointTests
 			);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void MoveWindowToPoint_RootIsSplitNode_AddInDifferentDirection(
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void MoveWindowToPoint_RootIsSplitNode_AddInDifferentDirection(
+		IContext ctx,
+		MutableRootSector root,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		Workspace workspace,
 		IWindow window1,
 		IWindow window2,
 		IWindow window3,
@@ -344,10 +391,8 @@ public class MoveWindowToPointTests
 	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window1);
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1)
-			.AddWindow(window2);
+		TreeCustomization.SetAsLastFocusedWindow(ctx, root, workspace, window1);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1).AddWindow(window2);
 
 		IPoint<double> point = new Point<double>() { X = 0.75, Y = 0.8 };
 
@@ -408,18 +453,26 @@ public class MoveWindowToPointTests
 			);
 	}
 
-	[InlineAutoSubstituteData(0.25, 0.25)]
-	[InlineAutoSubstituteData(0.25, 0.75)]
-	[InlineAutoSubstituteData(0.75, 0.25)]
-	[InlineAutoSubstituteData(0.75, 0.75)]
+	[InlineAutoSubstituteData<TreeCustomization>(0.25, 0.25)]
+	[InlineAutoSubstituteData<TreeCustomization>(0.25, 0.75)]
+	[InlineAutoSubstituteData<TreeCustomization>(0.75, 0.25)]
+	[InlineAutoSubstituteData<TreeCustomization>(0.75, 0.75)]
 	[Theory]
-	public void MoveWindowToPoint_AlreadyContainsWindow(double x, double y, IWindow window, IMonitor monitor)
+	internal void MoveWindowToPoint_AlreadyContainsWindow(
+		double x,
+		double y,
+		IWindow window,
+		IMonitor monitor,
+		IContext ctx,
+		MutableRootSector root,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		Workspace workspace
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window);
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window
-		);
+		TreeCustomization.SetAsLastFocusedWindow(ctx, root, workspace, window);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window);
 
 		IPoint<double> point = new Point<double>() { X = x, Y = y };
 

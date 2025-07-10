@@ -24,6 +24,7 @@ internal class TreeCustomization : StoreCustomization
 		StoreTestUtils.PopulateMonitorWorkspaceMap(_ctx, root, monitor, workspace);
 
 		ITreeLayoutPlugin plugin = Substitute.For<ITreeLayoutPlugin>();
+		plugin.Name.Returns("whim.tree_layout");
 		plugin.GetAddWindowDirection(Arg.Any<TreeLayoutEngine>()).Returns(Direction.Right);
 		fixture.Inject(plugin);
 

@@ -5,12 +5,16 @@ namespace Whim.TreeLayout.Tests;
 
 public class MinimizeWindowTests
 {
-	[Theory, AutoSubstituteData]
-	public void MinimizeWindowStart(IWindow window)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void MinimizeWindowStart(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window
+	)
 	{
 		// Given an empty layout engine
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity);
 
 		// When we minimize a window
 		ILayoutEngine result = engine.MinimizeWindowStart(window);
@@ -21,16 +25,16 @@ public class MinimizeWindowTests
 		Assert.Equal(1, result.Count);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void MinimizeWindowStart_AlreadyMinimized(IWindow window)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void MinimizeWindowStart_AlreadyMinimized(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window
+	)
 	{
 		// Given the window is already minimized
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(
-			wrapper.Context,
-			wrapper.Plugin,
-			wrapper.Identity
-		).MinimizeWindowStart(window);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).MinimizeWindowStart(window);
 
 		// When we minimize the window again
 		ILayoutEngine result = engine.MinimizeWindowStart(window);
@@ -41,14 +45,16 @@ public class MinimizeWindowTests
 		Assert.Equal(1, result.Count);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void MinimizeWindowStart_WindowAlreadyAdded(IWindow window)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void MinimizeWindowStart_WindowAlreadyAdded(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window
+	)
 	{
 		// Given the window is already added
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window
-		);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window);
 
 		// When we minimize the window
 		ILayoutEngine result = engine.MinimizeWindowStart(window);
@@ -59,16 +65,16 @@ public class MinimizeWindowTests
 		Assert.Equal(1, result.Count);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void MinimizeWindowEnd(IWindow window)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void MinimizeWindowEnd(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window
+	)
 	{
 		// Given the window is minimized
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(
-			wrapper.Context,
-			wrapper.Plugin,
-			wrapper.Identity
-		).MinimizeWindowStart(window);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).MinimizeWindowStart(window);
 
 		// When we unminimize the window
 		ILayoutEngine result = engine.MinimizeWindowEnd(window);
@@ -79,12 +85,16 @@ public class MinimizeWindowTests
 		Assert.Equal(1, result.Count);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void MinimizeWindowEnd_NotMinimized(IWindow window)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void MinimizeWindowEnd_NotMinimized(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window
+	)
 	{
 		// Given the window is not minimized
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity);
 
 		// When we unminimize the window
 		ILayoutEngine result = engine.MinimizeWindowEnd(window);
@@ -95,14 +105,16 @@ public class MinimizeWindowTests
 		Assert.Equal(1, result.Count);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void MinimizeWindowEnd_WindowAlreadyAdded(IWindow window)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void MinimizeWindowEnd_WindowAlreadyAdded(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window
+	)
 	{
 		// Given the window is already added
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window
-		);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window);
 
 		// When we unminimize the window
 		ILayoutEngine result = engine.MinimizeWindowEnd(window);

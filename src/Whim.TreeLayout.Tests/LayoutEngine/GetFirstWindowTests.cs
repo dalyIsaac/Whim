@@ -5,13 +5,19 @@ namespace Whim.TreeLayout.Tests;
 
 public class GetFirstWindowTests
 {
-	[Fact]
-	public void GetFirstWindow_RootIsNull()
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void GetFirstWindow_RootIsNull(
+		IContext ctx,
+		MutableRootSector root,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		Workspace workspace
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(null);
+		TreeCustomization.SetAsLastFocusedWindow(ctx, root, workspace, null);
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity);
 
 		// When
 		IWindow? result = engine.GetFirstWindow();
@@ -20,15 +26,20 @@ public class GetFirstWindowTests
 		Assert.Null(result);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void GetFirstWindow_RootIsWindow(IWindow window)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void GetFirstWindow_RootIsWindow(
+		IContext ctx,
+		MutableRootSector root,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		Workspace workspace,
+		IWindow window
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(null);
+		TreeCustomization.SetAsLastFocusedWindow(ctx, root, workspace, null);
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window
-		);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window);
 
 		// When
 		IWindow? result = engine.GetFirstWindow();
@@ -37,13 +48,22 @@ public class GetFirstWindowTests
 		Assert.Same(window, result);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void GetFirstWindow_RootIsSplitNode(IWindow window1, IWindow window2, IWindow window3)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void GetFirstWindow_RootIsSplitNode(
+		IContext ctx,
+		MutableRootSector root,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		Workspace workspace,
+		IWindow window1,
+		IWindow window2,
+		IWindow window3
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(null);
+		TreeCustomization.SetAsLastFocusedWindow(ctx, root, workspace, null);
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity)
 			.AddWindow(window1)
 			.AddWindow(window2)
 			.AddWindow(window3);

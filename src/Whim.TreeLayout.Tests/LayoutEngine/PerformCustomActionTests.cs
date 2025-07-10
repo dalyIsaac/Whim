@@ -5,18 +5,25 @@ namespace Whim.TreeLayout.Tests;
 
 public class PerformCustomActionTests
 {
-	[Theory, AutoSubstituteData]
-	public void PerformCustomAction(IWindow window)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void PerformCustomAction(
+		IContext ctx,
+		MutableRootSector root,
+		Workspace workspace,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(null);
+		TreeCustomization.SetAsLastFocusedWindow(ctx, root, workspace, null);
 		LayoutEngineCustomAction<string> action = new()
 		{
 			Name = "Action",
 			Payload = "payload",
 			Window = window,
 		};
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity);
 
 		// When
 		ILayoutEngine newEngine = engine.PerformCustomAction(action);
