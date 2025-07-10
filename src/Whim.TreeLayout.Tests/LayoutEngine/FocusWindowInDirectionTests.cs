@@ -6,13 +6,20 @@ namespace Whim.TreeLayout.Tests;
 
 public class FocusWindowInDirectionTests
 {
-	[Theory, AutoSubstituteData]
-	public void FocusWindowInDirection_RootIsNull(IWindow focusWindow)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void FocusWindowInDirection_RootIsNull(
+		IContext ctx,
+		MutableRootSector root,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		Workspace workspace,
+		IWindow focusWindow
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(null);
+		TreeCustomization.SetAsLastFocusedWindow(ctx, root, workspace, null);
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Left, focusWindow);
@@ -21,15 +28,17 @@ public class FocusWindowInDirectionTests
 		focusWindow.DidNotReceive().Focus();
 	}
 
-	[Theory, AutoSubstituteData]
-	public void FocusWindowInDirection_CannotFindWindow(IWindow window1, IWindow focusWindow)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void FocusWindowInDirection_CannotFindWindow(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window1,
+		IWindow focusWindow
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window1
-		);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Left, focusWindow);
@@ -39,15 +48,17 @@ public class FocusWindowInDirectionTests
 		focusWindow.DidNotReceive().Focus();
 	}
 
-	[Theory, AutoSubstituteData]
-	public void FocusWindowInDirection_CannotFindWindowInDirection(IWindow window1, IWindow window2)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void FocusWindowInDirection_CannotFindWindowInDirection(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window1,
+		IWindow window2
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1)
-			.AddWindow(window2);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1).AddWindow(window2);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Left, window1);
@@ -57,15 +68,17 @@ public class FocusWindowInDirectionTests
 		window2.DidNotReceive().Focus();
 	}
 
-	[Theory, AutoSubstituteData]
-	public void FocusWindowInDirection_FocusRight(IWindow window1, IWindow window2)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void FocusWindowInDirection_FocusRight(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window1,
+		IWindow window2
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1)
-			.AddWindow(window2);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1).AddWindow(window2);
 
 		// When
 		engine.FocusWindowInDirection(Direction.Right, window1);
