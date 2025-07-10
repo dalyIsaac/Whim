@@ -18,14 +18,17 @@ public class MoveSingleWindowEdgeInDirectionTests
 		return windows;
 	}
 
-	[Fact]
-	public void MoveWindowEdgesInDirection_RootIsNull()
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void MoveWindowEdgesInDirection_RootIsNull(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
 		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.1, Y = 0.1 };
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity);
 
 		// When
 		ILayoutEngine result = engine.MoveWindowEdgesInDirection(
@@ -38,16 +41,19 @@ public class MoveSingleWindowEdgeInDirectionTests
 		Assert.Same(engine, result);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void MoveWindowEdgesInDirection_CannotFindWindow(IWindow window1, IWindow window2)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void MoveWindowEdgesInDirection_CannotFindWindow(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window1,
+		IWindow window2
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
 		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.1, Y = 0.1 };
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1)
-			.AddWindow(window2);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1).AddWindow(window2);
 
 		// When
 		ILayoutEngine result = engine.MoveWindowEdgesInDirection(
@@ -60,18 +66,18 @@ public class MoveSingleWindowEdgeInDirectionTests
 		Assert.Same(engine, result);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void MoveWindowEdgesInDirection_CannotMoveRoot(IWindow window1)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void MoveWindowEdgesInDirection_CannotMoveRoot(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window1
+	)
 	{
 		// Given
-
-		LayoutEngineWrapper wrapper = new();
-
 		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.1, Y = 0.1 };
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window1
-		);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1);
 
 		// When
 		ILayoutEngine result = engine.MoveWindowEdgesInDirection(Direction.Left, pixelsDeltas, window1);
@@ -80,18 +86,20 @@ public class MoveSingleWindowEdgeInDirectionTests
 		Assert.Same(engine, result);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void MoveWindowEdgesInDirection_MoveFocusedWindowEdgeTooFar(
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void MoveWindowEdgesInDirection_MoveFocusedWindowEdgeTooFar(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
 		IWindow window1,
 		IWindow window2,
 		IWindow window3
 	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
 		IPoint<double> pixelsDeltas = new Point<double>() { X = -0.4 };
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity)
 			.AddWindow(window1)
 			.AddWindow(window2)
 			.AddWindow(window3);
@@ -103,18 +111,20 @@ public class MoveSingleWindowEdgeInDirectionTests
 		Assert.Same(engine, result);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void MoveWindowEdgesInDirection_MoveAdjacentWindowEdgeTooFar(
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void MoveWindowEdgesInDirection_MoveAdjacentWindowEdgeTooFar(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
 		IWindow window1,
 		IWindow window2,
 		IWindow window3
 	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
 		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.4 };
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity)
 			.AddWindow(window1)
 			.AddWindow(window2)
 			.AddWindow(window3);
@@ -326,29 +336,29 @@ public class MoveSingleWindowEdgeInDirectionTests
 	}
 
 	[Theory]
-	[MemberAutoSubstituteData(nameof(MoveWindowEdgesInDirection_Horizontal_Data))]
-	public void MoveWindowEdgesInDirection_Horizontal(
+	[MemberAutoSubstituteData<TreeCustomization>(nameof(MoveWindowEdgesInDirection_Horizontal_Data))]
+	internal void MoveWindowEdgesInDirection_Horizontal(
 		Direction edges,
 		IPoint<double> pixelDeltas,
 		IWindow[] windows,
 		IWindowState[] expectedWindowStates,
-		IMonitor monitor
+		IMonitor monitor,
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity
 	)
 	{
 		// Given
 		Assert.Equal(3, windows.Length);
-		LayoutEngineWrapper wrapper = new();
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity)
 			.AddWindow(windows[0])
 			.AddWindow(windows[1])
 			.AddWindow(windows[2]);
 
 		// When
 		ILayoutEngine result = engine.MoveWindowEdgesInDirection(edges, pixelDeltas, windows[1]);
-		IWindowState[] windowStates = result
-			.DoLayout(new Rectangle<int>() { Width = 100, Height = 100 }, monitor)
-			.ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(new Rectangle<int>() { Width = 100, Height = 100 }, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -540,19 +550,22 @@ public class MoveSingleWindowEdgeInDirectionTests
 	}
 
 	[Theory]
-	[MemberAutoSubstituteData(nameof(MoveWindowEdgesInDirection_Vertical_Data))]
-	public void MoveWindowEdgesInDirection_Vertical(
+	[MemberAutoSubstituteData<TreeCustomization>(nameof(MoveWindowEdgesInDirection_Vertical_Data))]
+	internal void MoveWindowEdgesInDirection_Vertical(
 		Direction edges,
 		IPoint<double> pixelDeltas,
 		IWindow[] windows,
 		IWindowState[] expectedWindowStates,
-		IMonitor monitor
+		IMonitor monitor,
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity
 	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAddWindowDirection(Direction.Down);
+		TreeCustomization.SetAddWindowDirection(plugin, Direction.Down);
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity);
 		foreach (IWindow window in windows)
 		{
 			engine = engine.AddWindow(window);
@@ -560,9 +573,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		// When
 		ILayoutEngine result = engine.MoveWindowEdgesInDirection(edges, pixelDeltas, windows[1]);
-		IWindowState[] windowStates = result
-			.DoLayout(new Rectangle<int>() { Width = 100, Height = 100 }, monitor)
-			.ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(new Rectangle<int>() { Width = 100, Height = 100 }, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -995,13 +1006,16 @@ public class MoveSingleWindowEdgeInDirectionTests
 	}
 
 	[Theory]
-	[MemberAutoSubstituteData(nameof(MoveWindowEdgesInDirection_Diagonal_Data))]
-	public void MoveWindowEdgesInDirection_Diagonal(
+	[MemberAutoSubstituteData<TreeCustomization>(nameof(MoveWindowEdgesInDirection_Diagonal_Data))]
+	internal void MoveWindowEdgesInDirection_Diagonal(
 		string window,
 		Direction edges,
 		IPoint<double> pixelDeltas,
 		IWindow[] windows,
 		IWindowState[] expectedWindowStates,
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
 		IMonitor monitor
 	)
 	{
@@ -1016,9 +1030,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 			{ "bottomRight", bottomRight },
 		};
 
-		LayoutEngineWrapper wrapper = new();
-
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity)
 			.AddWindow(topLeft)
 			.AddWindow(topRight)
 			.MoveWindowToPoint(bottomLeft, new Point<double>() { X = 0.25, Y = 0.9 })
@@ -1026,24 +1038,28 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		// When
 		ILayoutEngine result = engine.MoveWindowEdgesInDirection(edges, pixelDeltas, windowsDict[window]);
-		IWindowState[] windowStates = result
-			.DoLayout(new Rectangle<int>() { Width = 100, Height = 100 }, monitor)
-			.ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(new Rectangle<int>() { Width = 100, Height = 100 }, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
 		expectedWindowStates.Should().Equal(windowStates);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void MoveWindowEdgesInDirection_InvalidEdge(IWindow window1, IWindow window2, IWindow window3)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void MoveWindowEdgesInDirection_InvalidEdge(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window1,
+		IWindow window2,
+		IWindow window3
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
 
 		IPoint<double> pixelsDeltas = new Point<double>() { X = 0.1, Y = 0.1 };
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity)
 			.AddWindow(window1)
 			.AddWindow(window2)
 			.AddWindow(window3);

@@ -5,12 +5,16 @@ namespace Whim.TreeLayout.Tests;
 
 public class RemoveTests
 {
-	[Theory, AutoSubstituteData]
-	public void Remove_RootIsNull(IWindow window)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void Remove_RootIsNull(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-		TreeLayoutEngine engine = new(wrapper.Context, wrapper.Plugin, wrapper.Identity);
+		TreeLayoutEngine engine = new(ctx, plugin, identity);
 
 		// When
 		ILayoutEngine result = engine.RemoveWindow(window);
@@ -19,14 +23,16 @@ public class RemoveTests
 		Assert.Same(engine, result);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void Remove_RootIsWindow_Success(IWindow window)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void Remove_RootIsWindow_Success(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window
-		);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window);
 
 		// When
 		ILayoutEngine result = engine.RemoveWindow(window);
@@ -37,14 +43,17 @@ public class RemoveTests
 		Assert.Equal(0, result.Count);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void Remove_RootIsWindow_WrongWindow(IWindow window, IWindow wrongWindow)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void Remove_RootIsWindow_WrongWindow(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window,
+		IWindow wrongWindow
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window
-		);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window);
 
 		// When
 		ILayoutEngine result = engine.RemoveWindow(wrongWindow);
@@ -55,14 +64,18 @@ public class RemoveTests
 		Assert.Equal(1, result.Count);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void Remove_RootIsSplitNode_CannotFindWindow(IWindow window1, IWindow window2, IWindow wrongWindow)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void Remove_RootIsSplitNode_CannotFindWindow(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window1,
+		IWindow window2,
+		IWindow wrongWindow
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1)
-			.AddWindow(window2);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1).AddWindow(window2);
 
 		// When
 		ILayoutEngine result = engine.RemoveWindow(wrongWindow);
@@ -74,14 +87,17 @@ public class RemoveTests
 		Assert.Equal(2, result.Count);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void Remove_RootIsSplitNode_ReplaceRoot(IWindow window1, IWindow window2)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void Remove_RootIsSplitNode_ReplaceRoot(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window1,
+		IWindow window2
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1)
-			.AddWindow(window2);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1).AddWindow(window2);
 
 		// When
 		ILayoutEngine result = engine.RemoveWindow(window1);
@@ -93,16 +109,18 @@ public class RemoveTests
 		Assert.Equal(1, result.Count);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void Remove_RootIsSplitNode_ReplaceChildSplitNodeWithWindow(
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void Remove_RootIsSplitNode_ReplaceChildSplitNodeWithWindow(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
 		IWindow window1,
 		IWindow window2,
 		IWindow window3
 	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity)
 			.AddWindow(window1)
 			.AddWindow(window2)
 			.MoveWindowToPoint(window3, new Point<double>() { X = 0.75, Y = 0.75 });
@@ -118,12 +136,18 @@ public class RemoveTests
 		Assert.Equal(2, result.Count);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void Remove_RootIsSplitNode_ReplaceRootWithSplitNode(IWindow window1, IWindow window2, IWindow window3)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void Remove_RootIsSplitNode_ReplaceRootWithSplitNode(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window1,
+		IWindow window2,
+		IWindow window3
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity)
 			.AddWindow(window1)
 			.AddWindow(window2)
 			.MoveWindowToPoint(window3, new Point<double>() { X = 0.75, Y = 0.75 });
@@ -139,12 +163,18 @@ public class RemoveTests
 		Assert.Equal(2, result.Count);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void Remove_RootIsSplitNode_KeepRoot(IWindow window1, IWindow window2, IWindow window3)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void Remove_RootIsSplitNode_KeepRoot(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window1,
+		IWindow window2,
+		IWindow window3
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity)
 			.AddWindow(window1)
 			.AddWindow(window2)
 			.AddWindow(window3);
@@ -160,12 +190,18 @@ public class RemoveTests
 		Assert.Equal(2, result.Count);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void Remove_WindowWasMinimized(IWindow minimizedWindow, IWindow window1, IWindow window2)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void Remove_WindowWasMinimized(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow minimizedWindow,
+		IWindow window1,
+		IWindow window2
+	)
 	{
 		// Given a window has been minimized
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity)
 			.MinimizeWindowStart(minimizedWindow)
 			.AddWindow(window1)
 			.AddWindow(window2);
@@ -181,12 +217,18 @@ public class RemoveTests
 		Assert.Equal(2, result.Count);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void Remove_WindowWasVisible(IWindow windowWasVisible, IWindow minimizedWindow1, IWindow minimizedWindow2)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void Remove_WindowWasVisible(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow windowWasVisible,
+		IWindow minimizedWindow1,
+		IWindow minimizedWindow2
+	)
 	{
 		// Given only one window is visible, and the others are minimized
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity)
 			.MinimizeWindowStart(minimizedWindow1)
 			.MinimizeWindowStart(minimizedWindow2)
 			.AddWindow(windowWasVisible);

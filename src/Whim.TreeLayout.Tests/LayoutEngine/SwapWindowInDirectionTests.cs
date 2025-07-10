@@ -6,12 +6,16 @@ namespace Whim.TreeLayout.Tests;
 
 public class SwapWindowInDirectionTests
 {
-	[Theory, AutoSubstituteData]
-	public void SwapWindowInDirection_RootIsNull(IWindow window)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void SwapWindowInDirection_RootIsNull(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-		TreeLayoutEngine engine = new(wrapper.Context, wrapper.Plugin, wrapper.Identity);
+		TreeLayoutEngine engine = new(ctx, plugin, identity);
 
 		// When
 		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Left, window);
@@ -22,20 +26,24 @@ public class SwapWindowInDirectionTests
 		Assert.Equal(0, result.Count);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void SwapWindowInDirection_NoAdjacentNodeInDirection(IWindow window1, IWindow window2, IMonitor monitor)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void SwapWindowInDirection_NoAdjacentNodeInDirection(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window1,
+		IWindow window2,
+		IMonitor monitor
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1)
-			.AddWindow(window2);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1).AddWindow(window2);
 
 		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Left, window1);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.Same(engine, result);
@@ -71,20 +79,24 @@ public class SwapWindowInDirectionTests
 			.Equal(windowStates);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void SwapWindowInDirection_SameParent(IWindow window1, IWindow window2, IMonitor monitor)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void SwapWindowInDirection_SameParent(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window1,
+		IWindow window2,
+		IMonitor monitor
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1)
-			.AddWindow(window2);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1).AddWindow(window2);
 
 		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Right, window1);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -120,8 +132,11 @@ public class SwapWindowInDirectionTests
 			.Equal(windowStates);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void SwapWindowInDirection_DifferentParents(
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void SwapWindowInDirection_DifferentParents(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
 		IWindow window1,
 		IWindow window2,
 		IWindow window3,
@@ -129,8 +144,7 @@ public class SwapWindowInDirectionTests
 	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity)
 			.AddWindow(window1)
 			.AddWindow(window2)
 			.MoveWindowToPoint(window3, new Point<double>() { X = 0.75, Y = 0.75 });
@@ -139,7 +153,7 @@ public class SwapWindowInDirectionTests
 
 		// When
 		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Right, window1);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -181,8 +195,11 @@ public class SwapWindowInDirectionTests
 			.Equal(windowStates);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void SwapWindowInDirection_Diagonal(
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void SwapWindowInDirection_Diagonal(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
 		IWindow topLeft,
 		IWindow topRight,
 		IWindow bottomLeft,
@@ -191,9 +208,8 @@ public class SwapWindowInDirectionTests
 	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity)
 			.AddWindow(topLeft)
 			.AddWindow(topRight)
 			.MoveWindowToPoint(bottomLeft, new Point<double>() { X = 0.25, Y = 0.9 })
@@ -203,7 +219,7 @@ public class SwapWindowInDirectionTests
 
 		// When
 		ILayoutEngine result = engine.SwapWindowInDirection(Direction.LeftUp, bottomRight);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);

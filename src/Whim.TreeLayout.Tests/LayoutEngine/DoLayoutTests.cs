@@ -7,32 +7,40 @@ namespace Whim.TreeLayout.Tests;
 
 public class DoLayoutTests
 {
-	[Theory, AutoSubstituteData]
-	public void DoLayout_RootIsNull(IMonitor monitor)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void DoLayout_RootIsNull(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IMonitor monitor
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-		TreeLayoutEngine engine = new(wrapper.Context, wrapper.Plugin, wrapper.Identity);
+		TreeLayoutEngine engine = new(ctx, plugin, identity);
 
 		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
-		IWindowState[] windowStates = engine.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. engine.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.Empty(windowStates);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void DoLayout_OnlyMinimizedWindows(IMonitor monitor)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void DoLayout_OnlyMinimizedWindows(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IMonitor monitor
+	)
 	{
 		// Given a layout with two minimized windows
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity);
 
 		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
-		IWindow[] minimizedWindows = Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] minimizedWindows = [.. Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>())];
 
 		IWindowState[] expectedWindowStates =
 		[
@@ -56,7 +64,7 @@ public class DoLayoutTests
 			engine = engine.MinimizeWindowStart(minimizedWindows[idx]);
 		}
 
-		IWindowState[] windowStates = engine.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. engine.DoLayout(rect, monitor)];
 
 		// Then there will be 2 windows from the result of DoLayout
 		Assert.Equal(2, windowStates.Length);
@@ -64,17 +72,21 @@ public class DoLayoutTests
 		expectedWindowStates.Should().BeEquivalentTo(windowStates);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void DoLayout_MinimizedWindows(IMonitor monitor)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void DoLayout_MinimizedWindows(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IMonitor monitor
+	)
 	{
 		// Given a layout with two windows and two minimized windows
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity);
 
 		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
-		IWindow[] windows = Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>()).ToArray();
-		IWindow[] minimizedWindows = Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>())];
+		IWindow[] minimizedWindows = [.. Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>())];
 
 		IWindowState[] expectedWindowStates =
 		[
@@ -127,7 +139,7 @@ public class DoLayoutTests
 			engine = engine.MinimizeWindowStart(minimizedWindows[idx]);
 		}
 
-		IWindowState[] windowStates = engine.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. engine.DoLayout(rect, monitor)];
 
 		// Then there will be 4 windows from the result of DoLayout
 		Assert.Equal(4, windowStates.Length);

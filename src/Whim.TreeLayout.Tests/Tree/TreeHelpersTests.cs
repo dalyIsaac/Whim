@@ -609,7 +609,7 @@ public class TreeHelpersTests
 		];
 
 		// When
-		WindowNodeRectangleState[] windowRectangles = tree.Root.GetWindowRectangles(rectangle).ToArray();
+		WindowNodeRectangleState[] windowRectangles = [.. tree.Root.GetWindowRectangles(rectangle)];
 
 		// Then
 		windowRectangles

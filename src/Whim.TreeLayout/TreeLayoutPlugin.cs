@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace Whim.TreeLayout;
@@ -8,9 +9,19 @@ namespace Whim.TreeLayout;
 /// <summary>
 /// Initializes a new instance of the <see cref="TreeLayoutPlugin"/> class.
 /// </summary>
-public class TreeLayoutPlugin(IContext context) : ITreeLayoutPlugin
+public class TreeLayoutPlugin : ITreeLayoutPlugin
 {
-	private readonly IContext _context = context;
+	private readonly IContext _ctx;
+
+	/// <summary>
+	/// Creates a new instance of the <see cref="TreeLayoutPlugin"/> class.
+	/// </summary>
+	/// <param name="context"></param>
+	[SuppressMessage("Style", "IDE0290:Use primary constructor")]
+	public TreeLayoutPlugin(IContext context)
+	{
+		_ctx = context;
+	}
 
 	private readonly Dictionary<LayoutEngineIdentity, Direction> _addNodeDirections = [];
 	private const Direction DefaultAddNodeDirection = Direction.Right;
@@ -21,7 +32,7 @@ public class TreeLayoutPlugin(IContext context) : ITreeLayoutPlugin
 	public string Name => "whim.tree_layout";
 
 	/// <inheritdoc/>
-	public IPluginCommands PluginCommands => new TreeLayoutCommands(_context, this);
+	public IPluginCommands PluginCommands => new TreeLayoutCommands(_ctx, this);
 
 	/// <inheritdoc	/>
 	public event EventHandler<AddWindowDirectionChangedEventArgs>? AddWindowDirectionChanged;
@@ -35,7 +46,15 @@ public class TreeLayoutPlugin(IContext context) : ITreeLayoutPlugin
 	/// <inheritdoc />
 	public Direction? GetAddWindowDirection(IMonitor monitor)
 	{
-		ILayoutEngine? layoutEngine = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor)?.ActiveLayoutEngine;
+		if (
+			!_ctx
+				.Store.Pick(Pickers.PickActiveLayoutEngineByMonitor(monitor.Handle))
+				.TryGet(out ILayoutEngine? layoutEngine)
+		)
+		{
+			return null;
+		}
+
 		if (layoutEngine?.GetLayoutEngine<TreeLayoutEngine>() is not TreeLayoutEngine treeLayoutEngine)
 		{
 			return null;
@@ -59,7 +78,15 @@ public class TreeLayoutPlugin(IContext context) : ITreeLayoutPlugin
 	/// <inheritdoc />
 	public void SetAddWindowDirection(IMonitor monitor, Direction direction)
 	{
-		ILayoutEngine? layoutEngine = _context.Butler.Pantry.GetWorkspaceForMonitor(monitor)?.ActiveLayoutEngine;
+		if (
+			!_ctx
+				.Store.Pick(Pickers.PickActiveLayoutEngineByMonitor(monitor.Handle))
+				.TryGet(out ILayoutEngine? layoutEngine)
+		)
+		{
+			return;
+		}
+
 		if (layoutEngine?.GetLayoutEngine<TreeLayoutEngine>() is not TreeLayoutEngine treeLayoutEngine)
 		{
 			return;
@@ -77,7 +104,7 @@ public class TreeLayoutPlugin(IContext context) : ITreeLayoutPlugin
 
 		_addNodeDirections[engine.Identity] = direction;
 
-		context.NativeManager.TryEnqueue(() =>
+		_ctx.NativeManager.TryEnqueue(() =>
 			AddWindowDirectionChanged?.Invoke(
 				this,
 				new AddWindowDirectionChangedEventArgs()

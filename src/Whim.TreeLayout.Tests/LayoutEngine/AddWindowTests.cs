@@ -6,12 +6,16 @@ namespace Whim.TreeLayout.Tests;
 
 public class AddWindowTests
 {
-	[Theory, AutoSubstituteData]
-	public void AddWindow_RootIsNull(IWindow window)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	public void AddWindow_RootIsNull(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-		TreeLayoutEngine engine = new(wrapper.Context, wrapper.Plugin, wrapper.Identity);
+		TreeLayoutEngine engine = new(ctx, plugin, identity);
 
 		// When
 		ILayoutEngine result = engine.AddWindow(window);
@@ -22,19 +26,23 @@ public class AddWindowTests
 		Assert.Equal(1, result.Count);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void AddWindow_RootIsWindow(IWindow window1, IWindow window2, IMonitor monitor)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	public void AddWindow_RootIsWindow(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window1,
+		IWindow window2,
+		IMonitor monitor
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window1
-		);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1);
 		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.AddWindow(window2);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -74,26 +82,30 @@ public class AddWindowTests
 			);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void AddWindow_RootIsSplitNode_LastFocusedWindowIsNull(
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void AddWindow_RootIsSplitNode_LastFocusedWindowIsNull(
+		IContext ctx,
+		MutableRootSector root,
+		ITreeLayoutPlugin plugin,
+		Workspace workspace,
 		IWindow window1,
 		IWindow window2,
 		IWindow window3,
-		IMonitor monitor
+		IMonitor monitor,
+		LayoutEngineIdentity identity
 	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(null);
+		TreeCustomization.SetAsLastFocusedWindow(ctx, root, workspace, null);
+		TreeCustomization.SetAddWindowDirection(plugin, Direction.Right);
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1)
-			.AddWindow(window2);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1).AddWindow(window2);
 
 		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.AddWindow(window3);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -144,8 +156,13 @@ public class AddWindowTests
 			);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void AddWindow_RootIsSplitNode_CannotFindLastFocusedWindow(
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void AddWindow_RootIsSplitNode_CannotFindLastFocusedWindow(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		MutableRootSector root,
+		Workspace workspace,
 		IWindow window1,
 		IWindow window2,
 		IWindow window3,
@@ -153,17 +170,15 @@ public class AddWindowTests
 	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new LayoutEngineWrapper().SetAsLastFocusedWindow(window3);
+		TreeCustomization.SetAsLastFocusedWindow(ctx, root, workspace, window3);
 
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1)
-			.AddWindow(window2);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1).AddWindow(window2);
 
 		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.AddWindow(window3);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -214,8 +229,13 @@ public class AddWindowTests
 			);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void AddWindow_RootIsSplitNode_LastFocusedWindowIsLeft(
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void AddWindow_RootIsSplitNode_LastFocusedWindowIsLeft(
+		IContext ctx,
+		MutableRootSector root,
+		Workspace workspace,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
 		IWindow window1,
 		IWindow window2,
 		IWindow window3,
@@ -223,19 +243,14 @@ public class AddWindowTests
 	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1)
-			.AddWindow(window2);
-
-		wrapper.SetAsLastFocusedWindow(window1);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1).AddWindow(window2);
+		TreeCustomization.SetAsLastFocusedWindow(ctx, root, workspace, window1);
 
 		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.AddWindow(window3);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -286,8 +301,11 @@ public class AddWindowTests
 			);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void AddWindow_RootIsSplitNode_AddInDifferentDirection(
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	internal void AddWindow_RootIsSplitNode_AddInDifferentDirection(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
 		IWindow window1,
 		IWindow window2,
 		IWindow window3,
@@ -295,19 +313,14 @@ public class AddWindowTests
 	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1)
-			.AddWindow(window2);
-
-		wrapper.SetAddWindowDirection(Direction.Down);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1).AddWindow(window2);
+		TreeCustomization.SetAddWindowDirection(plugin, Direction.Down);
 
 		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.AddWindow(window3);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -358,21 +371,24 @@ public class AddWindowTests
 			);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void AddWindow_WindowAlreadyPresent(IWindow window1, IWindow window2, IMonitor monitor)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	public void AddWindow_WindowAlreadyPresent(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IWindow window1,
+		IWindow window2,
+		IMonitor monitor
+	)
 	{
 		// Given
-		LayoutEngineWrapper wrapper = new();
-
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity)
-			.AddWindow(window1)
-			.AddWindow(window2);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window1).AddWindow(window2);
 
 		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
 		ILayoutEngine result = engine.AddWindow(window2);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.Same(engine, result);
@@ -411,21 +427,23 @@ public class AddWindowTests
 			);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void AddWindow_WindowWasMinimized(IWindow window)
+	[Theory, AutoSubstituteData<TreeCustomization>]
+	public void AddWindow_WindowWasMinimized(
+		IContext ctx,
+		ITreeLayoutPlugin plugin,
+		LayoutEngineIdentity identity,
+		IMonitor monitor,
+		IWindow window
+	)
 	{
 		// Given a window has been added
-		LayoutEngineWrapper wrapper = new();
-
-		ILayoutEngine engine = new TreeLayoutEngine(wrapper.Context, wrapper.Plugin, wrapper.Identity).AddWindow(
-			window
-		);
+		ILayoutEngine engine = new TreeLayoutEngine(ctx, plugin, identity).AddWindow(window);
 
 		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When the window has been minimized
 		ILayoutEngine result = engine.MinimizeWindowStart(window).AddWindow(window);
-		IWindowState[] windowStates = result.DoLayout(rect, wrapper.Monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then the window is minimized, and a new layout engine is created
 		Assert.NotSame(engine, result);
