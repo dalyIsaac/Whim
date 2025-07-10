@@ -17,7 +17,7 @@ public class DoLayoutTests
 		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
 		// When
-		IWindowState[] windowStates = engine.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. engine.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.Empty(windowStates);
@@ -32,7 +32,7 @@ public class DoLayoutTests
 
 		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
-		IWindow[] minimizedWindows = Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] minimizedWindows = [.. Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>())];
 
 		IWindowState[] expectedWindowStates =
 		[
@@ -56,7 +56,7 @@ public class DoLayoutTests
 			engine = engine.MinimizeWindowStart(minimizedWindows[idx]);
 		}
 
-		IWindowState[] windowStates = engine.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. engine.DoLayout(rect, monitor)];
 
 		// Then there will be 2 windows from the result of DoLayout
 		Assert.Equal(2, windowStates.Length);
@@ -73,8 +73,8 @@ public class DoLayoutTests
 
 		IRectangle<int> rect = new Rectangle<int>() { Width = 100, Height = 100 };
 
-		IWindow[] windows = Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>()).ToArray();
-		IWindow[] minimizedWindows = Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>())];
+		IWindow[] minimizedWindows = [.. Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>())];
 
 		IWindowState[] expectedWindowStates =
 		[
@@ -127,7 +127,7 @@ public class DoLayoutTests
 			engine = engine.MinimizeWindowStart(minimizedWindows[idx]);
 		}
 
-		IWindowState[] windowStates = engine.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. engine.DoLayout(rect, monitor)];
 
 		// Then there will be 4 windows from the result of DoLayout
 		Assert.Equal(4, windowStates.Length);

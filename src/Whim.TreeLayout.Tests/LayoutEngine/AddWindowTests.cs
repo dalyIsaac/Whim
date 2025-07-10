@@ -34,7 +34,7 @@ public class AddWindowTests
 
 		// When
 		ILayoutEngine result = engine.AddWindow(window2);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -93,7 +93,7 @@ public class AddWindowTests
 
 		// When
 		ILayoutEngine result = engine.AddWindow(window3);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -163,7 +163,7 @@ public class AddWindowTests
 
 		// When
 		ILayoutEngine result = engine.AddWindow(window3);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -235,7 +235,7 @@ public class AddWindowTests
 
 		// When
 		ILayoutEngine result = engine.AddWindow(window3);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -307,7 +307,7 @@ public class AddWindowTests
 
 		// When
 		ILayoutEngine result = engine.AddWindow(window3);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -372,7 +372,7 @@ public class AddWindowTests
 
 		// When
 		ILayoutEngine result = engine.AddWindow(window2);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.Same(engine, result);
@@ -425,7 +425,7 @@ public class AddWindowTests
 
 		// When the window has been minimized
 		ILayoutEngine result = engine.MinimizeWindowStart(window).AddWindow(window);
-		IWindowState[] windowStates = result.DoLayout(rect, wrapper.Monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, wrapper.Monitor)];
 
 		// Then the window is minimized, and a new layout engine is created
 		Assert.NotSame(engine, result);

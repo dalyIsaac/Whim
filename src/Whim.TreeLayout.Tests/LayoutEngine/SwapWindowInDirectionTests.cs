@@ -35,7 +35,7 @@ public class SwapWindowInDirectionTests
 
 		// When
 		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Left, window1);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.Same(engine, result);
@@ -84,7 +84,7 @@ public class SwapWindowInDirectionTests
 
 		// When
 		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Right, window1);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -139,7 +139,7 @@ public class SwapWindowInDirectionTests
 
 		// When
 		ILayoutEngine result = engine.SwapWindowInDirection(Direction.Right, window1);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -203,7 +203,7 @@ public class SwapWindowInDirectionTests
 
 		// When
 		ILayoutEngine result = engine.SwapWindowInDirection(Direction.LeftUp, bottomRight);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);

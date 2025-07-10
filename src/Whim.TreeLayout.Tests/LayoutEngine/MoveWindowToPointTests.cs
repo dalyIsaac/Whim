@@ -38,7 +38,7 @@ public class MoveWindowToPointTests
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window2, point);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -92,7 +92,7 @@ public class MoveWindowToPointTests
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window2, point);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -146,7 +146,7 @@ public class MoveWindowToPointTests
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window2, point);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -200,7 +200,7 @@ public class MoveWindowToPointTests
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window2, point);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -282,7 +282,7 @@ public class MoveWindowToPointTests
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window3, point);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -355,7 +355,7 @@ public class MoveWindowToPointTests
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window3, point);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -427,7 +427,7 @@ public class MoveWindowToPointTests
 
 		// When
 		ILayoutEngine result = engine.MoveWindowToPoint(window, point);
-		IWindowState[] windowStates = result.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(rect, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);

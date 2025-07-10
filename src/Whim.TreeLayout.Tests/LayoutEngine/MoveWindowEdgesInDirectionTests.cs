@@ -346,9 +346,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		// When
 		ILayoutEngine result = engine.MoveWindowEdgesInDirection(edges, pixelDeltas, windows[1]);
-		IWindowState[] windowStates = result
-			.DoLayout(new Rectangle<int>() { Width = 100, Height = 100 }, monitor)
-			.ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(new Rectangle<int>() { Width = 100, Height = 100 }, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -560,9 +558,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		// When
 		ILayoutEngine result = engine.MoveWindowEdgesInDirection(edges, pixelDeltas, windows[1]);
-		IWindowState[] windowStates = result
-			.DoLayout(new Rectangle<int>() { Width = 100, Height = 100 }, monitor)
-			.ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(new Rectangle<int>() { Width = 100, Height = 100 }, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
@@ -1026,9 +1022,7 @@ public class MoveSingleWindowEdgeInDirectionTests
 
 		// When
 		ILayoutEngine result = engine.MoveWindowEdgesInDirection(edges, pixelDeltas, windowsDict[window]);
-		IWindowState[] windowStates = result
-			.DoLayout(new Rectangle<int>() { Width = 100, Height = 100 }, monitor)
-			.ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(new Rectangle<int>() { Width = 100, Height = 100 }, monitor)];
 
 		// Then
 		Assert.NotSame(engine, result);
