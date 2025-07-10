@@ -208,10 +208,12 @@ public static partial class Pickers
 				)
 			)
 			{
-				List<HMONITOR> monitorHandles = monitorIndices
-					.Where(monitorIndex => monitorIndex >= 0 && monitorIndex < monitors.Length)
-					.Select(monitorIndex => monitors[monitorIndex].Handle)
-					.ToList();
+				List<HMONITOR> monitorHandles =
+				[
+					.. monitorIndices
+						.Where(monitorIndex => monitorIndex >= 0 && monitorIndex < monitors.Length)
+						.Select(monitorIndex => monitors[monitorIndex].Handle),
+				];
 
 				if (monitorHandles.Count != 0)
 				{

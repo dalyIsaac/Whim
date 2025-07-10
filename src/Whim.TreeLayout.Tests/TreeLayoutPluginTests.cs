@@ -1,14 +1,44 @@
 using System.Text.Json;
 using NSubstitute;
 using Whim.TestUtils;
+using Windows.Win32.Graphics.Gdi;
 using Xunit;
+using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.TreeLayout.Tests;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class TreeLayoutPluginTests
 {
-	[Theory, AutoSubstituteData]
-	public void Name(IContext ctx)
+	private class Customization : StoreCustomization
+	{
+		public static Workspace CreateWorkspace(IContext ctx)
+		{
+			LayoutEngineIdentity identity = new();
+			ILayoutEngine layoutEngine = Substitute.For<ILayoutEngine>();
+			layoutEngine.Identity.Returns(identity);
+
+			Workspace workspace = StoreTestUtils.CreateWorkspace(ctx) with { LayoutEngines = [layoutEngine] };
+			return workspace;
+		}
+
+		public static Workspace CreateTreeWorkspace(IContext ctx, TreeLayoutPlugin plugin)
+		{
+			LayoutEngineIdentity identity = new();
+			TreeLayoutEngine layoutEngine = new(ctx, plugin, identity);
+			return CreateWorkspace(ctx) with { LayoutEngines = [layoutEngine] };
+		}
+
+		public static IMonitor CreateMonitor(IContext ctx)
+		{
+			IMonitor monitor = Substitute.For<IMonitor>();
+			monitor.Handle.Returns((HMONITOR)1);
+			return monitor;
+		}
+	}
+
+	[Theory, AutoSubstituteData<Customization>]
+	internal void Name(IContext ctx)
 	{
 		// Given
 		TreeLayoutPlugin plugin = new(ctx);
@@ -20,8 +50,8 @@ public class TreeLayoutPluginTests
 		Assert.Equal("whim.tree_layout", name);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void PluginCommands(IContext ctx)
+	[Theory, AutoSubstituteData<Customization>]
+	internal void PluginCommands(IContext ctx)
 	{
 		// Given
 		TreeLayoutPlugin plugin = new(ctx);
@@ -33,8 +63,8 @@ public class TreeLayoutPluginTests
 		Assert.NotEmpty(commands.Commands);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void PreInitialize(IContext ctx)
+	[Theory, AutoSubstituteData<Customization>]
+	internal void PreInitialize(IContext ctx)
 	{
 		// Given
 		TreeLayoutPlugin plugin = new(ctx);
@@ -46,8 +76,8 @@ public class TreeLayoutPluginTests
 		CustomAssert.NoContextCalls(ctx);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void PostInitialize(IContext ctx)
+	[Theory, AutoSubstituteData<Customization>]
+	internal void PostInitialize(IContext ctx)
 	{
 		// Given
 		TreeLayoutPlugin plugin = new(ctx);
@@ -60,8 +90,8 @@ public class TreeLayoutPluginTests
 	}
 
 	#region GetAddWindowDirection
-	[Theory, AutoSubstituteData]
-	public void GetAddWindowDirection_Monitor_NoLayoutEngine(IContext ctx, IMonitor monitor)
+	[Theory, AutoSubstituteData<Customization>]
+	internal void GetAddWindowDirection_Monitor_NoLayoutEngine(IContext ctx, IMonitor monitor)
 	{
 		// Given
 		TreeLayoutPlugin plugin = new(ctx);
@@ -73,19 +103,14 @@ public class TreeLayoutPluginTests
 		Assert.Null(direction);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void GetAddWindowDirection_Monitor_IsNotTreeLayoutEngine(
-		IContext ctx,
-		IMonitor monitor,
-		IWorkspace workspace,
-		ILayoutEngine layoutEngine
-	)
+	[Theory, AutoSubstituteData<Customization>]
+	internal void GetAddWindowDirection_Monitor_IsNotTreeLayoutEngine(IContext ctx, MutableRootSector root)
 	{
 		// Given
-		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
-		workspace.ActiveLayoutEngine.Returns(layoutEngine);
-
 		TreeLayoutPlugin plugin = new(ctx);
+
+		IMonitor monitor = Customization.CreateMonitor(ctx);
+		PopulateMonitorWorkspaceMap(ctx, root, monitor, StoreTestUtils.CreateWorkspace(ctx));
 
 		// When
 		Direction? direction = plugin.GetAddWindowDirection(monitor);
@@ -94,17 +119,14 @@ public class TreeLayoutPluginTests
 		Assert.Null(direction);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void GetAddWindowDirection_Monitor_LazyInit(IContext ctx, IMonitor monitor, IWorkspace workspace)
+	[Theory, AutoSubstituteData<Customization>]
+	internal void GetAddWindowDirection_Monitor_LazyInit(IContext ctx, MutableRootSector root)
 	{
 		// Given
-		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
-
 		TreeLayoutPlugin plugin = new(ctx);
 
-		LayoutEngineIdentity identity = new();
-		TreeLayoutEngine treeLayoutEngine = new(ctx, plugin, identity);
-		workspace.ActiveLayoutEngine.Returns(treeLayoutEngine);
+		IMonitor monitor = Customization.CreateMonitor(ctx);
+		PopulateMonitorWorkspaceMap(ctx, root, monitor, Customization.CreateTreeWorkspace(ctx, plugin));
 
 		// When
 		Direction? direction = plugin.GetAddWindowDirection(monitor);
@@ -113,17 +135,14 @@ public class TreeLayoutPluginTests
 		Assert.Equal(Direction.Right, direction);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void GetAddWindowDirection_Monitor_AlreadyInit(IContext ctx, IMonitor monitor, IWorkspace workspace)
+	[Theory, AutoSubstituteData<Customization>]
+	internal void GetAddWindowDirection_Monitor_AlreadyInit(IContext ctx, MutableRootSector root)
 	{
 		// Given
-		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
-
 		TreeLayoutPlugin plugin = new(ctx);
 
-		LayoutEngineIdentity identity = new();
-		TreeLayoutEngine treeLayoutEngine = new(ctx, plugin, identity);
-		workspace.ActiveLayoutEngine.Returns(treeLayoutEngine);
+		IMonitor monitor = Customization.CreateMonitor(ctx);
+		PopulateMonitorWorkspaceMap(ctx, root, monitor, Customization.CreateTreeWorkspace(ctx, plugin));
 
 		plugin.SetAddWindowDirection(monitor, Direction.Left);
 
@@ -134,8 +153,8 @@ public class TreeLayoutPluginTests
 		Assert.Equal(Direction.Left, direction);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void GetAddWindowDirection_Engine_LazyInit(IContext ctx)
+	[Theory, AutoSubstituteData<Customization>]
+	internal void GetAddWindowDirection_Engine_LazyInit(IContext ctx)
 	{
 		// Given
 		TreeLayoutPlugin plugin = new(ctx);
@@ -148,8 +167,8 @@ public class TreeLayoutPluginTests
 		Assert.Equal(Direction.Right, direction);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void GetAddWindowDirection_Engine_AlreadyInit(IContext ctx)
+	[Theory, AutoSubstituteData<Customization>]
+	internal void GetAddWindowDirection_Engine_AlreadyInit(IContext ctx)
 	{
 		// Given
 		TreeLayoutPlugin plugin = new(ctx);
@@ -166,8 +185,8 @@ public class TreeLayoutPluginTests
 	#endregion
 
 	#region SetAddWindowDirection
-	[Theory, AutoSubstituteData]
-	public void SetAddWindowDirection_NoLayoutEngine(IContext ctx, IMonitor monitor)
+	[Theory, AutoSubstituteData<Customization>]
+	internal void SetAddWindowDirection_NoLayoutEngine(IContext ctx, IMonitor monitor)
 	{
 		// Given
 		TreeLayoutPlugin plugin = new(ctx);
@@ -180,20 +199,14 @@ public class TreeLayoutPluginTests
 		Assert.Null(direction);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void SetAddWindowDirection_NotTreeLayoutEngine(
-		IContext ctx,
-		IMonitor monitor,
-		IWorkspace workspace,
-		ILayoutEngine layoutEngine
-	)
+	[Theory, AutoSubstituteData<Customization>]
+	internal void SetAddWindowDirection_NotTreeLayoutEngine(IContext ctx, MutableRootSector root)
 	{
 		// Given
-		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
-
 		TreeLayoutPlugin plugin = new(ctx);
 
-		workspace.ActiveLayoutEngine.Returns(layoutEngine);
+		IMonitor monitor = Customization.CreateMonitor(ctx);
+		PopulateMonitorWorkspaceMap(ctx, root, monitor, Customization.CreateWorkspace(ctx));
 
 		// When
 		plugin.SetAddWindowDirection(monitor, Direction.Up);
@@ -203,18 +216,16 @@ public class TreeLayoutPluginTests
 		Assert.Null(direction);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void SetAddWindowDirection_DirectionNotSet(IContext ctx, IMonitor monitor, IWorkspace workspace)
+	[Theory, AutoSubstituteData<Customization>]
+	internal void SetAddWindowDirection_DirectionNotSet(IContext ctx, MutableRootSector root)
 	{
 		// Given
+		TreeLayoutPlugin plugin = new(ctx);
+
 		NativeManagerUtils.SetupTryEnqueue(ctx);
-		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
-
-		TreeLayoutPlugin plugin = new(ctx);
-
-		LayoutEngineIdentity identity = new();
-		TreeLayoutEngine treeLayoutEngine = new(ctx, plugin, identity);
-		workspace.ActiveLayoutEngine.Returns(treeLayoutEngine);
+		IMonitor monitor = Customization.CreateMonitor(ctx);
+		Workspace workspace = Customization.CreateTreeWorkspace(ctx, plugin);
+		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
 
 		// When
 		Assert.RaisedEvent<AddWindowDirectionChangedEventArgs> addWindowEvent =
@@ -229,22 +240,20 @@ public class TreeLayoutPluginTests
 		// Then
 		Assert.Equal(Direction.Up, addWindowEvent.Arguments.CurrentDirection);
 		Assert.Equal(Direction.Right, addWindowEvent.Arguments.PreviousDirection);
-		Assert.Equal(treeLayoutEngine, addWindowEvent.Arguments.TreeLayoutEngine);
+		Assert.Equal(workspace.LayoutEngines[0], addWindowEvent.Arguments.TreeLayoutEngine);
 		Assert.Equal(Direction.Up, direction);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void SetAddWindowDirection_DirectionAlreadySet(IContext ctx, IMonitor monitor, IWorkspace workspace)
+	[Theory, AutoSubstituteData<Customization>]
+	internal void SetAddWindowDirection_DirectionAlreadySet(IContext ctx, MutableRootSector root)
 	{
 		// Given
-		NativeManagerUtils.SetupTryEnqueue(ctx);
-		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
-
 		TreeLayoutPlugin plugin = new(ctx);
 
-		LayoutEngineIdentity identity = new();
-		TreeLayoutEngine treeLayoutEngine = new(ctx, plugin, identity);
-		workspace.ActiveLayoutEngine.Returns(treeLayoutEngine);
+		NativeManagerUtils.SetupTryEnqueue(ctx);
+		IMonitor monitor = Customization.CreateMonitor(ctx);
+		Workspace workspace = Customization.CreateTreeWorkspace(ctx, plugin);
+		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
 
 		// When
 		plugin.SetAddWindowDirection(monitor, Direction.Up);
@@ -260,13 +269,13 @@ public class TreeLayoutPluginTests
 		// Then
 		Assert.Equal(Direction.Down, addWindowEvent.Arguments.CurrentDirection);
 		Assert.Equal(Direction.Up, addWindowEvent.Arguments.PreviousDirection);
-		Assert.Equal(treeLayoutEngine, addWindowEvent.Arguments.TreeLayoutEngine);
+		Assert.Equal(workspace.LayoutEngines[0], addWindowEvent.Arguments.TreeLayoutEngine);
 		Assert.Equal(Direction.Down, direction);
 	}
 	#endregion
 
-	[Theory, AutoSubstituteData]
-	public void LoadState(IContext ctx)
+	[Theory, AutoSubstituteData<Customization>]
+	internal void LoadState(IContext ctx)
 	{
 		// Given
 		TreeLayoutPlugin plugin = new(ctx);
@@ -278,8 +287,8 @@ public class TreeLayoutPluginTests
 		CustomAssert.NoContextCalls(ctx);
 	}
 
-	[Theory, AutoSubstituteData]
-	public void SaveState(IContext ctx)
+	[Theory, AutoSubstituteData<Customization>]
+	internal void SaveState(IContext ctx)
 	{
 		// Given
 		TreeLayoutPlugin plugin = new(ctx);
