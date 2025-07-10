@@ -59,13 +59,13 @@ internal static class StoreTestUtils
 	{
 		WorkspaceSector workspaceSector = rootSector.WorkspaceSector;
 
-		if (workspaceSector.WorkspaceOrder.Contains(workspace.Id))
-		{
-			return;
-		}
+		bool alreadyContains = workspaceSector.Workspaces.ContainsKey(workspace.Id);
+		workspaceSector.Workspaces = workspaceSector.Workspaces.SetItem(workspace.Id, workspace);
 
-		workspaceSector.Workspaces = workspaceSector.Workspaces.Add(workspace.Id, workspace);
-		workspaceSector.WorkspaceOrder = workspaceSector.WorkspaceOrder.Add(workspace.Id);
+		if (!alreadyContains)
+		{
+			workspaceSector.WorkspaceOrder = workspaceSector.WorkspaceOrder.Add(workspace.Id);
+		}
 	}
 
 	public static void AddWorkspacesToManager(

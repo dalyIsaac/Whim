@@ -2,6 +2,8 @@ using NSubstitute;
 
 namespace Whim.TreeLayout.Tests;
 
+// TODO: Delete
+[Obsolete]
 internal sealed class LayoutEngineWrapper
 {
 	public IContext Context { get; } = Substitute.For<IContext>();

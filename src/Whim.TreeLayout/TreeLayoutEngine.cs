@@ -181,7 +181,7 @@ public record TreeLayoutEngine : ILayoutEngine
 
 		// Try get the focused window, and use its parent. Otherwise, use the right-most window.
 		if (
-			_context.WorkspaceManager.ActiveWorkspace.LastFocusedWindow is IWindow focusedWindow
+			_context.Store.Pick(Pickers.PickLastFocusedWindow()).TryGet(out IWindow? focusedWindow)
 			&& _windows.TryGetValue(focusedWindow, out ImmutableArray<int> focusedWindowPath)
 			&& rootNode.GetNodeAtPath(focusedWindowPath) is NodeState nodeState
 			&& nodeState.Node is WindowNode focusedWindowNode
@@ -346,7 +346,7 @@ public record TreeLayoutEngine : ILayoutEngine
 			_root,
 			path,
 			direction,
-			_context.MonitorManager.ActiveMonitor
+			_context.Store.Pick(Pickers.PickActiveMonitor())
 		);
 
 		adjacentNodeResult?.WindowNode.Focus();
@@ -414,7 +414,7 @@ public record TreeLayoutEngine : ILayoutEngine
 			IRectangle<double> windowRectangle
 		) = windowData;
 
-		IMonitor monitor = _context.MonitorManager.ActiveMonitor;
+		IMonitor monitor = _context.Store.Pick(Pickers.PickActiveMonitor());
 		WindowNodeStateAtPoint? xAdjacentResult = null;
 		WindowNodeStateAtPoint? yAdjacentResult = null;
 
@@ -522,7 +522,7 @@ public record TreeLayoutEngine : ILayoutEngine
 
 		// Adjust the weight of the focused node.
 		// First, we need to find the rectangle of the parent node.
-		ImmutableArray<int> parentNodePath = focusedNodePath.Take(parentDepth).ToImmutableArray();
+		ImmutableArray<int> parentNodePath = [.. focusedNodePath.Take(parentDepth)];
 		NodeState? parentResult = root.GetNodeAtPath(parentNodePath);
 		if (parentResult is null || parentResult.Node is not ISplitNode parentSplitNode)
 		{
@@ -631,7 +631,7 @@ public record TreeLayoutEngine : ILayoutEngine
 		WindowNodeStateAtPoint? adjacentResult = TreeHelpers.GetAdjacentWindowNode(
 			windowData.RootSplitNode,
 			direction,
-			_context.MonitorManager.ActiveMonitor,
+			_context.Store.Pick(Pickers.PickActiveMonitor()),
 			windowData.WindowRectangle
 		);
 		if (adjacentResult is null)
