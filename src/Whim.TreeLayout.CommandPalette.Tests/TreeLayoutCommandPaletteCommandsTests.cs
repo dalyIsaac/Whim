@@ -2,38 +2,42 @@ using AutoFixture;
 using NSubstitute;
 using Whim.CommandPalette;
 using Whim.TestUtils;
+using Windows.Win32.Graphics.Gdi;
 using Xunit;
+using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.TreeLayout.CommandPalette.Tests;
 
-public class TreeLayoutCommandPaletteCommandsCustomization : ICustomization
-{
-	public void Customize(IFixture fixture)
-	{
-		IContext ctx = fixture.Freeze<IContext>();
-		IMonitor monitor = fixture.Freeze<IMonitor>();
-
-		ctx.MonitorManager.ActiveMonitor.Returns(monitor);
-
-		IPlugin treeLayoutCommandPalettePlugin = fixture.Freeze<IPlugin>();
-		treeLayoutCommandPalettePlugin.Name.Returns("whim.tree_layout.command_palette");
-
-		ITreeLayoutPlugin treeLayoutPlugin = fixture.Freeze<ITreeLayoutPlugin>();
-		ICommandPalettePlugin commandPalettePlugin = fixture.Freeze<ICommandPalettePlugin>();
-
-		TreeLayoutCommandPalettePluginCommands commands = new(
-			ctx,
-			treeLayoutCommandPalettePlugin,
-			treeLayoutPlugin,
-			commandPalettePlugin
-		);
-		fixture.Inject(commands);
-	}
-}
-
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class TreeLayoutCommandPaletteCommandsTests
 {
-	[Theory, AutoSubstituteData<TreeLayoutCommandPaletteCommandsCustomization>]
+	private class Customization : StoreCustomization
+	{
+		protected override void PostCustomize(IFixture fixture)
+		{
+			MutableRootSector root = _store._root.MutableRootSector;
+
+			IMonitor monitor = CreateMonitor((HMONITOR)1234);
+			fixture.Inject(monitor);
+			AddMonitorsToManager(_ctx, root, monitor);
+
+			IPlugin treeLayoutCommandPalettePlugin = fixture.Freeze<IPlugin>();
+			treeLayoutCommandPalettePlugin.Name.Returns("whim.tree_layout.command_palette");
+
+			ITreeLayoutPlugin treeLayoutPlugin = fixture.Freeze<ITreeLayoutPlugin>();
+			ICommandPalettePlugin commandPalettePlugin = fixture.Freeze<ICommandPalettePlugin>();
+
+			TreeLayoutCommandPalettePluginCommands commands = new(
+				_ctx,
+				treeLayoutCommandPalettePlugin,
+				treeLayoutPlugin,
+				commandPalettePlugin
+			);
+			fixture.Inject(commands);
+		}
+	}
+
+	[Theory, AutoSubstituteData<Customization>]
 	public void SetDirectionCommand_Activates(
 		ICommandPalettePlugin commandPalettePlugin,
 		TreeLayoutCommandPalettePluginCommands commands,
@@ -54,7 +58,7 @@ public class TreeLayoutCommandPaletteCommandsTests
 		commandPalettePlugin.Received(1).Activate(Arg.Any<MenuVariantConfig>());
 	}
 
-	[Theory, AutoSubstituteData<TreeLayoutCommandPaletteCommandsCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	public void SetDirectionCommand_Activates_Fails(
 		ICommandPalettePlugin commandPalettePlugin,
 		TreeLayoutCommandPalettePluginCommands commands,
@@ -75,7 +79,7 @@ public class TreeLayoutCommandPaletteCommandsTests
 		commandPalettePlugin.DidNotReceive().Activate(Arg.Any<MenuVariantConfig>());
 	}
 
-	[Theory, AutoSubstituteData<TreeLayoutCommandPaletteCommandsCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	public void CreateSetDirectionCommandItems(TreeLayoutCommandPalettePluginCommands commands)
 	{
 		// When
@@ -85,10 +89,10 @@ public class TreeLayoutCommandPaletteCommandsTests
 		Assert.Equal(4, commandItems.Length);
 	}
 
-	[InlineAutoSubstituteData<TreeLayoutCommandPaletteCommandsCustomization>("Left", Direction.Left)]
-	[InlineAutoSubstituteData<TreeLayoutCommandPaletteCommandsCustomization>("Right", Direction.Right)]
-	[InlineAutoSubstituteData<TreeLayoutCommandPaletteCommandsCustomization>("Up", Direction.Up)]
-	[InlineAutoSubstituteData<TreeLayoutCommandPaletteCommandsCustomization>("Down", Direction.Down)]
+	[InlineAutoSubstituteData<Customization>("Left", Direction.Left)]
+	[InlineAutoSubstituteData<Customization>("Right", Direction.Right)]
+	[InlineAutoSubstituteData<Customization>("Up", Direction.Up)]
+	[InlineAutoSubstituteData<Customization>("Down", Direction.Down)]
 	[Theory]
 	public void SetDirection(
 		string direction,
@@ -105,18 +109,18 @@ public class TreeLayoutCommandPaletteCommandsTests
 		treeLayoutPlugin.Received(1).SetAddWindowDirection(monitor, expectedDirection);
 	}
 
-	[Theory, AutoSubstituteData<TreeLayoutCommandPaletteCommandsCustomization>]
-	public void SetDirectionCommand_FailsWhenNoActiveTreeLayoutEngine(
+	[Theory, AutoSubstituteData<Customization>]
+	internal void SetDirectionCommand_FailsWhenNoActiveTreeLayoutEngine(
 		TreeLayoutCommandPalettePluginCommands commands,
 		ITreeLayoutPlugin treeLayoutPlugin,
 		IMonitor monitor,
 		IContext ctx,
-		IWorkspace workspace
+		MutableRootSector root
 	)
 	{
 		// Given
-		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
-		workspace.ActiveLayoutEngine.Returns((ILayoutEngine?)null);
+		Workspace workspace = CreateWorkspace(ctx);
+		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
 
 		// When
 		commands.SetDirection("welp");
