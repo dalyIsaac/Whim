@@ -244,7 +244,7 @@ public class InitializeWorkspacesTransformTests
 
 		Assert.Single(stickyWorkspace.LayoutEngines);
 		Assert.Single(rootSector.MapSector.StickyWorkspaceMonitorIndexMap);
-		rootSector.MapSector.StickyWorkspaceMonitorIndexMap[stickyWorkspace.Id].Should().BeEquivalentTo(new[] { 0, 1 });
+		rootSector.MapSector.StickyWorkspaceMonitorIndexMap[stickyWorkspace.Id].Should().BeEquivalentTo([0, 1]);
 
 		// - the automatically created workspace has the "Spotify" and "Discord" windows
 		Workspace autoWorkspace = rootSector.WorkspaceSector.Workspaces.Values.FirstOrDefault(w =>
@@ -269,6 +269,6 @@ public class InitializeWorkspacesTransformTests
 		Assert.Equal(5, rootSector.WindowSector.StartupWindows.Count);
 		rootSector
 			.WindowSector.StartupWindows.Should()
-			.BeEquivalentTo(new[] { BrowserHandle, DiscordHandle, SpotifyHandle, BrokenHandle, VscodeHandle });
+			.BeEquivalentTo([BrowserHandle, DiscordHandle, SpotifyHandle, BrokenHandle, VscodeHandle]);
 	}
 }
