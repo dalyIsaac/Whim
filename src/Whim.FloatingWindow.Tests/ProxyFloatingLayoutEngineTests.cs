@@ -422,7 +422,7 @@ public class ProxyFloatingLayoutEngine_DoLayoutTests
 		ProxyFloatingLayoutEngine sut = new(context, plugin, innerLayoutEngine);
 
 		// (mark the first and second windows as floating)
-		plugin.FloatingWindows.Returns(_ => (HashSet<HWND>)([window1.Handle, window2.Handle]));
+		plugin.FloatingWindows.Returns(_ => (HashSet<HWND>)[window1.Handle, window2.Handle]);
 
 		// (add the windows)
 		sut = (ProxyFloatingLayoutEngine)sut.AddWindow(window1);
