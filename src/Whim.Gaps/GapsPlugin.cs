@@ -25,7 +25,7 @@ public class GapsPlugin(IContext context, GapsConfig gapsConfig) : IGapsPlugin
 	/// <inheritdoc />
 	public void PreInitialize()
 	{
-		_context.WorkspaceManager.AddProxyLayoutEngine(layout => new GapsLayoutEngine(GapsConfig, layout));
+		_context.Store.Dispatch(new AddProxyLayoutEngineTransform(layout => new GapsLayoutEngine(GapsConfig, layout)));
 	}
 
 	/// <inheritdoc />
@@ -39,7 +39,7 @@ public class GapsPlugin(IContext context, GapsConfig gapsConfig) : IGapsPlugin
 	public void UpdateOuterGap(int delta)
 	{
 		GapsConfig.OuterGap += delta;
-		_context.Butler.LayoutAllActiveWorkspaces();
+		_context.Store.Dispatch(new LayoutAllActiveWorkspacesTransform());
 	}
 
 	/// <summary>
@@ -49,7 +49,7 @@ public class GapsPlugin(IContext context, GapsConfig gapsConfig) : IGapsPlugin
 	public void UpdateInnerGap(int delta)
 	{
 		GapsConfig.InnerGap += delta;
-		_context.Butler.LayoutAllActiveWorkspaces();
+		_context.Store.Dispatch(new LayoutAllActiveWorkspacesTransform());
 	}
 
 	/// <inheritdoc />

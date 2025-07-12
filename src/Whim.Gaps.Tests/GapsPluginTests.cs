@@ -6,21 +6,21 @@ using Xunit;
 
 namespace Whim.Gaps.Tests;
 
-public class GapsPluginCustomization : ICustomization
-{
-	public void Customize(IFixture fixture)
-	{
-		GapsConfig gapsConfig = fixture.Freeze<GapsConfig>();
-		gapsConfig.InnerGap = 10;
-		gapsConfig.OuterGap = 10;
-
-		fixture.Inject(gapsConfig);
-	}
-}
-
 public class GapsPluginTests
 {
-	[Theory, AutoSubstituteData<GapsPluginCustomization>]
+	private class Customization : ICustomization
+	{
+		public void Customize(IFixture fixture)
+		{
+			GapsConfig gapsConfig = fixture.Freeze<GapsConfig>();
+			gapsConfig.InnerGap = 10;
+			gapsConfig.OuterGap = 10;
+
+			fixture.Inject(gapsConfig);
+		}
+	}
+
+	[Theory, AutoSubstituteData<Customization>]
 	public void UpdateOuterGap_IncreasesOuterGapByDelta(IContext context, GapsConfig gapsConfig)
 	{
 		// Given
@@ -31,10 +31,10 @@ public class GapsPluginTests
 
 		// Then
 		Assert.Equal(20, gapsConfig.OuterGap);
-		context.Butler.Received(1).LayoutAllActiveWorkspaces();
+		context.Store.Received(1).Dispatch(Arg.Any<LayoutAllActiveWorkspacesTransform>());
 	}
 
-	[Theory, AutoSubstituteData<GapsPluginCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	public void UpdateInnerGap_IncreasesInnerGapByDelta(IContext context, GapsConfig gapsConfig)
 	{
 		// Given
@@ -45,10 +45,10 @@ public class GapsPluginTests
 
 		// Then
 		Assert.Equal(20, gapsConfig.InnerGap);
-		context.Butler.Received(1).LayoutAllActiveWorkspaces();
+		context.Store.Received(1).Dispatch(Arg.Any<LayoutAllActiveWorkspacesTransform>());
 	}
 
-	[Theory, AutoSubstituteData<GapsPluginCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	public void UpdateOuterGap_WithNegativeDelta_DecreasesOuterGapByDelta(IContext context, GapsConfig gapsConfig)
 	{
 		// Given
@@ -59,10 +59,10 @@ public class GapsPluginTests
 
 		// Then
 		Assert.Equal(0, gapsConfig.OuterGap);
-		context.Butler.Received(1).LayoutAllActiveWorkspaces();
+		context.Store.Received(1).Dispatch(Arg.Any<LayoutAllActiveWorkspacesTransform>());
 	}
 
-	[Theory, AutoSubstituteData<GapsPluginCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	public void UpdateInnerGap_WithNegativeDelta_DecreasesInnerGapByDelta(IContext context, GapsConfig gapsConfig)
 	{
 		// Given
@@ -73,10 +73,10 @@ public class GapsPluginTests
 
 		// Then
 		Assert.Equal(0, gapsConfig.InnerGap);
-		context.Butler.Received(1).LayoutAllActiveWorkspaces();
+		context.Store.Received(1).Dispatch(Arg.Any<LayoutAllActiveWorkspacesTransform>());
 	}
 
-	[Theory, AutoSubstituteData<GapsPluginCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	public void PluginCommands(IContext context, GapsConfig gapsConfig)
 	{
 		// Given
@@ -89,7 +89,7 @@ public class GapsPluginTests
 		Assert.Equal(4, pluginCommands.Commands.Count());
 	}
 
-	[Theory, AutoSubstituteData<GapsPluginCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	public void SaveState(IContext context, GapsConfig gapsConfig)
 	{
 		// Given

@@ -112,7 +112,7 @@ internal static class YamlLayoutEngineLoader
 			(in Schema.SliceLayoutEngineEntity.VariantEntity.AnyOf3Entity multiColumnLayout) =>
 			{
 				var columns = multiColumnLayout.Columns;
-				uint[] unsignedColumns = columns.Select(c => (uint)c).ToArray();
+				uint[] unsignedColumns = [.. columns.Select(c => (uint)c)];
 				leafLayoutEngineCreators.Add(
 					(id) => SliceLayouts.CreateMultiColumnLayout(ctx, plugin, id, unsignedColumns)
 				);

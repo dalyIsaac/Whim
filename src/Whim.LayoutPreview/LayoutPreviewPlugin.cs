@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Text.Json;
 using Whim.FloatingWindow;
 
@@ -79,7 +78,8 @@ public class LayoutPreviewPlugin(IContext context) : IPlugin, IDisposable
 		DraggedWindow = e.Window;
 
 		IPoint<double> normalizedPoint = monitor.WorkingArea.NormalizeAbsolutePoint(cursorDraggedPoint);
-		ILayoutEngine layoutEngine = workspace.ActiveLayoutEngine.MoveWindowToPoint(e.Window, normalizedPoint);
+		ILayoutEngine activeLayoutEngine = WorkspaceUtils.GetActiveLayoutEngine(workspace);
+		ILayoutEngine layoutEngine = activeLayoutEngine.MoveWindowToPoint(e.Window, normalizedPoint);
 		if (layoutEngine.GetLayoutEngine<FloatingLayoutEngine>() is not null)
 		{
 			Logger.Debug("Skip LayoutPreview as LeafLayoutEngine is a FloatingLayoutEngine");
@@ -97,12 +97,7 @@ public class LayoutPreviewPlugin(IContext context) : IPlugin, IDisposable
 			Y = cursorDraggedPoint.Y - monitor.WorkingArea.Y,
 		};
 
-		_layoutPreviewWindow?.Update(
-			layoutEngine.DoLayout(rect, monitor).ToArray(),
-			adjustedCursorPoint,
-			e.Window,
-			monitor
-		);
+		_layoutPreviewWindow?.Update([.. layoutEngine.DoLayout(rect, monitor)], adjustedCursorPoint, e.Window, monitor);
 	}
 
 	private void WindowEvents_WindowRemoved(object? sender, WindowEventArgs e)

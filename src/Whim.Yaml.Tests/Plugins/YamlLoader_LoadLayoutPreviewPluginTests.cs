@@ -58,7 +58,12 @@ public class YamlLoader_LoadLayoutPreviewPluginTests
 		};
 
 	[Theory, MemberAutoSubstituteData<YamlLoaderCustomization>(nameof(LayoutPreviewConfig))]
-	public void LoadLayoutPreviewPlugin(string yaml, bool isYaml, bool isEnabled, IContext ctx)
+	[System.Diagnostics.CodeAnalysis.SuppressMessage(
+		"Usage",
+		"xUnit1026:Theory methods should use all of their parameters",
+		Justification = "Theory data is shared with other tests"
+	)]
+	public void LoadLayoutPreviewPlugin(string yaml, bool isYaml, bool _isEnabled, IContext ctx)
 	{
 		// Given a a YAML config with the layout preview plugin
 		YamlLoaderTestUtils.SetupFileConfig(ctx, yaml, isYaml);

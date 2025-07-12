@@ -422,7 +422,7 @@ public class ProxyFloatingLayoutEngine_DoLayoutTests
 		ProxyFloatingLayoutEngine sut = new(context, plugin, innerLayoutEngine);
 
 		// (mark the first and second windows as floating)
-		plugin.FloatingWindows.Returns(_ => (HashSet<HWND>)([window1.Handle, window2.Handle]));
+		plugin.FloatingWindows.Returns(_ => (HashSet<HWND>)[window1.Handle, window2.Handle]);
 
 		// (add the windows)
 		sut = (ProxyFloatingLayoutEngine)sut.AddWindow(window1);
@@ -433,7 +433,7 @@ public class ProxyFloatingLayoutEngine_DoLayoutTests
 		sut = (ProxyFloatingLayoutEngine)sut.MinimizeWindowStart(window2);
 
 		// WHEN laying out the windows
-		IWindowState[] result = sut.DoLayout(new Rectangle<int>(0, 0, 100, 100), monitor).ToArray();
+		IWindowState[] result = [.. sut.DoLayout(new Rectangle<int>(0, 0, 100, 100), monitor)];
 
 		// THEN the windows should be laid out
 		Assert.Equal(3, result.Length);

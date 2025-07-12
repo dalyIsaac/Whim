@@ -6,34 +6,29 @@ using Whim.FloatingWindow;
 using Whim.TestUtils;
 using Windows.Win32.Graphics.Gdi;
 using Xunit;
+using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.LayoutPreview.Tests;
 
-public class LayoutPreviewPluginCustomization : StoreCustomization
-{
-	[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
-	protected override void PostCustomize(IFixture fixture)
-	{
-		Workspace workspace = StoreTestUtils.CreateWorkspace(_ctx);
-		fixture.Inject(workspace);
-
-		IMonitor monitor = StoreTestUtils.CreateMonitor((HMONITOR)1);
-		fixture.Inject(monitor);
-
-		StoreTestUtils.SetupMonitorAtPoint(
-			_ctx,
-			_internalCtx,
-			_store._root.MutableRootSector,
-			monitor,
-			new Point<int>(0, 0)
-		);
-		StoreTestUtils.PopulateMonitorWorkspaceMap(_ctx, _store._root.MutableRootSector, monitor, workspace);
-	}
-}
-
+[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class LayoutPreviewPluginTests
 {
-	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	private class Customization : StoreCustomization
+	{
+		protected override void PostCustomize(IFixture fixture)
+		{
+			Workspace workspace = CreateWorkspace(_ctx);
+			fixture.Inject(workspace);
+
+			IMonitor monitor = CreateMonitor((HMONITOR)1);
+			fixture.Inject(monitor);
+
+			SetupMonitorAtPoint(_ctx, _internalCtx, _store._root.MutableRootSector, monitor, new Point<int>(0, 0));
+			PopulateMonitorWorkspaceMap(_ctx, _store._root.MutableRootSector, monitor, workspace);
+		}
+	}
+
+	[Theory, AutoSubstituteData<Customization>]
 	internal void Name(IContext ctx)
 	{
 		// Given
@@ -46,7 +41,7 @@ public class LayoutPreviewPluginTests
 		Assert.Equal("whim.layout_preview", name);
 	}
 
-	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	internal void PluginCommands(IContext ctx)
 	{
 		// Given
@@ -77,7 +72,7 @@ public class LayoutPreviewPluginTests
 		ctx.FilterManager.Received(1).AddTitleMatchFilter(LayoutPreviewWindow.WindowTitle);
 	}
 
-	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	internal void PostInitialize(IContext ctx)
 	{
 		// Given
@@ -90,7 +85,7 @@ public class LayoutPreviewPluginTests
 		Assert.True(true);
 	}
 
-	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	internal void LoadState(IContext ctx)
 	{
 		// Given
@@ -103,7 +98,7 @@ public class LayoutPreviewPluginTests
 		Assert.True(true);
 	}
 
-	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	internal void SaveState(IContext ctx)
 	{
 		// Given
@@ -116,7 +111,7 @@ public class LayoutPreviewPluginTests
 		Assert.Null(state);
 	}
 
-	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	internal void WindowMoveStarted_NotDragged(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given
@@ -138,7 +133,7 @@ public class LayoutPreviewPluginTests
 	}
 
 	#region WindowMoved
-	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	internal void WindowMoved_NotDragged(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given
@@ -156,11 +151,10 @@ public class LayoutPreviewPluginTests
 		rootSector.DispatchEvents();
 
 		// Then
-		ctx.MonitorManager.DidNotReceive().GetMonitorAtPoint(Arg.Any<IPoint<int>>());
 		Assert.Null(plugin.DraggedWindow);
 	}
 
-	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	internal void WindowMoved_MovingEdges(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given
@@ -178,15 +172,14 @@ public class LayoutPreviewPluginTests
 		rootSector.DispatchEvents();
 
 		// Then
-		ctx.MonitorManager.DidNotReceive().GetMonitorAtPoint(Arg.Any<IPoint<int>>());
 		Assert.Null(plugin.DraggedWindow);
 	}
 
-	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	internal void WindowMoved_Dragged_CannotFindWorkspace(
 		IContext ctx,
 		MutableRootSector rootSector,
-		IWorkspace workspace
+		Workspace workspace
 	)
 	{
 		// Given
@@ -211,13 +204,12 @@ public class LayoutPreviewPluginTests
 		Assert.Null(plugin.DraggedWindow);
 	}
 
-	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	internal void WindowMoved_Dragged_IgnoreFloatingLayoutEngine(
 		IContext ctx,
 		MutableRootSector rootSector,
 		IWindow window,
-		Workspace workspace,
-		IMonitor monitor
+		Workspace workspace
 	)
 	{
 		// Given
@@ -227,7 +219,6 @@ public class LayoutPreviewPluginTests
 			ActiveLayoutEngineIndex = 0,
 		};
 		rootSector.WorkspaceSector.Workspaces = rootSector.WorkspaceSector.Workspaces.SetItem(workspace.Id, workspace);
-		ctx.MonitorManager.GetMonitorAtPoint(Arg.Any<IPoint<int>>()).Returns(monitor);
 
 		using LayoutPreviewPlugin plugin = new(ctx);
 		WindowMovedEventArgs e = new()
@@ -246,7 +237,7 @@ public class LayoutPreviewPluginTests
 		Assert.Null(plugin.DraggedWindow);
 	}
 
-	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	internal void WindowMoved_Dragged_Success(
 		IContext ctx,
 		MutableRootSector rootSector,
@@ -277,7 +268,7 @@ public class LayoutPreviewPluginTests
 	}
 	#endregion
 
-	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	internal void WindowMoveEnded(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given
@@ -298,7 +289,7 @@ public class LayoutPreviewPluginTests
 		Assert.Null(plugin.DraggedWindow);
 	}
 
-	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	internal void WindowEvents_WindowRemoved_NotHidden(
 		IContext ctx,
 		MutableRootSector rootSector,
@@ -326,7 +317,7 @@ public class LayoutPreviewPluginTests
 		Assert.Equal(movedWindow, plugin.DraggedWindow);
 	}
 
-	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	internal void WindowEvents_WindowRemoved_Hidden(IContext ctx, MutableRootSector rootSector, IWindow movedWindow)
 	{
 		// Given
@@ -350,7 +341,7 @@ public class LayoutPreviewPluginTests
 		Assert.Null(plugin.DraggedWindow);
 	}
 
-	[Theory, AutoSubstituteData<LayoutPreviewPluginCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	internal void WindowEvents_WindowFocused(IContext ctx, MutableRootSector rootSector, IWindow movedWindow)
 	{
 		// Given

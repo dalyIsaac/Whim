@@ -132,9 +132,10 @@ public class FloatingLayoutEngineTests
 		ILayoutEngine engine = new FloatingLayoutEngine(context, identity);
 
 		// When
-		IWindowState[] windowStates = engine
-			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] windowStates =
+		[
+			.. engine.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>()),
+		];
 
 		// Then
 		Assert.Empty(windowStates);
@@ -144,7 +145,7 @@ public class FloatingLayoutEngineTests
 	internal void DoLayout_KeepWindowSize(IContext context, MutableRootSector root)
 	{
 		// Given
-		IWindow[] allWindows = root.WindowSector.Windows.Values.ToArray();
+		IWindow[] allWindows = [.. root.WindowSector.Windows.Values];
 		IWindow windowNormal = allWindows[0];
 		IWindow windowMinimized = allWindows[1];
 		IWindow windowMaximized = allWindows[2];
@@ -157,10 +158,12 @@ public class FloatingLayoutEngineTests
 			.AddWindow(windowMaximized);
 
 		// When
-		WindowSize[] windowSizes = engine
-			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
-			.Select(window => window.WindowSize)
-			.ToArray();
+		WindowSize[] windowSizes =
+		[
+			.. engine
+				.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
+				.Select(window => window.WindowSize),
+		];
 
 		// Then
 		Assert.Equal(3, windowSizes.Length);
