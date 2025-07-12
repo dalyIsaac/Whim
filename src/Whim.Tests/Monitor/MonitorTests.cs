@@ -180,6 +180,7 @@ public class MonitorTests
 	}
 
 	[Theory, AutoSubstituteData<MonitorCustomization>]
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "For testing purposes")]
 	internal void Equals_Failure_Null(IInternalContext internalCtx, HMONITOR hmonitor)
 	{
 		// Given
@@ -188,9 +189,7 @@ public class MonitorTests
 		Monitor monitor = new(internalCtx, hmonitor, false);
 
 		// Then
-#pragma warning disable CA1508 // Avoid dead conditional code
 		Assert.False(monitor.Equals(null));
-#pragma warning restore CA1508 // Avoid dead conditional code
 	}
 
 	[Theory, AutoSubstituteData<MonitorCustomization>]

@@ -2,7 +2,6 @@ using System.ComponentModel;
 
 namespace Whim.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WindowAddedTransformTests
 {
 	private static Result<IWindow> AssertDoesNotRaise(

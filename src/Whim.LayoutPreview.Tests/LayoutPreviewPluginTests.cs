@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using AutoFixture;
 using NSubstitute;
@@ -10,7 +9,6 @@ using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.LayoutPreview.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class LayoutPreviewPluginTests
 {
 	private class Customization : StoreCustomization
@@ -55,7 +53,6 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Theory, AutoSubstituteData]
-	[SuppressMessage("Usage", "NS5000:Received check.")]
 	internal void PreInitialize(IContext ctx)
 	{
 		// Given

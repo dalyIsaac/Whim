@@ -1,9 +1,7 @@
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.UI.Dispatching;
 
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WorkspaceSectorTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]

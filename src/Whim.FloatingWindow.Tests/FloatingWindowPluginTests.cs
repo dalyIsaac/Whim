@@ -7,7 +7,6 @@ using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.FloatingWindow.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class FloatingWindowPluginTests
 {
 	private static FloatingWindowPlugin CreateSut(IContext ctx) => new(ctx);
@@ -115,7 +114,6 @@ public class FloatingWindowPluginTests
 	}
 }
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class FloatingWindowPlugin_MarkWindowAsFloatingTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -171,7 +169,6 @@ public class FloatingWindowPlugin_MarkWindowAsFloatingTests
 	}
 }
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class FloatingWindowPlugin_MarkWindowAsDockedTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -228,7 +225,6 @@ public class FloatingWindowPlugin_MarkWindowAsDockedTests
 	}
 }
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class FloatingWindowPlugin_ToggleWindowFloatingTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]

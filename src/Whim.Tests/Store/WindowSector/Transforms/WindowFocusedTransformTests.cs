@@ -1,8 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WindowFocusedTransformTests
 {
 	private static readonly HMONITOR HMONITOR_1 = (HMONITOR)1;

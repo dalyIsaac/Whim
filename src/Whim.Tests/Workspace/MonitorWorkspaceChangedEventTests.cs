@@ -3,15 +3,14 @@ namespace Whim.Tests;
 public class MonitorWorkspaceChangedEventTests
 {
 	[Theory, AutoSubstituteData]
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "For testing purposes")]
 	public void Equals_Null(IMonitor monitor, IWorkspace workspace)
 	{
 		// Given
 		MonitorWorkspaceChangedEventArgs a = new() { CurrentWorkspace = workspace, Monitor = monitor };
 
 		// Then
-#pragma warning disable CA1508 // Avoid dead conditional code
 		Assert.False(a.Equals(null));
-#pragma warning restore CA1508 // Avoid dead conditional code
 	}
 
 	[Theory, AutoSubstituteData]

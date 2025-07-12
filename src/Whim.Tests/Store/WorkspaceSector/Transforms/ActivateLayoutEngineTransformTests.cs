@@ -1,8 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class SetLayoutEngineFromIndexTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -54,7 +51,6 @@ public class SetLayoutEngineFromIndexTransformTests
 	}
 }
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class ActivatePreviouslyActiveLayoutEngineTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -108,7 +104,6 @@ public class ActivatePreviouslyActiveLayoutEngineTransformTests
 	}
 }
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class SetLayoutEngineFromNameTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]

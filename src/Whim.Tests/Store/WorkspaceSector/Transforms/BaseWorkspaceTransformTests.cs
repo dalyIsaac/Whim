@@ -1,9 +1,7 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class BaseWorkspaceTransformTests
 {
 	private record FailedWorkspaceTransform(Guid WorkspaceId) : BaseWorkspaceTransform(WorkspaceId)

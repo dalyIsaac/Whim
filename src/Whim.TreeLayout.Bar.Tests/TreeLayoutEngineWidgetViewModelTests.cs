@@ -8,11 +8,6 @@ using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.TreeLayout.Bar.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage(
-	"Reliability",
-	"CA2000:Dispose objects before losing scope",
-	Justification = "Unnecessary for tests"
-)]
 public class TreeLayoutEngineWidgetViewModelTests
 {
 	private class Customization : StoreCustomization
@@ -288,7 +283,6 @@ public class TreeLayoutEngineWidgetViewModelTests
 	}
 
 	[Theory, AutoSubstituteData]
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "NS5000:Received check.")]
 	internal void Dispose(IContext ctx, ITreeLayoutPlugin plugin, IMonitor monitor)
 	{
 		// Given

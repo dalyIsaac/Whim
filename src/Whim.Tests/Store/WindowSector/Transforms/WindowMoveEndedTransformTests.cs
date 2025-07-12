@@ -2,7 +2,6 @@ namespace Whim.Tests;
 
 public class WindowMoveEndedTransformTests
 {
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 	private static void Setup_GetMovedEdges(IContext ctx, MutableRootSector rootSector, IWindow window)
 	{
 		IRectangle<int> originalRect = new Rectangle<int>() { Y = 4, Height = 4 };

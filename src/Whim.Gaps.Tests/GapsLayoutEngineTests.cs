@@ -411,7 +411,6 @@ public class GapsLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 	internal void DoLayout_WithProxyFloatingLayoutEngine(IContext context, MutableRootSector root)
 	{
 		// Input
@@ -514,7 +513,6 @@ public class GapsLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 	internal void DoLayout_WithFloatingLayoutEngine(IContext context, MutableRootSector root)
 	{
 		// Input

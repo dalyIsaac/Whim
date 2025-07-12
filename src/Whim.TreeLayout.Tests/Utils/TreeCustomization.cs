@@ -6,7 +6,6 @@ using Windows.Win32.Graphics.Gdi;
 
 namespace Whim.TreeLayout.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 internal class TreeCustomization : StoreCustomization
 {
 	private int _windowIdx = 1;

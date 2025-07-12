@@ -8,7 +8,6 @@ using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.SliceLayout.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class SliceLayoutPluginTests
 {
 	private class Customization : StoreCustomization

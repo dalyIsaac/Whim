@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
 using NSubstitute;
 using Whim.TestUtils;
@@ -9,7 +8,6 @@ namespace Whim.FloatingWindow.Tests;
 
 public class FloatingWindowCustomization : ICustomization
 {
-	[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 	public void Customize(IFixture fixture)
 	{
 		IContext ctx = fixture.Freeze<IContext>();

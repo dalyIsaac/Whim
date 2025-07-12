@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
 
 namespace Whim.Tests;
@@ -7,7 +6,6 @@ public class RouterManagerCustomization : StoreCustomization
 {
 	public IRouterManager? RouterManager { get; private set; }
 
-	[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 	protected override void PostCustomize(IFixture fixture)
 	{
 		// System under test

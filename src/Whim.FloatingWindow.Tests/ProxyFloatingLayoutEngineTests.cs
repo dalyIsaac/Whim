@@ -378,7 +378,6 @@ public class ProxyFloatingLayoutEngine_MoveWindowEdgesInDirectionTests
 public class ProxyFloatingLayoutEngine_DoLayoutTests
 {
 	[Theory, AutoSubstituteData<FloatingWindowCustomization>]
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 	internal void DoLayout(
 		IContext context,
 		IFloatingWindowPlugin plugin,

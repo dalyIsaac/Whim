@@ -9,7 +9,6 @@ namespace Whim.CommandPalette.Tests;
 
 public record UnknownConfig : BaseVariantConfig { }
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class CommandPaletteWindowViewModelTests
 {
 	private class Customization : StoreCustomization

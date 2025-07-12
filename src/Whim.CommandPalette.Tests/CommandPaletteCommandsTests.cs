@@ -8,7 +8,6 @@ using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.CommandPalette.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class CommandPaletteCommandsTests
 {
 	private class Customization : StoreCustomization

@@ -8,7 +8,6 @@ using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.Bar.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class FocusedWindowWidgetViewModelTests
 {
 	private class Customization : StoreCustomization

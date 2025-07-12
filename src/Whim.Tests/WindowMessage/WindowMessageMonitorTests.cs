@@ -4,11 +4,6 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Whim.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage(
-	"Reliability",
-	"CA2000:Dispose objects before losing scope",
-	Justification = "Unnecessary for tests"
-)]
 public class WindowMessageMonitorTests
 {
 	private class CaptureProc

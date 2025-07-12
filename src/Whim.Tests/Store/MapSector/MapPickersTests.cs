@@ -3,7 +3,6 @@ using FluentAssertions;
 
 namespace Whim.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class MapPickersTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]

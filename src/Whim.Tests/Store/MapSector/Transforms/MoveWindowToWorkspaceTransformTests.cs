@@ -1,6 +1,5 @@
 namespace Whim.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class MoveWindowToWorkspaceTransformTests
 {
 	private static Result<Unit> AssertDoesNotRaise(

@@ -1,9 +1,7 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class MonitorEventListenerTests
 {
 	private static readonly WindowMessageMonitorEventArgs _windowMessageArgs = new()
@@ -18,7 +16,6 @@ public class MonitorEventListenerTests
 	};
 
 	[Theory, AutoSubstituteData]
-	[SuppressMessage("Usage", "NS5000:Received check.")]
 	internal void Initialize(IContext ctx, IInternalContext internalCtx)
 	{
 		// Given
@@ -113,7 +110,6 @@ public class MonitorEventListenerTests
 		ctx.Store.Received(1).Dispatch(new MonitorsChangedTransform());
 	}
 
-	[SuppressMessage("Usage", "NS5000:Received check.")]
 	[Theory, AutoSubstituteData]
 	internal void Dispose_Success(IContext ctx, IInternalContext internalCtx)
 	{
