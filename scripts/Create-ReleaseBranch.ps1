@@ -15,6 +15,8 @@ param (
     [string]$VersionBump = "minor"
 )
 
+dotnet tool restore
+
 $repository = $env:GITHUB_REPOSITORY
 
 if ($null -eq $repository) {
@@ -40,19 +42,8 @@ if (0 -ne $LastExitCode) {
     exit 1
 }
 
-# Check for set-version.
-if (!(Get-Command setversion -ErrorAction SilentlyContinue)) {
-    $proceed = Read-Host "dotnet-setversion not found. Install now? (y/N)"
-    if ($proceed -cne "y") {
-        Write-Error -Message "dotnet-setversion not found. Aborting."
-        exit 1
-    }
-
-    dotnet tool install -g dotnet-setversion
-}
-
 # Bump the version.
-setversion -r $nextVersion
+dotnet tool run setversion -r $nextVersion
 
 $proceed = Read-Host "Commit and push on branch ${bumpVersionBranch}? (y/N)"
 if ($proceed -cne "y") {
