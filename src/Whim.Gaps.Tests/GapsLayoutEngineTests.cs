@@ -132,7 +132,7 @@ public class GapsLayoutEngineTests
 		monitor.ScaleFactor.Returns(scale);
 
 		// When
-		IWindowState[] windowStates = gapsLayoutEngine.DoLayout(rect, monitor).ToArray();
+		IWindowState[] windowStates = [.. gapsLayoutEngine.DoLayout(rect, monitor)];
 
 		// Then
 		windowStates.Should().Equal(expectedWindowStates);
@@ -404,7 +404,7 @@ public class GapsLayoutEngineTests
 		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
 
 		// When
-		IWindowState[] windowStates = gapsLayoutEngine.DoLayout(rect, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] windowStates = [.. gapsLayoutEngine.DoLayout(rect, Substitute.For<IMonitor>())];
 
 		// Then
 		windowStates.Should().Equal(expectedWindowStates);
@@ -468,7 +468,7 @@ public class GapsLayoutEngineTests
 		GapsLayoutEngine gaps2 = (GapsLayoutEngine)gaps1.AddWindow(window2);
 		GapsLayoutEngine gaps3 = (GapsLayoutEngine)gaps2.AddWindow(window3);
 
-		IWindowState[] outputWindowStates = gaps3.DoLayout(monitor.WorkingArea, monitor).ToArray();
+		IWindowState[] outputWindowStates = [.. gaps3.DoLayout(monitor.WorkingArea, monitor)];
 
 		// Then
 		Assert.Equal(3, outputWindowStates.Length);
@@ -545,7 +545,7 @@ public class GapsLayoutEngineTests
 		GapsLayoutEngine gaps1 = (GapsLayoutEngine)gapsLayoutEngine.AddWindow(window1);
 		GapsLayoutEngine gaps2 = (GapsLayoutEngine)gaps1.AddWindow(window2);
 
-		IWindowState[] outputWindowStates = gaps2.DoLayout(monitor.WorkingArea, monitor).ToArray();
+		IWindowState[] outputWindowStates = [.. gaps2.DoLayout(monitor.WorkingArea, monitor)];
 
 		// Then
 		Assert.Equal(2, outputWindowStates.Length);
