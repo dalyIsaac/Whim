@@ -1,71 +1,71 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <AnalysisModeDesign>All</AnalysisModeDesign>
-    <AnalysisModeDocumentation>All</AnalysisModeDocumentation>
-    <AnalysisModeGlobalization>None</AnalysisModeGlobalization>
-    <AnalysisModeInteroperability>All</AnalysisModeInteroperability>
-    <AnalysisModeMaintainability>All</AnalysisModeMaintainability>
-    <AnalysisModeNaming>All</AnalysisModeNaming>
-    <AnalysisModePerformance>All</AnalysisModePerformance>
-    <AnalysisModeReliability>All</AnalysisModeReliability>
-    <AnalysisModeSecurity>All</AnalysisModeSecurity>
-    <AnalysisModeSingleFile>All</AnalysisModeSingleFile>
-    <AnalysisModeStyle>All</AnalysisModeStyle>
-    <AnalysisModeUsage>All</AnalysisModeUsage>
-    <Authors>Isaac Daly</Authors>
-    <BuildInParallel>true</BuildInParallel>
-    <Description>An extensible window manager for Windows.</Description>
-    <EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <GenerateLibraryLayout>true</GenerateLibraryLayout>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <Platforms>x64;arm64;Any CPU</Platforms>
-    <RootNamespace>Whim.Yaml</RootNamespace>
-    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
-    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
-    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-    <UseWinUI>true</UseWinUI>
-    <Version>0.8.0</Version>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Whim.Bar\Whim.Bar.csproj" />
-    <ProjectReference Include="..\Whim.CommandPalette\Whim.CommandPalette.csproj" />
-    <ProjectReference Include="..\Whim.FloatingWindow\Whim.FloatingWindow.csproj" />
-    <ProjectReference Include="..\Whim.FocusIndicator\Whim.FocusIndicator.csproj" />
-    <ProjectReference Include="..\Whim.Gaps\Whim.Gaps.csproj" />
-    <ProjectReference Include="..\Whim.LayoutPreview\Whim.LayoutPreview.csproj" />
-    <ProjectReference Include="..\Whim.SliceLayout\Whim.SliceLayout.csproj" />
-    <ProjectReference Include="..\Whim.TreeLayout.CommandPalette\Whim.TreeLayout.CommandPalette.csproj" />
-    <ProjectReference Include="..\Whim.TreeLayout\Whim.TreeLayout.csproj" />
-    <ProjectReference Include="..\Whim.TreeLayout.Bar\Whim.TreeLayout.Bar.csproj" />
-    <ProjectReference Include="..\Whim.Updater\Whim.Updater.csproj" />
-    <ProjectReference Include="..\Whim\Whim.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <InternalsVisibleTo Include="Whim.Yaml.Tests" />
-    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Corvus.Json.ExtendedTypes" />
-    <PackageReference Include="Corvus.Json.SourceGenerator">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Yaml2JsonNode" />
-    <PackageReference Include="YamlDotNet" />
-  </ItemGroup>
-  <PropertyGroup>
-    <CorvusJsonSchemaOptionalAsNullable>NullOrUndefined </CorvusJsonSchemaOptionalAsNullable>
-  </PropertyGroup>
-  <ItemGroup>
-    <AdditionalFiles Include="schema.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="ErrorWindow.xaml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="ErrorWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
+	<PropertyGroup>
+		<AnalysisModeDesign>All</AnalysisModeDesign>
+		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
+		<AnalysisModeGlobalization>None</AnalysisModeGlobalization>
+		<AnalysisModeInteroperability>All</AnalysisModeInteroperability>
+		<AnalysisModeMaintainability>All</AnalysisModeMaintainability>
+		<AnalysisModeNaming>All</AnalysisModeNaming>
+		<AnalysisModePerformance>All</AnalysisModePerformance>
+		<AnalysisModeReliability>All</AnalysisModeReliability>
+		<AnalysisModeSecurity>All</AnalysisModeSecurity>
+		<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
+		<AnalysisModeStyle>All</AnalysisModeStyle>
+		<AnalysisModeUsage>All</AnalysisModeUsage>
+		<Authors>Isaac Daly</Authors>
+		<BuildInParallel>true</BuildInParallel>
+		<Description>An extensible window manager for Windows.</Description>
+		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<GenerateLibraryLayout>true</GenerateLibraryLayout>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Platforms>x64;arm64;Any CPU</Platforms>
+		<RootNamespace>Whim.Yaml</RootNamespace>
+		<RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<UseWinUI>true</UseWinUI>
+		<Version>0.8.0</Version>
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Whim.Bar\Whim.Bar.csproj" />
+		<ProjectReference Include="..\Whim.CommandPalette\Whim.CommandPalette.csproj" />
+		<ProjectReference Include="..\Whim.FloatingWindow\Whim.FloatingWindow.csproj" />
+		<ProjectReference Include="..\Whim.FocusIndicator\Whim.FocusIndicator.csproj" />
+		<ProjectReference Include="..\Whim.Gaps\Whim.Gaps.csproj" />
+		<ProjectReference Include="..\Whim.LayoutPreview\Whim.LayoutPreview.csproj" />
+		<ProjectReference Include="..\Whim.SliceLayout\Whim.SliceLayout.csproj" />
+		<ProjectReference Include="..\Whim.TreeLayout.CommandPalette\Whim.TreeLayout.CommandPalette.csproj" />
+		<ProjectReference Include="..\Whim.TreeLayout\Whim.TreeLayout.csproj" />
+		<ProjectReference Include="..\Whim.TreeLayout.Bar\Whim.TreeLayout.Bar.csproj" />
+		<ProjectReference Include="..\Whim.Updater\Whim.Updater.csproj" />
+		<ProjectReference Include="..\Whim\Whim.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<InternalsVisibleTo Include="Whim.Yaml.Tests" />
+		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Corvus.Json.ExtendedTypes" />
+		<PackageReference Include="Corvus.Json.SourceGenerator">
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Yaml2JsonNode" />
+		<PackageReference Include="YamlDotNet" />
+	</ItemGroup>
+	<PropertyGroup>
+		<CorvusJsonSchemaOptionalAsNullable>NullOrUndefined </CorvusJsonSchemaOptionalAsNullable>
+	</PropertyGroup>
+	<ItemGroup>
+		<AdditionalFiles Include="schema.json" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Remove="ErrorWindow.xaml" />
+	</ItemGroup>
+	<ItemGroup>
+		<Page Update="ErrorWindow.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
 </Project>

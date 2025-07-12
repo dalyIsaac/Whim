@@ -1,49 +1,49 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <AnalysisModeDesign>All</AnalysisModeDesign>
-    <AnalysisModeDocumentation>All</AnalysisModeDocumentation>
-    <AnalysisModeGlobalization>None</AnalysisModeGlobalization>
-    <AnalysisModeInteroperability>All</AnalysisModeInteroperability>
-    <AnalysisModeMaintainability>All</AnalysisModeMaintainability>
-    <AnalysisModeNaming>All</AnalysisModeNaming>
-    <AnalysisModePerformance>All</AnalysisModePerformance>
-    <AnalysisModeReliability>All</AnalysisModeReliability>
-    <AnalysisModeSecurity>All</AnalysisModeSecurity>
-    <AnalysisModeSingleFile>All</AnalysisModeSingleFile>
-    <AnalysisModeStyle>All</AnalysisModeStyle>
-    <AnalysisModeUsage>All</AnalysisModeUsage>
-    <Authors>Isaac Daly</Authors>
-    <BuildInParallel>true</BuildInParallel>
-    <Description>An extensible window manager for Windows.</Description>
-    <EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <GenerateLibraryLayout>true</GenerateLibraryLayout>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <Platforms>x64;arm64;Any CPU</Platforms>
-    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
-    <Version>0.8.0</Version>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="AutoFixture" />
-    <PackageReference Include="AutoFixture.AutoNSubstitute" />
-    <PackageReference Include="AutoFixture.Xunit2" />
-    <PackageReference Include="coverlet.collector">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="FluentAssertions" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="NSubstitute" />
-    <PackageReference Include="NSubstitute.Analyzers.CSharp" />
-    <PackageReference Include="xunit" />
-    <PackageReference Include="xunit.runner.visualstudio">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Whim.CommandPalette\Whim.CommandPalette.csproj" />
-    <ProjectReference Include="..\Whim.TestUtils\Whim.TestUtils.csproj" />
-  </ItemGroup>
+	<PropertyGroup>
+		<AnalysisModeDesign>All</AnalysisModeDesign>
+		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
+		<AnalysisModeGlobalization>None</AnalysisModeGlobalization>
+		<AnalysisModeInteroperability>All</AnalysisModeInteroperability>
+		<AnalysisModeMaintainability>All</AnalysisModeMaintainability>
+		<AnalysisModeNaming>All</AnalysisModeNaming>
+		<AnalysisModePerformance>All</AnalysisModePerformance>
+		<AnalysisModeReliability>All</AnalysisModeReliability>
+		<AnalysisModeSecurity>All</AnalysisModeSecurity>
+		<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
+		<AnalysisModeStyle>All</AnalysisModeStyle>
+		<AnalysisModeUsage>All</AnalysisModeUsage>
+		<Authors>Isaac Daly</Authors>
+		<BuildInParallel>true</BuildInParallel>
+		<Description>An extensible window manager for Windows.</Description>
+		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<GenerateLibraryLayout>true</GenerateLibraryLayout>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Platforms>x64;arm64;Any CPU</Platforms>
+		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+		<Version>0.8.0</Version>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="AutoFixture" />
+		<PackageReference Include="AutoFixture.AutoNSubstitute" />
+		<PackageReference Include="AutoFixture.Xunit2" />
+		<PackageReference Include="coverlet.collector">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="FluentAssertions" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" />
+		<PackageReference Include="NSubstitute" />
+		<PackageReference Include="NSubstitute.Analyzers.CSharp" />
+		<PackageReference Include="xunit" />
+		<PackageReference Include="xunit.runner.visualstudio">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Whim.CommandPalette\Whim.CommandPalette.csproj" />
+		<ProjectReference Include="..\Whim.TestUtils\Whim.TestUtils.csproj" />
+	</ItemGroup>
 </Project>
