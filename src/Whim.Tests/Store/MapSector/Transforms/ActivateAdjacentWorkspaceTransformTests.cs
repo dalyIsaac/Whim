@@ -1,8 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class ActivateAdjacentWorkspaceTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -22,10 +19,10 @@ public class ActivateAdjacentWorkspaceTransformTests
 	internal void AdjacentWorkspaceNotFound(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the workspace doesn't exist
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		IMonitor monitor = CreateMonitor((HMONITOR)1);
 
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, workspace);
+		PopulateMonitorWorkspaceMap(rootSector, monitor, workspace);
 
 		ActivateAdjacentWorkspaceTransform sut = new(monitor.Handle);
 
@@ -40,13 +37,13 @@ public class ActivateAdjacentWorkspaceTransformTests
 	internal void Success(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the workspace exists
-		Workspace workspace1 = CreateWorkspace(ctx);
-		Workspace workspace2 = CreateWorkspace(ctx);
+		Workspace workspace1 = CreateWorkspace();
+		Workspace workspace2 = CreateWorkspace();
 
 		IMonitor monitor = CreateMonitor((HMONITOR)1);
 
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, workspace1);
-		AddWorkspacesToManager(ctx, rootSector, workspace2);
+		PopulateMonitorWorkspaceMap(rootSector, monitor, workspace1);
+		AddWorkspacesToStore(rootSector, workspace2);
 
 		ActivateAdjacentWorkspaceTransform sut = new(monitor.Handle);
 

@@ -17,8 +17,7 @@ internal record WorkspaceToCreate(
 internal class WorkspaceSector(IContext ctx, IInternalContext internalCtx)
 	: SectorBase,
 		IWorkspaceSector,
-		IWorkspaceSectorEvents,
-		IDisposable
+		IWorkspaceSectorEvents
 {
 	private readonly IContext _ctx = ctx;
 	private readonly IInternalContext _internalCtx = internalCtx;
@@ -201,13 +200,5 @@ internal class WorkspaceSector(IContext ctx, IInternalContext internalCtx)
 		}
 
 		Workspaces = Workspaces.SetItem(workspace.Id, workspace with { WindowPositions = windowPositions });
-	}
-
-	public void Dispose()
-	{
-		foreach (Workspace workspace in Workspaces.Values)
-		{
-			workspace.Dispose();
-		}
 	}
 }

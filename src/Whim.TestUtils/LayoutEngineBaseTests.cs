@@ -3,7 +3,6 @@ using Xunit;
 
 namespace Whim.TestUtils;
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 /// <summary>
 /// Tests for <see cref="ILayoutEngine"/> implementations.
 /// </summary>
@@ -195,4 +194,3 @@ public abstract class LayoutEngineBaseTests
 		// Then it shouldn't throw.
 	}
 }
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

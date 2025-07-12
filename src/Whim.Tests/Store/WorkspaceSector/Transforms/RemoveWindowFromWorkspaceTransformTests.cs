@@ -1,8 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class RemoveWindowFromWorkspaceTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -11,9 +8,9 @@ public class RemoveWindowFromWorkspaceTransformTests
 		// Given the window is not found
 		window.Handle.Returns((HWND)3);
 
-		Workspace workspace = CreateWorkspace(ctx);
-		workspace = PopulateWindowWorkspaceMap(ctx, root, CreateWindow((HWND)1), workspace);
-		workspace = PopulateWindowWorkspaceMap(ctx, root, CreateWindow((HWND)2), workspace);
+		Workspace workspace = CreateWorkspace();
+		workspace = PopulateWindowWorkspaceMap(root, CreateWindow((HWND)1), workspace);
+		workspace = PopulateWindowWorkspaceMap(root, CreateWindow((HWND)2), workspace);
 
 		RemoveWindowFromWorkspaceTransform sut = new(workspace.Id, window);
 
@@ -31,11 +28,11 @@ public class RemoveWindowFromWorkspaceTransformTests
 		// Given the window is not the last focused window
 		window.Handle.Returns((HWND)1);
 
-		Workspace workspace = CreateWorkspace(ctx) with { LastFocusedWindowHandle = (HWND)2 };
+		Workspace workspace = CreateWorkspace() with { LastFocusedWindowHandle = (HWND)2 };
 
-		workspace = PopulateWindowWorkspaceMap(ctx, root, CreateWindow((HWND)1), workspace);
-		workspace = PopulateWindowWorkspaceMap(ctx, root, CreateWindow((HWND)2), workspace);
-		workspace = PopulateWindowWorkspaceMap(ctx, root, CreateWindow((HWND)3), workspace);
+		workspace = PopulateWindowWorkspaceMap(root, CreateWindow((HWND)1), workspace);
+		workspace = PopulateWindowWorkspaceMap(root, CreateWindow((HWND)2), workspace);
+		workspace = PopulateWindowWorkspaceMap(root, CreateWindow((HWND)3), workspace);
 
 		RemoveWindowFromWorkspaceTransform sut = new(workspace.Id, window);
 
@@ -57,9 +54,9 @@ public class RemoveWindowFromWorkspaceTransformTests
 	{
 		// Given the window is the last focused window and the last window in the workspace
 		window.Handle.Returns((HWND)1);
-		Workspace workspace = CreateWorkspace(ctx) with { LastFocusedWindowHandle = window.Handle };
+		Workspace workspace = CreateWorkspace() with { LastFocusedWindowHandle = window.Handle };
 
-		workspace = PopulateWindowWorkspaceMap(ctx, root, CreateWindow(window.Handle), workspace);
+		workspace = PopulateWindowWorkspaceMap(root, CreateWindow(window.Handle), workspace);
 
 		RemoveWindowFromWorkspaceTransform sut = new(workspace.Id, window);
 
@@ -80,7 +77,7 @@ public class RemoveWindowFromWorkspaceTransformTests
 	{
 		// Given the window is the last focused window and the window is not the last window in the workspace
 		window.Handle.Returns((HWND)1);
-		Workspace workspace = CreateWorkspace(ctx) with
+		Workspace workspace = CreateWorkspace() with
 		{
 			LastFocusedWindowHandle = window.Handle,
 			WindowPositions = ImmutableDictionary<HWND, WindowPosition>.Empty.Add(
@@ -89,8 +86,8 @@ public class RemoveWindowFromWorkspaceTransformTests
 			),
 		};
 
-		workspace = PopulateWindowWorkspaceMap(ctx, root, CreateWindow(window.Handle), workspace);
-		workspace = PopulateWindowWorkspaceMap(ctx, root, CreateWindow((HWND)2), workspace);
+		workspace = PopulateWindowWorkspaceMap(root, CreateWindow(window.Handle), workspace);
+		workspace = PopulateWindowWorkspaceMap(root, CreateWindow((HWND)2), workspace);
 		// HWND 3 is minimized and has already been added to the workspace
 		AddWindowToSector(root, CreateWindow((HWND)3));
 

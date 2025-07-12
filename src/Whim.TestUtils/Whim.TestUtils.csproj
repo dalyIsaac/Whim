@@ -23,7 +23,7 @@
 		<Nullable>enable</Nullable>
 		<Platforms>x64;arm64;Any CPU</Platforms>
 		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
-		<Version>0.7.0</Version>
+		<Version>0.8.0</Version>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="AutoFixture" />

@@ -15,7 +15,6 @@ public class KeybindHookCustomization : ICustomization
 	}
 }
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class KeybindHookTests
 {
 	private class FakeSafeHandle(bool isInvalid) : UnhookWindowsHookExSafeHandle(default, default)

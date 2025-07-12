@@ -7,7 +7,6 @@ namespace Whim.CommandPalette.Tests;
 public class CommandPalettePluginTests
 {
 	[Theory, AutoSubstituteData]
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 	public void PreInitialize_ShouldIgnoreTitleMatch(IContext ctx)
 	{
 		// Given

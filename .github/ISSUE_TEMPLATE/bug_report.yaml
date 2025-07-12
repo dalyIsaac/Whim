@@ -32,7 +32,10 @@ body:
 
         void DoConfig(IContext context)
         {
-            context.WorkspaceManager.Add(CreateWorkspace(context, "1"));
+            context.FilterManager.Add(
+                window => window.Title.StartsWith("Meeting compact view")
+            );
+
             // ...
         }
       render: csharp

@@ -107,6 +107,6 @@ internal class CoreSavedStateManager : ICoreSavedStateManager
 			? [.. indices]
 			: null;
 
-		return new SavedWorkspace(workspace.BackingName, savedWindows, stickyMonitorIndices);
+		return new SavedWorkspace(workspace.Name, savedWindows, stickyMonitorIndices);
 	}
 }

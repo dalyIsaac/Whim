@@ -7,18 +7,17 @@ using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.TreeLayout.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class TreeLayoutPluginTests
 {
 	private class Customization : StoreCustomization
 	{
-		public static Workspace CreateWorkspace(IContext ctx)
+		public static Workspace CreateWorkspace()
 		{
 			LayoutEngineIdentity identity = new();
 			ILayoutEngine layoutEngine = Substitute.For<ILayoutEngine>();
 			layoutEngine.Identity.Returns(identity);
 
-			Workspace workspace = StoreTestUtils.CreateWorkspace(ctx) with { LayoutEngines = [layoutEngine] };
+			Workspace workspace = StoreTestUtils.CreateWorkspace() with { LayoutEngines = [layoutEngine] };
 			return workspace;
 		}
 
@@ -26,7 +25,7 @@ public class TreeLayoutPluginTests
 		{
 			LayoutEngineIdentity identity = new();
 			TreeLayoutEngine layoutEngine = new(ctx, plugin, identity);
-			return CreateWorkspace(ctx) with { LayoutEngines = [layoutEngine] };
+			return CreateWorkspace() with { LayoutEngines = [layoutEngine] };
 		}
 
 		public static IMonitor CreateMonitor(IContext ctx)
@@ -110,7 +109,7 @@ public class TreeLayoutPluginTests
 		TreeLayoutPlugin plugin = new(ctx);
 
 		IMonitor monitor = Customization.CreateMonitor(ctx);
-		PopulateMonitorWorkspaceMap(ctx, root, monitor, StoreTestUtils.CreateWorkspace(ctx));
+		PopulateMonitorWorkspaceMap(root, monitor, StoreTestUtils.CreateWorkspace());
 
 		// When
 		Direction? direction = plugin.GetAddWindowDirection(monitor);
@@ -126,7 +125,7 @@ public class TreeLayoutPluginTests
 		TreeLayoutPlugin plugin = new(ctx);
 
 		IMonitor monitor = Customization.CreateMonitor(ctx);
-		PopulateMonitorWorkspaceMap(ctx, root, monitor, Customization.CreateTreeWorkspace(ctx, plugin));
+		PopulateMonitorWorkspaceMap(root, monitor, Customization.CreateTreeWorkspace(ctx, plugin));
 
 		// When
 		Direction? direction = plugin.GetAddWindowDirection(monitor);
@@ -142,7 +141,7 @@ public class TreeLayoutPluginTests
 		TreeLayoutPlugin plugin = new(ctx);
 
 		IMonitor monitor = Customization.CreateMonitor(ctx);
-		PopulateMonitorWorkspaceMap(ctx, root, monitor, Customization.CreateTreeWorkspace(ctx, plugin));
+		PopulateMonitorWorkspaceMap(root, monitor, Customization.CreateTreeWorkspace(ctx, plugin));
 
 		plugin.SetAddWindowDirection(monitor, Direction.Left);
 
@@ -206,7 +205,7 @@ public class TreeLayoutPluginTests
 		TreeLayoutPlugin plugin = new(ctx);
 
 		IMonitor monitor = Customization.CreateMonitor(ctx);
-		PopulateMonitorWorkspaceMap(ctx, root, monitor, Customization.CreateWorkspace(ctx));
+		PopulateMonitorWorkspaceMap(root, monitor, Customization.CreateWorkspace());
 
 		// When
 		plugin.SetAddWindowDirection(monitor, Direction.Up);
@@ -225,7 +224,7 @@ public class TreeLayoutPluginTests
 		NativeManagerUtils.SetupTryEnqueue(ctx);
 		IMonitor monitor = Customization.CreateMonitor(ctx);
 		Workspace workspace = Customization.CreateTreeWorkspace(ctx, plugin);
-		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
+		PopulateMonitorWorkspaceMap(root, monitor, workspace);
 
 		// When
 		Assert.RaisedEvent<AddWindowDirectionChangedEventArgs> addWindowEvent =
@@ -253,7 +252,7 @@ public class TreeLayoutPluginTests
 		NativeManagerUtils.SetupTryEnqueue(ctx);
 		IMonitor monitor = Customization.CreateMonitor(ctx);
 		Workspace workspace = Customization.CreateTreeWorkspace(ctx, plugin);
-		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
+		PopulateMonitorWorkspaceMap(root, monitor, workspace);
 
 		// When
 		plugin.SetAddWindowDirection(monitor, Direction.Up);

@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
 
 namespace Whim.Tests;
@@ -7,7 +6,6 @@ public class RouterManagerCustomization : StoreCustomization
 {
 	public IRouterManager? RouterManager { get; private set; }
 
-	[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 	protected override void PostCustomize(IFixture fixture)
 	{
 		// System under test
@@ -15,12 +13,12 @@ public class RouterManagerCustomization : StoreCustomization
 		fixture.Inject(RouterManager);
 
 		// Setup workspace
-		Workspace workspace = CreateWorkspace(_ctx) with
+		Workspace workspace = CreateWorkspace() with
 		{
-			BackingName = "Test",
+			Name = "Test",
 		};
 		fixture.Inject(workspace);
-		AddWorkspaceToManager(_ctx, _store._root.MutableRootSector, workspace);
+		AddWorkspaceToStore(_store._root.MutableRootSector, workspace);
 
 		// Setup window
 		IWindow window = fixture.Freeze<IWindow>();
@@ -41,7 +39,7 @@ public class RouterManagerTests
 		routerManager.AddWindowClassRoute("Test", "Test");
 
 		// Then
-		Assert.Equal("Test", routerManager.RouteWindow(window)?.BackingName);
+		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
 	}
 
 	[Theory, AutoSubstituteData<RouterManagerCustomization>]
@@ -53,7 +51,7 @@ public class RouterManagerTests
 		routerManager.AddWindowClassRoute("Test", workspace);
 
 		// Then
-		Assert.Equal("Test", routerManager.RouteWindow(window)?.BackingName);
+		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
 	}
 
 	[Theory, AutoSubstituteData<RouterManagerCustomization>]
@@ -65,7 +63,7 @@ public class RouterManagerTests
 		routerManager.AddProcessFileNameRoute("Test.exe", "Test");
 
 		// Then
-		Assert.Equal("Test", routerManager.RouteWindow(window)?.BackingName);
+		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
 	}
 
 	[Theory, AutoSubstituteData<RouterManagerCustomization>]
@@ -90,7 +88,7 @@ public class RouterManagerTests
 		routerManager.AddProcessFileNameRoute("Test.exe", workspace);
 
 		// Then
-		Assert.Equal("Test", routerManager.RouteWindow(window)?.BackingName);
+		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
 	}
 
 	[Theory, AutoSubstituteData<RouterManagerCustomization>]
@@ -119,7 +117,7 @@ public class RouterManagerTests
 		routerManager.AddTitleRoute("Test", "Test");
 
 		// Then
-		Assert.Equal("Test", routerManager.RouteWindow(window)?.BackingName);
+		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
 	}
 
 	[Theory, AutoSubstituteData<RouterManagerCustomization>]
@@ -131,7 +129,7 @@ public class RouterManagerTests
 		routerManager.AddTitleRoute("Test", workspace);
 
 		// Then
-		Assert.Equal("Test", routerManager.RouteWindow(window)?.BackingName);
+		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
 	}
 
 	[Theory, AutoSubstituteData<RouterManagerCustomization>]
@@ -143,7 +141,7 @@ public class RouterManagerTests
 		routerManager.AddTitleMatchRoute("Test", "Test");
 
 		// Then
-		Assert.Equal("Test", routerManager.RouteWindow(window)?.BackingName);
+		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
 	}
 
 	[Theory, AutoSubstituteData<RouterManagerCustomization>]
@@ -155,7 +153,7 @@ public class RouterManagerTests
 		routerManager.AddTitleMatchRoute("Test", workspace);
 
 		// Then
-		Assert.Equal("Test", routerManager.RouteWindow(window)?.BackingName);
+		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
 	}
 
 	[Theory, AutoSubstituteData<RouterManagerCustomization>]
@@ -181,6 +179,6 @@ public class RouterManagerTests
 		routerManager.Add((w) => w.WindowClass == "Test" ? workspace : null);
 
 		// Then
-		Assert.Equal("Test", routerManager.RouteWindow(window)?.BackingName);
+		Assert.Equal("Test", routerManager.RouteWindow(window)?.Name);
 	}
 }

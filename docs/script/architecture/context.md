@@ -5,7 +5,6 @@ The <xref:Whim.IContext> is the core of Whim. It consists of managers which cont
 The <xref:Whim.IContext> consists of:
 
 - the <xref:Whim.IStore> - see the [Store](./store.md) page for more
-- managers which contain and control Whim's state and functionality
 - events related to the `IContext`
 - the <xref:Whim.IContext.UncaughtExceptionHandling> setting
 - the <xref:Whim.Logger>
@@ -23,7 +22,7 @@ Plugins should subscribe to Whim's various `public` events.
 
 ## Initialization
 
-Managers and the store will generally implement a subset of the following methods:
+Classes will generally implement a subset of the following methods:
 
 - `PreInitialize` - used for things like subscribing to event listeners
 - `Initialize` - used for loading state, (usually user-defined or saved state)

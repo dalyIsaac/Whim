@@ -3,7 +3,7 @@ namespace Whim;
 /// <summary>
 /// Focus the last focused window in the workspace with given <paramref name="WorkspaceId"/>.
 ///
-/// NOTE: This does not update the workspace's <see cref="Workspace.LastFocusedWindow"/>.
+/// NOTE: This does not update the workspace's <see cref="Workspace.LastFocusedWindowHandle"/>.
 /// Instead, it queues a call to <see cref="IWindow.Focus"/>. If there is no last focused window, the monitor's
 /// desktop will be focused.
 /// </summary>

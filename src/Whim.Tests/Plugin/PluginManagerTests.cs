@@ -31,11 +31,6 @@ public class PluginManagerCustomization : ICustomization
 	}
 }
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage(
-	"Reliability",
-	"CA2000:Dispose objects before losing scope",
-	Justification = "Unnecessary for tests"
-)]
 public class PluginManagerTests
 {
 	private static (IPlugin, IPlugin, IPlugin) CreatePlugins()

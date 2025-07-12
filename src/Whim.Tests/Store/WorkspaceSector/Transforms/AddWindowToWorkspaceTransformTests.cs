@@ -1,18 +1,15 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class AddWindowToWorkspaceTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void AddWindowToWorkspaceTransform_Success(IContext ctx, MutableRootSector root, ILayoutEngine engine)
 	{
 		// Given
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		workspace = workspace with { LayoutEngines = [engine] };
 
-		AddWorkspaceToManager(ctx, root, workspace);
+		AddWorkspaceToStore(root, workspace);
 
 		AddWindowToWorkspaceTransform transform = new(workspace.Id, CreateWindow((HWND)1));
 

@@ -1,15 +1,12 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class RouteEventTests
 {
 	[Theory, AutoSubstituteData]
-	public void WindowAdded(IContext ctx, IWindow window)
+	public void WindowAdded(IWindow window)
 	{
 		// When
-		IWorkspace workspace = StoreTestUtils.CreateWorkspace(ctx);
+		IWorkspace workspace = StoreTestUtils.CreateWorkspace();
 		RouteEventArgs args = RouteEventArgs.WindowAdded(window, workspace);
 
 		// Then
@@ -19,10 +16,10 @@ public class RouteEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void WindowRemoved(IContext ctx, IWindow window)
+	public void WindowRemoved(IWindow window)
 	{
 		// When
-		IWorkspace workspace = StoreTestUtils.CreateWorkspace(ctx);
+		IWorkspace workspace = StoreTestUtils.CreateWorkspace();
 		RouteEventArgs args = RouteEventArgs.WindowRemoved(window, workspace);
 
 		// Then
@@ -32,11 +29,11 @@ public class RouteEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void WindowMoved(IContext ctx, IWindow window)
+	public void WindowMoved(IWindow window)
 	{
 		// When
-		IWorkspace fromWorkspace = StoreTestUtils.CreateWorkspace(ctx);
-		IWorkspace toWorkspace = StoreTestUtils.CreateWorkspace(ctx);
+		IWorkspace fromWorkspace = StoreTestUtils.CreateWorkspace();
+		IWorkspace toWorkspace = StoreTestUtils.CreateWorkspace();
 		RouteEventArgs args = RouteEventArgs.WindowMoved(window, fromWorkspace, toWorkspace);
 
 		// Then
@@ -46,10 +43,10 @@ public class RouteEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void Equals_Null(IContext ctx, IWindow window)
+	public void Equals_Null(IWindow window)
 	{
 		// Given
-		IWorkspace workspace = StoreTestUtils.CreateWorkspace(ctx);
+		IWorkspace workspace = StoreTestUtils.CreateWorkspace();
 		RouteEventArgs a = RouteEventArgs.WindowAdded(window, workspace);
 
 		// Then
@@ -57,10 +54,10 @@ public class RouteEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void Equals_DifferentType(IContext ctx, IWindow window)
+	public void Equals_DifferentType(IWindow window)
 	{
 		// Given
-		IWorkspace workspace = StoreTestUtils.CreateWorkspace(ctx);
+		IWorkspace workspace = StoreTestUtils.CreateWorkspace();
 		RouteEventArgs a = RouteEventArgs.WindowAdded(window, workspace);
 
 		// Then
@@ -68,10 +65,10 @@ public class RouteEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void Equals_DifferentWindow(IContext ctx, IWindow aWindow, IWindow bWindow)
+	public void Equals_DifferentWindow(IWindow aWindow, IWindow bWindow)
 	{
 		// Given
-		IWorkspace workspace = StoreTestUtils.CreateWorkspace(ctx);
+		IWorkspace workspace = StoreTestUtils.CreateWorkspace();
 		RouteEventArgs a = RouteEventArgs.WindowAdded(aWindow, workspace);
 		RouteEventArgs b = RouteEventArgs.WindowAdded(bWindow, workspace);
 
@@ -80,11 +77,11 @@ public class RouteEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void Equals_DifferentPreviousWorkspace(IContext ctx, IWindow Window)
+	public void Equals_DifferentPreviousWorkspace(IWindow Window)
 	{
 		// Given
-		IWorkspace aWorkspace = StoreTestUtils.CreateWorkspace(ctx);
-		IWorkspace bWorkspace = StoreTestUtils.CreateWorkspace(ctx);
+		IWorkspace aWorkspace = StoreTestUtils.CreateWorkspace();
+		IWorkspace bWorkspace = StoreTestUtils.CreateWorkspace();
 		RouteEventArgs a = RouteEventArgs.WindowRemoved(Window, aWorkspace);
 		RouteEventArgs b = RouteEventArgs.WindowRemoved(Window, bWorkspace);
 
@@ -93,11 +90,11 @@ public class RouteEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void Equals_DifferentNextWorkspace(IContext ctx, IWindow Window)
+	public void Equals_DifferentNextWorkspace(IWindow Window)
 	{
 		// Given
-		IWorkspace aWorkspace = StoreTestUtils.CreateWorkspace(ctx);
-		IWorkspace bWorkspace = StoreTestUtils.CreateWorkspace(ctx);
+		IWorkspace aWorkspace = StoreTestUtils.CreateWorkspace();
+		IWorkspace bWorkspace = StoreTestUtils.CreateWorkspace();
 		RouteEventArgs a = RouteEventArgs.WindowAdded(Window, aWorkspace);
 		RouteEventArgs b = RouteEventArgs.WindowAdded(Window, bWorkspace);
 
@@ -106,11 +103,11 @@ public class RouteEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void Equals_Sucess(IContext ctx, IWindow Window)
+	public void Equals_Sucess(IWindow Window)
 	{
 		// Given
-		IWorkspace fromWorkspace = StoreTestUtils.CreateWorkspace(ctx);
-		IWorkspace toWorkspace = StoreTestUtils.CreateWorkspace(ctx);
+		IWorkspace fromWorkspace = StoreTestUtils.CreateWorkspace();
+		IWorkspace toWorkspace = StoreTestUtils.CreateWorkspace();
 		RouteEventArgs a = RouteEventArgs.WindowMoved(Window, fromWorkspace, toWorkspace);
 		RouteEventArgs b = RouteEventArgs.WindowMoved(Window, fromWorkspace, toWorkspace);
 
@@ -119,11 +116,11 @@ public class RouteEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void GetHashCode_Success(IContext ctx, IWindow Window)
+	public void GetHashCode_Success(IWindow Window)
 	{
 		// Given
-		IWorkspace currentWorkspace = StoreTestUtils.CreateWorkspace(ctx);
-		IWorkspace previousWorkspace = StoreTestUtils.CreateWorkspace(ctx);
+		IWorkspace currentWorkspace = StoreTestUtils.CreateWorkspace();
+		IWorkspace previousWorkspace = StoreTestUtils.CreateWorkspace();
 		RouteEventArgs a = RouteEventArgs.WindowMoved(Window, currentWorkspace, previousWorkspace);
 
 		// Then

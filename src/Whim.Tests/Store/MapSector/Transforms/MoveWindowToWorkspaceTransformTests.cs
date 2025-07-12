@@ -1,6 +1,5 @@
 namespace Whim.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class MoveWindowToWorkspaceTransformTests
 {
 	private static Result<Unit> AssertDoesNotRaise(
@@ -56,10 +55,10 @@ public class MoveWindowToWorkspaceTransformTests
 	internal void WindowNotFound_SpecifiedHandle(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given a random window id
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		IWindow window = CreateWindow((HWND)10);
 
-		AddWorkspacesToManager(ctx, rootSector, workspace);
+		AddWorkspacesToStore(rootSector, workspace);
 
 		MoveWindowToWorkspaceTransform sut = new(workspace.Id, window.Handle);
 
@@ -74,8 +73,8 @@ public class MoveWindowToWorkspaceTransformTests
 	internal void WindowNotFound_Default(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given a random window id
-		Workspace workspace = CreateWorkspace(ctx);
-		AddActiveWorkspace(ctx, rootSector, workspace);
+		Workspace workspace = CreateWorkspace();
+		AddActiveWorkspaceToStore(rootSector, workspace);
 
 		MoveWindowToWorkspaceTransform sut = new(workspace.Id);
 
@@ -90,10 +89,10 @@ public class MoveWindowToWorkspaceTransformTests
 	internal void WorkspaceForWindowNotFound(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given a window which isn't in a workspace
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		IWindow window = CreateWindow((HWND)10);
 
-		AddWorkspacesToManager(ctx, rootSector, workspace);
+		AddWorkspacesToStore(rootSector, workspace);
 		rootSector.WindowSector.Windows = rootSector.WindowSector.Windows.Add(window.Handle, window);
 
 		MoveWindowToWorkspaceTransform sut = new(workspace.Id, window.Handle);
@@ -109,10 +108,10 @@ public class MoveWindowToWorkspaceTransformTests
 	internal void WindowAlreadyOnWorkspace(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the window is already on the workspace
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		IWindow window = CreateWindow((HWND)10);
 
-		PopulateThreeWayMap(ctx, rootSector, CreateMonitor((HMONITOR)1), workspace, window);
+		PopulateThreeWayMap(rootSector, CreateMonitor((HMONITOR)1), workspace, window);
 
 		MoveWindowToWorkspaceTransform sut = new(workspace.Id, window.Handle);
 
@@ -127,13 +126,13 @@ public class MoveWindowToWorkspaceTransformTests
 	internal void Success_BothWorkspacesLayout(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the window switches workspaces, and both workspaces are visible
-		Workspace workspace1 = CreateWorkspace(ctx);
-		Workspace workspace2 = CreateWorkspace(ctx);
+		Workspace workspace1 = CreateWorkspace();
+		Workspace workspace2 = CreateWorkspace();
 
 		IWindow window = CreateWindow((HWND)10);
 
-		PopulateThreeWayMap(ctx, rootSector, CreateMonitor((HMONITOR)1), workspace1, window);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor((HMONITOR)2), workspace2);
+		PopulateThreeWayMap(rootSector, CreateMonitor((HMONITOR)1), workspace1, window);
+		PopulateMonitorWorkspaceMap(rootSector, CreateMonitor((HMONITOR)2), workspace2);
 
 		MoveWindowToWorkspaceTransform sut = new(workspace2.Id, window.Handle);
 
@@ -176,15 +175,15 @@ public class MoveWindowToWorkspaceTransformTests
 	internal void Success_SingleWorkspaceLayout(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the window gets activated on a hidden workspace
-		Workspace workspace1 = CreateWorkspace(ctx);
-		Workspace workspace2 = CreateWorkspace(ctx);
+		Workspace workspace1 = CreateWorkspace();
+		Workspace workspace2 = CreateWorkspace();
 
 		IWindow window = CreateWindow((HWND)10);
 
 		IMonitor monitor = CreateMonitor((HMONITOR)1);
 
-		PopulateThreeWayMap(ctx, rootSector, monitor, workspace1, window);
-		AddWorkspacesToManager(ctx, rootSector, workspace2);
+		PopulateThreeWayMap(rootSector, monitor, workspace1, window);
+		AddWorkspacesToStore(rootSector, workspace2);
 		rootSector.MonitorSector.ActiveMonitorHandle = monitor.Handle;
 
 		MoveWindowToWorkspaceTransform sut = new(workspace2.Id, window.Handle);

@@ -63,7 +63,6 @@ internal class CaptureWinEventProc
 	}
 }
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WindowEventListenerTests
 {
 	private static void InitializeCoreNativeManagerMock(IInternalContext internalCtx)

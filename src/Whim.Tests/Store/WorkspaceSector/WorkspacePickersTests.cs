@@ -1,27 +1,24 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+﻿using System.Linq;
 
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WorkspacePickersTests
 {
 	private static void CreateNamedWorkspaces(IContext ctx, MutableRootSector root)
 	{
-		AddWorkspacesToManager(
-			ctx,
+		AddWorkspacesToStore(
 			root,
-			CreateWorkspace(ctx) with
+			CreateWorkspace() with
 			{
-				BackingName = "Test",
+				Name = "Test",
 			},
-			CreateWorkspace(ctx) with
+			CreateWorkspace() with
 			{
-				BackingName = "Test2",
+				Name = "Test2",
 			},
-			CreateWorkspace(ctx) with
+			CreateWorkspace() with
 			{
-				BackingName = "Test3",
+				Name = "Test3",
 			}
 		);
 	}
@@ -101,10 +98,10 @@ public class WorkspacePickersTests
 	internal void PickActiveWorkspace(IContext ctx, MutableRootSector root)
 	{
 		// Given the workspaces
-		AddWorkspacesToManager(ctx, root, CreateWorkspace(ctx), CreateWorkspace(ctx));
+		AddWorkspacesToStore(root, CreateWorkspace(), CreateWorkspace());
 
-		Workspace activeWorkspace = CreateWorkspace(ctx);
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), activeWorkspace);
+		Workspace activeWorkspace = CreateWorkspace();
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)1), activeWorkspace);
 
 		// When we get the workspace
 		IWorkspace result = ctx.Store.Pick(Pickers.PickActiveWorkspace());
@@ -117,10 +114,10 @@ public class WorkspacePickersTests
 	internal void PickActiveWorkspaceId(IContext ctx, MutableRootSector root)
 	{
 		// Given the workspaces
-		AddWorkspacesToManager(ctx, root, CreateWorkspace(ctx), CreateWorkspace(ctx));
+		AddWorkspacesToStore(root, CreateWorkspace(), CreateWorkspace());
 
-		Workspace activeWorkspace = CreateWorkspace(ctx);
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), activeWorkspace);
+		Workspace activeWorkspace = CreateWorkspace();
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)1), activeWorkspace);
 
 		// When we get the workspace id
 		Guid result = ctx.Store.Pick(Pickers.PickActiveWorkspaceId());
@@ -138,14 +135,14 @@ public class WorkspacePickersTests
 	)
 	{
 		// Given the workspaces
-		AddWorkspacesToManager(ctx, root, CreateWorkspace(ctx), CreateWorkspace(ctx));
+		AddWorkspacesToStore(root, CreateWorkspace(), CreateWorkspace());
 
-		Workspace activeWorkspace = CreateWorkspace(ctx) with
+		Workspace activeWorkspace = CreateWorkspace() with
 		{
 			LayoutEngines = [layoutEngine1, layoutEngine2],
 			ActiveLayoutEngineIndex = 1,
 		};
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), activeWorkspace);
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)1), activeWorkspace);
 
 		// When we get the layout engine
 		Result<ILayoutEngine> result = ctx.Store.Pick(Pickers.PickActiveLayoutEngine(activeWorkspace.Id));
@@ -165,12 +162,12 @@ public class WorkspacePickersTests
 			.Add((HWND)2, new())
 			.Add((HWND)3, new());
 
-		Workspace workspace = CreateWorkspace(ctx) with { WindowPositions = windowPositions };
+		Workspace workspace = CreateWorkspace() with { WindowPositions = windowPositions };
 
-		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
-		PopulateWindowWorkspaceMap(ctx, root, CreateWindow((HWND)1), workspace);
-		PopulateWindowWorkspaceMap(ctx, root, CreateWindow((HWND)2), workspace);
-		PopulateWindowWorkspaceMap(ctx, root, CreateWindow((HWND)3), workspace);
+		PopulateMonitorWorkspaceMap(root, monitor, workspace);
+		PopulateWindowWorkspaceMap(root, CreateWindow((HWND)1), workspace);
+		PopulateWindowWorkspaceMap(root, CreateWindow((HWND)2), workspace);
+		PopulateWindowWorkspaceMap(root, CreateWindow((HWND)3), workspace);
 
 		// When we get the windows
 		Result<IEnumerable<IWindow>> result = ctx.Store.Pick(Pickers.PickWorkspaceWindows(workspace.Id));
@@ -185,10 +182,10 @@ public class WorkspacePickersTests
 		IMonitor monitor = CreateMonitor((HMONITOR)1);
 		IWindow lastFocusedWindow = CreateWindow((HWND)2);
 
-		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
-		workspace = PopulateWindowWorkspaceMap(ctx, root, CreateWindow((HWND)1), workspace);
-		workspace = PopulateWindowWorkspaceMap(ctx, root, lastFocusedWindow, workspace);
-		PopulateWindowWorkspaceMap(ctx, root, CreateWindow((HWND)3), workspace);
+		PopulateMonitorWorkspaceMap(root, monitor, workspace);
+		workspace = PopulateWindowWorkspaceMap(root, CreateWindow((HWND)1), workspace);
+		workspace = PopulateWindowWorkspaceMap(root, lastFocusedWindow, workspace);
+		PopulateWindowWorkspaceMap(root, CreateWindow((HWND)3), workspace);
 
 		return lastFocusedWindow;
 	}
@@ -197,7 +194,7 @@ public class WorkspacePickersTests
 	internal void PickLastFocusedWindow_Success(IContext ctx, MutableRootSector root)
 	{
 		// Given the workspaces and windows
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		IWindow lastFocusedWindow = Setup_LastFocusedWindow(ctx, root, workspace);
 
 		root.WorkspaceSector.Workspaces = root.WorkspaceSector.Workspaces.SetItem(
@@ -220,7 +217,7 @@ public class WorkspacePickersTests
 	internal void PickLastFocusedWindow_WorkspaceNotFound(IContext ctx, MutableRootSector root)
 	{
 		// Given the workspaces and windows exist, but the workspace to search for doesn't exist
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		IWindow lastFocusedWindow = Setup_LastFocusedWindow(ctx, root, workspace);
 
 		root.WorkspaceSector.Workspaces = root.WorkspaceSector.Workspaces.SetItem(
@@ -244,7 +241,7 @@ public class WorkspacePickersTests
 	internal void PickLastFocusedWindow_NoLastFocusedWindow(IContext ctx, MutableRootSector root)
 	{
 		// Given the workspaces and windows, but the last focused window isn't set
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		IWindow lastFocusedWindow = Setup_LastFocusedWindow(ctx, root, workspace);
 
 		// When we get the last focused window
@@ -258,7 +255,7 @@ public class WorkspacePickersTests
 	internal void PickLastFocusedWindowHandle_DefaultWorkspace(IContext ctx, MutableRootSector root)
 	{
 		// Given the workspaces and windows
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		IWindow lastFocusedWindow = Setup_LastFocusedWindow(ctx, root, workspace);
 
 		root.WorkspaceSector.Workspaces = root.WorkspaceSector.Workspaces.SetItem(
@@ -281,7 +278,7 @@ public class WorkspacePickersTests
 	internal void PickLastFocusedWindowHandle_WorkspaceNotFound(IContext ctx, MutableRootSector root)
 	{
 		// Given the workspaces and windows exist, but the workspace to search for doesn't exist
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		IWindow lastFocusedWindow = Setup_LastFocusedWindow(ctx, root, workspace);
 
 		root.WorkspaceSector.Workspaces = root.WorkspaceSector.Workspaces.SetItem(
@@ -305,7 +302,7 @@ public class WorkspacePickersTests
 	internal void PickLastFocusedWindowHandle_NoLastFocusedWindow(IContext ctx, MutableRootSector root)
 	{
 		// Given the workspaces and windows, but the last focused window isn't set
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		IWindow lastFocusedWindow = Setup_LastFocusedWindow(ctx, root, workspace);
 
 		root.WorkspaceSector.Workspaces = root.WorkspaceSector.Workspaces.SetItem(workspace.Id, workspace);
@@ -330,9 +327,9 @@ public class WorkspacePickersTests
 			),
 		};
 
-		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
-		workspace = PopulateWindowWorkspaceMap(ctx, root, window, workspace);
-		PopulateWindowWorkspaceMap(ctx, root, CreateWindow((HWND)3), workspace);
+		PopulateMonitorWorkspaceMap(root, monitor, workspace);
+		workspace = PopulateWindowWorkspaceMap(root, window, workspace);
+		PopulateWindowWorkspaceMap(root, CreateWindow((HWND)3), workspace);
 
 		return window;
 	}
@@ -341,7 +338,7 @@ public class WorkspacePickersTests
 	internal void PickWindowPosition_WorkspaceNotFound(IContext ctx, MutableRootSector root)
 	{
 		// Given the workspaces and windows exist, but the workspace to search for doesn't exist
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		IWindow window = Setup_WindowPosition(ctx, root, workspace);
 
 		Guid workspaceToSearchFor = Guid.NewGuid();
@@ -357,7 +354,7 @@ public class WorkspacePickersTests
 	internal void PickWindowPosition_WindowNotFound(IContext ctx, MutableRootSector root)
 	{
 		// Given the workspaces and windows exist, but the window to search for doesn't exist
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		IWindow window = Setup_WindowPosition(ctx, root, workspace);
 
 		HWND hwndToSearchFor = (HWND)987;
@@ -373,7 +370,7 @@ public class WorkspacePickersTests
 	internal void PickWindowPosition_Success(IContext ctx, MutableRootSector root)
 	{
 		// Given the workspaces and windows
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		IWindow window = Setup_WindowPosition(ctx, root, workspace);
 
 		// When we get the window position
@@ -387,7 +384,7 @@ public class WorkspacePickersTests
 	internal void PickWindowPositionHandle_WorkspaceNotFound(IContext ctx, MutableRootSector root)
 	{
 		// Given the workspaces and windows exist, but the workspace to search for doesn't exist
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		IWindow window = Setup_WindowPosition(ctx, root, workspace);
 
 		Guid workspaceToSearchFor = Guid.NewGuid();
@@ -403,7 +400,7 @@ public class WorkspacePickersTests
 	internal void PickWindowPositionHandle_WindowNotFound(IContext ctx, MutableRootSector root)
 	{
 		// Given the workspaces and windows exist, but the window to search for doesn't exist
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		IWindow window = Setup_WindowPosition(ctx, root, workspace);
 
 		HWND hwndToSearchFor = (HWND)987;

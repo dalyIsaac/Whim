@@ -8,22 +8,21 @@ using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.SliceLayout.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class SliceLayoutPluginTests
 {
 	private class Customization : StoreCustomization
 	{
 		protected override void PostCustomize(IFixture fixture)
 		{
-			Workspace workspace = CreateWorkspace(_ctx);
+			Workspace workspace = CreateWorkspace();
 			fixture.Inject(workspace);
 
 			IMonitor monitor = CreateMonitor();
 			fixture.Inject(monitor);
 
 			MutableRootSector root = _store._root.MutableRootSector;
-			PopulateMonitorWorkspaceMap(_ctx, root, monitor, workspace);
-			AddActiveWorkspace(_ctx, root, workspace);
+			PopulateMonitorWorkspaceMap(root, monitor, workspace);
+			AddActiveWorkspaceToStore(root, workspace);
 		}
 
 		public static IWindow AddUntrackedWindow(MutableRootSector rootSector)
@@ -37,7 +36,7 @@ public class SliceLayoutPluginTests
 		{
 			IWindow window = CreateWindow(new HWND(1));
 			workspace = workspace with { LastFocusedWindowHandle = window.Handle };
-			PopulateWindowWorkspaceMap(ctx, rootSector, window, workspace);
+			PopulateWindowWorkspaceMap(rootSector, window, workspace);
 			return window;
 		}
 	}

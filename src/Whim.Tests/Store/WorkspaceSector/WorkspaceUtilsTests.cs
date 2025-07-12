@@ -1,8 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WorkspaceUtilsTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -11,7 +8,7 @@ public class WorkspaceUtilsTests
 		// Given the workspace id is default
 		Guid workspaceId = default;
 		Guid activeWorkspaceId = Guid.NewGuid();
-		AddActiveWorkspace(ctx, root, CreateWorkspace(ctx) with { Id = activeWorkspaceId });
+		AddActiveWorkspaceToStore(root, CreateWorkspace() with { Id = activeWorkspaceId });
 
 		// When
 		Guid result = WorkspaceUtils.OrActiveWorkspace(workspaceId, ctx);
@@ -26,7 +23,7 @@ public class WorkspaceUtilsTests
 		// Given the workspace id is not default
 		Guid workspaceId = Guid.NewGuid();
 		Guid activeWorkspaceId = Guid.NewGuid();
-		AddActiveWorkspace(ctx, root, CreateWorkspace(ctx) with { Id = activeWorkspaceId });
+		AddActiveWorkspaceToStore(root, CreateWorkspace() with { Id = activeWorkspaceId });
 
 		// When
 		Guid result = WorkspaceUtils.OrActiveWorkspace(workspaceId, ctx);
@@ -46,7 +43,7 @@ public class WorkspaceUtilsTests
 	{
 		// Given
 		HWND lastFocusedWindowHandle = new(1);
-		Workspace workspace = CreateWorkspace(ctx) with
+		Workspace workspace = CreateWorkspace() with
 		{
 			LayoutEngines = [engine1, engine2, engine3],
 			ActiveLayoutEngineIndex = 1,
@@ -82,7 +79,7 @@ public class WorkspaceUtilsTests
 	)
 	{
 		// Given
-		Workspace workspace = CreateWorkspace(ctx) with
+		Workspace workspace = CreateWorkspace() with
 		{
 			LayoutEngines = [engine],
 			ActiveLayoutEngineIndex = 0,
@@ -120,7 +117,7 @@ public class WorkspaceUtilsTests
 		// When
 		Result<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(
 			ctx,
-			CreateWorkspace(ctx),
+			CreateWorkspace(),
 			windowHandle,
 			defaultToLastFocusedWindow,
 			isWindowRequiredInWorkspace
@@ -142,7 +139,7 @@ public class WorkspaceUtilsTests
 		// When there are no windows
 		Result<IWindow> result = WorkspaceUtils.GetValidWorkspaceWindow(
 			ctx,
-			CreateWorkspace(ctx),
+			CreateWorkspace(),
 			windowHandle,
 			defaultToLastFocusedWindow,
 			isWindowRequiredInWorkspace
@@ -157,7 +154,7 @@ public class WorkspaceUtilsTests
 	{
 		// Given the handle is not null, but the window is not in the workspace
 		HWND windowHandle = new(1);
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 
 		bool isWindowRequiredInWorkspace = true;
 
@@ -179,7 +176,7 @@ public class WorkspaceUtilsTests
 	{
 		// Given the handle is not null, but the window is not in the workspace
 		HWND windowHandle = new(1);
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 
 		bool isWindowRequiredInWorkspace = false;
 
@@ -202,7 +199,7 @@ public class WorkspaceUtilsTests
 		// Given the handle is provided and the window is in the window sector
 		IWindow window = CreateWindow((HWND)1);
 		AddWindowToSector(root, window);
-		Workspace workspace = CreateWorkspace(ctx) with
+		Workspace workspace = CreateWorkspace() with
 		{
 			WindowPositions = ImmutableDictionary<HWND, WindowPosition>.Empty.Add(window.Handle, new()),
 		};

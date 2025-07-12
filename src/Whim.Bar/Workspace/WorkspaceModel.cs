@@ -17,7 +17,7 @@ internal class WorkspaceModel : INotifyPropertyChanged
 	/// <summary>
 	/// The The name of the workspace.
 	/// </summary>
-	public string? Name => _ctx.Store.Pick(Pickers.PickWorkspaceById(Workspace.Id)).ValueOrDefault?.BackingName;
+	public string? Name => _ctx.Store.Pick(Pickers.PickWorkspaceById(Workspace.Id)).ValueOrDefault?.Name;
 
 	private bool _activeonMonitor;
 

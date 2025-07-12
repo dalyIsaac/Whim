@@ -44,6 +44,7 @@ if (0 -ne $LastExitCode) {
 
 # Bump the version.
 dotnet tool run setversion -r $nextVersion
+dotnet tool run csharpier format .
 
 $proceed = Read-Host "Commit and push on branch ${bumpVersionBranch}? (y/N)"
 if ($proceed -cne "y") {

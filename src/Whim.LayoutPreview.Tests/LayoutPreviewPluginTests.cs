@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using AutoFixture;
 using NSubstitute;
@@ -10,21 +9,20 @@ using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.LayoutPreview.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class LayoutPreviewPluginTests
 {
 	private class Customization : StoreCustomization
 	{
 		protected override void PostCustomize(IFixture fixture)
 		{
-			Workspace workspace = CreateWorkspace(_ctx);
+			Workspace workspace = CreateWorkspace();
 			fixture.Inject(workspace);
 
 			IMonitor monitor = CreateMonitor((HMONITOR)1);
 			fixture.Inject(monitor);
 
-			SetupMonitorAtPoint(_ctx, _internalCtx, _store._root.MutableRootSector, monitor, new Point<int>(0, 0));
-			PopulateMonitorWorkspaceMap(_ctx, _store._root.MutableRootSector, monitor, workspace);
+			SetupMonitorAtPoint(_internalCtx, _store._root.MutableRootSector, monitor, new Point<int>(0, 0));
+			PopulateMonitorWorkspaceMap(_store._root.MutableRootSector, monitor, workspace);
 		}
 	}
 
@@ -55,7 +53,6 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Theory, AutoSubstituteData]
-	[SuppressMessage("Usage", "NS5000:Received check.")]
 	internal void PreInitialize(IContext ctx)
 	{
 		// Given
@@ -176,11 +173,7 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Theory, AutoSubstituteData<Customization>]
-	internal void WindowMoved_Dragged_CannotFindWorkspace(
-		IContext ctx,
-		MutableRootSector rootSector,
-		Workspace workspace
-	)
+	internal void WindowMoved_Dragged_CannotFindWorkspace(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -192,15 +185,12 @@ public class LayoutPreviewPluginTests
 		};
 		rootSector.MapSector.MonitorWorkspaceMap = rootSector.MapSector.MonitorWorkspaceMap.Clear();
 
-		workspace.ActiveLayoutEngine.ClearReceivedCalls();
-
 		// When
 		plugin.PreInitialize();
 		rootSector.WindowSector.QueueEvent(e);
 		rootSector.DispatchEvents();
 
 		// Then
-		Assert.Empty(workspace.ActiveLayoutEngine.ReceivedCalls());
 		Assert.Null(plugin.DraggedWindow);
 	}
 
@@ -238,12 +228,7 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Theory, AutoSubstituteData<Customization>]
-	internal void WindowMoved_Dragged_Success(
-		IContext ctx,
-		MutableRootSector rootSector,
-		IWindow window,
-		Workspace workspace
-	)
+	internal void WindowMoved_Dragged_Success(IContext ctx, MutableRootSector rootSector, IWindow window)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -254,8 +239,6 @@ public class LayoutPreviewPluginTests
 			MovedEdges = null,
 		};
 
-		workspace.ActiveLayoutEngine.ClearReceivedCalls();
-
 		rootSector.WindowSector.QueueEvent(e);
 
 		// When
@@ -263,7 +246,6 @@ public class LayoutPreviewPluginTests
 		rootSector.DispatchEvents();
 
 		// Then
-		Assert.Single(workspace.ActiveLayoutEngine.ReceivedCalls());
 		Assert.Equal(window, plugin.DraggedWindow);
 	}
 	#endregion

@@ -45,7 +45,7 @@ public class DeferWindowPosHandleTests
 		DeferWindowPosHandle sut = new(ctx, internalCtx);
 		HWND hwnd = (HWND)123;
 
-		AddMonitorsToManager(ctx, root, CreateMonitor((HMONITOR)1));
+		AddMonitorsToSector(root, CreateMonitor((HMONITOR)1));
 
 		// When
 		sut.DeferWindowPos(Create(hwnd));
@@ -72,7 +72,7 @@ public class DeferWindowPosHandleTests
 		DeferWindowPosHandle sut = new(ctx, internalCtx);
 		HWND hwnd = (HWND)123;
 
-		AddMonitorsToManager(ctx, root, CreateMonitor((HMONITOR)1));
+		AddMonitorsToSector(root, CreateMonitor((HMONITOR)1));
 
 		// When
 		sut.DeferWindowPos(Create(hwnd), forceTwoPasses: true);
@@ -92,7 +92,7 @@ public class DeferWindowPosHandleTests
 		IMonitor monitor = CreateMonitor((HMONITOR)1);
 		monitor.ScaleFactor.Returns(150);
 
-		AddMonitorsToManager(ctx, root, monitor);
+		AddMonitorsToSector(root, monitor);
 
 		// When
 		sut.DeferWindowPos(Create(hwnd), forceTwoPasses: false);
@@ -109,7 +109,7 @@ public class DeferWindowPosHandleTests
 		DeferWindowPosHandle sut = new(ctx, internalCtx);
 		HWND hwnd = (HWND)123;
 
-		AddMonitorsToManager(ctx, root, CreateMonitor((HMONITOR)1));
+		AddMonitorsToSector(root, CreateMonitor((HMONITOR)1));
 
 		// When
 		sut.DeferWindowPos(Create(hwnd), forceTwoPasses: false);
@@ -136,7 +136,7 @@ public class DeferWindowPosHandleTests
 
 		DeferWindowPosHandle sut = new(ctx, internalCtx, [state1, state2, state3, state4]);
 
-		AddMonitorsToManager(ctx, root, CreateMonitor((HMONITOR)1));
+		AddMonitorsToSector(root, CreateMonitor((HMONITOR)1));
 
 		// When
 		sut.Dispose();

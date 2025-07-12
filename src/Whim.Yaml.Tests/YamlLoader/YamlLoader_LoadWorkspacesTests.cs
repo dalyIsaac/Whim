@@ -79,11 +79,9 @@ public class YamlLoader_LoadWorkspacesTests
 		Assert.Equal(3, workspaces.Length);
 
 		// ...with the expected names...
-#pragma warning disable CS0618 // Type or member is obsolete
 		Assert.Equal("workspace1", workspaces[0].Name);
 		Assert.Equal("workspace2", workspaces[1].Name);
 		Assert.Equal("workspace3", workspaces[2].Name);
-#pragma warning restore CS0618 // Type or member is obsolete
 
 		// ...and the expected layout engines.
 		Assert.Empty(workspaces[0].LayoutEngines);

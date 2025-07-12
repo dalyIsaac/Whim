@@ -1,19 +1,16 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class DeactivateWorkspaceTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void Success(IContext ctx, MutableRootSector rootSector, IWindow window1, IWindow window2, IWindow window3)
 	{
 		// Given
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 
-		workspace = PopulateWindowWorkspaceMap(ctx, rootSector, window1, workspace);
-		workspace = PopulateWindowWorkspaceMap(ctx, rootSector, window2, workspace);
-		workspace = PopulateWindowWorkspaceMap(ctx, rootSector, window3, workspace);
+		workspace = PopulateWindowWorkspaceMap(rootSector, window1, workspace);
+		workspace = PopulateWindowWorkspaceMap(rootSector, window2, workspace);
+		workspace = PopulateWindowWorkspaceMap(rootSector, window3, workspace);
 
 		DeactivateWorkspaceTransform sut = new(workspace.Id);
 

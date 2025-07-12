@@ -71,11 +71,6 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 
 	private static void UpdateMapSector(IContext ctx, IWindow? window)
 	{
-		foreach (IWorkspace workspace in ctx.Store.Pick(PickWorkspaces()))
-		{
-			((IInternalWorkspace)workspace).WindowFocused(window);
-		}
-
 		// Only activate the workspace if the window is in a workspace, and the workspace isn't currently
 		// active.
 		if (window is null)
@@ -83,11 +78,12 @@ internal record WindowFocusedTransform(IWindow? Window) : Transform()
 			return;
 		}
 
-		Result<IWorkspace> workspaceResult = ctx.Store.Pick(PickWorkspaceByWindow(window.Handle));
-		if (!workspaceResult.TryGet(out IWorkspace workspaceForWindow))
+		if (!ctx.Store.Pick(PickWorkspaceByWindow(window.Handle)).TryGet(out IWorkspace? workspaceForWindow))
 		{
 			return;
 		}
+
+		ctx.Store.Dispatch(new SetLastFocusedWindowTransform(workspaceForWindow.Id, window.Handle));
 
 		if (ctx.Store.Pick(PickMonitorByWorkspace(workspaceForWindow.Id)).IsSuccessful)
 		{

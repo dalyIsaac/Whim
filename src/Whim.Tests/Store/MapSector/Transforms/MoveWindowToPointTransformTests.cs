@@ -1,6 +1,5 @@
 namespace Whim.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class MoveWindowToPointTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -24,7 +23,7 @@ public class MoveWindowToPointTransformTests
 		// Given there is no workspace for the monitor at the given point
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
 		Point<int> point = new(10, 10);
-		SetupMonitorAtPoint(ctx, internalCtx, rootSector, monitor, point);
+		SetupMonitorAtPoint(internalCtx, rootSector, monitor, point);
 
 		MoveWindowToPointTransform sut = new((HWND)10, point);
 
@@ -41,12 +40,12 @@ public class MoveWindowToPointTransformTests
 		// Given there is no workspace for the window
 		IWindow window = CreateWindow((HWND)10);
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		Point<int> point = new(10, 10);
 
 		AddWindowToSector(rootSector, window);
-		SetupMonitorAtPoint(ctx, internalCtx, rootSector, monitor, point);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, workspace);
+		SetupMonitorAtPoint(internalCtx, rootSector, monitor, point);
+		PopulateMonitorWorkspaceMap(rootSector, monitor, workspace);
 
 		MoveWindowToPointTransform sut = new(window.Handle, point);
 
@@ -67,12 +66,12 @@ public class MoveWindowToPointTransformTests
 		// Given there is a workspace for the window
 		IWindow window = CreateWindow((HWND)10);
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		Point<int> point = new(10, 10);
 
 		AddWindowToSector(rootSector, window);
-		SetupMonitorAtPoint(ctx, internalCtx, rootSector, monitor, point);
-		PopulateThreeWayMap(ctx, rootSector, monitor, workspace, window);
+		SetupMonitorAtPoint(internalCtx, rootSector, monitor, point);
+		PopulateThreeWayMap(rootSector, monitor, workspace, window);
 
 		MoveWindowToPointTransform sut = new(window.Handle, point);
 
@@ -105,17 +104,17 @@ public class MoveWindowToPointTransformTests
 		// Given there is a workspace for the window
 		IWindow window = CreateWindow((HWND)10);
 		IMonitor sourceMonitor = CreateMonitor((HMONITOR)10);
-		Workspace sourceWorkspace = CreateWorkspace(ctx);
+		Workspace sourceWorkspace = CreateWorkspace();
 
 		IMonitor targetMonitor = CreateMonitor((HMONITOR)11);
-		Workspace targetWorkspace = CreateWorkspace(ctx);
+		Workspace targetWorkspace = CreateWorkspace();
 
 		Point<int> point = new(10, 10);
 
 		AddWindowToSector(rootSector, window);
-		SetupMonitorAtPoint(ctx, internalCtx, rootSector, targetMonitor, point);
-		PopulateThreeWayMap(ctx, rootSector, sourceMonitor, sourceWorkspace, window);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, targetMonitor, targetWorkspace);
+		SetupMonitorAtPoint(internalCtx, rootSector, targetMonitor, point);
+		PopulateThreeWayMap(rootSector, sourceMonitor, sourceWorkspace, window);
+		PopulateMonitorWorkspaceMap(rootSector, targetMonitor, targetWorkspace);
 
 		MoveWindowToPointTransform sut = new(window.Handle, point);
 

@@ -1,6 +1,5 @@
 namespace Whim.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class MoveWindowToAdjacentMonitorTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -37,9 +36,9 @@ public class MoveWindowToAdjacentMonitorTransformTests
 		AddWindowToSector(rootSector, window);
 
 		// and there are three adjacent monitors
-		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor((HMONITOR)10), CreateWorkspace(ctx));
-		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor((HMONITOR)11), CreateWorkspace(ctx));
-		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor((HMONITOR)12), CreateWorkspace(ctx));
+		PopulateMonitorWorkspaceMap(rootSector, CreateMonitor((HMONITOR)10), CreateWorkspace());
+		PopulateMonitorWorkspaceMap(rootSector, CreateMonitor((HMONITOR)11), CreateWorkspace());
+		PopulateMonitorWorkspaceMap(rootSector, CreateMonitor((HMONITOR)12), CreateWorkspace());
 
 		rootSector.MonitorSector.ActiveMonitorHandle = rootSector.MonitorSector.Monitors[startIdx].Handle;
 

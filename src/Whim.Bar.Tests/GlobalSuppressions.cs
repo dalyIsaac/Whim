@@ -17,3 +17,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Performance", "CA1813:Avoid unsealed attributes")]
 [assembly: SuppressMessage("Performance", "CA1852:Seal internal types")]
 [assembly: SuppressMessage("Performance", "CA1861:Avoid constant arrays as arguments")]
+[assembly: SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]

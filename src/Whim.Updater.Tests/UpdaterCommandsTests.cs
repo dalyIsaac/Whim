@@ -7,7 +7,6 @@ namespace Whim.Updater.Tests;
 
 public class UpdaterCommandsCustomization : ICustomization
 {
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 	public void Customize(IFixture fixture)
 	{
 		IUpdaterPlugin plugin = fixture.Create<IUpdaterPlugin>();

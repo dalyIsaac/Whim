@@ -60,9 +60,7 @@ internal record InitializeWorkspacesTransform : Transform
 		// Route windows to their saved workspaces.
 		foreach (SavedWorkspace savedWorkspace in internalCtx.CoreSavedStateManager.SavedState?.Workspaces ?? [])
 		{
-			Workspace? workspace = workspaceSector.Workspaces.Values.FirstOrDefault(w =>
-				w.BackingName == savedWorkspace.Name
-			);
+			Workspace? workspace = workspaceSector.Workspaces.Values.FirstOrDefault(w => w.Name == savedWorkspace.Name);
 
 			if (workspace == null)
 			{

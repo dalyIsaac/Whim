@@ -308,7 +308,7 @@ public class ResultTests
 		Result<int> result = new(42);
 
 		// When & Then
-		Assert.False(result.Equals(null));
+		Assert.False(result.Equals((Result<int>?)null));
 	}
 
 	[Fact]
@@ -562,14 +562,8 @@ public class ResultTests
 /// <summary>
 /// Test class to verify reference equality behavior in Result equality tests.
 /// </summary>
-internal class TestClass
-{
-	public string Name { get; }
-	public int Value { get; }
-
-	public TestClass(string name, int value)
-	{
-		Name = name;
-		Value = value;
-	}
-}
+/// <param name="Name"></param>
+/// <param name="Value"></param>
+#pragma warning disable CS9113 // Parameter is unread.
+internal class TestClass(string Name, int Value);
+#pragma warning restore CS9113 // Parameter is unread.

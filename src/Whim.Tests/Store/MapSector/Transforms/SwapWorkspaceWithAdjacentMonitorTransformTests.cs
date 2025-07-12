@@ -1,6 +1,5 @@
 namespace Whim.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class SwapWorkspaceWithAdjacentMonitorTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -24,8 +23,8 @@ public class SwapWorkspaceWithAdjacentMonitorTransformTests
 	{
 		// Given there is a single monitor
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
-		Workspace workspace = CreateWorkspace(ctx);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, workspace);
+		Workspace workspace = CreateWorkspace();
+		PopulateMonitorWorkspaceMap(rootSector, monitor, workspace);
 
 		SwapWorkspaceWithAdjacentMonitorTransform sut = new(workspace.Id, reverse);
 
@@ -42,10 +41,10 @@ public class SwapWorkspaceWithAdjacentMonitorTransformTests
 		// Given there are multiple monitors
 		IMonitor monitor1 = CreateMonitor((HMONITOR)1);
 		IMonitor monitor2 = CreateMonitor((HMONITOR)2);
-		Workspace workspace1 = CreateWorkspace(ctx);
+		Workspace workspace1 = CreateWorkspace();
 
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor1, workspace1);
-		AddMonitorsToManager(ctx, rootSector, monitor2);
+		PopulateMonitorWorkspaceMap(rootSector, monitor1, workspace1);
+		AddMonitorsToSector(rootSector, monitor2);
 
 		SwapWorkspaceWithAdjacentMonitorTransform sut = new(workspace1.Id);
 
@@ -68,9 +67,9 @@ public class SwapWorkspaceWithAdjacentMonitorTransformTests
 	)
 	{
 		// Given the target monitor has an old workspace, and the new workspace wasn't previously activated
-		Workspace workspace1 = CreateWorkspace(ctx);
-		Workspace workspace2 = CreateWorkspace(ctx);
-		Workspace workspace3 = CreateWorkspace(ctx);
+		Workspace workspace1 = CreateWorkspace();
+		Workspace workspace2 = CreateWorkspace();
+		Workspace workspace3 = CreateWorkspace();
 		Workspace[] workspaces = [workspace1, workspace2, workspace3];
 
 		IMonitor monitor1 = CreateMonitor((HMONITOR)1);
@@ -78,9 +77,9 @@ public class SwapWorkspaceWithAdjacentMonitorTransformTests
 		IMonitor monitor3 = CreateMonitor((HMONITOR)3);
 		IMonitor[] monitors = [monitor1, monitor2, monitor3];
 
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor1, workspace1);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor2, workspace2);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor3, workspace3);
+		PopulateMonitorWorkspaceMap(rootSector, monitor1, workspace1);
+		PopulateMonitorWorkspaceMap(rootSector, monitor2, workspace2);
+		PopulateMonitorWorkspaceMap(rootSector, monitor3, workspace3);
 
 		SwapWorkspaceWithAdjacentMonitorTransform sut = new(workspaces[workspaceIndex].Id, reverse);
 

@@ -1,8 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class FocusWindowInDirectionTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -19,10 +16,9 @@ public class FocusWindowInDirectionTransformTests
 		IWindow window = CreateWindow(handle);
 
 		Workspace workspace = PopulateWindowWorkspaceMap(
-			ctx,
 			root,
 			window,
-			CreateWorkspace(ctx) with
+			CreateWorkspace() with
 			{
 				LayoutEngines = [engine1, engine2],
 				ActiveLayoutEngineIndex = 1,
@@ -60,10 +56,9 @@ public class FocusWindowInDirectionTransformTests
 		IWindow window = CreateWindow(handle);
 
 		Workspace workspace = PopulateWindowWorkspaceMap(
-			ctx,
 			root,
 			window,
-			CreateWorkspace(ctx) with
+			CreateWorkspace() with
 			{
 				LayoutEngines = [engine1, engine2],
 				ActiveLayoutEngineIndex = 1,

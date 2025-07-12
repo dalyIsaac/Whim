@@ -1,8 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class CycleLayoutEngineTransformTests
 {
 	[Theory]
@@ -24,12 +21,12 @@ public class CycleLayoutEngineTransformTests
 	)
 	{
 		// Given
-		Workspace workspace = CreateWorkspace(ctx) with
+		Workspace workspace = CreateWorkspace() with
 		{
 			LayoutEngines = [engine1, engine2, engine3],
 			ActiveLayoutEngineIndex = startIdx,
 		};
-		AddWorkspaceToManager(ctx, rootSector, workspace);
+		AddWorkspaceToStore(rootSector, workspace);
 
 		CycleLayoutEngineTransform sut = new(workspace.Id, reverse);
 

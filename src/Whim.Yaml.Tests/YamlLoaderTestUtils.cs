@@ -35,10 +35,7 @@ public static class YamlLoaderTestUtils
 				IWorkspace workspace = Substitute.For<IWorkspace>();
 
 				workspace.Id.Returns(transform.WorkspaceId);
-
-#pragma warning disable CS0618 // Type or member is obsolete
 				workspace.Name.Returns(transform.Name);
-#pragma warning restore CS0618 // Type or member is obsolete
 
 				var engines = transform.CreateLeafLayoutEngines?.Select(c => c(new()));
 				workspace.LayoutEngines.Returns(engines?.ToImmutableList() ?? []);

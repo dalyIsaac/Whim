@@ -9,7 +9,6 @@ namespace Whim.CommandPalette.Tests;
 
 public record UnknownConfig : BaseVariantConfig { }
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class CommandPaletteWindowViewModelTests
 {
 	private class Customization : StoreCustomization
@@ -19,7 +18,7 @@ public class CommandPaletteWindowViewModelTests
 			IMonitor monitor = StoreTestUtils.CreateMonitor();
 			fixture.Inject(monitor);
 
-			StoreTestUtils.AddMonitorsToManager(_ctx, _store._root.MutableRootSector, monitor);
+			StoreTestUtils.AddMonitorsToSector(_store._root.MutableRootSector, monitor);
 
 			fixture.Inject(new CommandPalettePlugin(_ctx, new CommandPaletteConfig(_ctx)));
 

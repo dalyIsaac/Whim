@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using AutoFixture;
 using Microsoft.Windows.AppNotifications;
@@ -18,8 +17,6 @@ public class UpdaterPluginCustomization : ICustomization
 	}
 }
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
-[SuppressMessage("Usage", "CA2007:Consider calling ConfigureAwait on the awaited task")]
 public class UpdaterPluginTests
 {
 	[Theory, AutoSubstituteData<UpdaterPluginCustomization>]

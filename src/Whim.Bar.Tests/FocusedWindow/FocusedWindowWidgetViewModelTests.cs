@@ -8,7 +8,6 @@ using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.Bar.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class FocusedWindowWidgetViewModelTests
 {
 	private class Customization : StoreCustomization
@@ -39,7 +38,7 @@ public class FocusedWindowWidgetViewModelTests
 	{
 		// Given
 		FocusedWindowWidgetViewModel viewModel = CreateSut(ctx, monitor);
-		PopulateThreeWayMap(ctx, root, monitor, CreateWorkspace(ctx), window);
+		PopulateThreeWayMap(root, monitor, CreateWorkspace(), window);
 
 		// When
 		root.WindowSector.QueueEvent(new WindowFocusedEventArgs() { Window = window });
@@ -58,7 +57,7 @@ public class FocusedWindowWidgetViewModelTests
 		IWindow otherWindow = CreateOtherWindow();
 		IMonitor otherMonitor = CreateMonitor((HMONITOR)200);
 
-		PopulateThreeWayMap(ctx, root, monitor, CreateWorkspace(ctx), window);
+		PopulateThreeWayMap(root, monitor, CreateWorkspace(), window);
 
 		// Setup the initial title
 		root.WindowSector.QueueEvent(new WindowFocusedEventArgs() { Window = window });
@@ -77,7 +76,7 @@ public class FocusedWindowWidgetViewModelTests
 	{
 		// Given
 		FocusedWindowWidgetViewModel viewModel = CreateSut(ctx, monitor);
-		PopulateThreeWayMap(ctx, root, monitor, CreateWorkspace(ctx), window);
+		PopulateThreeWayMap(root, monitor, CreateWorkspace(), window);
 
 		// When
 		root.WindowSector.QueueEvent(new WindowFocusedEventArgs() { Window = window });
@@ -107,7 +106,7 @@ public class FocusedWindowWidgetViewModelTests
 			h => viewModel.PropertyChanged -= h,
 			() =>
 			{
-				PopulateThreeWayMap(ctx, root, monitor, CreateWorkspace(ctx), window);
+				PopulateThreeWayMap(root, monitor, CreateWorkspace(), window);
 				root.WindowSector.QueueEvent(new WindowFocusedEventArgs() { Window = window });
 				root.DispatchEvents();
 			}

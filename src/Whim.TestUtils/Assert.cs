@@ -134,9 +134,6 @@ public static class CustomAssert
 	public static void NoContextCalls(IContext ctx)
 	{
 		Assert.Empty(ctx.ResourceManager.ReceivedCalls());
-		Assert.Empty(ctx.WorkspaceManager.ReceivedCalls());
-		Assert.Empty(ctx.WindowManager.ReceivedCalls());
-		Assert.Empty(ctx.MonitorManager.ReceivedCalls());
 		Assert.Empty(ctx.RouterManager.ReceivedCalls());
 		Assert.Empty(ctx.FilterManager.ReceivedCalls());
 		Assert.Empty(ctx.CommandManager.ReceivedCalls());

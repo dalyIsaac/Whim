@@ -6,7 +6,6 @@ using Xunit;
 
 namespace Whim.FloatingWindow.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class FloatingUtilsTests
 {
 	[Theory, AutoSubstituteData]
@@ -51,9 +50,9 @@ public class FloatingUtilsTests
 		// Given a window with a rectangle and a monitor, but no old rectangle
 		IWindow window = StoreTestUtils.CreateWindow((HWND)1);
 		IMonitor monitor = StoreTestUtils.CreateMonitor();
-		Workspace workspace = StoreTestUtils.CreateWorkspace(ctx);
+		Workspace workspace = StoreTestUtils.CreateWorkspace();
 
-		StoreTestUtils.PopulateThreeWayMap(ctx, root, monitor, workspace, window);
+		StoreTestUtils.PopulateThreeWayMap(root, monitor, workspace, window);
 
 		ImmutableDictionary<IWindow, IRectangle<double>> dict = new Dictionary<IWindow, IRectangle<double>>()
 		{
@@ -75,9 +74,9 @@ public class FloatingUtilsTests
 		// Given a window with a rectangle and a monitor, but no change
 		IWindow window = StoreTestUtils.CreateWindow((HWND)1);
 		IMonitor monitor = StoreTestUtils.CreateMonitor();
-		Workspace workspace = StoreTestUtils.CreateWorkspace(ctx);
+		Workspace workspace = StoreTestUtils.CreateWorkspace();
 
-		StoreTestUtils.PopulateThreeWayMap(ctx, root, monitor, workspace, window);
+		StoreTestUtils.PopulateThreeWayMap(root, monitor, workspace, window);
 
 		ImmutableDictionary<IWindow, IRectangle<double>> dict = new Dictionary<IWindow, IRectangle<double>>()
 		{
@@ -99,9 +98,9 @@ public class FloatingUtilsTests
 		IMonitor monitor = StoreTestUtils.CreateMonitor();
 		monitor.WorkingArea.Returns(new Rectangle<int>(0, 0, 1920, 1080));
 
-		Workspace workspace = StoreTestUtils.CreateWorkspace(ctx);
+		Workspace workspace = StoreTestUtils.CreateWorkspace();
 
-		StoreTestUtils.PopulateThreeWayMap(ctx, root, monitor, workspace, window);
+		StoreTestUtils.PopulateThreeWayMap(root, monitor, workspace, window);
 
 		ImmutableDictionary<IWindow, IRectangle<double>> dict = new Dictionary<IWindow, IRectangle<double>>()
 		{

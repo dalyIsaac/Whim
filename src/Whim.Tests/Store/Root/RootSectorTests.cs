@@ -1,6 +1,5 @@
 namespace Whim.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class RootSectorTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -11,7 +10,7 @@ public class RootSectorTests
 		CaptureWinEventProc.Create(internalCtx);
 
 		// Create a workspace for the monitor created. This will avoid a KeyNotFoundException during Dispose.
-		AddWorkspaceToManager(ctx, rootSector, CreateWorkspace(ctx));
+		AddWorkspaceToStore(rootSector, CreateWorkspace());
 
 		// When
 		sut.Initialize();

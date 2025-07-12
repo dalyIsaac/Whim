@@ -5,7 +5,6 @@ using Xunit;
 
 namespace Whim.Bar.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class SwitchWorkspaceCommandTests
 {
 	private static SwitchWorkspaceCommand CreateSut(

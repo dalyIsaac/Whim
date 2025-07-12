@@ -1,8 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class MoveWindowToPointInWorkspaceTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -18,10 +15,9 @@ public class MoveWindowToPointInWorkspaceTransformTests
 		IWindow window = CreateWindow(handle);
 
 		Workspace workspace = PopulateWindowWorkspaceMap(
-			ctx,
 			root,
 			window,
-			CreateWorkspace(ctx) with
+			CreateWorkspace() with
 			{
 				LayoutEngines = [engine1, engine2],
 			}
@@ -56,8 +52,8 @@ public class MoveWindowToPointInWorkspaceTransformTests
 		IWindow window = CreateWindow(handle);
 		AddWindowToSector(root, window);
 
-		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [engine1, engine2] };
-		AddWorkspaceToManager(ctx, root, workspace);
+		Workspace workspace = CreateWorkspace() with { LayoutEngines = [engine1, engine2] };
+		AddWorkspaceToStore(root, workspace);
 		Point<double> point = new(0.5, 0.5);
 
 		MoveWindowToPointInWorkspaceTransform sut = new(workspace.Id, handle, point);
