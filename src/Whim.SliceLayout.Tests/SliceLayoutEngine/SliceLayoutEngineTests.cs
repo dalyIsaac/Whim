@@ -65,7 +65,11 @@ public class SliceLayoutEngineTests
 	}
 
 	[Theory, AutoSubstituteData]
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "For testing purposes")]
+	[System.Diagnostics.CodeAnalysis.SuppressMessage(
+		"Maintainability",
+		"CA1508:Avoid dead conditional code",
+		Justification = "For testing purposes"
+	)]
 	public void Equals_Null(IContext ctx, SliceLayoutPlugin plugin)
 	{
 		// Given
