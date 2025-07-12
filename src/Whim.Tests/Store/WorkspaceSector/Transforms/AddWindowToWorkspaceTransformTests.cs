@@ -9,10 +9,10 @@ public class AddWindowToWorkspaceTransformTests
 	internal void AddWindowToWorkspaceTransform_Success(IContext ctx, MutableRootSector root, ILayoutEngine engine)
 	{
 		// Given
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		workspace = workspace with { LayoutEngines = [engine] };
 
-		AddWorkspaceToStore(ctx, root, workspace);
+		AddWorkspaceToStore(root, workspace);
 
 		AddWindowToWorkspaceTransform transform = new(workspace.Id, CreateWindow((HWND)1));
 

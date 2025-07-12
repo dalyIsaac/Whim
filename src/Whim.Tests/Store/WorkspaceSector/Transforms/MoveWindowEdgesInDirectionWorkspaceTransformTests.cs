@@ -20,10 +20,9 @@ public class MoveWindowEdgesInDirectionWorkspaceTransformTests
 		Point<double> point = new(0.2, 0.5);
 
 		Workspace workspace = PopulateWindowWorkspaceMap(
-			ctx,
 			root,
 			window,
-			CreateWorkspace(ctx) with
+			CreateWorkspace() with
 			{
 				LayoutEngines = [engine1, engine2],
 				ActiveLayoutEngineIndex = 1,
@@ -68,10 +67,9 @@ public class MoveWindowEdgesInDirectionWorkspaceTransformTests
 		Point<double> point = new(0.2, 0.5);
 
 		Workspace workspace = PopulateWindowWorkspaceMap(
-			ctx,
 			root,
 			window,
-			CreateWorkspace(ctx) with
+			CreateWorkspace() with
 			{
 				LayoutEngines = [engine1, engine2],
 				ActiveLayoutEngineIndex = 1,

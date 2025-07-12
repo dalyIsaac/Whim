@@ -19,10 +19,9 @@ public class SwapWindowInDirectionTransformTests
 		IWindow window = CreateWindow(handle);
 
 		Workspace workspace = PopulateWindowWorkspaceMap(
-			ctx,
 			root,
 			window,
-			CreateWorkspace(ctx) with
+			CreateWorkspace() with
 			{
 				LayoutEngines = [engine1, engine2],
 				ActiveLayoutEngineIndex = 1,
@@ -60,10 +59,9 @@ public class SwapWindowInDirectionTransformTests
 		IWindow window = CreateWindow(handle);
 
 		Workspace workspace = PopulateWindowWorkspaceMap(
-			ctx,
 			root,
 			window,
-			CreateWorkspace(ctx) with
+			CreateWorkspace() with
 			{
 				LayoutEngines = [engine1, engine2],
 				ActiveLayoutEngineIndex = 1,

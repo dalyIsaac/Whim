@@ -3,14 +3,14 @@ namespace Whim.Tests;
 public class WorkspaceTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void Name_Get(IContext ctx, MutableRootSector root)
+	internal void Name_Get(MutableRootSector root)
 	{
 		// Given
-		Workspace workspace = CreateWorkspace(ctx) with
+		Workspace workspace = CreateWorkspace() with
 		{
 			Name = "Bob",
 		};
-		AddWorkspaceToStore(ctx, root, workspace);
+		AddWorkspaceToStore(root, workspace);
 
 		// When
 		string name = workspace.Name;

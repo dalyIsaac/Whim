@@ -17,14 +17,14 @@ public class LayoutPreviewPluginTests
 	{
 		protected override void PostCustomize(IFixture fixture)
 		{
-			Workspace workspace = CreateWorkspace(_ctx);
+			Workspace workspace = CreateWorkspace();
 			fixture.Inject(workspace);
 
 			IMonitor monitor = CreateMonitor((HMONITOR)1);
 			fixture.Inject(monitor);
 
-			SetupMonitorAtPoint(_ctx, _internalCtx, _store._root.MutableRootSector, monitor, new Point<int>(0, 0));
-			PopulateMonitorWorkspaceMap(_ctx, _store._root.MutableRootSector, monitor, workspace);
+			SetupMonitorAtPoint(_internalCtx, _store._root.MutableRootSector, monitor, new Point<int>(0, 0));
+			PopulateMonitorWorkspaceMap(_store._root.MutableRootSector, monitor, workspace);
 		}
 	}
 

@@ -25,10 +25,10 @@ public class MergeWorkspaceWindowsTransformTests
 	internal void TargetWorkspaceNotFound(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		Guid targetWorkspaceId = Guid.NewGuid();
 
-		AddWorkspacesToStore(ctx, rootSector, workspace);
+		AddWorkspacesToStore(rootSector, workspace);
 
 		MergeWorkspaceWindowsTransform sut = new(workspace.Id, targetWorkspaceId);
 
@@ -43,8 +43,8 @@ public class MergeWorkspaceWindowsTransformTests
 	internal void Success(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the source and target workspaces
-		Workspace sourceWorkspace = CreateWorkspace(ctx);
-		Workspace targetWorkspace = CreateWorkspace(ctx);
+		Workspace sourceWorkspace = CreateWorkspace();
+		Workspace targetWorkspace = CreateWorkspace();
 
 		HMONITOR monitorHandle = (HMONITOR)1;
 		IMonitor monitor = CreateMonitor(monitorHandle);
@@ -53,13 +53,13 @@ public class MergeWorkspaceWindowsTransformTests
 		IWindow window2 = CreateWindow((HWND)2);
 		IWindow window3 = CreateWindow((HWND)3);
 
-		sourceWorkspace = PopulateWindowWorkspaceMap(ctx, rootSector, window1, sourceWorkspace);
-		sourceWorkspace = PopulateWindowWorkspaceMap(ctx, rootSector, window2, sourceWorkspace);
-		sourceWorkspace = PopulateWindowWorkspaceMap(ctx, rootSector, window3, sourceWorkspace);
+		sourceWorkspace = PopulateWindowWorkspaceMap(rootSector, window1, sourceWorkspace);
+		sourceWorkspace = PopulateWindowWorkspaceMap(rootSector, window2, sourceWorkspace);
+		sourceWorkspace = PopulateWindowWorkspaceMap(rootSector, window3, sourceWorkspace);
 
-		AddWorkspaceToStore(ctx, rootSector, targetWorkspace);
+		AddWorkspaceToStore(rootSector, targetWorkspace);
 
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, sourceWorkspace);
+		PopulateMonitorWorkspaceMap(rootSector, monitor, sourceWorkspace);
 
 		MergeWorkspaceWindowsTransform sut = new(sourceWorkspace.Id, targetWorkspace.Id);
 

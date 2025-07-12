@@ -27,8 +27,8 @@ public class WindowMinimizeEndedTransformTests
 	internal void Success(IContext ctx, MutableRootSector rootSector, IWindow window)
 	{
 		// Given the window is in a workspace
-		Workspace workspace = CreateWorkspace(ctx);
-		PopulateThreeWayMap(ctx, rootSector, CreateMonitor((HMONITOR)1), workspace, window);
+		Workspace workspace = CreateWorkspace();
+		PopulateThreeWayMap(rootSector, CreateMonitor((HMONITOR)1), workspace, window);
 
 		WindowMinimizeEndedTransform sut = new(window);
 

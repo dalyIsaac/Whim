@@ -14,11 +14,11 @@ public class SetLayoutEngineFromIndexTransformTests
 	)
 	{
 		// Given there is a layout engine at index 1
-		Workspace workspace = CreateWorkspace(ctx) with
+		Workspace workspace = CreateWorkspace() with
 		{
 			LayoutEngines = [engine, engine2],
 		};
-		AddWorkspaceToStore(ctx, rootSector, workspace);
+		AddWorkspaceToStore(rootSector, workspace);
 
 		SetLayoutEngineFromIndexTransform transform = new(workspace.Id, 1);
 
@@ -38,11 +38,11 @@ public class SetLayoutEngineFromIndexTransformTests
 	)
 	{
 		// Given there is no layout engine at index 2
-		Workspace workspace = CreateWorkspace(ctx) with
+		Workspace workspace = CreateWorkspace() with
 		{
 			LayoutEngines = [engine, engine2],
 		};
-		AddWorkspaceToStore(ctx, rootSector, workspace);
+		AddWorkspaceToStore(rootSector, workspace);
 
 		SetLayoutEngineFromIndexTransform transform = new(workspace.Id, 2);
 
@@ -66,12 +66,12 @@ public class ActivatePreviouslyActiveLayoutEngineTransformTests
 	)
 	{
 		// Given there is a previously active layout engine
-		Workspace workspace = CreateWorkspace(ctx) with
+		Workspace workspace = CreateWorkspace() with
 		{
 			LayoutEngines = [engine, engine2],
 			PreviousLayoutEngineIndex = 1,
 		};
-		AddWorkspaceToStore(ctx, rootSector, workspace);
+		AddWorkspaceToStore(rootSector, workspace);
 
 		ActivatePreviouslyActiveLayoutEngineTransform sut = new(workspace.Id);
 
@@ -91,12 +91,12 @@ public class ActivatePreviouslyActiveLayoutEngineTransformTests
 	)
 	{
 		// Given there is no previously active layout engine with a matching index
-		Workspace workspace = CreateWorkspace(ctx) with
+		Workspace workspace = CreateWorkspace() with
 		{
 			LayoutEngines = [engine, engine2],
 			PreviousLayoutEngineIndex = 10,
 		};
-		AddWorkspaceToStore(ctx, rootSector, workspace);
+		AddWorkspaceToStore(rootSector, workspace);
 
 		ActivatePreviouslyActiveLayoutEngineTransform transform = new(workspace.Id);
 
@@ -123,9 +123,9 @@ public class SetLayoutEngineFromNameTransformTests
 		engine.Name.Returns("Engine 1");
 		engine2.Name.Returns("Engine 2");
 
-		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [engine, engine2] };
+		Workspace workspace = CreateWorkspace() with { LayoutEngines = [engine, engine2] };
 
-		AddWorkspaceToStore(ctx, rootSector, workspace);
+		AddWorkspaceToStore(rootSector, workspace);
 
 		SetLayoutEngineFromNameTransform transform = new(workspace.Id, "Engine 1");
 
@@ -148,9 +148,9 @@ public class SetLayoutEngineFromNameTransformTests
 		engine.Name.Returns("Engine 1");
 		engine2.Name.Returns("Engine 2");
 
-		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [engine, engine2] };
+		Workspace workspace = CreateWorkspace() with { LayoutEngines = [engine, engine2] };
 
-		AddWorkspaceToStore(ctx, rootSector, workspace);
+		AddWorkspaceToStore(rootSector, workspace);
 
 		SetLayoutEngineFromNameTransform transform = new(workspace.Id, "Engine 3");
 

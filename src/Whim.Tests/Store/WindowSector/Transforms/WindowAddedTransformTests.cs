@@ -118,10 +118,10 @@ public class WindowAddedTransformTests
 		// Given the window is routed to a workspace
 		HWND hwnd = (HWND)1;
 		HMONITOR monitorHandle = (HMONITOR)1;
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 
 		Setup(ctx, internalCtx, hwnd);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor(monitorHandle), workspace);
+		PopulateMonitorWorkspaceMap(rootSector, CreateMonitor(monitorHandle), workspace);
 		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		WindowAddedTransform sut = new(hwnd);
@@ -146,10 +146,10 @@ public class WindowAddedTransformTests
 		// Given the window is routed to an active workspace
 		HWND hwnd = (HWND)1;
 		HMONITOR monitorHandle = (HMONITOR)1;
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 
 		Setup(ctx, internalCtx, hwnd);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor(monitorHandle), workspace);
+		PopulateMonitorWorkspaceMap(rootSector, CreateMonitor(monitorHandle), workspace);
 		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).ReturnsNull();
 
 		WindowAddedTransform sut = new(hwnd, RouterOptions.RouteToActiveWorkspace);
@@ -174,13 +174,13 @@ public class WindowAddedTransformTests
 		// Given the window is routed to last tracked active workspace
 		HWND hwnd = (HWND)1;
 		HMONITOR monitorHandle = (HMONITOR)1;
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 
 		Setup(ctx, internalCtx, hwnd);
 		ctx.RouterManager.RouterOptions.Returns(RouterOptions.RouteToLastTrackedActiveWorkspace);
 		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).ReturnsNull();
 
-		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor(monitorHandle), workspace);
+		PopulateMonitorWorkspaceMap(rootSector, CreateMonitor(monitorHandle), workspace);
 		rootSector.MonitorSector.LastWhimActiveMonitorHandle = monitorHandle;
 
 		WindowAddedTransform sut = new(hwnd);
@@ -201,7 +201,7 @@ public class WindowAddedTransformTests
 		// Given the window has a workspace
 		HWND hwnd = (HWND)1;
 		HMONITOR monitorHandle = (HMONITOR)1;
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 
 		Setup(ctx, internalCtx, hwnd);
 		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).ReturnsNull();
@@ -209,7 +209,7 @@ public class WindowAddedTransformTests
 		internalCtx
 			.CoreNativeManager.MonitorFromWindow(hwnd, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST)
 			.Returns(monitorHandle);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor(monitorHandle), workspace);
+		PopulateMonitorWorkspaceMap(rootSector, CreateMonitor(monitorHandle), workspace);
 
 		WindowAddedTransform sut = new(hwnd, RouterOptions.RouteToLaunchedWorkspace);
 
@@ -228,10 +228,10 @@ public class WindowAddedTransformTests
 	{
 		// Given the window is not routed, so we use the active workspace
 		HWND hwnd = (HWND)1;
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 
 		Setup(ctx, internalCtx, hwnd);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor((HMONITOR)1), workspace);
+		PopulateMonitorWorkspaceMap(rootSector, CreateMonitor((HMONITOR)1), workspace);
 		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).ReturnsNull();
 
 		WindowAddedTransform sut = new(hwnd, RouterOptions.RouteToLaunchedWorkspace);
@@ -251,12 +251,12 @@ public class WindowAddedTransformTests
 	{
 		// Given the window is minimized
 		HWND hwnd = (HWND)1;
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 
 		internalCtx.CoreNativeManager.IsWindowMinimized(hwnd).Returns((BOOL)true);
 
 		Setup(ctx, internalCtx, hwnd);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor((HMONITOR)1), workspace);
+		PopulateMonitorWorkspaceMap(rootSector, CreateMonitor((HMONITOR)1), workspace);
 		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		WindowAddedTransform sut = new(hwnd);
@@ -278,12 +278,12 @@ public class WindowAddedTransformTests
 	{
 		// Given the window is not minimized
 		HWND hwnd = (HWND)1;
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 
 		internalCtx.CoreNativeManager.IsWindowMinimized(hwnd).Returns((BOOL)false);
 
 		Setup(ctx, internalCtx, hwnd);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor((HMONITOR)1), workspace);
+		PopulateMonitorWorkspaceMap(rootSector, CreateMonitor((HMONITOR)1), workspace);
 		ctx.RouterManager.RouteWindow(Arg.Any<IWindow>()).Returns(workspace);
 
 		WindowAddedTransform sut = new(hwnd);

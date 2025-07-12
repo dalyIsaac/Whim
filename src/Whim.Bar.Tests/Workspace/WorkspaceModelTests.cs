@@ -37,11 +37,11 @@ public class WorkspaceModelTests
 	internal void Workspace_Renamed(IContext ctx, MutableRootSector root, WorkspaceWidgetViewModel viewModel)
 	{
 		// Given
-		Workspace workspace = StoreTestUtils.CreateWorkspace(ctx) with
+		Workspace workspace = StoreTestUtils.CreateWorkspace() with
 		{
 			Name = "This is the workspace name",
 		};
-		StoreTestUtils.AddWorkspaceToStore(ctx, root, workspace);
+		StoreTestUtils.AddWorkspaceToStore(root, workspace);
 
 		// When
 		WorkspaceModel model = CreateSut(ctx, viewModel, workspace, true);

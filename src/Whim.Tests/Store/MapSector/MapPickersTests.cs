@@ -10,9 +10,9 @@ public class MapPickersTests
 	internal void PickAllActiveWorkspaces(IContext ctx, MutableRootSector root)
 	{
 		// Given there are three active workspaces
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), CreateWorkspace(ctx));
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)2), CreateWorkspace(ctx));
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)3), CreateWorkspace(ctx));
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)1), CreateWorkspace());
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)2), CreateWorkspace());
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)3), CreateWorkspace());
 
 		// When we get the workspaces
 		var result = ctx.Store.Pick(Pickers.PickAllActiveWorkspaces());
@@ -25,9 +25,9 @@ public class MapPickersTests
 	internal void PickWorkspaceById_Failure(IContext ctx, MutableRootSector root)
 	{
 		// Given there are three workspaces
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), CreateWorkspace(ctx));
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)2), CreateWorkspace(ctx));
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)3), CreateWorkspace(ctx));
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)1), CreateWorkspace());
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)2), CreateWorkspace());
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)3), CreateWorkspace());
 
 		Guid workspaceId = Guid.NewGuid();
 
@@ -42,13 +42,13 @@ public class MapPickersTests
 	internal void PickWorkspaceById_Success(IContext ctx, MutableRootSector root)
 	{
 		// Given there are three workspaces
-		var workspace1 = CreateWorkspace(ctx);
-		var workspace2 = CreateWorkspace(ctx);
-		var workspace3 = CreateWorkspace(ctx);
+		var workspace1 = CreateWorkspace();
+		var workspace2 = CreateWorkspace();
+		var workspace3 = CreateWorkspace();
 
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), workspace1);
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)2), workspace2);
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)3), workspace3);
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)1), workspace1);
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)2), workspace2);
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)3), workspace3);
 
 		// When we get the workspace
 		var result = ctx.Store.Pick(Pickers.PickWorkspaceById(workspace1.Id));
@@ -64,8 +64,8 @@ public class MapPickersTests
 		// Given there is a workspace
 		HMONITOR handle = (HMONITOR)1;
 
-		var workspace = CreateWorkspace(ctx);
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor(handle), workspace);
+		var workspace = CreateWorkspace();
+		PopulateMonitorWorkspaceMap(root, CreateMonitor(handle), workspace);
 
 		// When we get the workspace
 		var result = ctx.Store.Pick(Pickers.PickWorkspaceByMonitor(handle));
@@ -80,7 +80,7 @@ public class MapPickersTests
 	{
 		// Given there is a workspace
 		HWND handle = (HWND)1;
-		Workspace workspace = PopulateWindowWorkspaceMap(ctx, root, CreateWindow(handle), CreateWorkspace(ctx));
+		Workspace workspace = PopulateWindowWorkspaceMap(root, CreateWindow(handle), CreateWorkspace());
 
 		// When we get the workspace
 		var result = ctx.Store.Pick(Pickers.PickWorkspaceByWindow(handle));
@@ -94,8 +94,8 @@ public class MapPickersTests
 	internal void PickMonitorByWorkspace_Failure(IContext ctx, MutableRootSector root)
 	{
 		// Given we have an untracked workspace
-		var untrackedWorkspace = CreateWorkspace(ctx);
-		var workspace = CreateWorkspace(ctx);
+		var untrackedWorkspace = CreateWorkspace();
+		var workspace = CreateWorkspace();
 		root.MapSector.MonitorWorkspaceMap = root.MapSector.MonitorWorkspaceMap.SetItem((HMONITOR)1, workspace.Id);
 
 		// When we get the monitor
@@ -109,7 +109,7 @@ public class MapPickersTests
 	internal void PickMonitorByWorkspace_Success(IContext ctx, MutableRootSector root)
 	{
 		// Given we have a tracked workspace
-		var workspace = CreateWorkspace(ctx);
+		var workspace = CreateWorkspace();
 		root.MapSector.MonitorWorkspaceMap = root.MapSector.MonitorWorkspaceMap.SetItem((HMONITOR)1, workspace.Id);
 
 		IMonitor monitor = CreateMonitor((HMONITOR)1);
@@ -130,7 +130,7 @@ public class MapPickersTests
 		HWND hwnd = (HWND)10;
 		HWND untrackedHwnd = (HWND)20;
 
-		PopulateThreeWayMap(ctx, root, CreateMonitor((HMONITOR)1), CreateWorkspace(ctx), CreateWindow(untrackedHwnd));
+		PopulateThreeWayMap(root, CreateMonitor((HMONITOR)1), CreateWorkspace(), CreateWindow(untrackedHwnd));
 
 		// When we get the monitor
 		var result = ctx.Store.Pick(Pickers.PickMonitorByWindow(hwnd));
@@ -149,8 +149,8 @@ public class MapPickersTests
 		IMonitor monitor1 = CreateMonitor((HMONITOR)1);
 		IMonitor monitor2 = CreateMonitor((HMONITOR)2);
 
-		PopulateThreeWayMap(ctx, root, monitor1, CreateWorkspace(ctx), CreateWindow(hwnd1));
-		PopulateThreeWayMap(ctx, root, monitor2, CreateWorkspace(ctx), CreateWindow(hwnd2));
+		PopulateThreeWayMap(root, monitor1, CreateWorkspace(), CreateWindow(hwnd1));
+		PopulateThreeWayMap(root, monitor2, CreateWorkspace(), CreateWindow(hwnd2));
 
 		// When we get the monitor
 		var result = ctx.Store.Pick(Pickers.PickMonitorByWindow(hwnd1));
@@ -164,8 +164,8 @@ public class MapPickersTests
 	internal void PickAdjacentWorkspace_CouldNotFindWorkspace(IContext ctx, MutableRootSector root)
 	{
 		// Given we have an untracked workspace
-		var untrackedWorkspace = CreateWorkspace(ctx);
-		var workspace = CreateWorkspace(ctx);
+		var untrackedWorkspace = CreateWorkspace();
+		var workspace = CreateWorkspace();
 		root.MapSector.MonitorWorkspaceMap = root.MapSector.MonitorWorkspaceMap.SetItem((HMONITOR)1, workspace.Id);
 
 		// When we get the workspace
@@ -179,7 +179,7 @@ public class MapPickersTests
 	internal void PickAdjacentWorkspace_NoAdjacentWorkspaces(IContext ctx, MutableRootSector root)
 	{
 		// Given we have a tracked workspace
-		var workspace = CreateWorkspace(ctx);
+		var workspace = CreateWorkspace();
 		root.MapSector.MonitorWorkspaceMap = root.MapSector.MonitorWorkspaceMap.SetItem((HMONITOR)1, workspace.Id);
 
 		// When we get the workspace
@@ -220,14 +220,7 @@ public class MapPickersTests
 	)
 	{
 		// Given we have four workspaces
-		AddWorkspacesToStore(
-			ctx,
-			root,
-			CreateWorkspace(ctx),
-			CreateWorkspace(ctx),
-			CreateWorkspace(ctx),
-			CreateWorkspace(ctx)
-		);
+		AddWorkspacesToStore(root, CreateWorkspace(), CreateWorkspace(), CreateWorkspace(), CreateWorkspace());
 
 		ImmutableArray<Guid> workspaceOrder = root.WorkspaceSector.WorkspaceOrder;
 		Guid startId = workspaceOrder[startIdx];
@@ -267,7 +260,7 @@ public class MapPickersTests
 	{
 		// Given we have a monitor with no workspace
 		IMonitor monitor = CreateMonitor((HMONITOR)1);
-		AddMonitorsToSector(ctx, root, monitor);
+		AddMonitorsToSector(root, monitor);
 
 		// When we get the layout engine
 		var result = ctx.Store.Pick(Pickers.PickActiveLayoutEngineByMonitor(monitor.Handle));
@@ -285,9 +278,9 @@ public class MapPickersTests
 	{
 		// Given we have a monitor with an active layout engine
 		IMonitor monitor = CreateMonitor((HMONITOR)1);
-		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [layoutEngine] };
+		Workspace workspace = CreateWorkspace() with { LayoutEngines = [layoutEngine] };
 
-		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
+		PopulateMonitorWorkspaceMap(root, monitor, workspace);
 
 		// When we get the layout engine
 		var result = ctx.Store.Pick(Pickers.PickActiveLayoutEngineByMonitor(monitor.Handle));
@@ -301,7 +294,7 @@ public class MapPickersTests
 	internal void PickStickyMonitorsByWorkspace_Failure(IContext ctx)
 	{
 		// Given we have an untracked workspace
-		var untrackedWorkspace = CreateWorkspace(ctx);
+		var untrackedWorkspace = CreateWorkspace();
 
 		// When we get the monitors
 		var result = ctx.Store.Pick(Pickers.PickStickyMonitorsByWorkspace(untrackedWorkspace.Id));
@@ -314,15 +307,9 @@ public class MapPickersTests
 	internal void PickStickyMonitorsByWorkspace_StickyWorkspaceMonitorMapIsEmpty(IContext ctx, MutableRootSector root)
 	{
 		// Given we have a sticky workspace
-		var workspace = CreateWorkspace(ctx);
-		AddWorkspacesToStore(ctx, root, workspace);
-		AddMonitorsToSector(
-			ctx,
-			root,
-			CreateMonitor((HMONITOR)0),
-			CreateMonitor((HMONITOR)1),
-			CreateMonitor((HMONITOR)2)
-		);
+		var workspace = CreateWorkspace();
+		AddWorkspacesToStore(root, workspace);
+		AddMonitorsToSector(root, CreateMonitor((HMONITOR)0), CreateMonitor((HMONITOR)1), CreateMonitor((HMONITOR)2));
 
 		root.MapSector.StickyWorkspaceMonitorIndexMap = root.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(
 			workspace.Id,
@@ -342,15 +329,9 @@ public class MapPickersTests
 	internal void PickStickyMonitorsByWorkspace_Success(IContext ctx, MutableRootSector root)
 	{
 		// Given we have workspace which isn't sticky
-		var workspace = CreateWorkspace(ctx);
-		AddWorkspacesToStore(ctx, root, workspace);
-		AddMonitorsToSector(
-			ctx,
-			root,
-			CreateMonitor((HMONITOR)0),
-			CreateMonitor((HMONITOR)1),
-			CreateMonitor((HMONITOR)2)
-		);
+		var workspace = CreateWorkspace();
+		AddWorkspacesToStore(root, workspace);
+		AddMonitorsToSector(root, CreateMonitor((HMONITOR)0), CreateMonitor((HMONITOR)1), CreateMonitor((HMONITOR)2));
 
 		// When we get the monitors
 		var result = ctx.Store.Pick(Pickers.PickStickyMonitorsByWorkspace(workspace.Id));
@@ -365,15 +346,9 @@ public class MapPickersTests
 	internal void PickStickyMonitorsByWorkspace_NoMonitors(IContext ctx, MutableRootSector root)
 	{
 		// Given we have workspace which is sticky, but is stuck to non-existent monitors
-		var workspace = CreateWorkspace(ctx);
-		AddWorkspacesToStore(ctx, root, workspace);
-		AddMonitorsToSector(
-			ctx,
-			root,
-			CreateMonitor((HMONITOR)0),
-			CreateMonitor((HMONITOR)1),
-			CreateMonitor((HMONITOR)2)
-		);
+		var workspace = CreateWorkspace();
+		AddWorkspacesToStore(root, workspace);
+		AddMonitorsToSector(root, CreateMonitor((HMONITOR)0), CreateMonitor((HMONITOR)1), CreateMonitor((HMONITOR)2));
 
 		root.MapSector.StickyWorkspaceMonitorIndexMap = root.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(
 			workspace.Id,
@@ -393,7 +368,7 @@ public class MapPickersTests
 	internal void PickExplicitStickyMonitorIndicesByWorkspace_Failure(IContext ctx)
 	{
 		// Given we have an untracked workspace
-		var untrackedWorkspace = CreateWorkspace(ctx);
+		var untrackedWorkspace = CreateWorkspace();
 
 		// When we get the monitor indices
 		var result = ctx.Store.Pick(Pickers.PickExplicitStickyMonitorIndicesByWorkspace(untrackedWorkspace.Id));
@@ -406,7 +381,7 @@ public class MapPickersTests
 	internal void PickExplicitStickyMonitorIndicesByWorkspace_Success(IContext ctx, MutableRootSector root)
 	{
 		// Given we have workspace which is sticky
-		var workspace = CreateWorkspace(ctx);
+		var workspace = CreateWorkspace();
 		root.MapSector.StickyWorkspaceMonitorIndexMap = root.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(
 			workspace.Id,
 			[0, 1]
@@ -428,9 +403,9 @@ public class PickValidMonitorByWorkspaceTests
 	internal void TargetMonitorIsValid(IContext ctx, MutableRootSector root)
 	{
 		// Given we have a workspace and target monitor that is valid for it
-		var workspace = CreateWorkspace(ctx);
-		AddWorkspacesToStore(ctx, root, workspace);
-		AddMonitorsToSector(ctx, root, CreateMonitor((HMONITOR)1), CreateMonitor((HMONITOR)2));
+		var workspace = CreateWorkspace();
+		AddWorkspacesToStore(root, workspace);
+		AddMonitorsToSector(root, CreateMonitor((HMONITOR)1), CreateMonitor((HMONITOR)2));
 
 		root.MapSector.StickyWorkspaceMonitorIndexMap = root.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(
 			workspace.Id,
@@ -449,9 +424,9 @@ public class PickValidMonitorByWorkspaceTests
 	internal void FallbackToLastMonitor(IContext ctx, MutableRootSector root)
 	{
 		// Given we have a workspace with an invalid target monitor but valid last monitor
-		var workspace = CreateWorkspace(ctx);
-		AddWorkspacesToStore(ctx, root, workspace);
-		AddMonitorsToSector(ctx, root, CreateMonitor((HMONITOR)1), CreateMonitor((HMONITOR)2));
+		var workspace = CreateWorkspace();
+		AddWorkspacesToStore(root, workspace);
+		AddMonitorsToSector(root, CreateMonitor((HMONITOR)1), CreateMonitor((HMONITOR)2));
 
 		root.MapSector.StickyWorkspaceMonitorIndexMap = root.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(
 			workspace.Id,
@@ -475,9 +450,9 @@ public class PickValidMonitorByWorkspaceTests
 	internal void FallbackToFirstAvailableMonitor(IContext ctx, MutableRootSector root)
 	{
 		// Given we have a workspace with invalid target and last monitors
-		var workspace = CreateWorkspace(ctx);
-		AddWorkspacesToStore(ctx, root, workspace);
-		AddMonitorsToSector(ctx, root, CreateMonitor((HMONITOR)1), CreateMonitor((HMONITOR)2));
+		var workspace = CreateWorkspace();
+		AddWorkspacesToStore(root, workspace);
+		AddMonitorsToSector(root, CreateMonitor((HMONITOR)1), CreateMonitor((HMONITOR)2));
 
 		root.MapSector.StickyWorkspaceMonitorIndexMap = root.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(
 			workspace.Id,
@@ -501,8 +476,8 @@ public class PickValidMonitorByWorkspaceTests
 	internal void NoValidMonitors(IContext ctx, MutableRootSector root)
 	{
 		// Given we have a workspace with no valid monitors and no fallback monitors
-		var workspace = CreateWorkspace(ctx);
-		AddWorkspacesToStore(ctx, root, workspace);
+		var workspace = CreateWorkspace();
+		AddWorkspacesToStore(root, workspace);
 
 		// We don't add any monitors to the system
 		// This ensures there are no fallback monitors available
@@ -524,9 +499,9 @@ public class PickValidMonitorByWorkspaceTests
 	internal void UseActiveMonitorWhenNoTargetSpecified(IContext ctx, MutableRootSector root)
 	{
 		// Given we have a workspace and an active monitor
-		var workspace = CreateWorkspace(ctx);
-		AddWorkspacesToStore(ctx, root, workspace);
-		AddMonitorsToSector(ctx, root, CreateMonitor((HMONITOR)1), CreateMonitor((HMONITOR)2));
+		var workspace = CreateWorkspace();
+		AddWorkspacesToStore(root, workspace);
+		AddMonitorsToSector(root, CreateMonitor((HMONITOR)1), CreateMonitor((HMONITOR)2));
 
 		root.MonitorSector.ActiveMonitorHandle = (HMONITOR)2;
 
@@ -573,13 +548,13 @@ public class PickStickyWorkspacesByMonitorTests
 	internal void GetStickyWorkspaces(IContext ctx, MutableRootSector root)
 	{
 		// Given we have three workspaces, two sticky to monitor 1
-		var workspace1 = CreateWorkspace(ctx);
-		var workspace2 = CreateWorkspace(ctx);
-		var workspace3 = CreateWorkspace(ctx);
-		AddWorkspacesToStore(ctx, root, workspace1, workspace2, workspace3);
+		var workspace1 = CreateWorkspace();
+		var workspace2 = CreateWorkspace();
+		var workspace3 = CreateWorkspace();
+		AddWorkspacesToStore(root, workspace1, workspace2, workspace3);
 
 		IMonitor monitor = CreateMonitor((HMONITOR)1);
-		AddMonitorsToSector(ctx, root, monitor);
+		AddMonitorsToSector(root, monitor);
 
 		root.MapSector.StickyWorkspaceMonitorIndexMap = root
 			.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(workspace1.Id, [0, 1])
@@ -600,13 +575,13 @@ public class PickStickyWorkspacesByMonitorTests
 	internal void GetAllWorkspacesWhenNoneSticky(IContext ctx, MutableRootSector root)
 	{
 		// Given we have three workspaces but none are sticky
-		var workspace1 = CreateWorkspace(ctx);
-		var workspace2 = CreateWorkspace(ctx);
-		var workspace3 = CreateWorkspace(ctx);
-		AddWorkspacesToStore(ctx, root, workspace1, workspace2, workspace3);
+		var workspace1 = CreateWorkspace();
+		var workspace2 = CreateWorkspace();
+		var workspace3 = CreateWorkspace();
+		AddWorkspacesToStore(root, workspace1, workspace2, workspace3);
 
 		IMonitor monitor = CreateMonitor((HMONITOR)1);
-		AddMonitorsToSector(ctx, root, monitor);
+		AddMonitorsToSector(root, monitor);
 
 		// When we get the workspaces for the monitor
 		var result = ctx.Store.Pick(Pickers.PickStickyWorkspacesByMonitor(monitor.Handle));
@@ -623,12 +598,12 @@ public class PickStickyWorkspacesByMonitorTests
 	internal void InvalidMonitorIndicesAreIgnored(IContext ctx, MutableRootSector root)
 	{
 		// Given we have a workspace with both valid and invalid monitor indices
-		var workspace = CreateWorkspace(ctx);
-		AddWorkspacesToStore(ctx, root, workspace);
+		var workspace = CreateWorkspace();
+		AddWorkspacesToStore(root, workspace);
 
 		IMonitor monitor1 = CreateMonitor((HMONITOR)1);
 		IMonitor monitor2 = CreateMonitor((HMONITOR)2);
-		AddMonitorsToSector(ctx, root, monitor1, monitor2); // Only indices 0 and 1 are valid
+		AddMonitorsToSector(root, monitor1, monitor2); // Only indices 0 and 1 are valid
 
 		root.MapSector.StickyWorkspaceMonitorIndexMap = root.MapSector.StickyWorkspaceMonitorIndexMap.SetItem(
 			workspace.Id,

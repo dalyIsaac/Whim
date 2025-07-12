@@ -8,7 +8,7 @@ public class WindowMoveEndedTransformTests
 		IRectangle<int> originalRect = new Rectangle<int>() { Y = 4, Height = 4 };
 		IRectangle<int> newRect = new Rectangle<int>() { Y = 4, Height = 3 };
 
-		Workspace workspace = CreateWorkspace(ctx) with
+		Workspace workspace = CreateWorkspace() with
 		{
 			WindowPositions = ImmutableDictionary<HWND, WindowPosition>.Empty.Add(
 				window.Handle,
@@ -16,8 +16,8 @@ public class WindowMoveEndedTransformTests
 			),
 		};
 
-		PopulateWindowWorkspaceMap(ctx, rootSector, window, workspace);
-		AddActiveWorkspaceToStore(ctx, rootSector, workspace);
+		PopulateWindowWorkspaceMap(rootSector, window, workspace);
+		AddActiveWorkspaceToStore(rootSector, workspace);
 
 		ctx.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns(newRect);
 	}

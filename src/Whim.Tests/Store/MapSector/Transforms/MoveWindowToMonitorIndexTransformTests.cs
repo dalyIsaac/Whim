@@ -13,8 +13,8 @@ public class MoveWindowToMonitorIndexTransformTests
 		IMonitor originalMonitor = CreateMonitor((HMONITOR)10);
 		IMonitor newMonitor = CreateMonitor((HMONITOR)11);
 
-		PopulateThreeWayMap(ctx, rootSector, originalMonitor, CreateWorkspace(ctx), window);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, newMonitor, CreateWorkspace(ctx));
+		PopulateThreeWayMap(rootSector, originalMonitor, CreateWorkspace(), window);
+		PopulateMonitorWorkspaceMap(rootSector, newMonitor, CreateWorkspace());
 
 		MoveWindowToMonitorIndexTransform sut = new(2, window.Handle);
 
@@ -34,11 +34,11 @@ public class MoveWindowToMonitorIndexTransformTests
 		IMonitor originalMonitor = CreateMonitor((HMONITOR)10);
 		IMonitor newMonitor = CreateMonitor((HMONITOR)11);
 
-		Workspace originalWorkspace = CreateWorkspace(ctx);
-		Workspace newWorkspace = CreateWorkspace(ctx);
+		Workspace originalWorkspace = CreateWorkspace();
+		Workspace newWorkspace = CreateWorkspace();
 
-		PopulateThreeWayMap(ctx, rootSector, originalMonitor, originalWorkspace, window);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, newMonitor, newWorkspace);
+		PopulateThreeWayMap(rootSector, originalMonitor, originalWorkspace, window);
+		PopulateMonitorWorkspaceMap(rootSector, newMonitor, newWorkspace);
 
 		MoveWindowToMonitorIndexTransform sut = new(1, window.Handle);
 

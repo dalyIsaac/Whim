@@ -7,7 +7,7 @@ public class MoveWindowToMonitorTransformTests
 	internal void NoValidWindows(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given there is no valid windows
-		AddActiveWorkspaceToStore(ctx, rootSector, CreateWorkspace(ctx));
+		AddActiveWorkspaceToStore(rootSector, CreateWorkspace());
 		MoveWindowToMonitorTransform sut = new((HMONITOR)10);
 
 		// When
@@ -21,7 +21,7 @@ public class MoveWindowToMonitorTransformTests
 	internal void NoWindowForHandle(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given there is no window for the handle
-		AddActiveWorkspaceToStore(ctx, rootSector, CreateWorkspace(ctx));
+		AddActiveWorkspaceToStore(rootSector, CreateWorkspace());
 		MoveWindowToMonitorTransform sut = new((HMONITOR)10);
 
 		// When
@@ -56,7 +56,7 @@ public class MoveWindowToMonitorTransformTests
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
 
 		AddWindowToSector(rootSector, window);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, CreateWorkspace(ctx));
+		PopulateMonitorWorkspaceMap(rootSector, monitor, CreateWorkspace());
 
 		MoveWindowToMonitorTransform sut = new(monitor.Handle, window.Handle);
 
@@ -74,7 +74,7 @@ public class MoveWindowToMonitorTransformTests
 		IWindow window = CreateWindow((HWND)10);
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
 
-		PopulateThreeWayMap(ctx, rootSector, monitor, CreateWorkspace(ctx), window);
+		PopulateThreeWayMap(rootSector, monitor, CreateWorkspace(), window);
 
 		MoveWindowToMonitorTransform sut = new(monitor.Handle, window.Handle);
 
@@ -93,8 +93,8 @@ public class MoveWindowToMonitorTransformTests
 		IMonitor originalMonitor = CreateMonitor((HMONITOR)10);
 		IMonitor newMonitor = CreateMonitor((HMONITOR)11);
 
-		PopulateThreeWayMap(ctx, rootSector, originalMonitor, CreateWorkspace(ctx), window);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, newMonitor, CreateWorkspace(ctx));
+		PopulateThreeWayMap(rootSector, originalMonitor, CreateWorkspace(), window);
+		PopulateMonitorWorkspaceMap(rootSector, newMonitor, CreateWorkspace());
 
 		MoveWindowToMonitorTransform sut = new(newMonitor.Handle, window.Handle);
 

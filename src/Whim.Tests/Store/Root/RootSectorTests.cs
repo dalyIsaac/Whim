@@ -11,7 +11,7 @@ public class RootSectorTests
 		CaptureWinEventProc.Create(internalCtx);
 
 		// Create a workspace for the monitor created. This will avoid a KeyNotFoundException during Dispose.
-		AddWorkspaceToStore(ctx, rootSector, CreateWorkspace(ctx));
+		AddWorkspaceToStore(rootSector, CreateWorkspace());
 
 		// When
 		sut.Initialize();

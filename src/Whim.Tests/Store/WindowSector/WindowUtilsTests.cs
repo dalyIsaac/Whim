@@ -34,11 +34,11 @@ public class WindowUtilsTests
 	{
 		// Given we can't get the window position from the native manager
 		window.Handle.Returns((HWND)12);
-		Workspace workspace = CreateWorkspace(ctx) with
+		Workspace workspace = CreateWorkspace() with
 		{
 			WindowPositions = ImmutableDictionary<HWND, WindowPosition>.Empty.Add(window.Handle, new()),
 		};
-		PopulateWindowWorkspaceMap(ctx, rootSector, window, workspace);
+		PopulateWindowWorkspaceMap(rootSector, window, workspace);
 
 		ctx.NativeManager.DwmGetWindowRectangle(window.Handle).ReturnsNull();
 
@@ -65,12 +65,12 @@ public class WindowUtilsTests
 	{
 		// Given the new window position
 		window.Handle.Returns((HWND)12);
-		Workspace workspace = CreateWorkspace(ctx) with
+		Workspace workspace = CreateWorkspace() with
 		{
 			WindowPositions = ImmutableDictionary<HWND, WindowPosition>.Empty.Add(window.Handle, new()),
 		};
 
-		PopulateWindowWorkspaceMap(ctx, rootSector, window, workspace);
+		PopulateWindowWorkspaceMap(rootSector, window, workspace);
 
 		ctx.NativeManager.DwmGetWindowRectangle(window.Handle)
 			.Returns(new Rectangle<int>(newX, newY, newWidth, newHeight));
@@ -157,7 +157,7 @@ public class WindowUtilsTests
 	{
 		// Given the new window position
 		window.Handle.Returns((HWND)12);
-		Workspace workspace = CreateWorkspace(ctx) with
+		Workspace workspace = CreateWorkspace() with
 		{
 			WindowPositions = ImmutableDictionary<HWND, WindowPosition>.Empty.Add(
 				window.Handle,
@@ -165,7 +165,7 @@ public class WindowUtilsTests
 			),
 		};
 
-		PopulateWindowWorkspaceMap(ctx, rootSector, window, workspace);
+		PopulateWindowWorkspaceMap(rootSector, window, workspace);
 		ctx.NativeManager.DwmGetWindowRectangle(window.Handle).Returns(newRect);
 
 		// When we get the moved edges

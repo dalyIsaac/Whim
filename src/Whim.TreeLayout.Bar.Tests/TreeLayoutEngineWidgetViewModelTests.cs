@@ -25,10 +25,10 @@ public class TreeLayoutEngineWidgetViewModelTests
 			var root = _store._root.MutableRootSector;
 
 			ILayoutEngine layoutEngine = fixture.Freeze<ILayoutEngine>();
-			Workspace workspace = CreateWorkspace(_ctx) with { LayoutEngines = [layoutEngine] };
+			Workspace workspace = CreateWorkspace() with { LayoutEngines = [layoutEngine] };
 			fixture.Inject(workspace);
 
-			PopulateMonitorWorkspaceMap(_ctx, root, monitor, workspace);
+			PopulateMonitorWorkspaceMap(root, monitor, workspace);
 		}
 	}
 

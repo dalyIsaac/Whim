@@ -27,7 +27,7 @@ internal static class ProxyFloatingLayoutEngineUtils
 	{
 		monitor.WorkingArea.Returns(new Rectangle<int>(0, 0, 100, 100));
 		ctx.NativeManager.DwmGetWindowRectangle(window.Handle).Returns(rect);
-		StoreTestUtils.PopulateThreeWayMap(ctx, root, monitor, workspace, window);
+		StoreTestUtils.PopulateThreeWayMap(root, monitor, workspace, window);
 	}
 
 	/// <summary>
@@ -46,7 +46,7 @@ internal static class ProxyFloatingLayoutEngineUtils
 	public static (IMonitor, Workspace, IWindow) Create(IContext ctx)
 	{
 		IMonitor monitor = StoreTestUtils.CreateMonitor();
-		Workspace workspace = StoreTestUtils.CreateWorkspace(ctx);
+		Workspace workspace = StoreTestUtils.CreateWorkspace();
 		IWindow window = StoreTestUtils.CreateWindow((HWND)1);
 		return (monitor, workspace, window);
 	}
@@ -393,7 +393,7 @@ public class ProxyFloatingLayoutEngine_DoLayoutTests
 
 		// (set up the inner layout engine)
 		IMonitor monitor = StoreTestUtils.CreateMonitor();
-		Workspace workspace = StoreTestUtils.CreateWorkspace(context);
+		Workspace workspace = StoreTestUtils.CreateWorkspace();
 		ProxyFloatingLayoutEngineUtils.SetupUpdate(
 			context,
 			root,

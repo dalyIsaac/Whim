@@ -41,9 +41,9 @@ public class MonitorWorkspaceChangedEventTests
 	public void Equals_DifferentPreviousWorkspace(IContext ctx, IMonitor monitor)
 	{
 		// Given
-		IWorkspace workspace = StoreTestUtils.CreateWorkspace(ctx);
-		IWorkspace aWorkspace = StoreTestUtils.CreateWorkspace(ctx);
-		IWorkspace bWorkspace = StoreTestUtils.CreateWorkspace(ctx);
+		IWorkspace workspace = StoreTestUtils.CreateWorkspace();
+		IWorkspace aWorkspace = StoreTestUtils.CreateWorkspace();
+		IWorkspace bWorkspace = StoreTestUtils.CreateWorkspace();
 		MonitorWorkspaceChangedEventArgs a = new()
 		{
 			Monitor = monitor,
@@ -65,9 +65,9 @@ public class MonitorWorkspaceChangedEventTests
 	public void Equals_DifferentCurrentWorkspace(IContext ctx, IMonitor monitor)
 	{
 		// Given
-		IWorkspace aCurrentWorkspace = StoreTestUtils.CreateWorkspace(ctx);
-		IWorkspace bCurrentWorkspace = StoreTestUtils.CreateWorkspace(ctx);
-		IWorkspace previousWorkspace = StoreTestUtils.CreateWorkspace(ctx);
+		IWorkspace aCurrentWorkspace = StoreTestUtils.CreateWorkspace();
+		IWorkspace bCurrentWorkspace = StoreTestUtils.CreateWorkspace();
+		IWorkspace previousWorkspace = StoreTestUtils.CreateWorkspace();
 		MonitorWorkspaceChangedEventArgs a = new()
 		{
 			Monitor = monitor,

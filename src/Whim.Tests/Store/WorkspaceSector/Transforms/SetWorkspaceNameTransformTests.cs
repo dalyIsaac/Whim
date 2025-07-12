@@ -9,11 +9,11 @@ public class SetWorkspaceNameTransformTests
 	internal void NoChanges(IContext ctx, MutableRootSector root)
 	{
 		// Given the new name is the same as the old name
-		Workspace workspace = CreateWorkspace(ctx) with
+		Workspace workspace = CreateWorkspace() with
 		{
 			Name = "test",
 		};
-		AddWorkspaceToStore(ctx, root, workspace);
+		AddWorkspaceToStore(root, workspace);
 
 		SetWorkspaceNameTransform sut = new(workspace.Id, "test");
 
@@ -30,11 +30,11 @@ public class SetWorkspaceNameTransformTests
 	internal void ChangeName(IContext ctx, MutableRootSector root)
 	{
 		// Given the new name is different from the old name
-		Workspace workspace = CreateWorkspace(ctx) with
+		Workspace workspace = CreateWorkspace() with
 		{
 			Name = "test",
 		};
-		AddWorkspaceToStore(ctx, root, workspace);
+		AddWorkspaceToStore(root, workspace);
 
 		SetWorkspaceNameTransform sut = new(workspace.Id, "test2");
 

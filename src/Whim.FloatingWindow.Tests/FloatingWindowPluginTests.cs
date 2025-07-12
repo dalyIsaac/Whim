@@ -3,19 +3,20 @@ using System.Text.Json;
 using Whim.TestUtils;
 using Windows.Win32.Foundation;
 using Xunit;
+using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.FloatingWindow.Tests;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class FloatingWindowPluginTests
 {
-	private static FloatingWindowPlugin CreateSut(IContext context) => new(context);
+	private static FloatingWindowPlugin CreateSut(IContext ctx) => new(ctx);
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	public void Name(IContext context)
+	public void Name(IContext ctx)
 	{
 		// Given
-		FloatingWindowPlugin plugin = CreateSut(context);
+		FloatingWindowPlugin plugin = CreateSut(ctx);
 
 		// When
 		string name = plugin.Name;
@@ -25,10 +26,10 @@ public class FloatingWindowPluginTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	public void PluginCommands(IContext context)
+	public void PluginCommands(IContext ctx)
 	{
 		// Given
-		FloatingWindowPlugin plugin = CreateSut(context);
+		FloatingWindowPlugin plugin = CreateSut(ctx);
 
 		// When
 		IPluginCommands commands = plugin.PluginCommands;
@@ -38,10 +39,10 @@ public class FloatingWindowPluginTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	public void PreInitialize(IContext context, List<object> transforms, ILayoutEngine layoutEngine)
+	public void PreInitialize(IContext ctx, List<object> transforms, ILayoutEngine layoutEngine)
 	{
 		// Given
-		FloatingWindowPlugin plugin = CreateSut(context);
+		FloatingWindowPlugin plugin = CreateSut(ctx);
 
 		// When
 		plugin.PreInitialize();
@@ -54,10 +55,10 @@ public class FloatingWindowPluginTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	public void PostInitialize(IContext context, List<object> transforms)
+	public void PostInitialize(IContext ctx, List<object> transforms)
 	{
 		// Given
-		FloatingWindowPlugin plugin = CreateSut(context);
+		FloatingWindowPlugin plugin = CreateSut(ctx);
 
 		// When
 		plugin.PostInitialize();
@@ -70,8 +71,8 @@ public class FloatingWindowPluginTests
 	internal void WindowManager_WindowRemoved(IContext ctx, MutableRootSector root, IWindow window)
 	{
 		// Given
-		Workspace activeWorkspace = StoreTestUtils.CreateWorkspace(ctx);
-		StoreTestUtils.PopulateWindowWorkspaceMap(ctx, root, window, activeWorkspace);
+		Workspace activeWorkspace = CreateWorkspace();
+		PopulateWindowWorkspaceMap(root, window, activeWorkspace);
 
 		FloatingWindowPlugin plugin = CreateSut(ctx);
 
@@ -88,10 +89,10 @@ public class FloatingWindowPluginTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	public void SaveState(IContext context)
+	public void SaveState(IContext ctx)
 	{
 		// Given
-		FloatingWindowPlugin plugin = CreateSut(context);
+		FloatingWindowPlugin plugin = CreateSut(ctx);
 
 		// When
 		JsonElement? json = plugin.SaveState();
@@ -101,10 +102,10 @@ public class FloatingWindowPluginTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	public void LoadState(IContext context)
+	public void LoadState(IContext ctx)
 	{
 		// Given
-		FloatingWindowPlugin plugin = CreateSut(context);
+		FloatingWindowPlugin plugin = CreateSut(ctx);
 
 		// When
 		plugin.LoadState(JsonDocument.Parse("{}").RootElement);
@@ -118,11 +119,11 @@ public class FloatingWindowPluginTests
 public class FloatingWindowPlugin_MarkWindowAsFloatingTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void MarkWindowAsFloating_NoWindow(IContext context, MutableRootSector root)
+	internal void MarkWindowAsFloating_NoWindow(IContext ctx, MutableRootSector root)
 	{
 		// Given
-		FloatingWindowPlugin plugin = new(context);
-		StoreTestUtils.AddActiveWorkspaceToStore(context, root, StoreTestUtils.CreateWorkspace(context));
+		FloatingWindowPlugin plugin = new(ctx);
+		AddActiveWorkspaceToStore(root, CreateWorkspace());
 
 		// When
 		plugin.MarkWindowAsFloating();
@@ -132,10 +133,10 @@ public class FloatingWindowPlugin_MarkWindowAsFloatingTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	public void MarkWindowAsFloating_NoWindowPosition(IContext context, IWindow window)
+	public void MarkWindowAsFloating_NoWindowPosition(IContext ctx, IWindow window)
 	{
 		// Given
-		FloatingWindowPlugin plugin = new(context);
+		FloatingWindowPlugin plugin = new(ctx);
 
 		// When
 		plugin.MarkWindowAsFloating(window);
@@ -145,23 +146,18 @@ public class FloatingWindowPlugin_MarkWindowAsFloatingTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void MarkWindowAsFloating(
-		IContext context,
-		MutableRootSector root,
-		IWindow window,
-		List<object> transforms
-	)
+	internal void MarkWindowAsFloating(IContext ctx, MutableRootSector root, IWindow window, List<object> transforms)
 	{
 		// Given
-		FloatingWindowPlugin plugin = new(context);
-		Workspace activeWorkspace = StoreTestUtils.CreateWorkspace(context) with
+		FloatingWindowPlugin plugin = new(ctx);
+		Workspace activeWorkspace = CreateWorkspace() with
 		{
 			WindowPositions = new Dictionary<HWND, WindowPosition>()
 			{
 				{ window.Handle, new WindowPosition(WindowSize.Normal, new Rectangle<int>(0, 0, 100, 100)) },
 			}.ToImmutableDictionary(),
 		};
-		StoreTestUtils.PopulateWindowWorkspaceMap(context, root, window, activeWorkspace);
+		PopulateWindowWorkspaceMap(root, window, activeWorkspace);
 
 		// When
 		plugin.MarkWindowAsFloating(window);
@@ -179,11 +175,11 @@ public class FloatingWindowPlugin_MarkWindowAsFloatingTests
 public class FloatingWindowPlugin_MarkWindowAsDockedTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void MarkWindowAsDocked_NoWindow(IContext context, MutableRootSector root)
+	internal void MarkWindowAsDocked_NoWindow(IContext ctx, MutableRootSector root)
 	{
 		// Given
-		FloatingWindowPlugin plugin = new(context);
-		StoreTestUtils.AddActiveWorkspaceToStore(context, root, StoreTestUtils.CreateWorkspace(context));
+		FloatingWindowPlugin plugin = new(ctx);
+		AddActiveWorkspaceToStore(root, CreateWorkspace());
 
 		// When
 		plugin.MarkWindowAsDocked();
@@ -193,10 +189,10 @@ public class FloatingWindowPlugin_MarkWindowAsDockedTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void MarkWindowAsDocked_NoWindowPosition(IContext context, IWindow window)
+	internal void MarkWindowAsDocked_NoWindowPosition(IContext ctx, IWindow window)
 	{
 		// Given
-		FloatingWindowPlugin plugin = new(context);
+		FloatingWindowPlugin plugin = new(ctx);
 
 		// When
 		plugin.MarkWindowAsDocked(window);
@@ -206,18 +202,18 @@ public class FloatingWindowPlugin_MarkWindowAsDockedTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void MarkWindowAsDocked(IContext context, MutableRootSector root, IWindow window, List<object> transforms)
+	internal void MarkWindowAsDocked(IContext ctx, MutableRootSector root, IWindow window, List<object> transforms)
 	{
 		// Given
-		FloatingWindowPlugin plugin = new(context);
-		Workspace activeWorkspace = StoreTestUtils.CreateWorkspace(context) with
+		FloatingWindowPlugin plugin = new(ctx);
+		Workspace activeWorkspace = CreateWorkspace() with
 		{
 			WindowPositions = new Dictionary<HWND, WindowPosition>()
 			{
 				{ window.Handle, new WindowPosition(WindowSize.Normal, new Rectangle<int>(0, 0, 100, 100)) },
 			}.ToImmutableDictionary(),
 		};
-		StoreTestUtils.PopulateWindowWorkspaceMap(context, root, window, activeWorkspace);
+		PopulateWindowWorkspaceMap(root, window, activeWorkspace);
 		plugin.MarkWindowAsFloating(window);
 
 		// When
@@ -236,11 +232,11 @@ public class FloatingWindowPlugin_MarkWindowAsDockedTests
 public class FloatingWindowPlugin_ToggleWindowFloatingTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void ToggleWindowFloating_NoWindow(IContext context, MutableRootSector root)
+	internal void ToggleWindowFloating_NoWindow(IContext ctx, MutableRootSector root)
 	{
 		// Given
-		FloatingWindowPlugin plugin = new(context);
-		StoreTestUtils.AddActiveWorkspaceToStore(context, root, StoreTestUtils.CreateWorkspace(context));
+		FloatingWindowPlugin plugin = new(ctx);
+		AddActiveWorkspaceToStore(root, CreateWorkspace());
 
 		// When
 		plugin.ToggleWindowFloating();
@@ -251,22 +247,22 @@ public class FloatingWindowPlugin_ToggleWindowFloatingTests
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void ToggleWindowFloating_FloatWindow(
-		IContext context,
+		IContext ctx,
 		MutableRootSector root,
 		IWindow window,
 		List<object> transforms
 	)
 	{
 		// Given
-		FloatingWindowPlugin plugin = new(context);
-		Workspace activeWorkspace = StoreTestUtils.CreateWorkspace(context) with
+		FloatingWindowPlugin plugin = new(ctx);
+		Workspace activeWorkspace = CreateWorkspace() with
 		{
 			WindowPositions = new Dictionary<HWND, WindowPosition>()
 			{
 				{ window.Handle, new WindowPosition(WindowSize.Normal, new Rectangle<int>(0, 0, 100, 100)) },
 			}.ToImmutableDictionary(),
 		};
-		StoreTestUtils.PopulateWindowWorkspaceMap(context, root, window, activeWorkspace);
+		PopulateWindowWorkspaceMap(root, window, activeWorkspace);
 
 		// When
 		plugin.ToggleWindowFloating(window);
@@ -281,22 +277,22 @@ public class FloatingWindowPlugin_ToggleWindowFloatingTests
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void ToggleWindowFloating_DockWindow(
-		IContext context,
+		IContext ctx,
 		MutableRootSector root,
 		IWindow window,
 		List<object> transforms
 	)
 	{
 		// Given
-		FloatingWindowPlugin plugin = new(context);
-		Workspace activeWorkspace = StoreTestUtils.CreateWorkspace(context) with
+		FloatingWindowPlugin plugin = new(ctx);
+		Workspace activeWorkspace = CreateWorkspace() with
 		{
 			WindowPositions = new Dictionary<HWND, WindowPosition>()
 			{
 				{ window.Handle, new WindowPosition(WindowSize.Normal, new Rectangle<int>(0, 0, 100, 100)) },
 			}.ToImmutableDictionary(),
 		};
-		StoreTestUtils.PopulateWindowWorkspaceMap(context, root, window, activeWorkspace);
+		PopulateWindowWorkspaceMap(root, window, activeWorkspace);
 		plugin.MarkWindowAsFloating(window);
 
 		// When

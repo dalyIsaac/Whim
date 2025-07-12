@@ -147,10 +147,9 @@ public class CoreCommandsTests
 		window.Handle.Returns((HWND)123);
 
 		PopulateThreeWayMap(
-			ctx,
 			root,
 			CreateMonitor(),
-			CreateWorkspace(ctx) with
+			CreateWorkspace() with
 			{
 				LastFocusedWindowHandle = window.Handle,
 			},
@@ -183,11 +182,11 @@ public class CoreCommandsTests
 		window1.Handle.Returns((HWND)123);
 		window3.IsMinimized.Returns(false);
 
-		Workspace workspace = CreateWorkspace(ctx) with { LastFocusedWindowHandle = window1.Handle };
-		AddActiveWorkspaceToStore(ctx, root, workspace);
-		PopulateWindowWorkspaceMap(ctx, root, window1, workspace);
-		PopulateWindowWorkspaceMap(ctx, root, window2, workspace);
-		PopulateWindowWorkspaceMap(ctx, root, window3, workspace);
+		Workspace workspace = CreateWorkspace() with { LastFocusedWindowHandle = window1.Handle };
+		AddActiveWorkspaceToStore(root, workspace);
+		PopulateWindowWorkspaceMap(root, window1, workspace);
+		PopulateWindowWorkspaceMap(root, window2, workspace);
+		PopulateWindowWorkspaceMap(root, window3, workspace);
 
 		ICommand command = testUtils.GetCommand("whim.core.minimize_window");
 
@@ -213,10 +212,10 @@ public class CoreCommandsTests
 
 		window2.IsMinimized.Returns(false);
 
-		Workspace workspace = CreateWorkspace(ctx);
-		AddActiveWorkspaceToStore(ctx, root, workspace);
-		PopulateWindowWorkspaceMap(ctx, root, window1, workspace);
-		PopulateWindowWorkspaceMap(ctx, root, window2, workspace);
+		Workspace workspace = CreateWorkspace();
+		AddActiveWorkspaceToStore(root, workspace);
+		PopulateWindowWorkspaceMap(root, window1, workspace);
+		PopulateWindowWorkspaceMap(root, window2, workspace);
 
 		ICommand command = testUtils.GetCommand("whim.core.minimize_window");
 
@@ -269,14 +268,14 @@ public class CoreCommandsTests
 	internal void FocusMonitor(string commandName, IContext ctx, MutableRootSector root, List<object> transforms)
 	{
 		// Given
-		Workspace w1 = CreateWorkspace(ctx);
-		Workspace w2 = CreateWorkspace(ctx);
+		Workspace w1 = CreateWorkspace();
+		Workspace w2 = CreateWorkspace();
 
 		IMonitor m1 = CreateMonitor((HMONITOR)1);
 		IMonitor m2 = CreateMonitor((HMONITOR)2);
 
-		PopulateMonitorWorkspaceMap(ctx, root, m1, w1);
-		PopulateMonitorWorkspaceMap(ctx, root, m2, w2);
+		PopulateMonitorWorkspaceMap(root, m1, w1);
+		PopulateMonitorWorkspaceMap(root, m2, w2);
 
 		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
@@ -304,7 +303,7 @@ public class CoreCommandsTests
 		ICommand command = testUtils.GetCommand("whim.core.focus_previous_monitor");
 
 		IMonitor monitor = CreateMonitor();
-		AddMonitorsToSector(ctx, root, monitor);
+		AddMonitorsToSector(root, monitor);
 		root.MapSector.MonitorWorkspaceMap = root.MapSector.MonitorWorkspaceMap.Add(monitor.Handle, Guid.NewGuid());
 
 		// When
@@ -318,8 +317,8 @@ public class CoreCommandsTests
 	internal void CloseCurrentWorkspace(IContext ctx, MutableRootSector root, List<object> transforms)
 	{
 		// Given there is an active workspace
-		Workspace workspace = CreateWorkspace(ctx);
-		AddActiveWorkspaceToStore(ctx, root, workspace);
+		Workspace workspace = CreateWorkspace();
+		AddActiveWorkspaceToStore(root, workspace);
 
 		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
@@ -378,7 +377,7 @@ public class CoreCommandsTests
 
 		for (int idx = 0; idx < 2; idx++)
 		{
-			AddWorkspaceToStore(ctx, root, CreateWorkspace(ctx));
+			AddWorkspaceToStore(root, CreateWorkspace());
 		}
 
 		int index = 3;
@@ -404,7 +403,7 @@ public class CoreCommandsTests
 
 		for (int idx = 0; idx < 10; idx++)
 		{
-			AddWorkspaceToStore(ctx, root, CreateWorkspace(ctx));
+			AddWorkspaceToStore(root, CreateWorkspace());
 		}
 
 		ICommand command = testUtils.GetCommand($"whim.core.activate_workspace_{index}");
@@ -457,7 +456,7 @@ public class CoreCommandsTests
 
 		for (int idx = 0; idx < 2; idx++)
 		{
-			AddWorkspaceToStore(ctx, root, CreateWorkspace(ctx));
+			AddWorkspaceToStore(root, CreateWorkspace());
 		}
 
 		int index = 3;
@@ -489,16 +488,16 @@ public class CoreCommandsTests
 		IWindow window = CreateWindow((HWND)123);
 		for (int idx = 0; idx < 10; idx++)
 		{
-			Workspace w = CreateWorkspace(ctx) with { LastFocusedWindowHandle = window.Handle };
+			Workspace w = CreateWorkspace() with { LastFocusedWindowHandle = window.Handle };
 			if (idx == 0)
 			{
 				w = w with { LastFocusedWindowHandle = window.Handle };
-				w = PopulateWindowWorkspaceMap(ctx, root, window, w);
-				AddActiveWorkspaceToStore(ctx, root, w);
+				w = PopulateWindowWorkspaceMap(root, window, w);
+				AddActiveWorkspaceToStore(root, w);
 			}
 			else
 			{
-				AddWorkspaceToStore(ctx, root, w);
+				AddWorkspaceToStore(root, w);
 			}
 		}
 
@@ -529,8 +528,8 @@ public class CoreCommandsTests
 		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
 
-		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [layoutEngine] };
-		AddActiveWorkspaceToStore(ctx, root, workspace);
+		Workspace workspace = CreateWorkspace() with { LayoutEngines = [layoutEngine] };
+		AddActiveWorkspaceToStore(root, workspace);
 
 		ICommand command = testUtils.GetCommand("whim.core.focus_layout.toggle_maximized");
 
@@ -553,8 +552,8 @@ public class CoreCommandsTests
 		PluginCommandsTestUtils testUtils = new(commands);
 
 		FocusLayoutEngine engine = new(new LayoutEngineIdentity());
-		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [engine] };
-		AddActiveWorkspaceToStore(ctx, root, workspace);
+		Workspace workspace = CreateWorkspace() with { LayoutEngines = [engine] };
+		AddActiveWorkspaceToStore(root, workspace);
 
 		ICommand command = testUtils.GetCommand("whim.core.focus_layout.toggle_maximized");
 
@@ -586,13 +585,13 @@ public class CoreCommandsTests
 	)
 	{
 		// Given we have three workspaces, two sticky to monitor 1
-		var workspace1 = CreateWorkspace(ctx);
-		var workspace2 = CreateWorkspace(ctx);
-		var workspace3 = CreateWorkspace(ctx);
-		AddWorkspacesToStore(ctx, root, workspace1, workspace2, workspace3);
+		var workspace1 = CreateWorkspace();
+		var workspace2 = CreateWorkspace();
+		var workspace3 = CreateWorkspace();
+		AddWorkspacesToStore(root, workspace1, workspace2, workspace3);
 
 		IMonitor monitor = CreateMonitor((HMONITOR)1);
-		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace1);
+		PopulateMonitorWorkspaceMap(root, monitor, workspace1);
 		root.MonitorSector.ActiveMonitorHandle = monitor.Handle;
 
 		root.MapSector.StickyWorkspaceMonitorIndexMap = root
@@ -600,7 +599,7 @@ public class CoreCommandsTests
 			.SetItem(workspace2.Id, [0, 4]);
 
 		// Set workspace1 as active
-		AddActiveWorkspaceToStore(ctx, root, workspace1);
+		AddActiveWorkspaceToStore(root, workspace1);
 
 		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
@@ -626,13 +625,13 @@ public class CoreCommandsTests
 	)
 	{
 		// Given we have three workspaces, two sticky to monitor 1
-		var workspace1 = CreateWorkspace(ctx);
-		var workspace2 = CreateWorkspace(ctx);
-		var workspace3 = CreateWorkspace(ctx);
-		AddWorkspacesToStore(ctx, root, workspace1, workspace2, workspace3);
+		var workspace1 = CreateWorkspace();
+		var workspace2 = CreateWorkspace();
+		var workspace3 = CreateWorkspace();
+		AddWorkspacesToStore(root, workspace1, workspace2, workspace3);
 
 		IMonitor monitor = CreateMonitor((HMONITOR)1);
-		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace1);
+		PopulateMonitorWorkspaceMap(root, monitor, workspace1);
 		root.MonitorSector.ActiveMonitorHandle = monitor.Handle;
 
 		root.MapSector.StickyWorkspaceMonitorIndexMap = root
@@ -642,8 +641,8 @@ public class CoreCommandsTests
 		// Set up window in workspace1 as last focused
 		window.Handle.Returns((HWND)123);
 		workspace1 = workspace1 with { LastFocusedWindowHandle = window.Handle };
-		AddActiveWorkspaceToStore(ctx, root, workspace1);
-		PopulateWindowWorkspaceMap(ctx, root, window, workspace1);
+		AddActiveWorkspaceToStore(root, workspace1);
+		PopulateWindowWorkspaceMap(root, window, workspace1);
 
 		CoreCommands commands = new(ctx);
 		PluginCommandsTestUtils testUtils = new(commands);
@@ -674,9 +673,9 @@ public class CoreCommandsTests
 		// Given we have three workspaces
 		IWindow window = CreateWindow((HWND)123);
 
-		var workspace1 = CreateWorkspace(ctx) with { LastFocusedWindowHandle = window.Handle };
-		var workspace2 = CreateWorkspace(ctx);
-		var workspace3 = CreateWorkspace(ctx);
+		var workspace1 = CreateWorkspace() with { LastFocusedWindowHandle = window.Handle };
+		var workspace2 = CreateWorkspace();
+		var workspace3 = CreateWorkspace();
 		Workspace[] workspaces = [workspace1, workspace2, workspace3];
 
 		Workspace sourceWorkspace = workspace1;
@@ -684,10 +683,10 @@ public class CoreCommandsTests
 
 		var monitor = CreateMonitor((HMONITOR)1);
 
-		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace1);
+		PopulateMonitorWorkspaceMap(root, monitor, workspace1);
 
-		PopulateWindowWorkspaceMap(ctx, root, window, workspace1);
-		AddWorkspacesToStore(ctx, root, workspace2, workspace3);
+		PopulateWindowWorkspaceMap(root, window, workspace1);
+		AddWorkspacesToStore(root, workspace2, workspace3);
 
 		// When we move the window to the next/previous workspace
 		CoreCommands commands = new(ctx);

@@ -7,7 +7,7 @@ public class MoveWindowToAdjacentWorkspaceTransformTests
 	internal void NoValidWindows(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given there is no valid windows
-		AddActiveWorkspaceToStore(ctx, rootSector, CreateWorkspace(ctx));
+		AddActiveWorkspaceToStore(rootSector, CreateWorkspace());
 		MoveWindowToAdjacentWorkspaceTransform sut = new();
 
 		// When
@@ -72,7 +72,7 @@ public class MoveWindowToAdjacentWorkspaceTransformTests
 	{
 		// Given there are no adjacent workspaces
 		IWindow window = CreateWindow((HWND)10);
-		PopulateThreeWayMap(ctx, rootSector, CreateMonitor((HMONITOR)10), CreateWorkspace(ctx), window);
+		PopulateThreeWayMap(rootSector, CreateMonitor((HMONITOR)10), CreateWorkspace(), window);
 
 		MoveWindowToAdjacentWorkspaceTransform sut = new(window.Handle);
 
@@ -89,11 +89,11 @@ public class MoveWindowToAdjacentWorkspaceTransformTests
 		// Given
 		IWindow window = CreateWindow((HWND)10);
 
-		Workspace workspace1 = CreateWorkspace(ctx);
-		Workspace workspace2 = CreateWorkspace(ctx);
+		Workspace workspace1 = CreateWorkspace();
+		Workspace workspace2 = CreateWorkspace();
 
-		PopulateThreeWayMap(ctx, rootSector, CreateMonitor((HMONITOR)10), workspace1, window);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, CreateMonitor((HMONITOR)11), workspace2);
+		PopulateThreeWayMap(rootSector, CreateMonitor((HMONITOR)10), workspace1, window);
+		PopulateMonitorWorkspaceMap(rootSector, CreateMonitor((HMONITOR)11), workspace2);
 
 		MoveWindowToAdjacentWorkspaceTransform sut = new(window.Handle);
 

@@ -48,7 +48,7 @@ public class BaseWorkspaceTransformTests
 	)
 	{
 		// Given the workspace doesn't exist, but there is an active workspace
-		AddActiveWorkspaceToStore(ctx, root, CreateWorkspace(ctx));
+		AddActiveWorkspaceToStore(root, CreateWorkspace());
 		SuccessfulWorkspaceTransform sut = new(default);
 
 		// When we execute the transform (outside of the store)
@@ -62,8 +62,8 @@ public class BaseWorkspaceTransformTests
 	internal void OperationFailed(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
 	{
 		// Given the operation fails
-		Workspace workspace = CreateWorkspace(ctx);
-		AddWorkspaceToStore(ctx, root, workspace);
+		Workspace workspace = CreateWorkspace();
+		AddWorkspaceToStore(root, workspace);
 
 		FailedWorkspaceTransform sut = new(workspace.Id);
 
@@ -89,8 +89,8 @@ public class BaseWorkspaceTransformTests
 	internal void SameWorkspace(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
 	{
 		// Given the operation succeeds, but the returned workspace is the same
-		Workspace workspace = CreateWorkspace(ctx);
-		AddWorkspaceToStore(ctx, root, workspace);
+		Workspace workspace = CreateWorkspace();
+		AddWorkspaceToStore(root, workspace);
 
 		SameWorkspaceTransform sut = new(workspace.Id);
 
@@ -107,8 +107,8 @@ public class BaseWorkspaceTransformTests
 	internal void DifferentWorkspace_SkipDoLayout(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
 	{
 		// Given the operation succeeds and the returned workspace is the same
-		Workspace workspace = CreateWorkspace(ctx);
-		AddWorkspaceToStore(ctx, root, workspace);
+		Workspace workspace = CreateWorkspace();
+		AddWorkspaceToStore(root, workspace);
 
 		SuccessfulWorkspaceTransform sut = new(workspace.Id, true);
 
@@ -125,8 +125,8 @@ public class BaseWorkspaceTransformTests
 	internal void DifferentWorkspace_DoLayout(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
 	{
 		// Given the operation succeeds and the returned workspace is the same
-		Workspace workspace = CreateWorkspace(ctx);
-		AddWorkspaceToStore(ctx, root, workspace);
+		Workspace workspace = CreateWorkspace();
+		AddWorkspaceToStore(root, workspace);
 
 		SuccessfulWorkspaceTransform sut = new(workspace.Id, false);
 

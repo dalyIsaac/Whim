@@ -82,8 +82,8 @@ public class WindowRemovedTransformTests
 	{
 		// Given the window is tracked
 		window.Handle.Returns((HWND)2);
-		Workspace workspace = CreateWorkspace(ctx);
-		PopulateWindowWorkspaceMap(ctx, mutableRootSector, window, workspace);
+		Workspace workspace = CreateWorkspace();
+		PopulateWindowWorkspaceMap(mutableRootSector, window, workspace);
 
 		mutableRootSector.MapSector.WindowWorkspaceMap = mutableRootSector.MapSector.WindowWorkspaceMap.Add(
 			window.Handle,

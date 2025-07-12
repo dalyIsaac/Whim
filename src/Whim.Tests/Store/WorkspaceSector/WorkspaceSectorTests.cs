@@ -10,7 +10,7 @@ public class WorkspaceSectorTests
 	internal void DoLayout_NoMonitorFoundForWorkspace(IContext ctx, MutableRootSector root)
 	{
 		// Given
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 
 		// When
 		root.WorkspaceSector.WorkspacesToLayout = root.WorkspaceSector.WorkspacesToLayout.Add(workspace.Id);
@@ -50,8 +50,8 @@ public class WorkspaceSectorTests
 				},
 			});
 
-		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [engine] };
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), workspace);
+		Workspace workspace = CreateWorkspace() with { LayoutEngines = [engine] };
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)1), workspace);
 
 		ctx.NativeManager.DeferWindowPos().Returns(new DeferWindowPosHandle(ctx, internalCtx));
 
@@ -84,10 +84,10 @@ public class WorkspaceSectorTests
 
 		internalCtx.CoreNativeManager.IsWindow(invalidWindow.Handle).Returns(false);
 
-		Workspace workspace = CreateWorkspace(ctx);
-		workspace = PopulateWindowWorkspaceMap(ctx, root, validWindow, workspace);
-		workspace = PopulateWindowWorkspaceMap(ctx, root, invalidWindow, workspace);
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), workspace);
+		Workspace workspace = CreateWorkspace();
+		workspace = PopulateWindowWorkspaceMap(root, validWindow, workspace);
+		workspace = PopulateWindowWorkspaceMap(root, invalidWindow, workspace);
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)1), workspace);
 
 		WorkspaceSector sut = root.WorkspaceSector;
 		sut.WorkspacesToLayout = sut.WorkspacesToLayout.Add(workspace.Id);
@@ -105,10 +105,10 @@ public class WorkspaceSectorTests
 		// Given
 		IWindow window = CreateWindow((HWND)1);
 
-		Workspace workspace = CreateWorkspace(ctx);
-		workspace = PopulateWindowWorkspaceMap(ctx, root, window, workspace);
+		Workspace workspace = CreateWorkspace();
+		workspace = PopulateWindowWorkspaceMap(root, window, workspace);
 
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), workspace);
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)1), workspace);
 
 		WorkspaceSector sut = root.WorkspaceSector;
 		sut.WorkspacesToLayout = sut.WorkspacesToLayout.Add(workspace.Id);

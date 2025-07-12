@@ -15,12 +15,12 @@ public class RouterManagerCustomization : StoreCustomization
 		fixture.Inject(RouterManager);
 
 		// Setup workspace
-		Workspace workspace = CreateWorkspace(_ctx) with
+		Workspace workspace = CreateWorkspace() with
 		{
 			Name = "Test",
 		};
 		fixture.Inject(workspace);
-		AddWorkspaceToStore(_ctx, _store._root.MutableRootSector, workspace);
+		AddWorkspaceToStore(_store._root.MutableRootSector, workspace);
 
 		// Setup window
 		IWindow window = fixture.Freeze<IWindow>();

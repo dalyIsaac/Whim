@@ -187,7 +187,6 @@ public class InitializeWorkspacesTransformTests
 
 		// - there are three monitors
 		AddMonitorsToSector(
-			ctx,
 			rootSector,
 			CreateMonitor(BrowserMonitor),
 			CreateMonitor(CodeMonitor),

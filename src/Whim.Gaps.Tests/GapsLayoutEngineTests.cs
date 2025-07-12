@@ -428,10 +428,10 @@ public class GapsLayoutEngineTests
 		IWindow window2 = StoreTestUtils.CreateWindow((HWND)2);
 		IWindow window3 = StoreTestUtils.CreateWindow((HWND)3);
 
-		Workspace workspace = StoreTestUtils.CreateWorkspace(context);
-		StoreTestUtils.PopulateThreeWayMap(context, root, monitor, workspace, window1);
-		StoreTestUtils.PopulateWindowWorkspaceMap(context, root, window2, workspace);
-		StoreTestUtils.PopulateWindowWorkspaceMap(context, root, window3, workspace);
+		Workspace workspace = StoreTestUtils.CreateWorkspace();
+		StoreTestUtils.PopulateThreeWayMap(root, monitor, workspace, window1);
+		StoreTestUtils.PopulateWindowWorkspaceMap(root, window2, workspace);
+		StoreTestUtils.PopulateWindowWorkspaceMap(root, window3, workspace);
 
 		IFloatingWindowPlugin floatingWindowPlugin = Substitute.For<IFloatingWindowPlugin>();
 		floatingWindowPlugin.FloatingWindows.Returns(_ => new HashSet<HWND>() { window1.Handle, window2.Handle });
@@ -529,9 +529,9 @@ public class GapsLayoutEngineTests
 		IWindow window1 = StoreTestUtils.CreateWindow((HWND)1);
 		IWindow window2 = StoreTestUtils.CreateWindow((HWND)2);
 
-		Workspace workspace = StoreTestUtils.CreateWorkspace(context);
-		StoreTestUtils.PopulateThreeWayMap(context, root, monitor, workspace, window1);
-		StoreTestUtils.PopulateWindowWorkspaceMap(context, root, window2, workspace);
+		Workspace workspace = StoreTestUtils.CreateWorkspace();
+		StoreTestUtils.PopulateThreeWayMap(root, monitor, workspace, window1);
+		StoreTestUtils.PopulateWindowWorkspaceMap(root, window2, workspace);
 
 		context.NativeManager.DwmGetWindowRectangle(window1.Handle).Returns(rect1);
 		context.NativeManager.DwmGetWindowRectangle(window2.Handle).Returns(rect2);

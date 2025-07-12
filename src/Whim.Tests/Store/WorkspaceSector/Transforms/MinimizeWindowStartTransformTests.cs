@@ -16,8 +16,8 @@ public class MinimizeWindowStartTransformTests
 		// Given the window is already in the workspace
 		IWindow window = CreateWindow((HWND)1);
 
-		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [engine1, engine2] };
-		workspace = PopulateWindowWorkspaceMap(ctx, root, window, workspace);
+		Workspace workspace = CreateWorkspace() with { LayoutEngines = [engine1, engine2] };
+		workspace = PopulateWindowWorkspaceMap(root, window, workspace);
 
 		MinimizeWindowStartTransform sut = new(workspace.Id, window.Handle);
 
@@ -43,8 +43,8 @@ public class MinimizeWindowStartTransformTests
 		IWindow window = CreateWindow((HWND)1);
 		AddWindowToSector(root, window);
 
-		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [engine1, engine2] };
-		AddWorkspaceToStore(ctx, root, workspace);
+		Workspace workspace = CreateWorkspace() with { LayoutEngines = [engine1, engine2] };
+		AddWorkspaceToStore(root, workspace);
 
 		MinimizeWindowStartTransform sut = new(workspace.Id, window.Handle);
 

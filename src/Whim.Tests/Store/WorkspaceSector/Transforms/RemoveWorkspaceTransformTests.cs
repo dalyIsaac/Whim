@@ -13,8 +13,8 @@ public class RemoveWorkspaceTransformTests
 	)
 	{
 		// Given there are less workspaces than monitors
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), CreateWorkspace(ctx));
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)2), providedWorkspace);
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)1), CreateWorkspace());
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)2), providedWorkspace);
 
 		// When we execute the transform
 		Result<Unit> result = ctx.Store.Dispatch(sut);
@@ -31,8 +31,8 @@ public class RemoveWorkspaceTransformTests
 	)
 	{
 		// Given there are no matching workspaces
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), CreateWorkspace(ctx) with { Name = "Test" });
-		AddWorkspacesToStore(ctx, root, providedWorkspace);
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)1), CreateWorkspace() with { Name = "Test" });
+		AddWorkspacesToStore(root, providedWorkspace);
 
 		// When we execute the transform
 		Result<Unit> result = ctx.Store.Dispatch(sut);
@@ -49,8 +49,8 @@ public class RemoveWorkspaceTransformTests
 	)
 	{
 		// Given there is a matching workspace
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), CreateWorkspace(ctx) with { Name = "Test" });
-		AddWorkspacesToStore(ctx, root, providedWorkspace);
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)1), CreateWorkspace() with { Name = "Test" });
+		AddWorkspacesToStore(root, providedWorkspace);
 
 		// When we execute the transform
 		Result<Unit>? result = null;
@@ -72,7 +72,7 @@ public class RemoveWorkspaceTransformTests
 	internal void ById_NotEnoughWorkspaces(IContext ctx, MutableRootSector root)
 	{
 		Guid workspaceId = Guid.NewGuid();
-		Workspace workspace = CreateWorkspace(ctx, workspaceId);
+		Workspace workspace = CreateWorkspace(workspaceId);
 		NotEnoughWorkspaces(new RemoveWorkspaceByIdTransform(workspaceId), workspace, ctx, root);
 	}
 
@@ -81,7 +81,7 @@ public class RemoveWorkspaceTransformTests
 	{
 		Guid workspaceId = Guid.NewGuid();
 		Guid searchId = Guid.NewGuid();
-		Workspace workspace = CreateWorkspace(ctx, workspaceId);
+		Workspace workspace = CreateWorkspace(workspaceId);
 		NoMatchingWorkspace(new RemoveWorkspaceByIdTransform(searchId), workspace, ctx, root);
 	}
 
@@ -89,7 +89,7 @@ public class RemoveWorkspaceTransformTests
 	internal void ById_Success(IContext ctx, MutableRootSector root)
 	{
 		Guid workspaceId = Guid.NewGuid();
-		Workspace workspace = CreateWorkspace(ctx, workspaceId);
+		Workspace workspace = CreateWorkspace(workspaceId);
 		Success(new RemoveWorkspaceByIdTransform(workspaceId), workspace, ctx, root);
 	}
 	#endregion
@@ -100,7 +100,7 @@ public class RemoveWorkspaceTransformTests
 	{
 		NotEnoughWorkspaces(
 			new RemoveWorkspaceByNameTransform("Different test workspace"),
-			CreateWorkspace(ctx),
+			CreateWorkspace(),
 			ctx,
 			root
 		);
@@ -111,7 +111,7 @@ public class RemoveWorkspaceTransformTests
 	{
 		NoMatchingWorkspace(
 			new RemoveWorkspaceByNameTransform("Different test workspace"),
-			CreateWorkspace(ctx),
+			CreateWorkspace(),
 			ctx,
 			root
 		);
@@ -121,7 +121,7 @@ public class RemoveWorkspaceTransformTests
 	internal void ByName_Success(IContext ctx, MutableRootSector root)
 	{
 		string name = "Test";
-		Success(new RemoveWorkspaceByNameTransform(name), CreateWorkspace(ctx) with { Name = name }, ctx, root);
+		Success(new RemoveWorkspaceByNameTransform(name), CreateWorkspace() with { Name = name }, ctx, root);
 	}
 	#endregion
 }

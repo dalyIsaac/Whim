@@ -54,8 +54,8 @@ public class ActivateWorkspaceTransformTests
 	internal void MonitorNotFound(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given the monitor doesn't exist
-		Workspace workspace = CreateWorkspace(ctx);
-		AddWorkspacesToStore(ctx, rootSector, workspace);
+		Workspace workspace = CreateWorkspace();
+		AddWorkspacesToStore(rootSector, workspace);
 
 		ActivateWorkspaceTransform sut = new(workspace.Id);
 
@@ -74,9 +74,9 @@ public class ActivateWorkspaceTransformTests
 	)
 	{
 		// Given the workspace is already activated on the monitor
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, workspace);
+		PopulateMonitorWorkspaceMap(rootSector, monitor, workspace);
 
 		ActivateWorkspaceTransform sut = new(workspace.Id, monitor.Handle);
 
@@ -93,17 +93,17 @@ public class ActivateWorkspaceTransformTests
 	internal void LayoutOldWorkspace(IContext ctx, MutableRootSector rootSector, List<object> executedTransforms)
 	{
 		// Given the target monitor has an old workspace
-		Workspace workspace1 = CreateWorkspace(ctx);
-		Workspace workspace2 = CreateWorkspace(ctx);
-		Workspace workspace3 = CreateWorkspace(ctx);
+		Workspace workspace1 = CreateWorkspace();
+		Workspace workspace2 = CreateWorkspace();
+		Workspace workspace3 = CreateWorkspace();
 
 		IMonitor monitor1 = CreateMonitor((HMONITOR)1);
 		IMonitor monitor2 = CreateMonitor((HMONITOR)2);
 		IMonitor monitor3 = CreateMonitor((HMONITOR)3);
 
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor1, workspace1);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor2, workspace2);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor3, workspace3);
+		PopulateMonitorWorkspaceMap(rootSector, monitor1, workspace1);
+		PopulateMonitorWorkspaceMap(rootSector, monitor2, workspace2);
+		PopulateMonitorWorkspaceMap(rootSector, monitor3, workspace3);
 
 		ActivateWorkspaceTransform sut = new(workspace3.Id, monitor1.Handle);
 
@@ -137,16 +137,16 @@ public class ActivateWorkspaceTransformTests
 	internal void DeactivateOldWorkspace(IContext ctx, MutableRootSector rootSector, List<object> executedTransforms)
 	{
 		// Given the target monitor has an old workspace, and the new workspace wasn't previously activated
-		Workspace oldWorkspace = CreateWorkspace(ctx);
-		Workspace workspace2 = CreateWorkspace(ctx);
-		Workspace newWorkspace = CreateWorkspace(ctx);
+		Workspace oldWorkspace = CreateWorkspace();
+		Workspace workspace2 = CreateWorkspace();
+		Workspace newWorkspace = CreateWorkspace();
 
 		IMonitor monitor1 = CreateMonitor((HMONITOR)1);
 		IMonitor monitor2 = CreateMonitor((HMONITOR)2);
 
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor1, oldWorkspace);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor2, workspace2);
-		AddWorkspacesToStore(ctx, rootSector, newWorkspace);
+		PopulateMonitorWorkspaceMap(rootSector, monitor1, oldWorkspace);
+		PopulateMonitorWorkspaceMap(rootSector, monitor2, workspace2);
+		AddWorkspacesToStore(rootSector, newWorkspace);
 
 		ActivateWorkspaceTransform sut = new(newWorkspace.Id, monitor1.Handle);
 
@@ -178,13 +178,13 @@ public class ActivateWorkspaceTransformTests
 	)
 	{
 		// Given the FocusWorkspaceWindow flag is false and the active workspace is the old workspace...
-		Workspace workspace1 = CreateWorkspace(ctx);
-		Workspace workspace2 = CreateWorkspace(ctx);
+		Workspace workspace1 = CreateWorkspace();
+		Workspace workspace2 = CreateWorkspace();
 
 		IMonitor monitor1 = CreateMonitor((HMONITOR)1);
 
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor1, workspace1);
-		AddWorkspacesToStore(ctx, rootSector, workspace2);
+		PopulateMonitorWorkspaceMap(rootSector, monitor1, workspace1);
+		AddWorkspacesToStore(rootSector, workspace2);
 
 		ActivateWorkspaceTransform sut = new(workspace2.Id, monitor1.Handle, FocusWorkspaceWindow: false);
 
@@ -204,17 +204,17 @@ public class ActivateWorkspaceTransformTests
 	)
 	{
 		// Given the FocusWorkspaceWindow flag is false and the active workspace is still visible...
-		Workspace workspace1 = CreateWorkspace(ctx);
-		Workspace workspace2 = CreateWorkspace(ctx);
-		Workspace workspace3 = CreateWorkspace(ctx);
+		Workspace workspace1 = CreateWorkspace();
+		Workspace workspace2 = CreateWorkspace();
+		Workspace workspace3 = CreateWorkspace();
 
 		IMonitor monitor1 = CreateMonitor((HMONITOR)1);
 		IMonitor monitor2 = CreateMonitor((HMONITOR)2);
 
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor1, workspace1);
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor2, workspace2);
-		AddWorkspacesToStore(ctx, rootSector, workspace3);
-		AddActiveWorkspaceToStore(ctx, rootSector, workspace1);
+		PopulateMonitorWorkspaceMap(rootSector, monitor1, workspace1);
+		PopulateMonitorWorkspaceMap(rootSector, monitor2, workspace2);
+		AddWorkspacesToStore(rootSector, workspace3);
+		AddActiveWorkspaceToStore(rootSector, workspace1);
 
 		ActivateWorkspaceTransform sut = new(workspace3.Id, monitor2.Handle, FocusWorkspaceWindow: false);
 

@@ -10,9 +10,9 @@ public class SetLastFocusedWindowTransformTests
 	{
 		// Given the last focused window is the same as the window we're setting.
 		IWindow window = CreateWindow((HWND)123);
-		Workspace workspace = CreateWorkspace(ctx) with { LastFocusedWindowHandle = window.Handle };
+		Workspace workspace = CreateWorkspace() with { LastFocusedWindowHandle = window.Handle };
 
-		workspace = PopulateWindowWorkspaceMap(ctx, root, window, workspace);
+		workspace = PopulateWindowWorkspaceMap(root, window, workspace);
 
 		SetLastFocusedWindowTransform sut = new(workspace.Id, window.Handle);
 
@@ -32,9 +32,9 @@ public class SetLastFocusedWindowTransformTests
 	{
 		// Given the last focused window is not the same as the window we're setting.
 		IWindow window = CreateWindow((HWND)123);
-		Workspace workspace = CreateWorkspace(ctx) with { LastFocusedWindowHandle = (HWND)456 };
+		Workspace workspace = CreateWorkspace() with { LastFocusedWindowHandle = (HWND)456 };
 
-		workspace = PopulateWindowWorkspaceMap(ctx, root, window, workspace);
+		workspace = PopulateWindowWorkspaceMap(root, window, workspace);
 
 		SetLastFocusedWindowTransform sut = new(workspace.Id, window.Handle);
 
