@@ -76,7 +76,7 @@ public class WorkspaceSectorTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void DoLayout_GarbageCollect(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
+	internal void DoLayout_GarbageCollect(IInternalContext internalCtx, MutableRootSector root)
 	{
 		// Given one of the windows is not a valid window.
 		IWindow validWindow = CreateWindow((HWND)1);
@@ -100,7 +100,7 @@ public class WorkspaceSectorTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void DoLayout_FocusWindow(IContext ctx, MutableRootSector root, List<object> transforms)
+	internal void DoLayout_FocusWindow(MutableRootSector root, List<object> transforms)
 	{
 		// Given
 		IWindow window = CreateWindow((HWND)1);

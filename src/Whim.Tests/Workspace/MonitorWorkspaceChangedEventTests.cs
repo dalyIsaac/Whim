@@ -38,7 +38,7 @@ public class MonitorWorkspaceChangedEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void Equals_DifferentPreviousWorkspace(IContext ctx, IMonitor monitor)
+	public void Equals_DifferentPreviousWorkspace(IMonitor monitor)
 	{
 		// Given
 		IWorkspace workspace = StoreTestUtils.CreateWorkspace();
@@ -62,7 +62,7 @@ public class MonitorWorkspaceChangedEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void Equals_DifferentCurrentWorkspace(IContext ctx, IMonitor monitor)
+	public void Equals_DifferentCurrentWorkspace(IMonitor monitor)
 	{
 		// Given
 		IWorkspace aCurrentWorkspace = StoreTestUtils.CreateWorkspace();

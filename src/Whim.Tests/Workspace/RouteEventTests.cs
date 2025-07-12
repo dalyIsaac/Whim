@@ -6,7 +6,7 @@ namespace Whim.Tests;
 public class RouteEventTests
 {
 	[Theory, AutoSubstituteData]
-	public void WindowAdded(IContext ctx, IWindow window)
+	public void WindowAdded(IWindow window)
 	{
 		// When
 		IWorkspace workspace = StoreTestUtils.CreateWorkspace();
@@ -19,7 +19,7 @@ public class RouteEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void WindowRemoved(IContext ctx, IWindow window)
+	public void WindowRemoved(IWindow window)
 	{
 		// When
 		IWorkspace workspace = StoreTestUtils.CreateWorkspace();
@@ -32,7 +32,7 @@ public class RouteEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void WindowMoved(IContext ctx, IWindow window)
+	public void WindowMoved(IWindow window)
 	{
 		// When
 		IWorkspace fromWorkspace = StoreTestUtils.CreateWorkspace();
@@ -46,7 +46,7 @@ public class RouteEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void Equals_Null(IContext ctx, IWindow window)
+	public void Equals_Null(IWindow window)
 	{
 		// Given
 		IWorkspace workspace = StoreTestUtils.CreateWorkspace();
@@ -57,7 +57,7 @@ public class RouteEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void Equals_DifferentType(IContext ctx, IWindow window)
+	public void Equals_DifferentType(IWindow window)
 	{
 		// Given
 		IWorkspace workspace = StoreTestUtils.CreateWorkspace();
@@ -68,7 +68,7 @@ public class RouteEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void Equals_DifferentWindow(IContext ctx, IWindow aWindow, IWindow bWindow)
+	public void Equals_DifferentWindow(IWindow aWindow, IWindow bWindow)
 	{
 		// Given
 		IWorkspace workspace = StoreTestUtils.CreateWorkspace();
@@ -80,7 +80,7 @@ public class RouteEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void Equals_DifferentPreviousWorkspace(IContext ctx, IWindow Window)
+	public void Equals_DifferentPreviousWorkspace(IWindow Window)
 	{
 		// Given
 		IWorkspace aWorkspace = StoreTestUtils.CreateWorkspace();
@@ -93,7 +93,7 @@ public class RouteEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void Equals_DifferentNextWorkspace(IContext ctx, IWindow Window)
+	public void Equals_DifferentNextWorkspace(IWindow Window)
 	{
 		// Given
 		IWorkspace aWorkspace = StoreTestUtils.CreateWorkspace();
@@ -106,7 +106,7 @@ public class RouteEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void Equals_Sucess(IContext ctx, IWindow Window)
+	public void Equals_Sucess(IWindow Window)
 	{
 		// Given
 		IWorkspace fromWorkspace = StoreTestUtils.CreateWorkspace();
@@ -119,7 +119,7 @@ public class RouteEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void GetHashCode_Success(IContext ctx, IWindow Window)
+	public void GetHashCode_Success(IWindow Window)
 	{
 		// Given
 		IWorkspace currentWorkspace = StoreTestUtils.CreateWorkspace();
