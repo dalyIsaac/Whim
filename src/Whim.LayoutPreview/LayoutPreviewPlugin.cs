@@ -97,12 +97,7 @@ public class LayoutPreviewPlugin(IContext context) : IPlugin, IDisposable
 			Y = cursorDraggedPoint.Y - monitor.WorkingArea.Y,
 		};
 
-		_layoutPreviewWindow?.Update(
-			layoutEngine.DoLayout(rect, monitor).ToArray(),
-			adjustedCursorPoint,
-			e.Window,
-			monitor
-		);
+		_layoutPreviewWindow?.Update([.. layoutEngine.DoLayout(rect, monitor)], adjustedCursorPoint, e.Window, monitor);
 	}
 
 	private void WindowEvents_WindowRemoved(object? sender, WindowEventArgs e)

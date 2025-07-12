@@ -163,7 +163,7 @@ public class FocusLayoutEngineTests
 		sut = sut.AddWindow(window3);
 
 		// When
-		IWindowState[] result = sut.DoLayout(rectangle, monitor).ToArray();
+		IWindowState[] result = [.. sut.DoLayout(rectangle, monitor)];
 
 		// Then
 		Assert.Equal(3, result.Length);
@@ -215,7 +215,7 @@ public class FocusLayoutEngineTests
 	public void FocusWindowInDirection_WindowInLayout(int focusedIndex, Direction direction, int expectedIndex)
 	{
 		// Given
-		IWindow[] windows = Enumerable.Range(0, 3).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, 3).Select(_ => Substitute.For<IWindow>())];
 		ILayoutEngine sut = new FocusLayoutEngine(_identity);
 		sut = sut.AddWindow(windows[0]);
 		sut = sut.AddWindow(windows[1]);
@@ -223,7 +223,7 @@ public class FocusLayoutEngineTests
 
 		// When
 		ILayoutEngine result = sut.FocusWindowInDirection(direction, windows[focusedIndex]);
-		IWindowState[] windowStates = result.DoLayout(new Rectangle<int>(), Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(new Rectangle<int>(), Substitute.For<IMonitor>())];
 
 		// Then
 		Assert.NotSame(sut, result);
@@ -304,7 +304,7 @@ public class FocusLayoutEngineTests
 				Payload = null,
 			}
 		);
-		IWindowState[] windowStates = result.DoLayout(new Rectangle<int>(), Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(new Rectangle<int>(), Substitute.For<IMonitor>())];
 
 		// Then
 		Assert.NotSame(sut, result);
@@ -388,7 +388,7 @@ public class FocusLayoutEngineTests
 	public void SwapWindowInDirection_CanFindWindow(int focusedIndex, Direction direction, int expectedIndex)
 	{
 		// Given
-		IWindow[] windows = Enumerable.Range(0, 3).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, 3).Select(_ => Substitute.For<IWindow>())];
 		ILayoutEngine sut = new FocusLayoutEngine(_identity);
 		sut = sut.AddWindow(windows[0]);
 		sut = sut.AddWindow(windows[1]);
@@ -409,14 +409,14 @@ public class FocusLayoutEngineTests
 	public void MinimizeWindowStart_ContainsWindow(IMonitor monitor)
 	{
 		// Given there are two windows in the layout
-		IWindow[] windows = Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>())];
 		ILayoutEngine sut = new FocusLayoutEngine(_identity);
 		sut = sut.AddWindow(windows[0]);
 		sut = sut.AddWindow(windows[1]);
 
 		// When the focused window is minimized
 		ILayoutEngine result = sut.MinimizeWindowStart(windows[1]);
-		IWindowState[] windowStates = result.DoLayout(new Rectangle<int>(), monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(new Rectangle<int>(), monitor)];
 
 		// Then all the windows are minimized
 		Assert.NotSame(sut, result);
@@ -448,7 +448,7 @@ public class FocusLayoutEngineTests
 
 		// When a new window is minimized
 		ILayoutEngine result = sut.MinimizeWindowStart(newWindow);
-		IWindowState[] windowStates = result.DoLayout(new Rectangle<int>(), monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(new Rectangle<int>(), monitor)];
 
 		// Then the window is added to the layout
 		Assert.NotSame(sut, result);
@@ -470,14 +470,14 @@ public class FocusLayoutEngineTests
 	public void MinimizeWindowStart_WindowNotFound(IMonitor monitor, IWindow newWindow)
 	{
 		// Given there are two windows in the layout
-		IWindow[] windows = Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>())];
 		ILayoutEngine sut = new FocusLayoutEngine(_identity);
 		sut = sut.AddWindow(windows[0]);
 		sut = sut.AddWindow(windows[1]);
 
 		// When a new window is minimized
 		ILayoutEngine result = sut.MinimizeWindowStart(newWindow);
-		IWindowState[] windowStates = result.DoLayout(new Rectangle<int>(), monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(new Rectangle<int>(), monitor)];
 
 		// Then the window is added to the layout
 		Assert.NotSame(sut, result);
@@ -511,14 +511,14 @@ public class FocusLayoutEngineTests
 	public void MinimizeWindowStart_NonFocusedWindowMinimized(IMonitor monitor)
 	{
 		// Given there are two windows in the layout
-		IWindow[] windows = Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>())];
 		ILayoutEngine sut = new FocusLayoutEngine(_identity);
 		sut = sut.AddWindow(windows[0]);
 		sut = sut.AddWindow(windows[1]);
 
 		// When the non-focused window is minimized
 		ILayoutEngine result = sut.MinimizeWindowStart(windows[0]);
-		IWindowState[] windowStates = result.DoLayout(new Rectangle<int>(), monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(new Rectangle<int>(), monitor)];
 
 		// Then the window is added to the layout
 		Assert.Same(sut, result);
@@ -548,14 +548,14 @@ public class FocusLayoutEngineTests
 	public void MinimizeWindowEnd_DoesNotContainWindow(IMonitor monitor, IWindow newWindow)
 	{
 		// Given there are two windows in the layout
-		IWindow[] windows = Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>())];
 		ILayoutEngine sut = new FocusLayoutEngine(_identity);
 		sut = sut.AddWindow(windows[0]);
 		sut = sut.AddWindow(windows[1]);
 
 		// When a new window is restored
 		ILayoutEngine result = sut.MinimizeWindowEnd(newWindow);
-		IWindowState[] windowStates = result.DoLayout(new Rectangle<int>(), monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(new Rectangle<int>(), monitor)];
 
 		// Then the window is added to the layout
 		Assert.NotSame(sut, result);
@@ -589,14 +589,14 @@ public class FocusLayoutEngineTests
 	public void MinimizeWindowEnd_ExistingWindow(IMonitor monitor)
 	{
 		// Given there are two windows in the layout
-		IWindow[] windows = Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>()).ToArray();
+		IWindow[] windows = [.. Enumerable.Range(0, 2).Select(_ => Substitute.For<IWindow>())];
 		ILayoutEngine sut = new FocusLayoutEngine(_identity);
 		sut = sut.AddWindow(windows[0]);
 		sut = sut.AddWindow(windows[1]);
 
 		// When a new window is restored
 		ILayoutEngine result = sut.MinimizeWindowEnd(windows[0]);
-		IWindowState[] windowStates = result.DoLayout(new Rectangle<int>(), monitor).ToArray();
+		IWindowState[] windowStates = [.. result.DoLayout(new Rectangle<int>(), monitor)];
 
 		// Then the window is added to the layout
 		Assert.NotSame(sut, result);

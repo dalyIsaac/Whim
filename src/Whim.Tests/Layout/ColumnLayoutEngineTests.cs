@@ -187,9 +187,10 @@ public class ColumnLayoutEngineTests
 		ILayoutEngine engine = new ColumnLayoutEngine(identity);
 
 		// When
-		IWindowState[] windowStates = engine
-			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] windowStates =
+		[
+			.. engine.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>()),
+		];
 
 		// Then
 		Assert.Empty(windowStates);
@@ -202,9 +203,10 @@ public class ColumnLayoutEngineTests
 		ILayoutEngine engine = new ColumnLayoutEngine(identity).MinimizeWindowStart(window);
 
 		// When
-		IWindowState[] windowStates = engine
-			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] windowStates =
+		[
+			.. engine.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>()),
+		];
 
 		// Then
 		Assert.Single(windowStates);
@@ -226,9 +228,10 @@ public class ColumnLayoutEngineTests
 		ILayoutEngine engine = new ColumnLayoutEngine(identity).AddWindow(window);
 
 		// When
-		IWindowState[] windowStates = engine
-			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] windowStates =
+		[
+			.. engine.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>()),
+		];
 
 		// Then
 		Assert.Single(windowStates);
@@ -258,7 +261,7 @@ public class ColumnLayoutEngineTests
 		Rectangle<int> rect = new() { Width = 1920, Height = 1080 };
 
 		// When
-		IWindowState[] result = engine.DoLayout(rect, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] result = [.. engine.DoLayout(rect, Substitute.For<IMonitor>())];
 
 		// Then
 		Assert.Equal(3, result.Length);
@@ -321,7 +324,7 @@ public class ColumnLayoutEngineTests
 		Rectangle<int> rect = new() { Width = 1920, Height = 1080 };
 
 		// When
-		IWindowState[] result = engine.DoLayout(rect, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] result = [.. engine.DoLayout(rect, Substitute.For<IMonitor>())];
 
 		// Then
 		Assert.Single(result);
@@ -354,7 +357,7 @@ public class ColumnLayoutEngineTests
 		Rectangle<int> rect = new() { Width = 1920, Height = 1080 };
 
 		// When
-		IWindowState[] result = engine.DoLayout(rect, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] result = [.. engine.DoLayout(rect, Substitute.For<IMonitor>())];
 
 		// Then
 		Assert.Equal(3, result.Length);
@@ -420,7 +423,7 @@ public class ColumnLayoutEngineTests
 		Rectangle<int> rect = new() { Width = 1920, Height = 1080 };
 
 		// When performing a layout
-		IWindowState[] result = engine.DoLayout(rect, Substitute.For<IMonitor>()).ToArray();
+		IWindowState[] result = [.. engine.DoLayout(rect, Substitute.For<IMonitor>())];
 
 		// Then the resulting window states will include the minimized window
 		Assert.Equal(2, result.Length);
@@ -627,9 +630,10 @@ public class ColumnLayoutEngineTests
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Up, leftWindow);
 
 		// Then
-		IWindowState[] windows = newEngine
-			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] windows =
+		[
+			.. newEngine.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>()),
+		];
 
 		Assert.Same(engine, newEngine);
 		Assert.Equal(2, windows.Length);
@@ -651,9 +655,10 @@ public class ColumnLayoutEngineTests
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, notFoundWindow);
 
 		// Then
-		IWindowState[] windows = newEngine
-			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] windows =
+		[
+			.. newEngine.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>()),
+		];
 
 		Assert.Same(engine, newEngine);
 		Assert.Equal(2, windows.Length);
@@ -675,9 +680,10 @@ public class ColumnLayoutEngineTests
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Right, leftWindow);
 
 		// Then
-		IWindowState[] windows = newEngine
-			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] windows =
+		[
+			.. newEngine.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>()),
+		];
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
@@ -699,9 +705,10 @@ public class ColumnLayoutEngineTests
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Right, rightWindow);
 
 		// Then
-		IWindowState[] windows = newEngine
-			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] windows =
+		[
+			.. newEngine.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>()),
+		];
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
@@ -723,9 +730,10 @@ public class ColumnLayoutEngineTests
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, rightWindow);
 
 		// Then
-		IWindowState[] windows = newEngine
-			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] windows =
+		[
+			.. newEngine.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>()),
+		];
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
@@ -747,9 +755,10 @@ public class ColumnLayoutEngineTests
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, leftWindow);
 
 		// Then
-		IWindowState[] windows = newEngine
-			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] windows =
+		[
+			.. newEngine.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>()),
+		];
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
@@ -773,9 +782,10 @@ public class ColumnLayoutEngineTests
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, leftWindow);
 
 		// Then
-		IWindowState[] windows = newEngine
-			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] windows =
+		[
+			.. newEngine.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>()),
+		];
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
@@ -799,9 +809,10 @@ public class ColumnLayoutEngineTests
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Left, rightWindow);
 
 		// Then
-		IWindowState[] windows = newEngine
-			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] windows =
+		[
+			.. newEngine.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>()),
+		];
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
@@ -825,9 +836,10 @@ public class ColumnLayoutEngineTests
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Right, rightWindow);
 
 		// Then
-		IWindowState[] windows = newEngine
-			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] windows =
+		[
+			.. newEngine.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>()),
+		];
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
@@ -851,9 +863,10 @@ public class ColumnLayoutEngineTests
 		ILayoutEngine newEngine = engine.SwapWindowInDirection(Direction.Right, leftWindow);
 
 		// Then
-		IWindowState[] windows = newEngine
-			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
-			.ToArray();
+		IWindowState[] windows =
+		[
+			.. newEngine.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>()),
+		];
 
 		Assert.Equal(2, windows.Length);
 		Assert.NotSame(engine, newEngine);
@@ -892,9 +905,10 @@ public class ColumnLayoutEngineTests
 
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, new Point<double>() { X = -10 });
-		List<IWindowState> windows = newEngine
-			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
-			.ToList();
+		List<IWindowState> windows =
+		[
+			.. newEngine.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>()),
+		];
 
 		// Then
 		Assert.NotSame(engine, newEngine);
@@ -909,9 +923,10 @@ public class ColumnLayoutEngineTests
 
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, new Point<double>() { X = 10 });
-		List<IWindowState> windows = newEngine
-			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
-			.ToList();
+		List<IWindowState> windows =
+		[
+			.. newEngine.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>()),
+		];
 
 		// Then
 		Assert.NotSame(engine, newEngine);
@@ -928,9 +943,10 @@ public class ColumnLayoutEngineTests
 
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, new Point<double>() { X = 0.5 });
-		List<IWindowState> windows = newEngine
-			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
-			.ToList();
+		List<IWindowState> windows =
+		[
+			.. newEngine.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>()),
+		];
 
 		// Then
 		Assert.NotSame(engine, newEngine);
@@ -947,9 +963,10 @@ public class ColumnLayoutEngineTests
 
 		// When
 		ILayoutEngine newEngine = engine.MoveWindowToPoint(window, new Point<double>() { X = 0.5 });
-		List<IWindowState> windows = newEngine
-			.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>())
-			.ToList();
+		List<IWindowState> windows =
+		[
+			.. newEngine.DoLayout(new Rectangle<int>() { Width = 1920, Height = 1080 }, Substitute.For<IMonitor>()),
+		];
 
 		// Then
 		Assert.NotSame(engine, newEngine);

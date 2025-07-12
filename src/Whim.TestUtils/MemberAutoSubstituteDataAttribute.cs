@@ -159,17 +159,17 @@ public abstract class BaseMemberAutoSubstituteDataAttribute : MemberDataAttribut
 	private Func<object?>? GetMethodAccessor(Type type)
 	{
 		MethodInfo? methodInfo = null;
-		Type?[] parameterTypes = Parameters == null ? [] : Parameters.Select(p => p?.GetType()).ToArray();
+		Type?[] parameterTypes = Parameters == null ? [] : [.. Parameters.Select(p => p?.GetType())];
 		for (
 			Type? reflectionType = type;
 			reflectionType != null;
 			reflectionType = reflectionType.GetTypeInfo().BaseType
 		)
 		{
-			MethodInfo[] runtimeMethodsWithGivenName = reflectionType
-				.GetRuntimeMethods()
-				.Where(m => m.Name == MemberName)
-				.ToArray();
+			MethodInfo[] runtimeMethodsWithGivenName =
+			[
+				.. reflectionType.GetRuntimeMethods().Where(m => m.Name == MemberName),
+			];
 			methodInfo = runtimeMethodsWithGivenName.FirstOrDefault(m =>
 				ParameterTypesCompatible(m.GetParameters(), parameterTypes)
 			);

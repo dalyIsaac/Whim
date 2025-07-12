@@ -99,7 +99,7 @@ public class MostRecentlyUsedMatcherTests
 		(MenuVariantRowModel[] items, MatcherResult<MenuVariantRowModelData>[] _) = CreateMocks(["A", "B"]);
 
 		// When
-		MatcherResult<MenuVariantRowModelData>[] rowItems = matcher.Match("", items).ToArray();
+		MatcherResult<MenuVariantRowModelData>[] rowItems = [.. matcher.Match("", items)];
 
 		// Then
 		Assert.Equal(2, rowItems.Length);

@@ -433,7 +433,7 @@ public class ProxyFloatingLayoutEngine_DoLayoutTests
 		sut = (ProxyFloatingLayoutEngine)sut.MinimizeWindowStart(window2);
 
 		// WHEN laying out the windows
-		IWindowState[] result = sut.DoLayout(new Rectangle<int>(0, 0, 100, 100), monitor).ToArray();
+		IWindowState[] result = [.. sut.DoLayout(new Rectangle<int>(0, 0, 100, 100), monitor)];
 
 		// THEN the windows should be laid out
 		Assert.Equal(3, result.Length);

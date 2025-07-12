@@ -209,10 +209,10 @@ public class YamlLoader_LoadWorkspacesTests
 		Assert.Equal(3, received.Length);
 
 		// Verify the monitor indices.
-		AddWorkspaceTransform[] transforms = received
-			.Select(c => c.GetArguments()[0])
-			.OfType<AddWorkspaceTransform>()
-			.ToArray();
+		AddWorkspaceTransform[] transforms =
+		[
+			.. received.Select(c => c.GetArguments()[0]).OfType<AddWorkspaceTransform>(),
+		];
 
 		transforms[0].MonitorIndices.Should().BeEquivalentTo([0, 1]);
 		transforms[1].MonitorIndices.Should().BeEquivalentTo([2]);
