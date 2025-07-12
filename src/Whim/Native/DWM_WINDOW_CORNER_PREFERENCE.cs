@@ -8,6 +8,7 @@ namespace Windows.Win32
 		///
 		/// For more, see https://docs.microsoft.com/en-au/windows/win32/api/dwmapi/ne-dwmapi-dwm_window_corner_preference
 		/// </summary>
+		[global::System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1707:Identifiers should not contain underscores", Justification = "Whim doesn't own this namespace.")]
 		public enum DWM_WINDOW_CORNER_PREFERENCE
 		{
 			/// <summary>

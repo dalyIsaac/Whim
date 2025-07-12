@@ -5,7 +5,7 @@ namespace Whim.TreeLayout;
 /// <summary>
 /// <see cref="TreeLayoutPlugin"/> provides commands and functionality for the <see cref="TreeLayoutEngine"/>.
 /// <see cref="TreeLayoutPlugin"/> does not load the <see cref="TreeLayoutEngine"/> - that is done when creating
-/// a workspace via <see cref="IWorkspaceManager.Add"/>.
+/// a workspace dispatching <see cref="AddWorkspaceTransform"/>.
 /// </summary>
 public interface ITreeLayoutPlugin : IPlugin
 {

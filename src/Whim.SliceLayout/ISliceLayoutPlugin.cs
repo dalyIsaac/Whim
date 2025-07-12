@@ -19,7 +19,7 @@ public enum WindowInsertionType
 /// <summary>
 /// <see cref="SliceLayoutPlugin"/> provides commands and functionality for the <see cref="SliceLayoutEngine"/>.
 /// <see cref="SliceLayoutPlugin"/> does not load the <see cref="SliceLayoutEngine"/> - that is done when creating
-/// a workspace via <see cref="IWorkspaceManager.Add"/>.
+/// a workspace via dispatching <see cref="AddWorkspaceTransform"/>.
 /// </summary>
 public interface ISliceLayoutPlugin : IPlugin
 {
@@ -52,7 +52,7 @@ public interface ISliceLayoutPlugin : IPlugin
 	/// Promotes the given window in the stack.
 	/// </summary>
 	/// <param name="window">
-	/// The window to promote. If <see langword="null"/>, then <see cref="IWorkspace.LastFocusedWindow"/>
+	/// The window to promote. If <see langword="null"/>, then it defaults to the last active window.
 	/// is used.
 	/// </param>
 	void PromoteWindowInStack(IWindow? window = null);
@@ -61,7 +61,7 @@ public interface ISliceLayoutPlugin : IPlugin
 	/// Demotes the given window in the stack.
 	/// </summary>
 	/// <param name="window">
-	/// The window to demote. If <see langword="null"/>, then <see cref="IWorkspace.LastFocusedWindow"/>
+	/// The window to demote. If <see langword="null"/>, then it defaults to the last active window.
 	/// is used.
 	/// </param>
 	void DemoteWindowInStack(IWindow? window = null);
@@ -70,7 +70,7 @@ public interface ISliceLayoutPlugin : IPlugin
 	/// Promotes the focus to the next slice with a lower order - see <see cref="SliceArea.Order"/>.
 	/// </summary>
 	/// <param name="window">
-	/// The current window. If <see langword="null"/>, then <see cref="IWorkspace.LastFocusedWindow"/>
+	/// The current window. If <see langword="null"/>, then it defaults to the last active window.
 	/// is used.
 	/// </param>
 	void PromoteFocusInStack(IWindow? window = null);
@@ -79,7 +79,7 @@ public interface ISliceLayoutPlugin : IPlugin
 	/// Demotes the focus to the next slice with a higher order - see <see cref="SliceArea.Order"/>.
 	/// </summary>
 	/// <param name="window">
-	/// The current window. If <see langword="null"/>, then <see cref="IWorkspace.LastFocusedWindow"/>
+	/// The current window. If <see langword="null"/>, then it defaults to the last active window.
 	/// is used.
 	/// </param>
 	void DemoteFocusInStack(IWindow? window = null);
