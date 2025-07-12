@@ -78,18 +78,25 @@ internal class WindowSector(IContext ctx, IInternalContext internalCtx)
 	/// <inheritdoc/>
 	protected virtual void Dispose(bool disposing)
 	{
-		if (!_disposedValue)
+		if (_disposedValue)
 		{
-			if (disposing)
-			{
-				// dispose managed state (managed objects)
-				_listener.Dispose();
-			}
-
-			// free unmanaged resources (unmanaged objects) and override finalizer
-			// set large fields to null
-			_disposedValue = true;
+			return;
 		}
+
+		if (disposing)
+		{
+			// dispose managed state (managed objects)
+			_listener.Dispose();
+
+			foreach (IWindow window in Windows.Values)
+			{
+				window.Restore();
+			}
+		}
+
+		// free unmanaged resources (unmanaged objects) and override finalizer
+		// set large fields to null
+		_disposedValue = true;
 	}
 
 	/// <inheritdoc/>

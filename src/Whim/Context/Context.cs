@@ -13,23 +13,11 @@ internal class Context : IContext
 {
 	private readonly InternalContext _internalContext;
 
-	[Obsolete("Use transforms and pickers to interact with the store instead")]
-	public IButler Butler { get; }
-
 	public IFileManager FileManager { get; }
 	public IResourceManager ResourceManager { get; }
 	public Logger Logger { get; }
 	public UncaughtExceptionHandling UncaughtExceptionHandling { get; set; } = UncaughtExceptionHandling.Log;
 	public INativeManager NativeManager { get; }
-
-	[Obsolete("Use transforms and pickers to interact with the store instead")]
-	public IWorkspaceManager WorkspaceManager { get; }
-
-	[Obsolete("Use transforms and pickers to interact with the store instead")]
-	public IWindowManager WindowManager { get; }
-
-	[Obsolete("Use transforms and pickers to interact with the store instead")]
-	public IMonitorManager MonitorManager { get; }
 
 	public IRouterManager RouterManager { get; }
 	public IFilterManager FilterManager { get; }
@@ -57,16 +45,12 @@ internal class Context : IContext
 		_internalContext = new InternalContext(this);
 
 		Store = new Store(this, _internalContext);
-		Butler = new Butler(this);
 
 		NativeManager = new NativeManager(this, _internalContext);
 
 		RouterManager = new RouterManager(this);
 		FilterManager = new FilterManager();
-		WindowManager = new WindowManager(this);
-		MonitorManager = new MonitorManager(this);
 
-		WorkspaceManager = new WorkspaceManager(this);
 		_commandManager = [];
 		PluginManager = new PluginManager(this, _commandManager);
 		KeybindManager = new KeybindManager(this);
@@ -107,12 +91,7 @@ internal class Context : IContext
 		PluginManager.PreInitialize();
 
 		NotificationManager.Initialize();
-		MonitorManager.Initialize();
-		WorkspaceManager.Initialize();
-		WindowManager.Initialize();
-
 		Store.Initialize();
-		Butler.Initialize();
 
 		PluginManager.PostInitialize();
 		_internalContext.PostInitialize();
@@ -146,10 +125,7 @@ internal class Context : IContext
 		Exiting?.Invoke(this, args);
 
 		PluginManager.Dispose();
-		WindowManager.Dispose();
-		MonitorManager.Dispose();
 		NotificationManager.Dispose();
-		Butler.Dispose();
 		Store.Dispose();
 		_internalContext.Dispose();
 

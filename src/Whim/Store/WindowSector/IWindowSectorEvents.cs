@@ -6,7 +6,7 @@ namespace Whim;
 public interface IWindowSectorEvents
 {
 	/// <summary>
-	/// Event for when a window is added by the <see cref="IWindowManager"/>.
+	/// Event for when a window is added by the <see cref="IWindowSector"/>.
 	/// </summary>
 	event EventHandler<WindowAddedEventArgs>? WindowAdded;
 

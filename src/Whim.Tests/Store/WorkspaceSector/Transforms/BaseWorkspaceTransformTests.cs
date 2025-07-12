@@ -24,7 +24,7 @@ public class BaseWorkspaceTransformTests
 			IInternalContext internalCtx,
 			MutableRootSector rootSector,
 			Workspace workspace
-		) => workspace with { BackingName = "bob" };
+		) => workspace with { Name = "bob" };
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]

@@ -11,7 +11,7 @@ public class SetWorkspaceNameTransformTests
 		// Given the new name is the same as the old name
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
-			BackingName = "test",
+			Name = "test",
 		};
 		AddWorkspaceToManager(ctx, root, workspace);
 
@@ -32,7 +32,7 @@ public class SetWorkspaceNameTransformTests
 		// Given the new name is different from the old name
 		Workspace workspace = CreateWorkspace(ctx) with
 		{
-			BackingName = "test",
+			Name = "test",
 		};
 		AddWorkspaceToManager(ctx, root, workspace);
 
@@ -45,6 +45,6 @@ public class SetWorkspaceNameTransformTests
 		Assert.True(result.IsSuccessful);
 		Assert.True(result.Value);
 		Assert.NotSame(workspace, root.WorkspaceSector.Workspaces[workspace.Id]);
-		Assert.Equal("test2", root.WorkspaceSector.Workspaces[workspace.Id].BackingName);
+		Assert.Equal("test2", root.WorkspaceSector.Workspaces[workspace.Id].Name);
 	}
 }

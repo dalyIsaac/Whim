@@ -13,15 +13,15 @@ public class WorkspacePickersTests
 			root,
 			CreateWorkspace(ctx) with
 			{
-				BackingName = "Test",
+				Name = "Test",
 			},
 			CreateWorkspace(ctx) with
 			{
-				BackingName = "Test2",
+				Name = "Test2",
 			},
 			CreateWorkspace(ctx) with
 			{
-				BackingName = "Test3",
+				Name = "Test3",
 			}
 		);
 	}

@@ -111,7 +111,7 @@ public class CoreSavedStateManagerTests
 
 		// Create two workspaces with two windows each
 		ILayoutEngine engine1 = Substitute.For<ILayoutEngine>();
-		Workspace workspace1 = CreateWorkspace(ctx) with { BackingName = "workspace1", LayoutEngines = [engine1] };
+		Workspace workspace1 = CreateWorkspace(ctx) with { Name = "workspace1", LayoutEngines = [engine1] };
 		engine1
 			.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
 			.Returns(
@@ -133,7 +133,7 @@ public class CoreSavedStateManagerTests
 			);
 
 		ILayoutEngine engine2 = Substitute.For<ILayoutEngine>();
-		Workspace workspace2 = CreateWorkspace(ctx) with { BackingName = "workspace2", LayoutEngines = [engine2] };
+		Workspace workspace2 = CreateWorkspace(ctx) with { Name = "workspace2", LayoutEngines = [engine2] };
 		engine2
 			.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
 			.Returns(

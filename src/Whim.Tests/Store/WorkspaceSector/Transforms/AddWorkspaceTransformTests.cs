@@ -173,7 +173,7 @@ public class AddWorkspaceTransformTests_Initialized
 
 		Assert.Empty(root.WorkspaceSector.WorkspacesToCreate);
 
-		Assert.Equal(name, workspace.BackingName);
+		Assert.Equal(name, workspace.Name);
 		Assert.Equal(layoutEngineCount, workspace.LayoutEngines.Count);
 
 		// We actually create the proxy layout engines.
@@ -210,7 +210,7 @@ public class AddWorkspaceTransformTests_Initialized
 			Assert.Equal(workspaceId, args.Workspace.Id);
 		}
 
-		Assert.Equal(name, args.Workspace.BackingName);
+		Assert.Equal(name, args.Workspace.Name);
 		Assert.Equal(layoutEngineCount, args.Workspace.LayoutEngines.Count);
 
 		for (int idx = 0; idx < layoutEngineCount; idx++)

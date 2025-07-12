@@ -31,15 +31,7 @@ public class RemoveWorkspaceTransformTests
 	)
 	{
 		// Given there are no matching workspaces
-		PopulateMonitorWorkspaceMap(
-			ctx,
-			root,
-			CreateMonitor((HMONITOR)1),
-			CreateWorkspace(ctx) with
-			{
-				BackingName = "Test",
-			}
-		);
+		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), CreateWorkspace(ctx) with { Name = "Test" });
 		AddWorkspacesToManager(ctx, root, providedWorkspace);
 
 		// When we execute the transform
@@ -57,15 +49,7 @@ public class RemoveWorkspaceTransformTests
 	)
 	{
 		// Given there is a matching workspace
-		PopulateMonitorWorkspaceMap(
-			ctx,
-			root,
-			CreateMonitor((HMONITOR)1),
-			CreateWorkspace(ctx) with
-			{
-				BackingName = "Test",
-			}
-		);
+		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), CreateWorkspace(ctx) with { Name = "Test" });
 		AddWorkspacesToManager(ctx, root, providedWorkspace);
 
 		// When we execute the transform
@@ -137,7 +121,7 @@ public class RemoveWorkspaceTransformTests
 	internal void ByName_Success(IContext ctx, MutableRootSector root)
 	{
 		string name = "Test";
-		Success(new RemoveWorkspaceByNameTransform(name), CreateWorkspace(ctx) with { BackingName = name }, ctx, root);
+		Success(new RemoveWorkspaceByNameTransform(name), CreateWorkspace(ctx) with { Name = name }, ctx, root);
 	}
 	#endregion
 }

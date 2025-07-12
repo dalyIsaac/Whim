@@ -39,7 +39,7 @@ public class WorkspaceModelTests
 		// Given
 		Workspace workspace = StoreTestUtils.CreateWorkspace(ctx) with
 		{
-			BackingName = "This is the workspace name",
+			Name = "This is the workspace name",
 		};
 		StoreTestUtils.AddWorkspaceToManager(ctx, root, workspace);
 
@@ -47,7 +47,7 @@ public class WorkspaceModelTests
 		WorkspaceModel model = CreateSut(ctx, viewModel, workspace, true);
 
 		// Then
-		Assert.Equal(model.Name, workspace.BackingName);
+		Assert.Equal(model.Name, workspace.Name);
 		Assert.PropertyChanged(
 			model,
 			nameof(model.Name),

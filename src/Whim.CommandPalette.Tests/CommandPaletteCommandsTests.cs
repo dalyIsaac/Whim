@@ -44,8 +44,8 @@ public class CommandPaletteCommandsTests
 		ICommandPalettePlugin plugin
 	)
 	{
-		Workspace activeWorkspace = StoreTestUtils.CreateWorkspace(ctx) with { BackingName = "Workspace" };
-		Workspace otherWorkspace = StoreTestUtils.CreateWorkspace(ctx) with { BackingName = "Other workspace" };
+		Workspace activeWorkspace = StoreTestUtils.CreateWorkspace(ctx) with { Name = "Workspace" };
+		Workspace otherWorkspace = StoreTestUtils.CreateWorkspace(ctx) with { Name = "Other workspace" };
 
 		// Create windows for the workspaces.
 		IWindow[] windows = new IWindow[3];

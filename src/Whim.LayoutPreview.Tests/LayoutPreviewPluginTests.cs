@@ -176,11 +176,7 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Theory, AutoSubstituteData<Customization>]
-	internal void WindowMoved_Dragged_CannotFindWorkspace(
-		IContext ctx,
-		MutableRootSector rootSector,
-		Workspace workspace
-	)
+	internal void WindowMoved_Dragged_CannotFindWorkspace(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -192,15 +188,12 @@ public class LayoutPreviewPluginTests
 		};
 		rootSector.MapSector.MonitorWorkspaceMap = rootSector.MapSector.MonitorWorkspaceMap.Clear();
 
-		workspace.ActiveLayoutEngine.ClearReceivedCalls();
-
 		// When
 		plugin.PreInitialize();
 		rootSector.WindowSector.QueueEvent(e);
 		rootSector.DispatchEvents();
 
 		// Then
-		Assert.Empty(workspace.ActiveLayoutEngine.ReceivedCalls());
 		Assert.Null(plugin.DraggedWindow);
 	}
 
@@ -238,12 +231,7 @@ public class LayoutPreviewPluginTests
 	}
 
 	[Theory, AutoSubstituteData<Customization>]
-	internal void WindowMoved_Dragged_Success(
-		IContext ctx,
-		MutableRootSector rootSector,
-		IWindow window,
-		Workspace workspace
-	)
+	internal void WindowMoved_Dragged_Success(IContext ctx, MutableRootSector rootSector, IWindow window)
 	{
 		// Given
 		using LayoutPreviewPlugin plugin = new(ctx);
@@ -254,8 +242,6 @@ public class LayoutPreviewPluginTests
 			MovedEdges = null,
 		};
 
-		workspace.ActiveLayoutEngine.ClearReceivedCalls();
-
 		rootSector.WindowSector.QueueEvent(e);
 
 		// When
@@ -263,7 +249,6 @@ public class LayoutPreviewPluginTests
 		rootSector.DispatchEvents();
 
 		// Then
-		Assert.Single(workspace.ActiveLayoutEngine.ReceivedCalls());
 		Assert.Equal(window, plugin.DraggedWindow);
 	}
 	#endregion

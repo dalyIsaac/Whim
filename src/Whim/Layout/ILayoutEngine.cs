@@ -110,7 +110,7 @@ public interface ILayoutEngine
 	/// <summary>
 	/// Focuses the <paramref name="window"/> in the <paramref name="direction"/>.
 	/// It's recommended that this method is not called directly, but rather
-	/// through the <see cref="IWorkspace.FocusWindowInDirection"/> method.
+	/// through dispatching <see cref="FocusWindowInDirectionTransform"/>.
 	/// </summary>
 	/// <param name="direction">The direction to focus in.</param>
 	/// <param name="window">The origin window</param>
@@ -119,7 +119,7 @@ public interface ILayoutEngine
 	/// <summary>
 	/// Swaps the <paramref name="window"/> in the <paramref name="direction"/>.
 	/// It's recommended that this method is not called directly, but rather
-	/// through <see cref="IWorkspace.SwapWindowInDirection"/>.
+	/// through duspatching <see cref="SwapWindowInDirectionTransform"/>.
 	/// </summary>
 	/// <param name="direction">The direction to swap the window in.</param>
 	/// <param name="window">The window to swap.</param>
