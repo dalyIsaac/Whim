@@ -8,7 +8,7 @@ public class WorkspacePickersTests
 {
 	private static void CreateNamedWorkspaces(IContext ctx, MutableRootSector root)
 	{
-		AddWorkspacesToManager(
+		AddWorkspacesToStore(
 			ctx,
 			root,
 			CreateWorkspace(ctx) with
@@ -101,7 +101,7 @@ public class WorkspacePickersTests
 	internal void PickActiveWorkspace(IContext ctx, MutableRootSector root)
 	{
 		// Given the workspaces
-		AddWorkspacesToManager(ctx, root, CreateWorkspace(ctx), CreateWorkspace(ctx));
+		AddWorkspacesToStore(ctx, root, CreateWorkspace(ctx), CreateWorkspace(ctx));
 
 		Workspace activeWorkspace = CreateWorkspace(ctx);
 		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), activeWorkspace);
@@ -117,7 +117,7 @@ public class WorkspacePickersTests
 	internal void PickActiveWorkspaceId(IContext ctx, MutableRootSector root)
 	{
 		// Given the workspaces
-		AddWorkspacesToManager(ctx, root, CreateWorkspace(ctx), CreateWorkspace(ctx));
+		AddWorkspacesToStore(ctx, root, CreateWorkspace(ctx), CreateWorkspace(ctx));
 
 		Workspace activeWorkspace = CreateWorkspace(ctx);
 		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), activeWorkspace);
@@ -138,7 +138,7 @@ public class WorkspacePickersTests
 	)
 	{
 		// Given the workspaces
-		AddWorkspacesToManager(ctx, root, CreateWorkspace(ctx), CreateWorkspace(ctx));
+		AddWorkspacesToStore(ctx, root, CreateWorkspace(ctx), CreateWorkspace(ctx));
 
 		Workspace activeWorkspace = CreateWorkspace(ctx) with
 		{

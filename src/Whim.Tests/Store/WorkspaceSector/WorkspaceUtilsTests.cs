@@ -11,7 +11,7 @@ public class WorkspaceUtilsTests
 		// Given the workspace id is default
 		Guid workspaceId = default;
 		Guid activeWorkspaceId = Guid.NewGuid();
-		AddActiveWorkspace(ctx, root, CreateWorkspace(ctx) with { Id = activeWorkspaceId });
+		AddActiveWorkspaceToStore(ctx, root, CreateWorkspace(ctx) with { Id = activeWorkspaceId });
 
 		// When
 		Guid result = WorkspaceUtils.OrActiveWorkspace(workspaceId, ctx);
@@ -26,7 +26,7 @@ public class WorkspaceUtilsTests
 		// Given the workspace id is not default
 		Guid workspaceId = Guid.NewGuid();
 		Guid activeWorkspaceId = Guid.NewGuid();
-		AddActiveWorkspace(ctx, root, CreateWorkspace(ctx) with { Id = activeWorkspaceId });
+		AddActiveWorkspaceToStore(ctx, root, CreateWorkspace(ctx) with { Id = activeWorkspaceId });
 
 		// When
 		Guid result = WorkspaceUtils.OrActiveWorkspace(workspaceId, ctx);

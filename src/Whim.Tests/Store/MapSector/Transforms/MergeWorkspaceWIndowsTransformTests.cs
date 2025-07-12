@@ -28,7 +28,7 @@ public class MergeWorkspaceWindowsTransformTests
 		Workspace workspace = CreateWorkspace(ctx);
 		Guid targetWorkspaceId = Guid.NewGuid();
 
-		AddWorkspacesToManager(ctx, rootSector, workspace);
+		AddWorkspacesToStore(ctx, rootSector, workspace);
 
 		MergeWorkspaceWindowsTransform sut = new(workspace.Id, targetWorkspaceId);
 
@@ -57,7 +57,7 @@ public class MergeWorkspaceWindowsTransformTests
 		sourceWorkspace = PopulateWindowWorkspaceMap(ctx, rootSector, window2, sourceWorkspace);
 		sourceWorkspace = PopulateWindowWorkspaceMap(ctx, rootSector, window3, sourceWorkspace);
 
-		AddWorkspaceToManager(ctx, rootSector, targetWorkspace);
+		AddWorkspaceToStore(ctx, rootSector, targetWorkspace);
 
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, sourceWorkspace);
 

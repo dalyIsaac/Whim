@@ -45,7 +45,7 @@ public class SwapWorkspaceWithAdjacentMonitorTransformTests
 		Workspace workspace1 = CreateWorkspace(ctx);
 
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor1, workspace1);
-		AddMonitorsToManager(ctx, rootSector, monitor2);
+		AddMonitorsToSector(ctx, rootSector, monitor2);
 
 		SwapWorkspaceWithAdjacentMonitorTransform sut = new(workspace1.Id);
 

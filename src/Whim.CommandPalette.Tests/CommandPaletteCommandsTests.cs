@@ -62,7 +62,7 @@ public class CommandPaletteCommandsTests
 		activeWorkspace = PopulateWindowWorkspaceMap(ctx, root, windows[1], activeWorkspace);
 		otherWorkspace = PopulateWindowWorkspaceMap(ctx, root, windows[2], otherWorkspace);
 
-		AddActiveWorkspace(ctx, root, activeWorkspace);
+		AddActiveWorkspaceToStore(ctx, root, activeWorkspace);
 
 		return new WorkspaceWindowState(activeWorkspace, otherWorkspace, windows);
 	}

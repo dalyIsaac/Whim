@@ -16,7 +16,7 @@ public class WorkspaceWidgetViewModelTests
 		Workspace workspace1 = StoreTestUtils.CreateWorkspace(ctx);
 		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
 
-		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2);
+		StoreTestUtils.AddWorkspacesToStore(ctx, root, workspace1, workspace2);
 		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace2);
 
 		// When
@@ -38,13 +38,13 @@ public class WorkspaceWidgetViewModelTests
 		Workspace workspace1 = StoreTestUtils.CreateWorkspace(ctx);
 		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
 
-		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2);
+		StoreTestUtils.AddWorkspacesToStore(ctx, root, workspace1, workspace2);
 		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace2);
 
 		WorkspaceWidgetViewModel sut = new(ctx, monitor);
 
 		Workspace workspace3 = StoreTestUtils.CreateWorkspace(ctx);
-		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace3);
+		StoreTestUtils.AddWorkspacesToStore(ctx, root, workspace3);
 
 		// When
 		root.WorkspaceSector.QueueEvent(new WorkspaceAddedEventArgs() { Workspace = workspace3 });
@@ -69,7 +69,7 @@ public class WorkspaceWidgetViewModelTests
 		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
 		Workspace workspace3 = StoreTestUtils.CreateWorkspace(ctx);
 
-		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2, workspace3);
+		StoreTestUtils.AddWorkspacesToStore(ctx, root, workspace1, workspace2, workspace3);
 		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace2);
 
 		WorkspaceWidgetViewModel sut = new(ctx, monitor);
@@ -96,7 +96,7 @@ public class WorkspaceWidgetViewModelTests
 		Workspace workspace1 = StoreTestUtils.CreateWorkspace(ctx);
 		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
 
-		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2);
+		StoreTestUtils.AddWorkspacesToStore(ctx, root, workspace1, workspace2);
 		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor1, workspace1);
 		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor2, workspace2);
 
@@ -124,7 +124,7 @@ public class WorkspaceWidgetViewModelTests
 		Workspace workspace1 = StoreTestUtils.CreateWorkspace(ctx);
 		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
 
-		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2);
+		StoreTestUtils.AddWorkspacesToStore(ctx, root, workspace1, workspace2);
 		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace1);
 
 		WorkspaceWidgetViewModel sut = new(ctx, monitor);
@@ -152,7 +152,7 @@ public class WorkspaceWidgetViewModelTests
 		Workspace workspace1 = StoreTestUtils.CreateWorkspace(ctx);
 		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
 
-		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2);
+		StoreTestUtils.AddWorkspacesToStore(ctx, root, workspace1, workspace2);
 		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor1, workspace1);
 		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor2, workspace2);
 
@@ -181,7 +181,7 @@ public class WorkspaceWidgetViewModelTests
 		Workspace workspace1 = StoreTestUtils.CreateWorkspace(ctx);
 		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
 
-		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2);
+		StoreTestUtils.AddWorkspacesToStore(ctx, root, workspace1, workspace2);
 		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace1);
 
 		WorkspaceWidgetViewModel sut = new(ctx, monitor);

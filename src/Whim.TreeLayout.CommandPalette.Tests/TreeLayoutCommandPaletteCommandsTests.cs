@@ -19,7 +19,7 @@ public class TreeLayoutCommandPaletteCommandsTests
 
 			IMonitor monitor = CreateMonitor((HMONITOR)1234);
 			fixture.Inject(monitor);
-			AddMonitorsToManager(_ctx, root, monitor);
+			AddMonitorsToSector(_ctx, root, monitor);
 
 			IPlugin treeLayoutCommandPalettePlugin = fixture.Freeze<IPlugin>();
 			treeLayoutCommandPalettePlugin.Name.Returns("whim.tree_layout.command_palette");

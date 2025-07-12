@@ -12,7 +12,7 @@ public class AddWindowToWorkspaceTransformTests
 		Workspace workspace = CreateWorkspace(ctx);
 		workspace = workspace with { LayoutEngines = [engine] };
 
-		AddWorkspaceToManager(ctx, root, workspace);
+		AddWorkspaceToStore(ctx, root, workspace);
 
 		AddWindowToWorkspaceTransform transform = new(workspace.Id, CreateWindow((HWND)1));
 

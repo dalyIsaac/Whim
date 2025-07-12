@@ -48,7 +48,7 @@ public class BaseWorkspaceTransformTests
 	)
 	{
 		// Given the workspace doesn't exist, but there is an active workspace
-		AddActiveWorkspace(ctx, root, CreateWorkspace(ctx));
+		AddActiveWorkspaceToStore(ctx, root, CreateWorkspace(ctx));
 		SuccessfulWorkspaceTransform sut = new(default);
 
 		// When we execute the transform (outside of the store)
@@ -63,7 +63,7 @@ public class BaseWorkspaceTransformTests
 	{
 		// Given the operation fails
 		Workspace workspace = CreateWorkspace(ctx);
-		AddWorkspaceToManager(ctx, root, workspace);
+		AddWorkspaceToStore(ctx, root, workspace);
 
 		FailedWorkspaceTransform sut = new(workspace.Id);
 
@@ -90,7 +90,7 @@ public class BaseWorkspaceTransformTests
 	{
 		// Given the operation succeeds, but the returned workspace is the same
 		Workspace workspace = CreateWorkspace(ctx);
-		AddWorkspaceToManager(ctx, root, workspace);
+		AddWorkspaceToStore(ctx, root, workspace);
 
 		SameWorkspaceTransform sut = new(workspace.Id);
 
@@ -108,7 +108,7 @@ public class BaseWorkspaceTransformTests
 	{
 		// Given the operation succeeds and the returned workspace is the same
 		Workspace workspace = CreateWorkspace(ctx);
-		AddWorkspaceToManager(ctx, root, workspace);
+		AddWorkspaceToStore(ctx, root, workspace);
 
 		SuccessfulWorkspaceTransform sut = new(workspace.Id, true);
 
@@ -126,7 +126,7 @@ public class BaseWorkspaceTransformTests
 	{
 		// Given the operation succeeds and the returned workspace is the same
 		Workspace workspace = CreateWorkspace(ctx);
-		AddWorkspaceToManager(ctx, root, workspace);
+		AddWorkspaceToStore(ctx, root, workspace);
 
 		SuccessfulWorkspaceTransform sut = new(workspace.Id, false);
 

@@ -37,7 +37,7 @@ public class LayoutEngineCustomActionTransformTests
 				CreateLayoutEngineNotSupportingAction<IWindow?>(),
 			],
 		};
-		AddWorkspaceToManager(ctx, rootSector, workspace);
+		AddWorkspaceToStore(ctx, rootSector, workspace);
 
 		// When the action is performed
 		var result = ctx.Store.Dispatch(sut);
@@ -64,7 +64,7 @@ public class LayoutEngineCustomActionTransformTests
 				CreateLayoutEngineSupportingAction<IWindow?>(),
 			],
 		};
-		AddWorkspaceToManager(ctx, root, workspace);
+		AddWorkspaceToStore(ctx, root, workspace);
 
 		// When the action is performed
 		var result = ctx.Store.Dispatch(sut);

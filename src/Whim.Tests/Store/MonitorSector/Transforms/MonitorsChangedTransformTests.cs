@@ -72,7 +72,7 @@ public class MonitorsChangedTransformTests
 		Workspace workspace1 = CreateWorkspace(ctx);
 		Workspace workspace2 = CreateWorkspace(ctx);
 		Workspace workspace3 = CreateWorkspace(ctx);
-		AddWorkspacesToManager(ctx, rootSector, workspace1, workspace2, workspace3);
+		AddWorkspacesToStore(ctx, rootSector, workspace1, workspace2, workspace3);
 		rootSector.WorkspaceSector.HasInitialized = true;
 		return [workspace1, workspace2, workspace3];
 	}
@@ -94,7 +94,7 @@ public class MonitorsChangedTransformTests
 				t => t is AddWorkspaceTransform,
 				t =>
 				{
-					AddWorkspaceToManager(ctx, rootSector, workspace1);
+					AddWorkspaceToStore(ctx, rootSector, workspace1);
 					return workspace1.Id;
 				}
 			)
@@ -102,7 +102,7 @@ public class MonitorsChangedTransformTests
 				t => t is AddWorkspaceTransform,
 				t =>
 				{
-					AddWorkspaceToManager(ctx, rootSector, workspace2);
+					AddWorkspaceToStore(ctx, rootSector, workspace2);
 					return workspace2.Id;
 				}
 			)
@@ -110,7 +110,7 @@ public class MonitorsChangedTransformTests
 				t => t is AddWorkspaceTransform,
 				t =>
 				{
-					AddWorkspaceToManager(ctx, rootSector, workspace3);
+					AddWorkspaceToStore(ctx, rootSector, workspace3);
 					return workspace3.Id;
 				}
 			);

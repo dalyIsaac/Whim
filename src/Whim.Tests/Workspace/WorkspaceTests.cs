@@ -10,7 +10,7 @@ public class WorkspaceTests
 		{
 			Name = "Bob",
 		};
-		AddWorkspaceToManager(ctx, root, workspace);
+		AddWorkspaceToStore(ctx, root, workspace);
 
 		// When
 		string name = workspace.Name;

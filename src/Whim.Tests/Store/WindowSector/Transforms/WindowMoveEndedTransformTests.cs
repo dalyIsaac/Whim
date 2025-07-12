@@ -17,7 +17,7 @@ public class WindowMoveEndedTransformTests
 		};
 
 		PopulateWindowWorkspaceMap(ctx, rootSector, window, workspace);
-		AddActiveWorkspace(ctx, rootSector, workspace);
+		AddActiveWorkspaceToStore(ctx, rootSector, workspace);
 
 		ctx.NativeManager.DwmGetWindowRectangle(Arg.Any<HWND>()).Returns(newRect);
 	}

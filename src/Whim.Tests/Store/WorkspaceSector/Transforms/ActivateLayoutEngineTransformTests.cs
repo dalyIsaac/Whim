@@ -18,7 +18,7 @@ public class SetLayoutEngineFromIndexTransformTests
 		{
 			LayoutEngines = [engine, engine2],
 		};
-		AddWorkspaceToManager(ctx, rootSector, workspace);
+		AddWorkspaceToStore(ctx, rootSector, workspace);
 
 		SetLayoutEngineFromIndexTransform transform = new(workspace.Id, 1);
 
@@ -42,7 +42,7 @@ public class SetLayoutEngineFromIndexTransformTests
 		{
 			LayoutEngines = [engine, engine2],
 		};
-		AddWorkspaceToManager(ctx, rootSector, workspace);
+		AddWorkspaceToStore(ctx, rootSector, workspace);
 
 		SetLayoutEngineFromIndexTransform transform = new(workspace.Id, 2);
 
@@ -71,7 +71,7 @@ public class ActivatePreviouslyActiveLayoutEngineTransformTests
 			LayoutEngines = [engine, engine2],
 			PreviousLayoutEngineIndex = 1,
 		};
-		AddWorkspaceToManager(ctx, rootSector, workspace);
+		AddWorkspaceToStore(ctx, rootSector, workspace);
 
 		ActivatePreviouslyActiveLayoutEngineTransform sut = new(workspace.Id);
 
@@ -96,7 +96,7 @@ public class ActivatePreviouslyActiveLayoutEngineTransformTests
 			LayoutEngines = [engine, engine2],
 			PreviousLayoutEngineIndex = 10,
 		};
-		AddWorkspaceToManager(ctx, rootSector, workspace);
+		AddWorkspaceToStore(ctx, rootSector, workspace);
 
 		ActivatePreviouslyActiveLayoutEngineTransform transform = new(workspace.Id);
 
@@ -125,7 +125,7 @@ public class SetLayoutEngineFromNameTransformTests
 
 		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [engine, engine2] };
 
-		AddWorkspaceToManager(ctx, rootSector, workspace);
+		AddWorkspaceToStore(ctx, rootSector, workspace);
 
 		SetLayoutEngineFromNameTransform transform = new(workspace.Id, "Engine 1");
 
@@ -150,7 +150,7 @@ public class SetLayoutEngineFromNameTransformTests
 
 		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [engine, engine2] };
 
-		AddWorkspaceToManager(ctx, rootSector, workspace);
+		AddWorkspaceToStore(ctx, rootSector, workspace);
 
 		SetLayoutEngineFromNameTransform transform = new(workspace.Id, "Engine 3");
 

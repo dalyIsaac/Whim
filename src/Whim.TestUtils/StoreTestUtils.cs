@@ -55,7 +55,7 @@ internal static class StoreTestUtils
 		return window;
 	}
 
-	public static void AddWorkspaceToManager(IContext ctx, MutableRootSector rootSector, Workspace workspace)
+	public static void AddWorkspaceToStore(IContext ctx, MutableRootSector rootSector, Workspace workspace)
 	{
 		WorkspaceSector workspaceSector = rootSector.WorkspaceSector;
 
@@ -68,7 +68,7 @@ internal static class StoreTestUtils
 		}
 	}
 
-	public static void AddWorkspacesToManager(
+	public static void AddWorkspacesToStore(
 		IContext ctx,
 		MutableRootSector rootSector,
 		params Workspace[] newWorkspaces
@@ -78,7 +78,7 @@ internal static class StoreTestUtils
 		{
 			if (!rootSector.WorkspaceSector.Workspaces.ContainsKey(workspace.Id))
 			{
-				AddWorkspaceToManager(ctx, rootSector, workspace);
+				AddWorkspaceToStore(ctx, rootSector, workspace);
 			}
 		}
 	}
@@ -90,9 +90,9 @@ internal static class StoreTestUtils
 	/// <param name="ctx"></param>
 	/// <param name="root"></param>
 	/// <param name="workspace"></param>
-	public static void AddActiveWorkspace(IContext ctx, MutableRootSector root, Workspace workspace)
+	public static void AddActiveWorkspaceToStore(IContext ctx, MutableRootSector root, Workspace workspace)
 	{
-		AddWorkspaceToManager(ctx, root, workspace);
+		AddWorkspaceToStore(ctx, root, workspace);
 		if (root.MonitorSector.Monitors.Length == 0)
 		{
 			PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor(), workspace);
@@ -103,7 +103,7 @@ internal static class StoreTestUtils
 		}
 	}
 
-	public static void AddMonitorsToManager(IContext ctx, MutableRootSector rootSector, params IMonitor[] newMonitors)
+	public static void AddMonitorsToSector(IContext ctx, MutableRootSector rootSector, params IMonitor[] newMonitors)
 	{
 		List<IMonitor> monitors = [.. rootSector.MonitorSector.Monitors];
 		monitors.AddRange(newMonitors);
@@ -133,7 +133,7 @@ internal static class StoreTestUtils
 			workspace.Id
 		);
 		AddWindowToSector(rootSector, window);
-		AddWorkspaceToManager(ctx, rootSector, workspace);
+		AddWorkspaceToStore(ctx, rootSector, workspace);
 
 		if (!workspace.WindowPositions.ContainsKey(window.Handle))
 		{
@@ -185,7 +185,7 @@ internal static class StoreTestUtils
 			rootSector.MonitorSector.ActiveMonitorHandle = monitor.Handle;
 		}
 
-		AddWorkspaceToManager(ctx, rootSector, workspace);
+		AddWorkspaceToStore(ctx, rootSector, workspace);
 	}
 
 	public static Workspace PopulateThreeWayMap(
@@ -198,7 +198,7 @@ internal static class StoreTestUtils
 	{
 		workspace = PopulateWindowWorkspaceMap(ctx, rootSector, window, workspace);
 		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, workspace);
-		AddWorkspaceToManager(ctx, rootSector, workspace);
+		AddWorkspaceToStore(ctx, rootSector, workspace);
 		return workspace;
 	}
 
@@ -232,6 +232,6 @@ internal static class StoreTestUtils
 				return default;
 			});
 
-		AddMonitorsToManager(ctx, rootSector, monitor);
+		AddMonitorsToSector(ctx, rootSector, monitor);
 	}
 }

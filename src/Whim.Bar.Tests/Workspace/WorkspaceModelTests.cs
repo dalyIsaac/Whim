@@ -41,7 +41,7 @@ public class WorkspaceModelTests
 		{
 			Name = "This is the workspace name",
 		};
-		StoreTestUtils.AddWorkspaceToManager(ctx, root, workspace);
+		StoreTestUtils.AddWorkspaceToStore(ctx, root, workspace);
 
 		// When
 		WorkspaceModel model = CreateSut(ctx, viewModel, workspace, true);

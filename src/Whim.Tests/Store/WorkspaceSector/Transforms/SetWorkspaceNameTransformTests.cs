@@ -13,7 +13,7 @@ public class SetWorkspaceNameTransformTests
 		{
 			Name = "test",
 		};
-		AddWorkspaceToManager(ctx, root, workspace);
+		AddWorkspaceToStore(ctx, root, workspace);
 
 		SetWorkspaceNameTransform sut = new(workspace.Id, "test");
 
@@ -34,7 +34,7 @@ public class SetWorkspaceNameTransformTests
 		{
 			Name = "test",
 		};
-		AddWorkspaceToManager(ctx, root, workspace);
+		AddWorkspaceToStore(ctx, root, workspace);
 
 		SetWorkspaceNameTransform sut = new(workspace.Id, "test2");
 

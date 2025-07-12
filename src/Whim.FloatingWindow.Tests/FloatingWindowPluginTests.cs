@@ -122,7 +122,7 @@ public class FloatingWindowPlugin_MarkWindowAsFloatingTests
 	{
 		// Given
 		FloatingWindowPlugin plugin = new(context);
-		StoreTestUtils.AddActiveWorkspace(context, root, StoreTestUtils.CreateWorkspace(context));
+		StoreTestUtils.AddActiveWorkspaceToStore(context, root, StoreTestUtils.CreateWorkspace(context));
 
 		// When
 		plugin.MarkWindowAsFloating();
@@ -183,7 +183,7 @@ public class FloatingWindowPlugin_MarkWindowAsDockedTests
 	{
 		// Given
 		FloatingWindowPlugin plugin = new(context);
-		StoreTestUtils.AddActiveWorkspace(context, root, StoreTestUtils.CreateWorkspace(context));
+		StoreTestUtils.AddActiveWorkspaceToStore(context, root, StoreTestUtils.CreateWorkspace(context));
 
 		// When
 		plugin.MarkWindowAsDocked();
@@ -240,7 +240,7 @@ public class FloatingWindowPlugin_ToggleWindowFloatingTests
 	{
 		// Given
 		FloatingWindowPlugin plugin = new(context);
-		StoreTestUtils.AddActiveWorkspace(context, root, StoreTestUtils.CreateWorkspace(context));
+		StoreTestUtils.AddActiveWorkspaceToStore(context, root, StoreTestUtils.CreateWorkspace(context));
 
 		// When
 		plugin.ToggleWindowFloating();

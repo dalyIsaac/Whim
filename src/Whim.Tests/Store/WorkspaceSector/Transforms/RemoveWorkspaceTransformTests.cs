@@ -32,7 +32,7 @@ public class RemoveWorkspaceTransformTests
 	{
 		// Given there are no matching workspaces
 		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), CreateWorkspace(ctx) with { Name = "Test" });
-		AddWorkspacesToManager(ctx, root, providedWorkspace);
+		AddWorkspacesToStore(ctx, root, providedWorkspace);
 
 		// When we execute the transform
 		Result<Unit> result = ctx.Store.Dispatch(sut);
@@ -50,7 +50,7 @@ public class RemoveWorkspaceTransformTests
 	{
 		// Given there is a matching workspace
 		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), CreateWorkspace(ctx) with { Name = "Test" });
-		AddWorkspacesToManager(ctx, root, providedWorkspace);
+		AddWorkspacesToStore(ctx, root, providedWorkspace);
 
 		// When we execute the transform
 		Result<Unit>? result = null;

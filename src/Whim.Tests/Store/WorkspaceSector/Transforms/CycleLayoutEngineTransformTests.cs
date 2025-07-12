@@ -29,7 +29,7 @@ public class CycleLayoutEngineTransformTests
 			LayoutEngines = [engine1, engine2, engine3],
 			ActiveLayoutEngineIndex = startIdx,
 		};
-		AddWorkspaceToManager(ctx, rootSector, workspace);
+		AddWorkspaceToStore(ctx, rootSector, workspace);
 
 		CycleLayoutEngineTransform sut = new(workspace.Id, reverse);
 

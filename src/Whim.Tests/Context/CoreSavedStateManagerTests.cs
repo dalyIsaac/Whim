@@ -98,7 +98,7 @@ public class CoreSavedStateManagerTests
 	{
 		IMonitor monitor = CreateMonitor((HMONITOR)123);
 		monitor.WorkingArea.Returns(new Rectangle<int>(0, 0, 1000, 1000));
-		AddMonitorsToManager(ctx, root, monitor);
+		AddMonitorsToSector(ctx, root, monitor);
 		root.MonitorSector.PrimaryMonitorHandle = monitor.Handle;
 
 		// Create four windows.
@@ -155,7 +155,7 @@ public class CoreSavedStateManagerTests
 			);
 
 		// Load the workspaces into the context.
-		AddWorkspacesToManager(ctx, root, workspace1, workspace2);
+		AddWorkspacesToStore(ctx, root, workspace1, workspace2);
 
 		// Create the expected JSON.
 		return JsonSerializer.Serialize(

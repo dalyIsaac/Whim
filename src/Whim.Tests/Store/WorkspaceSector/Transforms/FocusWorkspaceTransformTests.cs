@@ -47,7 +47,7 @@ public class FocusWorkspaceTransformTests
 	{
 		// Given
 		Workspace workspace = CreateWorkspace(ctx);
-		AddWorkspacesToManager(ctx, root, workspace);
+		AddWorkspacesToStore(ctx, root, workspace);
 
 		// When
 		var result = ctx.Store.Dispatch(new FocusWorkspaceTransform(workspace.Id));

@@ -19,7 +19,7 @@ public class CommandPaletteWindowViewModelTests
 			IMonitor monitor = StoreTestUtils.CreateMonitor();
 			fixture.Inject(monitor);
 
-			StoreTestUtils.AddMonitorsToManager(_ctx, _store._root.MutableRootSector, monitor);
+			StoreTestUtils.AddMonitorsToSector(_ctx, _store._root.MutableRootSector, monitor);
 
 			fixture.Inject(new CommandPalettePlugin(_ctx, new CommandPaletteConfig(_ctx)));
 

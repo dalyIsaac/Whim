@@ -7,7 +7,7 @@ public class MoveWindowToAdjacentWorkspaceTransformTests
 	internal void NoValidWindows(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given there is no valid windows
-		AddActiveWorkspace(ctx, rootSector, CreateWorkspace(ctx));
+		AddActiveWorkspaceToStore(ctx, rootSector, CreateWorkspace(ctx));
 		MoveWindowToAdjacentWorkspaceTransform sut = new();
 
 		// When

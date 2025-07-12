@@ -186,7 +186,7 @@ public class InitializeWorkspacesTransformTests
 			.Returns(_ => CodeMonitor);
 
 		// - there are three monitors
-		AddMonitorsToManager(
+		AddMonitorsToSector(
 			ctx,
 			rootSector,
 			CreateMonitor(BrowserMonitor),

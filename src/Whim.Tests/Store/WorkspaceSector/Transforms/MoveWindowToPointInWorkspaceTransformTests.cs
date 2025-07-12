@@ -57,7 +57,7 @@ public class MoveWindowToPointInWorkspaceTransformTests
 		AddWindowToSector(root, window);
 
 		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [engine1, engine2] };
-		AddWorkspaceToManager(ctx, root, workspace);
+		AddWorkspaceToStore(ctx, root, workspace);
 		Point<double> point = new(0.5, 0.5);
 
 		MoveWindowToPointInWorkspaceTransform sut = new(workspace.Id, handle, point);

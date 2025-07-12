@@ -23,7 +23,7 @@ public class SliceLayoutPluginTests
 
 			MutableRootSector root = _store._root.MutableRootSector;
 			PopulateMonitorWorkspaceMap(_ctx, root, monitor, workspace);
-			AddActiveWorkspace(_ctx, root, workspace);
+			AddActiveWorkspaceToStore(_ctx, root, workspace);
 		}
 
 		public static IWindow AddUntrackedWindow(MutableRootSector rootSector)

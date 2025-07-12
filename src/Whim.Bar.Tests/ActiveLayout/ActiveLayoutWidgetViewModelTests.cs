@@ -66,7 +66,7 @@ public class ActiveLayoutWidgetViewModelTests
 		// GIVEN an initialized view model monitoring a specific workspace
 		IMonitor monitor = StoreTestUtils.CreateMonitor((HMONITOR)1);
 		Workspace workspace = StoreTestUtils.CreateWorkspace(ctx);
-		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace);
+		StoreTestUtils.AddWorkspacesToStore(ctx, root, workspace);
 
 		ActiveLayoutWidgetViewModel sut = CreateSut(ctx, monitor);
 		bool propertyChanged = false;

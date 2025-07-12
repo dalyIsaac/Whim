@@ -44,7 +44,7 @@ public class MinimizeWindowStartTransformTests
 		AddWindowToSector(root, window);
 
 		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [engine1, engine2] };
-		AddWorkspaceToManager(ctx, root, workspace);
+		AddWorkspaceToStore(ctx, root, workspace);
 
 		MinimizeWindowStartTransform sut = new(workspace.Id, window.Handle);
 

@@ -7,7 +7,7 @@ public class MoveWindowToMonitorTransformTests
 	internal void NoValidWindows(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given there is no valid windows
-		AddActiveWorkspace(ctx, rootSector, CreateWorkspace(ctx));
+		AddActiveWorkspaceToStore(ctx, rootSector, CreateWorkspace(ctx));
 		MoveWindowToMonitorTransform sut = new((HMONITOR)10);
 
 		// When
@@ -21,7 +21,7 @@ public class MoveWindowToMonitorTransformTests
 	internal void NoWindowForHandle(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given there is no window for the handle
-		AddActiveWorkspace(ctx, rootSector, CreateWorkspace(ctx));
+		AddActiveWorkspaceToStore(ctx, rootSector, CreateWorkspace(ctx));
 		MoveWindowToMonitorTransform sut = new((HMONITOR)10);
 
 		// When

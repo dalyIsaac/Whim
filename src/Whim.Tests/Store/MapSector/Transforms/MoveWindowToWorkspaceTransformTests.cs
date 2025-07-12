@@ -59,7 +59,7 @@ public class MoveWindowToWorkspaceTransformTests
 		Workspace workspace = CreateWorkspace(ctx);
 		IWindow window = CreateWindow((HWND)10);
 
-		AddWorkspacesToManager(ctx, rootSector, workspace);
+		AddWorkspacesToStore(ctx, rootSector, workspace);
 
 		MoveWindowToWorkspaceTransform sut = new(workspace.Id, window.Handle);
 
@@ -75,7 +75,7 @@ public class MoveWindowToWorkspaceTransformTests
 	{
 		// Given a random window id
 		Workspace workspace = CreateWorkspace(ctx);
-		AddActiveWorkspace(ctx, rootSector, workspace);
+		AddActiveWorkspaceToStore(ctx, rootSector, workspace);
 
 		MoveWindowToWorkspaceTransform sut = new(workspace.Id);
 
@@ -93,7 +93,7 @@ public class MoveWindowToWorkspaceTransformTests
 		Workspace workspace = CreateWorkspace(ctx);
 		IWindow window = CreateWindow((HWND)10);
 
-		AddWorkspacesToManager(ctx, rootSector, workspace);
+		AddWorkspacesToStore(ctx, rootSector, workspace);
 		rootSector.WindowSector.Windows = rootSector.WindowSector.Windows.Add(window.Handle, window);
 
 		MoveWindowToWorkspaceTransform sut = new(workspace.Id, window.Handle);
@@ -184,7 +184,7 @@ public class MoveWindowToWorkspaceTransformTests
 		IMonitor monitor = CreateMonitor((HMONITOR)1);
 
 		PopulateThreeWayMap(ctx, rootSector, monitor, workspace1, window);
-		AddWorkspacesToManager(ctx, rootSector, workspace2);
+		AddWorkspacesToStore(ctx, rootSector, workspace2);
 		rootSector.MonitorSector.ActiveMonitorHandle = monitor.Handle;
 
 		MoveWindowToWorkspaceTransform sut = new(workspace2.Id, window.Handle);

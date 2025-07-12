@@ -7,7 +7,7 @@ public class MoveWindowEdgesInDirectionTransformTests
 	internal void NoValidWindows(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given there are no valid windows
-		AddActiveWorkspace(ctx, rootSector, CreateWorkspace(ctx));
+		AddActiveWorkspaceToStore(ctx, rootSector, CreateWorkspace(ctx));
 		MoveWindowEdgesInDirectionTransform sut = new(Direction.Down, new Point<int>());
 
 		// When
