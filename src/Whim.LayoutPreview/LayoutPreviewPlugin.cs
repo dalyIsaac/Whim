@@ -78,7 +78,8 @@ public class LayoutPreviewPlugin(IContext context) : IPlugin, IDisposable
 		DraggedWindow = e.Window;
 
 		IPoint<double> normalizedPoint = monitor.WorkingArea.NormalizeAbsolutePoint(cursorDraggedPoint);
-		ILayoutEngine layoutEngine = workspace.ActiveLayoutEngine.MoveWindowToPoint(e.Window, normalizedPoint);
+		ILayoutEngine activeLayoutEngine = WorkspaceUtils.GetActiveLayoutEngine(workspace);
+		ILayoutEngine layoutEngine = activeLayoutEngine.MoveWindowToPoint(e.Window, normalizedPoint);
 		if (layoutEngine.GetLayoutEngine<FloatingLayoutEngine>() is not null)
 		{
 			Logger.Debug("Skip LayoutPreview as LeafLayoutEngine is a FloatingLayoutEngine");
