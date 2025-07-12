@@ -48,6 +48,9 @@ public abstract record BaseProxyLayoutEngine : ILayoutEngine
 	public abstract int Count { get; }
 
 	/// <inheritdoc/>
+	public bool SupportsStacking => InnerLayoutEngine.SupportsStacking;
+
+	/// <inheritdoc/>
 	public abstract ILayoutEngine AddWindow(IWindow window);
 
 	/// <inheritdoc/>
