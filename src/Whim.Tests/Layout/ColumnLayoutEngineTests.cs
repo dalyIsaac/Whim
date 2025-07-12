@@ -1,4 +1,3 @@
-using System.Linq;
 using AutoFixture;
 
 namespace Whim.Tests;
