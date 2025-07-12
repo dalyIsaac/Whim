@@ -47,5 +47,6 @@
 		<InternalsVisibleTo Include="Whim.LayoutPreview.Tests" />
 		<InternalsVisibleTo Include="Whim.SliceLayout.Tests" />
 		<InternalsVisibleTo Include="Whim.TreeLayout.Tests" />
+		<InternalsVisibleTo Include="Whim.TreeLayout.Bar.Tests" />
 	</ItemGroup>
 </Project>

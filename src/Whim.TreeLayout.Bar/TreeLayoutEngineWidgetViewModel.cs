@@ -48,12 +48,12 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 		_monitor = monitor;
 		ToggleDirectionCommand = new ToggleDirectionCommand(this);
 
-		_context.Butler.MonitorWorkspaceChanged += Butler_MonitorWorkspaceChanged;
-		_context.WorkspaceManager.ActiveLayoutEngineChanged += WorkspaceManager_ActiveLayoutEngineChanged;
+		_context.Store.MapEvents.MonitorWorkspaceChanged += MapEvents_MonitorWorkspaceChanged;
+		_context.Store.WorkspaceEvents.ActiveLayoutEngineChanged += WorkspaceEvents_ActiveLayoutEngineChanged;
 		_plugin.AddWindowDirectionChanged += Plugin_AddWindowDirectionChanged;
 	}
 
-	private void Butler_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e)
+	private void MapEvents_MonitorWorkspaceChanged(object? sender, MonitorWorkspaceChangedEventArgs e)
 	{
 		if (e.Monitor.Equals(_monitor))
 		{
@@ -61,9 +61,15 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 		}
 	}
 
-	private void WorkspaceManager_ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs e)
+	private void WorkspaceEvents_ActiveLayoutEngineChanged(object? sender, ActiveLayoutEngineChangedEventArgs e)
 	{
-		if (e.Workspace.Id == _context.Butler.Pantry.GetWorkspaceForMonitor(_monitor)?.Id)
+		if (!_context.Store.Pick(Pickers.PickWorkspaceByMonitor(_monitor.Handle)).TryGet(out IWorkspace workspace))
+		{
+			Logger.Error($"Could not find workspace for monitor {_monitor.Handle}");
+			return;
+		}
+
+		if (e.Workspace.Id == workspace.Id)
 		{
 			OnPropertyChanged(string.Empty);
 		}
@@ -123,8 +129,9 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 			if (disposing)
 			{
 				// dispose managed state (managed objects)
-				_context.Butler.MonitorWorkspaceChanged -= Butler_MonitorWorkspaceChanged;
-				_context.WorkspaceManager.ActiveLayoutEngineChanged -= WorkspaceManager_ActiveLayoutEngineChanged;
+				_context.Store.MapEvents.MonitorWorkspaceChanged -= MapEvents_MonitorWorkspaceChanged;
+				_context.Store.WorkspaceEvents.ActiveLayoutEngineChanged -= WorkspaceEvents_ActiveLayoutEngineChanged;
+				_plugin.AddWindowDirectionChanged -= Plugin_AddWindowDirectionChanged;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer
