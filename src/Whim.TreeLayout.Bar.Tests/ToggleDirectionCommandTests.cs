@@ -1,32 +1,38 @@
 using AutoFixture;
 using NSubstitute;
 using Whim.TestUtils;
+using Windows.Win32.Graphics.Gdi;
 using Xunit;
+using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.TreeLayout.Bar.Tests;
 
-public class ToggleDirectionCommandCustomization : ICustomization
-{
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
-	public void Customize(IFixture fixture)
-	{
-		IContext ctx = fixture.Freeze<IContext>();
-		IMonitor monitor = fixture.Freeze<IMonitor>();
-		IWorkspace workspace = fixture.Freeze<IWorkspace>();
-		ILayoutEngine treeLayoutEngine = fixture.Freeze<ILayoutEngine>();
-		ITreeLayoutPlugin plugin = fixture.Freeze<ITreeLayoutPlugin>();
-
-		TreeLayoutEngineWidgetViewModel viewModel = new(ctx, plugin, monitor);
-		fixture.Inject(viewModel);
-
-		ctx.Butler.Pantry.GetWorkspaceForMonitor(monitor).Returns(workspace);
-		workspace.ActiveLayoutEngine.Returns(treeLayoutEngine);
-	}
-}
-
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class ToggleDirectionCommandTests
 {
-	[Theory, AutoSubstituteData<ToggleDirectionCommandCustomization>]
+	private class Customization : StoreCustomization
+	{
+		protected override void PostCustomize(IFixture fixture)
+		{
+			IMonitor monitor = CreateMonitor((HMONITOR)1234);
+			fixture.Inject(monitor);
+
+			var root = _store._root.MutableRootSector;
+
+			ILayoutEngine layoutEngine = fixture.Freeze<ILayoutEngine>();
+			Workspace workspace = CreateWorkspace(_ctx) with { LayoutEngines = [layoutEngine] };
+			fixture.Inject(workspace);
+
+			PopulateMonitorWorkspaceMap(_ctx, root, monitor, workspace);
+
+			ITreeLayoutPlugin plugin = fixture.Freeze<ITreeLayoutPlugin>();
+
+			TreeLayoutEngineWidgetViewModel viewModel = new(_ctx, plugin, monitor);
+			fixture.Inject(viewModel);
+		}
+	}
+
+	[Theory, AutoSubstituteData<Customization>]
 	public void CanExecute_ShouldReturnTrue(TreeLayoutEngineWidgetViewModel viewModel)
 	{
 		// Given
@@ -39,7 +45,7 @@ public class ToggleDirectionCommandTests
 		Assert.True(actual);
 	}
 
-	[Theory, AutoSubstituteData<ToggleDirectionCommandCustomization>]
+	[Theory, AutoSubstituteData<Customization>]
 	public void Execute_ShouldToggleDirection(
 		ITreeLayoutPlugin plugin,
 		TreeLayoutEngineWidgetViewModel viewModel,
