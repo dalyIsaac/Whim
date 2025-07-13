@@ -8,7 +8,6 @@ using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.CommandPalette.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class CommandPaletteCommandsTests
 {
 	private class Customization : StoreCustomization
@@ -44,8 +43,8 @@ public class CommandPaletteCommandsTests
 		ICommandPalettePlugin plugin
 	)
 	{
-		Workspace activeWorkspace = StoreTestUtils.CreateWorkspace(ctx) with { BackingName = "Workspace" };
-		Workspace otherWorkspace = StoreTestUtils.CreateWorkspace(ctx) with { BackingName = "Other workspace" };
+		Workspace activeWorkspace = StoreTestUtils.CreateWorkspace() with { Name = "Workspace" };
+		Workspace otherWorkspace = StoreTestUtils.CreateWorkspace() with { Name = "Other workspace" };
 
 		// Create windows for the workspaces.
 		IWindow[] windows = new IWindow[3];
@@ -58,11 +57,11 @@ public class CommandPaletteCommandsTests
 		windows[2] = CreateWindow(new HWND(3));
 		windows[2].Title.Returns("Window 3");
 
-		activeWorkspace = PopulateWindowWorkspaceMap(ctx, root, windows[0], activeWorkspace);
-		activeWorkspace = PopulateWindowWorkspaceMap(ctx, root, windows[1], activeWorkspace);
-		otherWorkspace = PopulateWindowWorkspaceMap(ctx, root, windows[2], otherWorkspace);
+		activeWorkspace = PopulateWindowWorkspaceMap(root, windows[0], activeWorkspace);
+		activeWorkspace = PopulateWindowWorkspaceMap(root, windows[1], activeWorkspace);
+		otherWorkspace = PopulateWindowWorkspaceMap(root, windows[2], otherWorkspace);
 
-		AddActiveWorkspace(ctx, root, activeWorkspace);
+		AddActiveWorkspaceToStore(root, activeWorkspace);
 
 		return new WorkspaceWindowState(activeWorkspace, otherWorkspace, windows);
 	}
@@ -418,7 +417,7 @@ public class CommandPaletteCommandsTests
 		IWindow window = state.Windows[0];
 		window.IsMinimized.Returns(isMinimized);
 
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor(), state.ActiveWorkspace);
+		PopulateMonitorWorkspaceMap(root, CreateMonitor(), state.ActiveWorkspace);
 
 		// When the command is executed.
 		ICommand command = commands.FocusWindowCommandCreator(window);

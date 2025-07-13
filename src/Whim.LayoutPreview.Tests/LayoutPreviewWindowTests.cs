@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
 using NSubstitute;
 using Whim.TestUtils;
@@ -170,7 +169,6 @@ public class LayoutPreviewWindowTests
 	#endregion
 
 	[Theory, AutoSubstituteData<LayoutPreviewWindowCustomization>]
-	[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 	internal void Activate(
 		IContext ctx,
 		IInternalContext internalCtx,

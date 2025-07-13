@@ -1,8 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WindowHiddenTransformTests
 {
 	private static Result<Unit> AssertDoesNotRaise(
@@ -60,8 +57,8 @@ public class WindowHiddenTransformTests
 		IWindow window = CreateWindow((HWND)2);
 		IMonitor monitor = CreateMonitor((HMONITOR)3);
 
-		Workspace workspace = CreateWorkspace(ctx);
-		PopulateThreeWayMap(ctx, rootSector, monitor, workspace, window);
+		Workspace workspace = CreateWorkspace();
+		PopulateThreeWayMap(rootSector, monitor, workspace, window);
 
 		WindowHiddenTransform sut = new(window);
 

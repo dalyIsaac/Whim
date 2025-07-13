@@ -5,7 +5,6 @@ using Xunit;
 
 namespace Whim.Bar.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WorkspaceWidgetViewModelTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -13,11 +12,11 @@ public class WorkspaceWidgetViewModelTests
 	{
 		// Given
 		IMonitor monitor = StoreTestUtils.CreateMonitor((HMONITOR)100);
-		Workspace workspace1 = StoreTestUtils.CreateWorkspace(ctx);
-		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
+		Workspace workspace1 = StoreTestUtils.CreateWorkspace();
+		Workspace workspace2 = StoreTestUtils.CreateWorkspace();
 
-		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2);
-		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace2);
+		StoreTestUtils.AddWorkspacesToStore(root, workspace1, workspace2);
+		StoreTestUtils.PopulateMonitorWorkspaceMap(root, monitor, workspace2);
 
 		// When
 		WorkspaceWidgetViewModel sut = new(ctx, monitor);
@@ -35,16 +34,16 @@ public class WorkspaceWidgetViewModelTests
 	{
 		// Given
 		IMonitor monitor = StoreTestUtils.CreateMonitor((HMONITOR)100);
-		Workspace workspace1 = StoreTestUtils.CreateWorkspace(ctx);
-		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
+		Workspace workspace1 = StoreTestUtils.CreateWorkspace();
+		Workspace workspace2 = StoreTestUtils.CreateWorkspace();
 
-		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2);
-		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace2);
+		StoreTestUtils.AddWorkspacesToStore(root, workspace1, workspace2);
+		StoreTestUtils.PopulateMonitorWorkspaceMap(root, monitor, workspace2);
 
 		WorkspaceWidgetViewModel sut = new(ctx, monitor);
 
-		Workspace workspace3 = StoreTestUtils.CreateWorkspace(ctx);
-		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace3);
+		Workspace workspace3 = StoreTestUtils.CreateWorkspace();
+		StoreTestUtils.AddWorkspacesToStore(root, workspace3);
 
 		// When
 		root.WorkspaceSector.QueueEvent(new WorkspaceAddedEventArgs() { Workspace = workspace3 });
@@ -65,12 +64,12 @@ public class WorkspaceWidgetViewModelTests
 	{
 		// Given
 		IMonitor monitor = StoreTestUtils.CreateMonitor((HMONITOR)100);
-		Workspace workspace1 = StoreTestUtils.CreateWorkspace(ctx);
-		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
-		Workspace workspace3 = StoreTestUtils.CreateWorkspace(ctx);
+		Workspace workspace1 = StoreTestUtils.CreateWorkspace();
+		Workspace workspace2 = StoreTestUtils.CreateWorkspace();
+		Workspace workspace3 = StoreTestUtils.CreateWorkspace();
 
-		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2, workspace3);
-		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace2);
+		StoreTestUtils.AddWorkspacesToStore(root, workspace1, workspace2, workspace3);
+		StoreTestUtils.PopulateMonitorWorkspaceMap(root, monitor, workspace2);
 
 		WorkspaceWidgetViewModel sut = new(ctx, monitor);
 
@@ -93,12 +92,12 @@ public class WorkspaceWidgetViewModelTests
 		// Given
 		IMonitor monitor1 = StoreTestUtils.CreateMonitor((HMONITOR)100);
 		IMonitor monitor2 = StoreTestUtils.CreateMonitor((HMONITOR)200);
-		Workspace workspace1 = StoreTestUtils.CreateWorkspace(ctx);
-		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
+		Workspace workspace1 = StoreTestUtils.CreateWorkspace();
+		Workspace workspace2 = StoreTestUtils.CreateWorkspace();
 
-		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2);
-		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor1, workspace1);
-		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor2, workspace2);
+		StoreTestUtils.AddWorkspacesToStore(root, workspace1, workspace2);
+		StoreTestUtils.PopulateMonitorWorkspaceMap(root, monitor1, workspace1);
+		StoreTestUtils.PopulateMonitorWorkspaceMap(root, monitor2, workspace2);
 
 		WorkspaceWidgetViewModel sut = new(ctx, monitor1);
 
@@ -121,11 +120,11 @@ public class WorkspaceWidgetViewModelTests
 	{
 		// Given
 		IMonitor monitor = StoreTestUtils.CreateMonitor((HMONITOR)100);
-		Workspace workspace1 = StoreTestUtils.CreateWorkspace(ctx);
-		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
+		Workspace workspace1 = StoreTestUtils.CreateWorkspace();
+		Workspace workspace2 = StoreTestUtils.CreateWorkspace();
 
-		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2);
-		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace1);
+		StoreTestUtils.AddWorkspacesToStore(root, workspace1, workspace2);
+		StoreTestUtils.PopulateMonitorWorkspaceMap(root, monitor, workspace1);
 
 		WorkspaceWidgetViewModel sut = new(ctx, monitor);
 
@@ -149,12 +148,12 @@ public class WorkspaceWidgetViewModelTests
 		// Given
 		IMonitor monitor1 = StoreTestUtils.CreateMonitor((HMONITOR)100);
 		IMonitor monitor2 = StoreTestUtils.CreateMonitor((HMONITOR)200);
-		Workspace workspace1 = StoreTestUtils.CreateWorkspace(ctx);
-		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
+		Workspace workspace1 = StoreTestUtils.CreateWorkspace();
+		Workspace workspace2 = StoreTestUtils.CreateWorkspace();
 
-		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2);
-		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor1, workspace1);
-		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor2, workspace2);
+		StoreTestUtils.AddWorkspacesToStore(root, workspace1, workspace2);
+		StoreTestUtils.PopulateMonitorWorkspaceMap(root, monitor1, workspace1);
+		StoreTestUtils.PopulateMonitorWorkspaceMap(root, monitor2, workspace2);
 
 		WorkspaceWidgetViewModel sut = new(ctx, monitor1);
 		WorkspaceModel workspaceModel = sut.Workspaces[0];
@@ -178,11 +177,11 @@ public class WorkspaceWidgetViewModelTests
 	{
 		// Given
 		IMonitor monitor = StoreTestUtils.CreateMonitor((HMONITOR)100);
-		Workspace workspace1 = StoreTestUtils.CreateWorkspace(ctx);
-		Workspace workspace2 = StoreTestUtils.CreateWorkspace(ctx);
+		Workspace workspace1 = StoreTestUtils.CreateWorkspace();
+		Workspace workspace2 = StoreTestUtils.CreateWorkspace();
 
-		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace1, workspace2);
-		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace1);
+		StoreTestUtils.AddWorkspacesToStore(root, workspace1, workspace2);
+		StoreTestUtils.PopulateMonitorWorkspaceMap(root, monitor, workspace1);
 
 		WorkspaceWidgetViewModel sut = new(ctx, monitor);
 		WorkspaceModel workspaceModel = sut.Workspaces[0];

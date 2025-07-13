@@ -4,7 +4,7 @@ namespace Whim;
 /// Activates the next (or previous) workspace in the given monitor.
 /// </summary>
 /// <param name="MonitorHandle">
-/// The monitor to activate the next workspace in. Defaults to <see cref="IMonitorManager.ActiveMonitor"/>.
+/// The monitor to activate the next workspace in. Defaults to <see cref="Pickers.PickActiveMonitor"/>.
 /// </param>
 /// <param name="Reverse">
 /// When <see langword="true"/>, gets the previous monitor, otherwise gets the next monitor. Defaults to <see langword="false" />.

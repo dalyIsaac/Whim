@@ -8,11 +8,6 @@ using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.TreeLayout.Bar.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage(
-	"Reliability",
-	"CA2000:Dispose objects before losing scope",
-	Justification = "Unnecessary for tests"
-)]
 public class TreeLayoutEngineWidgetViewModelTests
 {
 	private class Customization : StoreCustomization
@@ -25,10 +20,10 @@ public class TreeLayoutEngineWidgetViewModelTests
 			var root = _store._root.MutableRootSector;
 
 			ILayoutEngine layoutEngine = fixture.Freeze<ILayoutEngine>();
-			Workspace workspace = CreateWorkspace(_ctx) with { LayoutEngines = [layoutEngine] };
+			Workspace workspace = CreateWorkspace() with { LayoutEngines = [layoutEngine] };
 			fixture.Inject(workspace);
 
-			PopulateMonitorWorkspaceMap(_ctx, root, monitor, workspace);
+			PopulateMonitorWorkspaceMap(root, monitor, workspace);
 		}
 	}
 
@@ -288,7 +283,6 @@ public class TreeLayoutEngineWidgetViewModelTests
 	}
 
 	[Theory, AutoSubstituteData]
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "NS5000:Received check.")]
 	internal void Dispose(IContext ctx, ITreeLayoutPlugin plugin, IMonitor monitor)
 	{
 		// Given

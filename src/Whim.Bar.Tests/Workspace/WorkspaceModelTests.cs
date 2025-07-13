@@ -3,7 +3,6 @@ using Xunit;
 
 namespace Whim.Bar.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WorkspaceModelTests
 {
 	private static WorkspaceModel CreateSut(
@@ -37,17 +36,17 @@ public class WorkspaceModelTests
 	internal void Workspace_Renamed(IContext ctx, MutableRootSector root, WorkspaceWidgetViewModel viewModel)
 	{
 		// Given
-		Workspace workspace = StoreTestUtils.CreateWorkspace(ctx) with
+		Workspace workspace = StoreTestUtils.CreateWorkspace() with
 		{
-			BackingName = "This is the workspace name",
+			Name = "This is the workspace name",
 		};
-		StoreTestUtils.AddWorkspaceToManager(ctx, root, workspace);
+		StoreTestUtils.AddWorkspaceToStore(root, workspace);
 
 		// When
 		WorkspaceModel model = CreateSut(ctx, viewModel, workspace, true);
 
 		// Then
-		Assert.Equal(model.Name, workspace.BackingName);
+		Assert.Equal(model.Name, workspace.Name);
 		Assert.PropertyChanged(
 			model,
 			nameof(model.Name),

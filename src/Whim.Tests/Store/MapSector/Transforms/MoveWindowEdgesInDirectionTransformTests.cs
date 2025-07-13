@@ -1,13 +1,12 @@
 namespace Whim.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class MoveWindowEdgesInDirectionTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void NoValidWindows(IContext ctx, MutableRootSector rootSector)
 	{
 		// Given there are no valid windows
-		AddActiveWorkspace(ctx, rootSector, CreateWorkspace(ctx));
+		AddActiveWorkspaceToStore(rootSector, CreateWorkspace());
 		MoveWindowEdgesInDirectionTransform sut = new(Direction.Down, new Point<int>());
 
 		// When
@@ -52,9 +51,9 @@ public class MoveWindowEdgesInDirectionTransformTests
 		// Given there is no monitor for the window
 		IWindow window = CreateWindow((HWND)10);
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 
-		PopulateMonitorWorkspaceMap(ctx, rootSector, monitor, workspace);
+		PopulateMonitorWorkspaceMap(rootSector, monitor, workspace);
 
 		MoveWindowEdgesInDirectionTransform sut = new(Direction.Down, new Point<int>(), window.Handle);
 
@@ -71,10 +70,10 @@ public class MoveWindowEdgesInDirectionTransformTests
 		// Given there is a workspace for the window
 		IWindow window = CreateWindow((HWND)10);
 		IMonitor monitor = CreateMonitor((HMONITOR)10);
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		Point<int> pixelDeltas = new(10, 10);
 
-		PopulateThreeWayMap(ctx, rootSector, monitor, workspace, window);
+		PopulateThreeWayMap(rootSector, monitor, workspace, window);
 
 		MoveWindowEdgesInDirectionTransform sut = new(Direction.Down, pixelDeltas, window.Handle);
 

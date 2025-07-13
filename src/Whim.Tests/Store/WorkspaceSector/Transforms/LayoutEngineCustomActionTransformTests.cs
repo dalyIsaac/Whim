@@ -1,8 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class LayoutEngineCustomActionTransformTests
 {
 	private static readonly Guid WorkspaceId = Guid.NewGuid();
@@ -29,7 +26,7 @@ public class LayoutEngineCustomActionTransformTests
 	)
 	{
 		// Given none of the layout engines support the action
-		Workspace workspace = CreateWorkspace(ctx, WorkspaceId) with
+		Workspace workspace = CreateWorkspace(WorkspaceId) with
 		{
 			LayoutEngines =
 			[
@@ -37,7 +34,7 @@ public class LayoutEngineCustomActionTransformTests
 				CreateLayoutEngineNotSupportingAction<IWindow?>(),
 			],
 		};
-		AddWorkspaceToManager(ctx, rootSector, workspace);
+		AddWorkspaceToStore(rootSector, workspace);
 
 		// When the action is performed
 		var result = ctx.Store.Dispatch(sut);
@@ -55,7 +52,7 @@ public class LayoutEngineCustomActionTransformTests
 	)
 	{
 		// Given the first and third layout engines support the action
-		Workspace workspace = CreateWorkspace(ctx, WorkspaceId) with
+		Workspace workspace = CreateWorkspace(WorkspaceId) with
 		{
 			LayoutEngines =
 			[
@@ -64,7 +61,7 @@ public class LayoutEngineCustomActionTransformTests
 				CreateLayoutEngineSupportingAction<IWindow?>(),
 			],
 		};
-		AddWorkspaceToManager(ctx, root, workspace);
+		AddWorkspaceToStore(root, workspace);
 
 		// When the action is performed
 		var result = ctx.Store.Dispatch(sut);

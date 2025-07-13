@@ -5,7 +5,6 @@ using Xunit;
 
 namespace Whim.Bar.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class ActiveLayoutWidgetViewModelTests
 {
 	private static ActiveLayoutWidgetViewModel CreateSut(IContext ctx, IMonitor monitor) => new(ctx, monitor);
@@ -65,8 +64,8 @@ public class ActiveLayoutWidgetViewModelTests
 	{
 		// GIVEN an initialized view model monitoring a specific workspace
 		IMonitor monitor = StoreTestUtils.CreateMonitor((HMONITOR)1);
-		Workspace workspace = StoreTestUtils.CreateWorkspace(ctx);
-		StoreTestUtils.AddWorkspacesToManager(ctx, root, workspace);
+		Workspace workspace = StoreTestUtils.CreateWorkspace();
+		StoreTestUtils.AddWorkspacesToStore(root, workspace);
 
 		ActiveLayoutWidgetViewModel sut = CreateSut(ctx, monitor);
 		bool propertyChanged = false;
@@ -100,11 +99,8 @@ public class ActiveLayoutWidgetViewModelTests
 		IMonitor monitor = StoreTestUtils.CreateMonitor((HMONITOR)1);
 		ILayoutEngine layoutEngine1 = CreateLayoutEngine("Layout1");
 		ILayoutEngine layoutEngine2 = CreateLayoutEngine("Layout2");
-		Workspace workspace = StoreTestUtils.CreateWorkspace(ctx) with
-		{
-			LayoutEngines = [layoutEngine1, layoutEngine2],
-		};
-		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
+		Workspace workspace = StoreTestUtils.CreateWorkspace() with { LayoutEngines = [layoutEngine1, layoutEngine2] };
+		StoreTestUtils.PopulateMonitorWorkspaceMap(root, monitor, workspace);
 
 		ActiveLayoutWidgetViewModel sut = CreateSut(ctx, monitor);
 		List<string> propertyChangedNames = [];
@@ -142,11 +138,8 @@ public class ActiveLayoutWidgetViewModelTests
 		IMonitor differentMonitor = StoreTestUtils.CreateMonitor((HMONITOR)2);
 		ILayoutEngine layoutEngine1 = CreateLayoutEngine("Layout1");
 		ILayoutEngine layoutEngine2 = CreateLayoutEngine("Layout2");
-		Workspace workspace = StoreTestUtils.CreateWorkspace(ctx) with
-		{
-			LayoutEngines = [layoutEngine1, layoutEngine2],
-		};
-		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, differentMonitor, workspace);
+		Workspace workspace = StoreTestUtils.CreateWorkspace() with { LayoutEngines = [layoutEngine1, layoutEngine2] };
+		StoreTestUtils.PopulateMonitorWorkspaceMap(root, differentMonitor, workspace);
 
 		ActiveLayoutWidgetViewModel sut = CreateSut(ctx, widgetMonitor);
 		List<string> propertyChangedNames = [];
@@ -206,8 +199,8 @@ public class ActiveLayoutWidgetViewModelTests
 		// GIVEN a view model with a workspace containing a specific layout engine
 		IMonitor monitor = StoreTestUtils.CreateMonitor((HMONITOR)1);
 		ILayoutEngine layoutEngine = CreateLayoutEngine("TestLayout");
-		Workspace workspace = StoreTestUtils.CreateWorkspace(ctx) with { LayoutEngines = [layoutEngine] };
-		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
+		Workspace workspace = StoreTestUtils.CreateWorkspace() with { LayoutEngines = [layoutEngine] };
+		StoreTestUtils.PopulateMonitorWorkspaceMap(root, monitor, workspace);
 
 		ActiveLayoutWidgetViewModel sut = CreateSut(ctx, monitor);
 
@@ -241,7 +234,7 @@ public class ActiveLayoutWidgetViewModelTests
 		// GIVEN a view model with a workspace and active layout engine
 		IMonitor monitor = StoreTestUtils.CreateMonitor((HMONITOR)1);
 		ILayoutEngine layoutEngine = CreateLayoutEngine("TestLayout");
-		Workspace workspace = StoreTestUtils.CreateWorkspace(ctx) with { LayoutEngines = [layoutEngine] };
+		Workspace workspace = StoreTestUtils.CreateWorkspace() with { LayoutEngines = [layoutEngine] };
 
 		ActiveLayoutWidgetViewModel sut = CreateSut(ctx, monitor);
 		bool propertyChanged = false;
@@ -265,8 +258,8 @@ public class ActiveLayoutWidgetViewModelTests
 		// GIVEN a view model with a workspace and specific layout engine
 		IMonitor monitor = StoreTestUtils.CreateMonitor((HMONITOR)1);
 		ILayoutEngine layoutEngine = CreateLayoutEngine("TestLayout");
-		Workspace workspace = StoreTestUtils.CreateWorkspace(ctx) with { LayoutEngines = [layoutEngine] };
-		StoreTestUtils.PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
+		Workspace workspace = StoreTestUtils.CreateWorkspace() with { LayoutEngines = [layoutEngine] };
+		StoreTestUtils.PopulateMonitorWorkspaceMap(root, monitor, workspace);
 
 		ActiveLayoutWidgetViewModel sut = CreateSut(ctx, monitor);
 		bool propertyChanged = false;

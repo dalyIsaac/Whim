@@ -3,15 +3,18 @@ namespace Whim.Tests;
 public class MonitorWorkspaceChangedEventTests
 {
 	[Theory, AutoSubstituteData]
+	[System.Diagnostics.CodeAnalysis.SuppressMessage(
+		"Maintainability",
+		"CA1508:Avoid dead conditional code",
+		Justification = "For testing purposes"
+	)]
 	public void Equals_Null(IMonitor monitor, IWorkspace workspace)
 	{
 		// Given
 		MonitorWorkspaceChangedEventArgs a = new() { CurrentWorkspace = workspace, Monitor = monitor };
 
 		// Then
-#pragma warning disable CA1508 // Avoid dead conditional code
 		Assert.False(a.Equals(null));
-#pragma warning restore CA1508 // Avoid dead conditional code
 	}
 
 	[Theory, AutoSubstituteData]
@@ -38,12 +41,12 @@ public class MonitorWorkspaceChangedEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void Equals_DifferentPreviousWorkspace(IContext ctx, IMonitor monitor)
+	public void Equals_DifferentPreviousWorkspace(IMonitor monitor)
 	{
 		// Given
-		IWorkspace workspace = StoreTestUtils.CreateWorkspace(ctx);
-		IWorkspace aWorkspace = StoreTestUtils.CreateWorkspace(ctx);
-		IWorkspace bWorkspace = StoreTestUtils.CreateWorkspace(ctx);
+		IWorkspace workspace = StoreTestUtils.CreateWorkspace();
+		IWorkspace aWorkspace = StoreTestUtils.CreateWorkspace();
+		IWorkspace bWorkspace = StoreTestUtils.CreateWorkspace();
 		MonitorWorkspaceChangedEventArgs a = new()
 		{
 			Monitor = monitor,
@@ -62,12 +65,12 @@ public class MonitorWorkspaceChangedEventTests
 	}
 
 	[Theory, AutoSubstituteData]
-	public void Equals_DifferentCurrentWorkspace(IContext ctx, IMonitor monitor)
+	public void Equals_DifferentCurrentWorkspace(IMonitor monitor)
 	{
 		// Given
-		IWorkspace aCurrentWorkspace = StoreTestUtils.CreateWorkspace(ctx);
-		IWorkspace bCurrentWorkspace = StoreTestUtils.CreateWorkspace(ctx);
-		IWorkspace previousWorkspace = StoreTestUtils.CreateWorkspace(ctx);
+		IWorkspace aCurrentWorkspace = StoreTestUtils.CreateWorkspace();
+		IWorkspace bCurrentWorkspace = StoreTestUtils.CreateWorkspace();
+		IWorkspace previousWorkspace = StoreTestUtils.CreateWorkspace();
 		MonitorWorkspaceChangedEventArgs a = new()
 		{
 			Monitor = monitor,

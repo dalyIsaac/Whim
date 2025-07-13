@@ -1,10 +1,8 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using static Whim.TestUtils.MonitorTestUtils;
 
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class MonitorsChangedTransformTests
 {
 	private static readonly (RECT Rect, HMONITOR Handle) LeftTopMonitorSetup = (
@@ -69,10 +67,10 @@ public class MonitorsChangedTransformTests
 	/// <returns></returns>
 	private static IWorkspace[] PopulateWorkspaces(IContext ctx, MutableRootSector rootSector)
 	{
-		Workspace workspace1 = CreateWorkspace(ctx);
-		Workspace workspace2 = CreateWorkspace(ctx);
-		Workspace workspace3 = CreateWorkspace(ctx);
-		AddWorkspacesToManager(ctx, rootSector, workspace1, workspace2, workspace3);
+		Workspace workspace1 = CreateWorkspace();
+		Workspace workspace2 = CreateWorkspace();
+		Workspace workspace3 = CreateWorkspace();
+		AddWorkspacesToStore(rootSector, workspace1, workspace2, workspace3);
 		rootSector.WorkspaceSector.HasInitialized = true;
 		return [workspace1, workspace2, workspace3];
 	}
@@ -85,16 +83,16 @@ public class MonitorsChangedTransformTests
 	/// <returns></returns>
 	private static IWorkspace[] SetupAddWorkspaces(IContext ctx, MutableRootSector rootSector)
 	{
-		Workspace workspace1 = CreateWorkspace(ctx);
-		Workspace workspace2 = CreateWorkspace(ctx);
-		Workspace workspace3 = CreateWorkspace(ctx);
+		Workspace workspace1 = CreateWorkspace();
+		Workspace workspace2 = CreateWorkspace();
+		Workspace workspace3 = CreateWorkspace();
 
 		((StoreWrapper)ctx.Store)
 			.AddInterceptor(
 				t => t is AddWorkspaceTransform,
 				t =>
 				{
-					AddWorkspaceToManager(ctx, rootSector, workspace1);
+					AddWorkspaceToStore(rootSector, workspace1);
 					return workspace1.Id;
 				}
 			)
@@ -102,7 +100,7 @@ public class MonitorsChangedTransformTests
 				t => t is AddWorkspaceTransform,
 				t =>
 				{
-					AddWorkspaceToManager(ctx, rootSector, workspace2);
+					AddWorkspaceToStore(rootSector, workspace2);
 					return workspace2.Id;
 				}
 			)
@@ -110,7 +108,7 @@ public class MonitorsChangedTransformTests
 				t => t is AddWorkspaceTransform,
 				t =>
 				{
-					AddWorkspaceToManager(ctx, rootSector, workspace3);
+					AddWorkspaceToStore(rootSector, workspace3);
 					return workspace3.Id;
 				}
 			);

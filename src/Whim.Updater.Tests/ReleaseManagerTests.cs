@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
 using Microsoft.UI.Dispatching;
 using NSubstitute;
@@ -8,7 +7,6 @@ using Xunit;
 
 namespace Whim.Updater.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class ReleaseManagerTests
 {
 	#region CheckForUpdates
@@ -156,7 +154,7 @@ public class ReleaseManagerTests
 
 		client
 			.Repository.Release.GetAll("dalyIsaac", "Whim", Arg.Any<ApiOptions>())
-			.Returns(orderedReleases.Select(t => Data.CreateRelease242(tagName: t)).ToArray());
+			.Returns([.. orderedReleases.Select(t => Data.CreateRelease242(tagName: t))]);
 
 		// When
 		IEnumerable<ReleaseInfo> releases = await sut.GetNotInstalledReleases();

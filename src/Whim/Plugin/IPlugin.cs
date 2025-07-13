@@ -19,7 +19,7 @@ public interface IPlugin
 	/// <b>This method is to be called by the plugin manager.</b>
 	/// Initializes the plugin before the <see cref="IContext"/> has been initialized.
 	/// Put things like event listeners here or adding proxy layout engines
-	/// (see <see cref="IWorkspaceManager.AddProxyLayoutEngine(ProxyLayoutEngineCreator)"/>).
+	/// (see <see cref="AddProxyLayoutEngineTransform"/>).
 	/// </summary>
 	void PreInitialize();
 

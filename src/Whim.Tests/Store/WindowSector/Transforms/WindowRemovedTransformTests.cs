@@ -1,8 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WindowRemovedTransformTests
 {
 	private static (Result<Unit>, Assert.RaisedEvent<WindowRemovedEventArgs>) AssertRaises(
@@ -82,8 +79,8 @@ public class WindowRemovedTransformTests
 	{
 		// Given the window is tracked
 		window.Handle.Returns((HWND)2);
-		Workspace workspace = CreateWorkspace(ctx);
-		PopulateWindowWorkspaceMap(ctx, mutableRootSector, window, workspace);
+		Workspace workspace = CreateWorkspace();
+		PopulateWindowWorkspaceMap(mutableRootSector, window, workspace);
 
 		mutableRootSector.MapSector.WindowWorkspaceMap = mutableRootSector.MapSector.WindowWorkspaceMap.Add(
 			window.Handle,

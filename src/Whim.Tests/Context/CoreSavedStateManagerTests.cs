@@ -2,7 +2,6 @@ using System.Text.Json;
 
 namespace Whim.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class CoreSavedStateManagerTests
 {
 	[Theory, AutoSubstituteData]
@@ -98,7 +97,7 @@ public class CoreSavedStateManagerTests
 	{
 		IMonitor monitor = CreateMonitor((HMONITOR)123);
 		monitor.WorkingArea.Returns(new Rectangle<int>(0, 0, 1000, 1000));
-		AddMonitorsToManager(ctx, root, monitor);
+		AddMonitorsToSector(root, monitor);
 		root.MonitorSector.PrimaryMonitorHandle = monitor.Handle;
 
 		// Create four windows.
@@ -111,7 +110,7 @@ public class CoreSavedStateManagerTests
 
 		// Create two workspaces with two windows each
 		ILayoutEngine engine1 = Substitute.For<ILayoutEngine>();
-		Workspace workspace1 = CreateWorkspace(ctx) with { BackingName = "workspace1", LayoutEngines = [engine1] };
+		Workspace workspace1 = CreateWorkspace() with { Name = "workspace1", LayoutEngines = [engine1] };
 		engine1
 			.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
 			.Returns(
@@ -133,7 +132,7 @@ public class CoreSavedStateManagerTests
 			);
 
 		ILayoutEngine engine2 = Substitute.For<ILayoutEngine>();
-		Workspace workspace2 = CreateWorkspace(ctx) with { BackingName = "workspace2", LayoutEngines = [engine2] };
+		Workspace workspace2 = CreateWorkspace() with { Name = "workspace2", LayoutEngines = [engine2] };
 		engine2
 			.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
 			.Returns(
@@ -155,7 +154,7 @@ public class CoreSavedStateManagerTests
 			);
 
 		// Load the workspaces into the context.
-		AddWorkspacesToManager(ctx, root, workspace1, workspace2);
+		AddWorkspacesToStore(root, workspace1, workspace2);
 
 		// Create the expected JSON.
 		return JsonSerializer.Serialize(

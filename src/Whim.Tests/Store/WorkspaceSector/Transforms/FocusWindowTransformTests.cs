@@ -1,8 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class FocusWindowTransformTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -24,10 +21,10 @@ public class FocusWindowTransformTests
 	internal void Success_NoWindowHandleDefined(IContext ctx, MutableRootSector root, List<object> transforms)
 	{
 		// Given
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 		IMonitor monitor = CreateMonitor((HMONITOR)123);
 
-		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
+		PopulateMonitorWorkspaceMap(root, monitor, workspace);
 
 		// When
 		var result = ctx.Store.Dispatch(new FocusWindowTransform());
@@ -46,10 +43,10 @@ public class FocusWindowTransformTests
 	{
 		// Given a last focused window handle is defined for the workspace, and we're not on the main thread
 		HWND handle = (HWND)123;
-		Workspace workspace = CreateWorkspace(ctx) with { LastFocusedWindowHandle = handle };
+		Workspace workspace = CreateWorkspace() with { LastFocusedWindowHandle = handle };
 		IMonitor monitor = CreateMonitor((HMONITOR)123);
 
-		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
+		PopulateMonitorWorkspaceMap(root, monitor, workspace);
 
 		internalCtx.CoreNativeManager.IsStaThread().Returns(false);
 

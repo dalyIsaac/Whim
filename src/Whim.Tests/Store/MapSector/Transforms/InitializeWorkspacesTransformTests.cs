@@ -186,8 +186,7 @@ public class InitializeWorkspacesTransformTests
 			.Returns(_ => CodeMonitor);
 
 		// - there are three monitors
-		AddMonitorsToManager(
-			ctx,
+		AddMonitorsToSector(
 			rootSector,
 			CreateMonitor(BrowserMonitor),
 			CreateMonitor(CodeMonitor),
@@ -221,7 +220,7 @@ public class InitializeWorkspacesTransformTests
 
 		// - the "Browser" workspace has been added with the "Browser", "Spotify", and "Discord"  windows
 		Workspace browserWorkspace = rootSector.WorkspaceSector.Workspaces.Values.FirstOrDefault(w =>
-			w.BackingName == BrowserWorkspaceName
+			w.Name == BrowserWorkspaceName
 		)!;
 		Assert.Single(browserWorkspace.WindowPositions);
 		Assert.Contains(BrowserHandle, browserWorkspace.WindowPositions);
@@ -230,7 +229,7 @@ public class InitializeWorkspacesTransformTests
 
 		// - the new "Code" workspace has been added with the new "vscode" window
 		Workspace codeWorkspace = rootSector.WorkspaceSector.Workspaces.Values.FirstOrDefault(w =>
-			w.BackingName == CodeWorkspaceName
+			w.Name == CodeWorkspaceName
 		)!;
 		Assert.Single(codeWorkspace.WindowPositions);
 		Assert.Contains(VscodeHandle, codeWorkspace.WindowPositions);
@@ -239,17 +238,17 @@ public class InitializeWorkspacesTransformTests
 
 		// - the "Sticky" workspace has been added with no windows
 		Workspace stickyWorkspace = rootSector.WorkspaceSector.Workspaces.Values.FirstOrDefault(w =>
-			w.BackingName == StickyWorkspaceName
+			w.Name == StickyWorkspaceName
 		)!;
 		Assert.Empty(stickyWorkspace.WindowPositions);
 
 		Assert.Single(stickyWorkspace.LayoutEngines);
 		Assert.Single(rootSector.MapSector.StickyWorkspaceMonitorIndexMap);
-		rootSector.MapSector.StickyWorkspaceMonitorIndexMap[stickyWorkspace.Id].Should().BeEquivalentTo(new[] { 0, 1 });
+		rootSector.MapSector.StickyWorkspaceMonitorIndexMap[stickyWorkspace.Id].Should().BeEquivalentTo([0, 1]);
 
 		// - the automatically created workspace has the "Spotify" and "Discord" windows
 		Workspace autoWorkspace = rootSector.WorkspaceSector.Workspaces.Values.FirstOrDefault(w =>
-			w.BackingName == "Workspace 4"
+			w.Name == "Workspace 4"
 		)!;
 		Assert.Equal(2, autoWorkspace.WindowPositions.Count);
 		Assert.Contains(SpotifyHandle, autoWorkspace.WindowPositions);
@@ -270,6 +269,6 @@ public class InitializeWorkspacesTransformTests
 		Assert.Equal(5, rootSector.WindowSector.StartupWindows.Count);
 		rootSector
 			.WindowSector.StartupWindows.Should()
-			.BeEquivalentTo(new[] { BrowserHandle, DiscordHandle, SpotifyHandle, BrokenHandle, VscodeHandle });
+			.BeEquivalentTo([BrowserHandle, DiscordHandle, SpotifyHandle, BrokenHandle, VscodeHandle]);
 	}
 }

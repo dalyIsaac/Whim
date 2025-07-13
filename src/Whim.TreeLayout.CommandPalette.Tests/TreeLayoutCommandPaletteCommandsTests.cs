@@ -8,7 +8,6 @@ using static Whim.TestUtils.StoreTestUtils;
 
 namespace Whim.TreeLayout.CommandPalette.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class TreeLayoutCommandPaletteCommandsTests
 {
 	private class Customization : StoreCustomization
@@ -19,7 +18,7 @@ public class TreeLayoutCommandPaletteCommandsTests
 
 			IMonitor monitor = CreateMonitor((HMONITOR)1234);
 			fixture.Inject(monitor);
-			AddMonitorsToManager(_ctx, root, monitor);
+			AddMonitorsToSector(root, monitor);
 
 			IPlugin treeLayoutCommandPalettePlugin = fixture.Freeze<IPlugin>();
 			treeLayoutCommandPalettePlugin.Name.Returns("whim.tree_layout.command_palette");
@@ -114,13 +113,12 @@ public class TreeLayoutCommandPaletteCommandsTests
 		TreeLayoutCommandPalettePluginCommands commands,
 		ITreeLayoutPlugin treeLayoutPlugin,
 		IMonitor monitor,
-		IContext ctx,
 		MutableRootSector root
 	)
 	{
 		// Given
-		Workspace workspace = CreateWorkspace(ctx);
-		PopulateMonitorWorkspaceMap(ctx, root, monitor, workspace);
+		Workspace workspace = CreateWorkspace();
+		PopulateMonitorWorkspaceMap(root, monitor, workspace);
 
 		// When
 		commands.SetDirection("welp");

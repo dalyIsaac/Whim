@@ -1,16 +1,14 @@
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.UI.Dispatching;
 
 namespace Whim.Tests;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 public class WorkspaceSectorTests
 {
 	[Theory, AutoSubstituteData<StoreCustomization>]
 	internal void DoLayout_NoMonitorFoundForWorkspace(IContext ctx, MutableRootSector root)
 	{
 		// Given
-		Workspace workspace = CreateWorkspace(ctx);
+		Workspace workspace = CreateWorkspace();
 
 		// When
 		root.WorkspaceSector.WorkspacesToLayout = root.WorkspaceSector.WorkspacesToLayout.Add(workspace.Id);
@@ -50,8 +48,8 @@ public class WorkspaceSectorTests
 				},
 			});
 
-		Workspace workspace = CreateWorkspace(ctx) with { LayoutEngines = [engine] };
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), workspace);
+		Workspace workspace = CreateWorkspace() with { LayoutEngines = [engine] };
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)1), workspace);
 
 		ctx.NativeManager.DeferWindowPos().Returns(new DeferWindowPosHandle(ctx, internalCtx));
 
@@ -76,7 +74,7 @@ public class WorkspaceSectorTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void DoLayout_GarbageCollect(IContext ctx, IInternalContext internalCtx, MutableRootSector root)
+	internal void DoLayout_GarbageCollect(IInternalContext internalCtx, MutableRootSector root)
 	{
 		// Given one of the windows is not a valid window.
 		IWindow validWindow = CreateWindow((HWND)1);
@@ -84,10 +82,10 @@ public class WorkspaceSectorTests
 
 		internalCtx.CoreNativeManager.IsWindow(invalidWindow.Handle).Returns(false);
 
-		Workspace workspace = CreateWorkspace(ctx);
-		workspace = PopulateWindowWorkspaceMap(ctx, root, validWindow, workspace);
-		workspace = PopulateWindowWorkspaceMap(ctx, root, invalidWindow, workspace);
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), workspace);
+		Workspace workspace = CreateWorkspace();
+		workspace = PopulateWindowWorkspaceMap(root, validWindow, workspace);
+		workspace = PopulateWindowWorkspaceMap(root, invalidWindow, workspace);
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)1), workspace);
 
 		WorkspaceSector sut = root.WorkspaceSector;
 		sut.WorkspacesToLayout = sut.WorkspacesToLayout.Add(workspace.Id);
@@ -100,15 +98,15 @@ public class WorkspaceSectorTests
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
-	internal void DoLayout_FocusWindow(IContext ctx, MutableRootSector root, List<object> transforms)
+	internal void DoLayout_FocusWindow(MutableRootSector root, List<object> transforms)
 	{
 		// Given
 		IWindow window = CreateWindow((HWND)1);
 
-		Workspace workspace = CreateWorkspace(ctx);
-		workspace = PopulateWindowWorkspaceMap(ctx, root, window, workspace);
+		Workspace workspace = CreateWorkspace();
+		workspace = PopulateWindowWorkspaceMap(root, window, workspace);
 
-		PopulateMonitorWorkspaceMap(ctx, root, CreateMonitor((HMONITOR)1), workspace);
+		PopulateMonitorWorkspaceMap(root, CreateMonitor((HMONITOR)1), workspace);
 
 		WorkspaceSector sut = root.WorkspaceSector;
 		sut.WorkspacesToLayout = sut.WorkspacesToLayout.Add(workspace.Id);

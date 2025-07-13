@@ -6,7 +6,6 @@ using Windows.Win32.Graphics.Gdi;
 
 namespace Whim.TreeLayout.Tests;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 internal class TreeCustomization : StoreCustomization
 {
 	private int _windowIdx = 1;
@@ -17,11 +16,11 @@ internal class TreeCustomization : StoreCustomization
 		monitor.WorkingArea.Returns(new Rectangle<int>() { Width = 100, Height = 100 });
 		fixture.Inject(monitor);
 
-		Workspace workspace = StoreTestUtils.CreateWorkspace(_ctx);
+		Workspace workspace = StoreTestUtils.CreateWorkspace();
 		fixture.Inject(workspace);
 
 		MutableRootSector root = _store._root.MutableRootSector;
-		StoreTestUtils.PopulateMonitorWorkspaceMap(_ctx, root, monitor, workspace);
+		StoreTestUtils.PopulateMonitorWorkspaceMap(root, monitor, workspace);
 
 		ITreeLayoutPlugin plugin = Substitute.For<ITreeLayoutPlugin>();
 		plugin.Name.Returns("whim.tree_layout");
@@ -60,7 +59,7 @@ internal class TreeCustomization : StoreCustomization
 
 		if (window != null)
 		{
-			StoreTestUtils.PopulateWindowWorkspaceMap(ctx, root, window, workspace);
+			StoreTestUtils.PopulateWindowWorkspaceMap(root, window, workspace);
 		}
 	}
 }

@@ -118,9 +118,3 @@ Items which don't return a `Result` do not need to be handled in this way - they
 ```csharp
 IMonitor primaryMonitor = context.Store.Pick(Pickers.PickPrimaryMonitor());
 ```
-
-## Deprecated API
-
-The store is also exposed using the deprecated interfaces <xref:Whim.IWindowManager>, <xref:Whim.IWorkspaceManager>, <xref:Whim.IMonitorManager> and <xref:Whim.IButler>. All functionality is now available as transforms and pickers on the store.
-
-The <xref:Whim.IWorkspace> also exposes a variety of methods to interact with workspaces. Similarly, all functionality is now available as transforms and pickers on the store.
