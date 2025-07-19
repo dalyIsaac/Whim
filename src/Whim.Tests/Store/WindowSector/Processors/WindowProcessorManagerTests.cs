@@ -12,7 +12,7 @@ public class WindowProcessorManagerTests
 		WindowProcessorManager sut = new(ctx);
 
 		// When ShouldBeIgnored is called
-		bool result = sut.ShouldBeIgnored(window, default, default, default, default, default, default);
+		bool result = sut.ShouldBeIgnored(window, default, default, default, default, default);
 
 		// Then the result should be false
 		Assert.False(result);
@@ -26,7 +26,7 @@ public class WindowProcessorManagerTests
 		WindowProcessorManager sut = new(ctx);
 
 		// When ShouldBeIgnored is called for the first time
-		bool result = sut.ShouldBeIgnored(window, default, default, default, default, default, default);
+		bool result = sut.ShouldBeIgnored(window, default, default, default, default, default);
 
 		// Then the result should be true
 		Assert.True(result);
@@ -40,8 +40,8 @@ public class WindowProcessorManagerTests
 		WindowProcessorManager sut = new(ctx);
 
 		// When ShouldBeIgnored is called for the second time
-		sut.ShouldBeIgnored(window, default, PInvoke.EVENT_OBJECT_CLOAKED, 0, 0, 0, 0);
-		bool result = sut.ShouldBeIgnored(window, default, 0, 0, 0, 0, 0);
+		sut.ShouldBeIgnored(window, PInvoke.EVENT_OBJECT_CLOAKED, 0, 0, 0, 0);
+		bool result = sut.ShouldBeIgnored(window, 0, 0, 0, 0, 0);
 
 		// Then the processor should have been created by the second call, and the window should not be ignored
 		Assert.False(result);
@@ -55,9 +55,9 @@ public class WindowProcessorManagerTests
 		WindowProcessorManager sut = new(ctx);
 
 		// When ShouldBeIgnored is called for the second time
-		sut.ShouldBeIgnored(window, default, PInvoke.EVENT_OBJECT_CLOAKED, 0, 0, 0, 0);
-		bool firstProcessorResult = sut.ShouldBeIgnored(window, default, PInvoke.EVENT_OBJECT_DESTROY, 0, 0, 0, 0);
-		bool secondProcessorResult = sut.ShouldBeIgnored(window, default, 0, 0, 0, 0, 0);
+		sut.ShouldBeIgnored(window, PInvoke.EVENT_OBJECT_CLOAKED, 0, 0, 0, 0);
+		bool firstProcessorResult = sut.ShouldBeIgnored(window, PInvoke.EVENT_OBJECT_DESTROY, 0, 0, 0, 0);
+		bool secondProcessorResult = sut.ShouldBeIgnored(window, 0, 0, 0, 0, 0);
 
 		// Then the processor should have been removed by the second call, and the window should be ignored in the next call
 		Assert.False(firstProcessorResult);
@@ -72,7 +72,7 @@ public class WindowProcessorManagerTests
 		WindowProcessorManager sut = new(ctx);
 
 		// When ShouldBeIgnored is called with a ProcessAndRemove result
-		bool result = sut.ShouldBeIgnored(window, default, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, 0, 0, 0, 0);
+		bool result = sut.ShouldBeIgnored(window, PInvoke.EVENT_OBJECT_LOCATIONCHANGE, 0, 0, 0, 0);
 
 		// Then the result should be true, and a LayoutAllActiveWorkspacesTransform should be dispatched
 		Assert.True(result);

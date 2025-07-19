@@ -63,6 +63,9 @@ public interface IContext
 	/// <inheritdoc cref="IStore" />
 	IStore Store { get; }
 
+	/// <inheritdoc cref="IWindowProcessorManager" />
+	IWindowProcessorManager WindowProcessorManager { get; }
+
 	/// <summary>
 	/// This will be called by the Whim Runner.
 	/// You likely won't need to call it yourself.

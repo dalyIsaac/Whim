@@ -6,6 +6,8 @@ Some applications are difficult to manage. Whim will try to manage them as best 
 
 To get around this, Whim has <xref:Whim.IWindowProcessor>s. These are used to tell Whim to ignore specific window messages (see [Event Constants](https://learn.microsoft.com/en-us/windows/win32/winauto/event-constants)). For example, the <xref:Whim.FirefoxWindowProcessor> ignores all events until the first [`EVENT_OBJECT_CLOAKED`](https://learn.microsoft.com/en-us/windows/win32/winauto/event-constants#:~:text=EVENT_OBJECT_CLOAKED) event is received. The <xref:Whim.TeamsWindowProcessor> automatically minimizes any compact mode windows.
 
+These can be added to the <xref:Whim.IWindowProcessorManager>, via the <xref:Whim.IContext>. For more, see the [`IContext`](../script/architecture/context.md) scripting documentation.
+
 ## Window launch locations
 
 Windows can launch windows in different locations. Additionally, interacting with some untracked windows like the Windows Taskbar can break focus tracking in Whim.

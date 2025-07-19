@@ -1,25 +1,25 @@
-using Windows.Win32.UI.Accessibility;
-
 namespace Whim;
 
-internal class WindowProcessorManager
+internal class WindowProcessorManager : IWindowProcessorManager
 {
 	private readonly IContext _ctx;
 
-	private readonly List<Func<IContext, IWindow, IWindowProcessor?>> _processorCreators = [];
+	private readonly Dictionary<string, Func<IContext, IWindow, IWindowProcessor?>> _processorCreators = [];
+
+	/// <inheritdoc />
+	public IDictionary<string, Func<IContext, IWindow, IWindowProcessor?>> ProcessorCreators => _processorCreators;
 
 	private readonly Dictionary<HWND, IWindowProcessor> _processors = [];
 
 	public WindowProcessorManager(IContext ctx)
 	{
 		_ctx = ctx;
-		_processorCreators.Add(FirefoxWindowProcessor.Create);
-		_processorCreators.Add(TeamsWindowProcessor.Create);
+		_processorCreators.Add(FirefoxWindowProcessor.Id, FirefoxWindowProcessor.Create);
+		_processorCreators.Add(TeamsWindowProcessor.Id, TeamsWindowProcessor.Create);
 	}
 
-	internal bool ShouldBeIgnored(
+	public bool ShouldBeIgnored(
 		IWindow window,
-		HWINEVENTHOOK hWinEventHook,
 		uint eventType,
 		int idObject,
 		int idChild,
@@ -63,7 +63,7 @@ internal class WindowProcessorManager
 
 	private IWindowProcessor? CreateProcessor(IWindow window)
 	{
-		foreach (Func<IContext, IWindow, IWindowProcessor?> creator in _processorCreators)
+		foreach (Func<IContext, IWindow, IWindowProcessor?> creator in _processorCreators.Values)
 		{
 			IWindowProcessor? processor = creator(_ctx, window);
 			if (processor != null)

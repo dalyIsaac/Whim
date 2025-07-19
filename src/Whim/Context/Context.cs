@@ -29,6 +29,8 @@ internal class Context : IContext
 
 	public IStore Store { get; }
 
+	public IWindowProcessorManager WindowProcessorManager { get; }
+
 	public event EventHandler<ExitEventArgs>? Exiting;
 	public event EventHandler<ExitEventArgs>? Exited;
 
@@ -55,6 +57,7 @@ internal class Context : IContext
 		PluginManager = new PluginManager(this, _commandManager);
 		KeybindManager = new KeybindManager(this);
 		NotificationManager = new NotificationManager(this);
+		WindowProcessorManager = new WindowProcessorManager(this);
 	}
 
 	public void Initialize()
