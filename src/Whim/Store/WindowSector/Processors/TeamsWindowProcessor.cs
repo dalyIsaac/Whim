@@ -5,6 +5,12 @@ namespace Whim;
 /// </summary>
 public class TeamsWindowProcessor : IWindowProcessor
 {
+	/// <summary>
+	/// Unique identifier for the Teams window processor.
+	/// This is used to identify the processor in the <see cref="IWindowProcessorManager"/>.
+	/// </summary>
+	public static string Id => "teams";
+
 	/// <inheritdoc />
 	public IWindow Window { get; }
 

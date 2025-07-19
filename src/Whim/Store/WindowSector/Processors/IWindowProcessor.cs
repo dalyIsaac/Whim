@@ -5,12 +5,18 @@ namespace Whim;
 /// For example, Firefox will try reset the window position on startup. The <see cref="FirefoxWindowProcessor"/>
 /// will ignore these events.
 /// </summary>
+/// <remarks>
+/// Window processors are expected to implement a method which accepts an <see cref="IContext"/> and an <see cref="IWindow"/>.
+/// If the window matches the processor, it should return an instance of the processor.
+/// Otherwise, it should return null.
+/// The processor will then be used to handle events for that window.
+/// </remarks>
 public interface IWindowProcessor
 {
 	/// <summary>
 	/// The window that this processor is for.
 	/// </summary>
-	public IWindow Window { get; }
+	IWindow Window { get; }
 
 	/// <summary>
 	/// Processes the given event.
@@ -25,7 +31,7 @@ public interface IWindowProcessor
 	/// <returns>
 	/// Whether the event should be ignored by Whim.
 	/// </returns>
-	public abstract WindowProcessorResult ProcessEvent(
+	WindowProcessorResult ProcessEvent(
 		uint eventType,
 		int idObject,
 		int idChild,

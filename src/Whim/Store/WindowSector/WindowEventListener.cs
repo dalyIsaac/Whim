@@ -20,14 +20,11 @@ internal class WindowEventListener : IDisposable
 	/// </summary>
 	private readonly WINEVENTPROC _hookDelegate;
 
-	private readonly WindowProcessorManager _processorManager;
-
 	public WindowEventListener(IContext ctx, IInternalContext internalCtx)
 	{
 		_ctx = ctx;
 		_internalCtx = internalCtx;
 		_hookDelegate = new WINEVENTPROC(WinEventProcWrapper);
-		_processorManager = new WindowProcessorManager(ctx);
 	}
 
 	public void Initialize()
@@ -136,9 +133,8 @@ internal class WindowEventListener : IDisposable
 		}
 
 		if (
-			_processorManager.ShouldBeIgnored(
+			_ctx.WindowProcessorManager.ShouldBeIgnored(
 				window,
-				_hWinEventHook,
 				eventType,
 				idObject,
 				idChild,

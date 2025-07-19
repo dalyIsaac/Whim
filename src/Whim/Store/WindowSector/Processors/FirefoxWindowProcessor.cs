@@ -7,6 +7,12 @@ namespace Whim;
 /// </summary>
 public class FirefoxWindowProcessor : IWindowProcessor
 {
+	/// <summary>
+	/// Unique identifier for the Firefox window processor.
+	/// This is used to identify the processor in the <see cref="IWindowProcessorManager"/>.
+	/// </summary>
+	public static string Id => "firefox";
+
 	private readonly IContext _ctx;
 	private readonly int _startTime;
 	private bool _hasExceededStartTime;
