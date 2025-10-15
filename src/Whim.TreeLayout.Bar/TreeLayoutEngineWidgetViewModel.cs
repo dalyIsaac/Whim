@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel;
 using Microsoft.UI.Xaml;
 
@@ -25,12 +27,17 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 	/// If the current workspace's active layout engine is not a tree layout engine, this will be
 	/// <see langword="null"/>.
 	/// </summary>
-	public string? AddNodeDirection => _plugin.GetAddWindowDirection(_monitor)?.ToString();
-
-	/// <summary>
-	/// Command to toggle through the directions.
-	/// </summary>
-	public ToggleDirectionCommand ToggleDirectionCommand { get; }
+	public string? AddNodeDirection
+	{
+		get => _plugin.GetAddWindowDirection(_monitor)?.ToString();
+		set
+		{
+			if (Enum.TryParse<Direction>(value, out Direction d))
+			{
+				_plugin.SetAddWindowDirection(_monitor, d);
+			}
+		}
+	}
 
 	/// <inheritdoc />
 	public event PropertyChangedEventHandler? PropertyChanged;
@@ -46,7 +53,6 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 		_context = context;
 		_plugin = plugin;
 		_monitor = monitor;
-		ToggleDirectionCommand = new ToggleDirectionCommand(this);
 
 		_context.Store.MapEvents.MonitorWorkspaceChanged += MapEvents_MonitorWorkspaceChanged;
 		_context.Store.WorkspaceEvents.ActiveLayoutEngineChanged += WorkspaceEvents_ActiveLayoutEngineChanged;
@@ -78,42 +84,18 @@ public class TreeLayoutEngineWidgetViewModel : INotifyPropertyChanged, IDisposab
 	private void Plugin_AddWindowDirectionChanged(object? sender, AddWindowDirectionChangedEventArgs e) =>
 		OnPropertyChanged(string.Empty);
 
+	private readonly ImmutableArray<string> _directions =
+	[
+		Direction.Up.ToString(),
+		Direction.Down.ToString(),
+		Direction.Left.ToString(),
+		Direction.Right.ToString(),
+	];
+
 	/// <summary>
-	/// Toggle the <see cref="AddNodeDirection"/> in a clockwise direction.
+	/// Supported Directions for The Tree Layout.
 	/// </summary>
-	public void ToggleDirection()
-	{
-		Direction? direction = _plugin.GetAddWindowDirection(_monitor);
-
-		if (direction == null)
-		{
-			Logger.Error("Tree layout engine not found");
-			return;
-		}
-
-		Direction nextDirection;
-		switch (direction)
-		{
-			case Direction.Left:
-				nextDirection = Direction.Up;
-				break;
-			case Direction.Up:
-				nextDirection = Direction.Right;
-				break;
-			case Direction.Right:
-				nextDirection = Direction.Down;
-				break;
-			case Direction.Down:
-				nextDirection = Direction.Left;
-				break;
-			default:
-				Logger.Error($"We don't support adding windows in {direction}");
-				nextDirection = Direction.Right;
-				break;
-		}
-
-		_plugin.SetAddWindowDirection(_monitor, nextDirection);
-	}
+	public IReadOnlyList<string> Directions => _directions;
 
 	/// <inheritdoc/>
 	protected virtual void OnPropertyChanged(string? propertyName)
