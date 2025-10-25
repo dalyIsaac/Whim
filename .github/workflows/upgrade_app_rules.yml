@@ -22,7 +22,7 @@ jobs:
 
       # UPGRADE APP-RULES
       - name: Set up python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: 3.11
           # cache for pip requires all requirements to be frozen
