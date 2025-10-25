@@ -22,7 +22,6 @@
       "args": [
         "tool",
         "run",
-        "xstyler",
         "--recursive",
         "--d",
         ".",

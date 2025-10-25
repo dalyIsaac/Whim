@@ -2,32 +2,19 @@
   "version": 1,
   "isRoot": true,
   "tools": {
-    "xamlstyler.console": {
-      "version": "3.2501.8",
-      "commands": [
-        "xstyler"
-      ],
-      "rollForward": false
-    },
     "csharpier": {
       "version": "1.1.2",
-      "commands": [
-        "csharpier"
-      ],
+      "commands": ["csharpier"],
       "rollForward": false
     },
     "docfx": {
       "version": "2.78.3",
-      "commands": [
-        "docfx"
-      ],
+      "commands": ["docfx"],
       "rollForward": false
     },
     "dotnet-setversion": {
       "version": "3.1.0",
-      "commands": [
-        "setversion"
-      ],
+      "commands": ["setversion"],
       "rollForward": false
     }
   }

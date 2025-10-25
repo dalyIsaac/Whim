@@ -25,7 +25,6 @@ Before making a pull request, please install the tools specified in [`.config/do
 cd Whim
 dotnet tool restore
 
-# Run the formatters
+# Run the formatter
 dotnet tool run csharpier format .
-dotnet tool run xstyler --recursive --d . --config ./.xamlstylerrc
 ```
