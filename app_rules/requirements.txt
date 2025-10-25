@@ -1,6 +1,6 @@
 # direct dependencies
 PyYAML==6.0.3
-requests==2.32.4
+requests==2.32.5
 # indirect dependencies, frozen to use cache by `actions/setup-python`
 certifi==2025.10.5
 charset-normalizer==3.4.4
