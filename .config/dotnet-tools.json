@@ -4,17 +4,23 @@
   "tools": {
     "csharpier": {
       "version": "1.1.2",
-      "commands": ["csharpier"],
+      "commands": [
+        "csharpier"
+      ],
       "rollForward": false
     },
     "docfx": {
-      "version": "2.78.3",
-      "commands": ["docfx"],
+      "version": "2.78.4",
+      "commands": [
+        "docfx"
+      ],
       "rollForward": false
     },
     "dotnet-setversion": {
       "version": "3.1.0",
-      "commands": ["setversion"],
+      "commands": [
+        "setversion"
+      ],
       "rollForward": false
     }
   }
