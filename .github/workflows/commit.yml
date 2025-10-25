@@ -71,10 +71,6 @@ jobs:
         run: |
           dotnet tool run csharpier check .
 
-      - name: Check XAML formatting
-        run: |
-          dotnet tool run xstyler --recursive --d . --passive --config ./.xamlstylerrc
-
       #   - name: Check analyzers
       #     run: |
       #       dotnet format analyzers Whim.sln --verify-no-changes --no-restore

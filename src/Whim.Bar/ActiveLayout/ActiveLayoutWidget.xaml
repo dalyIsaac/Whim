@@ -7,10 +7,10 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	d:DesignHeight="450"
 	d:DesignWidth="800"
-	mc:Ignorable="d">
-
-
-	<bar:DropDown ItemsSource="{x:Bind Path=ViewModel.LayoutEngines, Mode=OneWay}" SelectedItem="{x:Bind Path=ViewModel.ActiveLayoutEngine, Mode=TwoWay}" />
-
-
+	mc:Ignorable="d"
+>
+	<bar:DropDown
+		ItemsSource="{x:Bind Path=ViewModel.LayoutEngines, Mode=OneWay}"
+		SelectedItem="{x:Bind Path=ViewModel.ActiveLayoutEngine, Mode=TwoWay}"
+	/>
 </UserControl>

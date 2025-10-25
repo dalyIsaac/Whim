@@ -4,8 +4,8 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	mc:Ignorable="d">
-
+	mc:Ignorable="d"
+>
 	<RelativePanel>
 		<!--  Windows 11 uses 8px radii  -->
 		<Rectangle
@@ -16,7 +16,7 @@
 			RelativePanel.AlignRightWithPanel="True"
 			RelativePanel.AlignTopWithPanel="True"
 			Stroke="{x:Bind Path=FocusIndicatorConfig.Color, Mode=OneWay}"
-			StrokeThickness="{x:Bind Path=FocusIndicatorConfig.BorderSize, Mode=OneWay}" />
-
+			StrokeThickness="{x:Bind Path=FocusIndicatorConfig.BorderSize, Mode=OneWay}"
+		/>
 	</RelativePanel>
 </Window>
