@@ -1,5 +1,5 @@
 # direct dependencies
-PyYAML==6.0.2
+PyYAML==6.0.3
 requests==2.32.4
 # indirect dependencies, frozen to use cache by `actions/setup-python`
 certifi==2025.1.31
