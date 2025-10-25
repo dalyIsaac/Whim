@@ -6,12 +6,13 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	d:DesignHeight="450"
 	d:DesignWidth="800"
-	mc:Ignorable="d">
-	<StackPanel
-		FlowDirection="LeftToRight"
-		Orientation="Horizontal"
-		Style="{StaticResource bar:battery:stack_panel}">
+	mc:Ignorable="d"
+>
+	<StackPanel FlowDirection="LeftToRight" Orientation="Horizontal" Style="{StaticResource bar:battery:stack_panel}">
 		<FontIcon Glyph="{x:Bind ViewModel.Icon, Mode=OneWay}" Style="{StaticResource bar:battery:font_icon}" />
-		<TextBlock Style="{StaticResource bar:battery:text_block}" Text="{x:Bind ViewModel.RemainingChargePercent, Mode=OneWay}" />
+		<TextBlock
+			Style="{StaticResource bar:battery:text_block}"
+			Text="{x:Bind ViewModel.RemainingChargePercent, Mode=OneWay}"
+		/>
 	</StackPanel>
 </UserControl>

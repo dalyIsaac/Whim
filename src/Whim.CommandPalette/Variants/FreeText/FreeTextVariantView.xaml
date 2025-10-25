@@ -5,12 +5,13 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:local="using:Whim.CommandPalette"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	mc:Ignorable="d">
-
+	mc:Ignorable="d"
+>
 	<TextBlock
 		x:Name="Prompt"
 		Height="{x:Bind local:FreeTextVariantView.ViewHeight}"
 		Padding="12,11,0,0"
 		FontStyle="Italic"
-		Text="{x:Bind Path=ViewModel.Prompt}" />
+		Text="{x:Bind Path=ViewModel.Prompt}"
+	/>
 </UserControl>

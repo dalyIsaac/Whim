@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <UserControl
 	x:Class="Whim.Bar.DropDown"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -6,15 +6,16 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:local="using:Whim.Bar"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	mc:Ignorable="d">
-
+	mc:Ignorable="d"
+>
 	<!--  We need the Grid surrounding the StackPanel to fix the FlowDirection set in a parent.  -->
 	<Grid>
 		<StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
 			<DropDownButton
 				HorizontalAlignment="Left"
 				Content="{x:Bind Path=SelectedItem, Mode=TwoWay}"
-				Style="{StaticResource bar:active_layout:button}">
+				Style="{StaticResource bar:active_layout:button}"
+			>
 				<DropDownButton.Flyout>
 					<MenuFlyout x:Name="MenuFlyout" Placement="Bottom" />
 				</DropDownButton.Flyout>

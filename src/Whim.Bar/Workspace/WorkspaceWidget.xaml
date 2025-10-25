@@ -8,21 +8,22 @@
 	d:DataContext="{d:DesignInstance Type=local:WorkspaceWidgetViewModel}"
 	d:DesignHeight="450"
 	d:DesignWidth="800"
-	mc:Ignorable="d">
+	mc:Ignorable="d"
+>
 	<ItemsControl ItemsSource="{x:Bind ViewModel.Workspaces}">
 		<ItemsControl.ItemsPanel>
 			<ItemsPanelTemplate>
 				<StackPanel Orientation="Horizontal" />
 			</ItemsPanelTemplate>
 		</ItemsControl.ItemsPanel>
-
 		<ItemsControl.ItemTemplate>
 			<DataTemplate x:DataType="local:WorkspaceModel">
 				<Button
 					Command="{x:Bind SwitchWorkspaceCommand}"
 					CommandParameter="{x:Bind}"
 					Content="{x:Bind Name}"
-					Style="{StaticResource bar:workspace:button}">
+					Style="{StaticResource bar:workspace:button}"
+				>
 					<Button.Resources>
 						<!--
 							WinUI doesn't let us set `Trigger` styles explicitly. We can
@@ -33,8 +34,14 @@
 							- Button[Background|Foreground|Borderbrush]Pressed
 							- Button[Background|Foreground|Borderbrush]Disabled
 						-->
-						<SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="{StaticResource bar:active_workspace:background}" />
-						<SolidColorBrush x:Key="ButtonForegroundDisabled" Color="{StaticResource bar:active_workspace:foreground}" />
+						<SolidColorBrush
+							x:Key="ButtonBackgroundDisabled"
+							Color="{StaticResource bar:active_workspace:background}"
+						/>
+						<SolidColorBrush
+							x:Key="ButtonForegroundDisabled"
+							Color="{StaticResource bar:active_workspace:foreground}"
+						/>
 						<SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{StaticResource bar:hover:background}" />
 						<SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="{StaticResource bar:hover:foreground}" />
 					</Button.Resources>
