@@ -59,6 +59,12 @@
 		BasedOn="{StaticResource _base:button}"
 		TargetType="DropDownButton" />
 
+	<!--  Tree layout engine widget  -->
+	<Style
+		x:Key="bar:tree_layout:button"
+		BasedOn="{StaticResource _base:button}"
+		TargetType="DropDownButton" />
+
 
 	<!--  Workspace widget  -->
 	<Style x:Key="bar:workspace:button" BasedOn="{StaticResource _base:button}" TargetType="Button">
