@@ -35,7 +35,16 @@ public class SliceLayoutPlugin(IContext context) : ISliceLayoutPlugin
 	public WindowInsertionType WindowInsertionType { get; set; }
 
 	/// <inheritdoc />
-	public void PreInitialize() { }
+	public void PreInitialize()
+	{
+		_context.Store.WindowEvents.WindowMinimizeStarted += WindowEvents_WindowMinimizeStarted;
+	}
+
+	private void WindowEvents_WindowMinimizeStarted(object? sender, WindowEventArgs e)
+	{
+		System.Guid workspaceId = _context.Store.Pick(Pickers.PickActiveWorkspaceId());
+		_context.Store.Dispatch(new DoWorkspaceLayoutTransform(workspaceId));
+	}
 
 	/// <inheritdoc />
 	public void PostInitialize() { }
