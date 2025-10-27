@@ -6,9 +6,11 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:local="using:Whim.TreeLayout.Bar"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	mc:Ignorable="d">
+	mc:Ignorable="d"
+>
 	<bar:DropDown
 		ItemsSource="{x:Bind Path=ViewModel.Directions, Mode=OneWay}"
 		SelectedItem="{x:Bind Path=ViewModel.AddNodeDirection, Mode=TwoWay}"
-		Visibility="{x:Bind Path=ViewModel.IsVisible, Mode=OneWay}" />
+		Visibility="{x:Bind Path=ViewModel.IsVisible, Mode=OneWay}"
+	/>
 </UserControl>
