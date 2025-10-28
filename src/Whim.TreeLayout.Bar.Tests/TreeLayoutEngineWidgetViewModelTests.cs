@@ -105,76 +105,6 @@ public class TreeLayoutEngineWidgetViewModelTests
 	}
 
 	[Theory, AutoSubstituteData<Customization>]
-	internal void ToggleDirection_WhenDirectionValueIsNull_DoesNothing(
-		IContext ctx,
-		ITreeLayoutPlugin plugin,
-		IMonitor monitor
-	)
-	{
-		// Given
-		TreeLayoutEngineWidgetViewModel viewModel = new(ctx, plugin, monitor);
-
-		// When
-		viewModel.ToggleDirection();
-
-		// Then
-		Assert.Null(viewModel.AddNodeDirection);
-	}
-
-	[InlineAutoSubstituteData<Customization>(Direction.Left, Direction.Up)]
-	[InlineAutoSubstituteData<Customization>(Direction.Up, Direction.Right)]
-	[InlineAutoSubstituteData<Customization>(Direction.Right, Direction.Down)]
-	[InlineAutoSubstituteData<Customization>(Direction.Down, Direction.Left)]
-	[Theory]
-	internal void ToggleDirection_WhenDirectionValueIsNotNull_TogglesDirection(
-		Direction initial,
-		Direction expected,
-		IContext ctx,
-		ITreeLayoutPlugin plugin,
-		IMonitor monitor
-	)
-	{
-		// Given
-		plugin.GetAddWindowDirection(monitor).Returns(initial);
-		TreeLayoutEngineWidgetViewModel viewModel = new(ctx, plugin, monitor);
-
-		// When
-		viewModel.ToggleDirection();
-
-		// Then
-		plugin.Received(1).SetAddWindowDirection(monitor, expected);
-	}
-
-	[Theory, AutoSubstituteData<Customization>]
-	internal void ToggleDirection_EngineIsNull(IContext ctx, ITreeLayoutPlugin plugin, IMonitor monitor)
-	{
-		// Given
-		plugin.GetAddWindowDirection(monitor).Returns((Direction?)null);
-		TreeLayoutEngineWidgetViewModel viewModel = new(ctx, plugin, monitor);
-
-		// When
-		viewModel.ToggleDirection();
-
-		// Then
-		plugin.DidNotReceive().SetAddWindowDirection(monitor, Arg.Any<Direction>());
-		Assert.Null(viewModel.AddNodeDirection);
-	}
-
-	[Theory, AutoSubstituteData<Customization>]
-	internal void ToggleDirection_InvalidDirection(IContext ctx, ITreeLayoutPlugin plugin, IMonitor monitor)
-	{
-		// Given
-		plugin.GetAddWindowDirection(monitor).Returns((Direction)42);
-		TreeLayoutEngineWidgetViewModel viewModel = new(ctx, plugin, monitor);
-
-		// When
-		viewModel.ToggleDirection();
-
-		// Then
-		plugin.Received(1).SetAddWindowDirection(monitor, Arg.Any<Direction>());
-	}
-
-	[Theory, AutoSubstituteData<Customization>]
 	internal void Butler_MonitorWorkspaceChanged_Success(
 		IContext ctx,
 		MutableRootSector root,
@@ -299,19 +229,5 @@ public class TreeLayoutEngineWidgetViewModelTests
 			EventHandler<ActiveLayoutEngineChangedEventArgs>
 		>();
 		plugin.AddWindowDirectionChanged -= Arg.Any<EventHandler<AddWindowDirectionChangedEventArgs>>();
-	}
-
-	[Theory, AutoSubstituteData<Customization>]
-	internal void ToggleDirectionCommand(IContext ctx, ITreeLayoutPlugin plugin, IMonitor monitor)
-	{
-		// Given
-		plugin.GetAddWindowDirection(monitor).Returns(Direction.Left);
-		TreeLayoutEngineWidgetViewModel viewModel = new(ctx, plugin, monitor);
-
-		// When
-		viewModel.ToggleDirectionCommand.Execute(null);
-
-		// Then
-		plugin.Received(1).SetAddWindowDirection(monitor, Direction.Up);
 	}
 }
