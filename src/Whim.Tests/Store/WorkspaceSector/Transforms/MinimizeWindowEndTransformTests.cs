@@ -14,21 +14,27 @@ public class MinimizeWindowEndTransformTests
 		// not mutating.
 		HWND handle = (HWND)1;
 		IWindow window = CreateWindow(handle);
+		IMonitor monitor = CreateMonitor((HMONITOR)1);
 
-		Workspace workspace = PopulateWindowWorkspaceMap(
+		// Configure engines to return empty layout
+		engine1.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>()).Returns([]);
+		engine2.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>()).Returns([]);
+
+		Workspace workspace = PopulateThreeWayMap(
 			root,
-			window,
+			monitor,
 			CreateWorkspace() with
 			{
 				LayoutEngines = [engine1, engine2],
 				ActiveLayoutEngineIndex = 1,
-			}
+			},
+			window
 		);
 
 		engine2.MinimizeWindowEnd(Arg.Any<IWindow>()).Returns(engine2);
 
-		// When we execute the transform
-		var result = ctx.Store.Dispatch(new MinimizeWindowEndTransform(workspace.Id, handle));
+		// When we execute the transform - since the layout engine doesn't change, no layout should occur
+		Result<bool> result = ctx.Store.Dispatch(new MinimizeWindowEndTransform(workspace.Id, handle));
 
 		// Then it succeeds
 		Assert.True(result.IsSuccessful);
@@ -40,6 +46,9 @@ public class MinimizeWindowEndTransformTests
 
 		Assert.Same(workspaceResult.LayoutEngines[0], workspace.LayoutEngines[0]);
 		Assert.Same(workspaceResult.LayoutEngines[1], workspace.LayoutEngines[1]);
+
+		// Verify no layout was triggered since workspace didn't change
+		Assert.Empty(root.WorkspaceSector.WorkspacesToLayout);
 	}
 
 	[Theory, AutoSubstituteData<StoreCustomization>]
@@ -54,22 +63,33 @@ public class MinimizeWindowEndTransformTests
 		// mutating.
 		HWND handle = (HWND)1;
 		IWindow window = CreateWindow(handle);
+		IMonitor monitor = CreateMonitor((HMONITOR)1);
 
-		Workspace workspace = PopulateWindowWorkspaceMap(
+		// Configure engines to return empty layout
+		engine1.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>()).Returns([]);
+		engine2.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>()).Returns([]);
+
+		Workspace workspace = PopulateThreeWayMap(
 			root,
-			window,
+			monitor,
 			CreateWorkspace() with
 			{
 				LayoutEngines = [engine1, engine2],
 				ActiveLayoutEngineIndex = 1,
-			}
+			},
+			window
 		);
 
 		// When we execute the transform
-		var result = ctx.Store.Dispatch(new MinimizeWindowEndTransform(workspace.Id, handle));
+		Result<bool>? result = null;
+		CustomAssert.Layout(
+			root,
+			() => result = ctx.Store.Dispatch(new MinimizeWindowEndTransform(workspace.Id, handle)),
+			[workspace.Id]
+		);
 
 		// Then it succeeds
-		Assert.True(result.IsSuccessful);
+		Assert.True(result!.Value.IsSuccessful);
 
 		engine1.DidNotReceive().MinimizeWindowEnd(Arg.Any<IWindow>());
 		engine2.Received().MinimizeWindowEnd(window);
@@ -78,5 +98,9 @@ public class MinimizeWindowEndTransformTests
 
 		Assert.Same(workspaceResult.LayoutEngines[0], workspace.LayoutEngines[0]);
 		Assert.NotSame(workspaceResult.LayoutEngines[1], workspace.LayoutEngines[1]);
+
+		// Verify WindowPositions was updated
+		Assert.True(workspaceResult.WindowPositions.ContainsKey(handle));
+		Assert.Equal(new WindowPosition(), workspaceResult.WindowPositions[handle]);
 	}
 }
