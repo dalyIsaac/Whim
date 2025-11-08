@@ -8,13 +8,13 @@ namespace Whim;
 /// </summary>
 /// <param name="WorkspaceId"></param>
 /// <param name="WindowHandle"></param>
-internal record MinimizeWindowStartTransform(Guid WorkspaceId, HWND WindowHandle)
+internal record MinimizeWindowStartTransform(WorkspaceId WorkspaceId, HWND WindowHandle)
 	: BaseWorkspaceWindowTransform(
 		WorkspaceId,
 		WindowHandle,
 		DefaultToLastFocusedWindow: false,
 		IsWindowRequiredInWorkspace: false,
-		SkipDoLayout: true
+		SkipDoLayout: false
 	)
 {
 	private protected override Result<Workspace> WindowOperation(

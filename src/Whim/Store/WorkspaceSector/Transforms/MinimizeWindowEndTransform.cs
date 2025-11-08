@@ -14,7 +14,7 @@ internal record MinimizeWindowEndTransform(WorkspaceId WorkspaceId, HWND WindowH
 		WindowHandle,
 		DefaultToLastFocusedWindow: false,
 		IsWindowRequiredInWorkspace: true,
-		SkipDoLayout: true
+		SkipDoLayout: false
 	)
 {
 	private protected override Result<Workspace> WindowOperation(
