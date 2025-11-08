@@ -100,7 +100,7 @@ public class MinimizeWindowEndTransformTests
 		Assert.NotSame(workspaceResult.LayoutEngines[1], workspace.LayoutEngines[1]);
 
 		// Verify WindowPositions was updated
-		Assert.True(workspaceResult.WindowPositions.ContainsKey(handle));
-		Assert.Equal(new WindowPosition(), workspaceResult.WindowPositions[handle]);
+		Assert.True(workspaceResult.WindowPositions.TryGetValue(handle, out var position));
+		Assert.Equal(new WindowPosition(), position);
 	}
 }
