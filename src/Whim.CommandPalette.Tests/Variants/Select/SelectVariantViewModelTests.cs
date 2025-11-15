@@ -424,31 +424,29 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.PopulateItems(options);
 
 		// When
-		selectVariantViewModel.PopulateItems(
-			[
-				new()
-				{
-					Id = "4",
-					Title = "title4",
-					IsSelected = true,
-					IsEnabled = false,
-				},
-				new()
-				{
-					Id = "5",
-					Title = "title5",
-					IsSelected = false,
-					IsEnabled = false,
-				},
-				new()
-				{
-					Id = "6",
-					Title = "title6",
-					IsSelected = false,
-					IsEnabled = false,
-				},
-			]
-		);
+		selectVariantViewModel.PopulateItems([
+			new()
+			{
+				Id = "4",
+				Title = "title4",
+				IsSelected = true,
+				IsEnabled = false,
+			},
+			new()
+			{
+				Id = "5",
+				Title = "title5",
+				IsSelected = false,
+				IsEnabled = false,
+			},
+			new()
+			{
+				Id = "6",
+				Title = "title6",
+				IsSelected = false,
+				IsEnabled = false,
+			},
+		]);
 
 		// Then
 		Assert.Equal(3, selectVariantViewModel._allItems.Count);
@@ -467,18 +465,16 @@ public class SelectVariantViewModelTests
 		selectVariantViewModel.PopulateItems(options);
 
 		// When
-		selectVariantViewModel.PopulateItems(
-			[
-				options[0],
-				new()
-				{
-					Id = "5",
-					Title = "title5",
-					IsSelected = false,
-					IsEnabled = false,
-				},
-			]
-		);
+		selectVariantViewModel.PopulateItems([
+			options[0],
+			new()
+			{
+				Id = "5",
+				Title = "title5",
+				IsSelected = false,
+				IsEnabled = false,
+			},
+		]);
 
 		// Then
 		Assert.Equal(2, selectVariantViewModel._allItems.Count);

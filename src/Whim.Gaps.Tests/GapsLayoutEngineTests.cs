@@ -390,16 +390,14 @@ public class GapsLayoutEngineTests
 		ILayoutEngine innerLayoutEngine = Substitute.For<ILayoutEngine>();
 		innerLayoutEngine
 			.DoLayout(rect, Arg.Any<IMonitor>())
-			.Returns(
-				[
-					new WindowState()
-					{
-						Window = window,
-						Rectangle = rect,
-						WindowSize = WindowSize.Normal,
-					},
-				]
-			);
+			.Returns([
+				new WindowState()
+				{
+					Window = window,
+					Rectangle = rect,
+					WindowSize = WindowSize.Normal,
+				},
+			]);
 
 		GapsLayoutEngine gapsLayoutEngine = new(gapsConfig, innerLayoutEngine);
 
@@ -443,16 +441,14 @@ public class GapsLayoutEngineTests
 		inner2.Count.Returns(1);
 		inner2
 			.DoLayout(Arg.Any<IRectangle<int>>(), Arg.Any<IMonitor>())
-			.Returns(
-				[
-					new WindowState()
-					{
-						Rectangle = rect3,
-						Window = window3,
-						WindowSize = WindowSize.Normal,
-					},
-				]
-			);
+			.Returns([
+				new WindowState()
+				{
+					Rectangle = rect3,
+					Window = window3,
+					WindowSize = WindowSize.Normal,
+				},
+			]);
 
 		context.NativeManager.DwmGetWindowRectangle(window1.Handle).Returns(rect1);
 		context.NativeManager.DwmGetWindowRectangle(window2.Handle).Returns(rect2);

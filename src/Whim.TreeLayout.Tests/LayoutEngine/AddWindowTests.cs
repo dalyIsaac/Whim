@@ -52,34 +52,32 @@ public class AddWindowTests
 
 		windowStates
 			.Should()
-			.Equal(
-				[
-					new WindowState()
+			.Equal([
+				new WindowState()
+				{
+					Window = window1,
+					Rectangle = new Rectangle<int>()
 					{
-						Window = window1,
-						Rectangle = new Rectangle<int>()
-						{
-							X = 0,
-							Y = 0,
-							Width = 50,
-							Height = 100,
-						},
-						WindowSize = WindowSize.Normal,
+						X = 0,
+						Y = 0,
+						Width = 50,
+						Height = 100,
 					},
-					new WindowState()
+					WindowSize = WindowSize.Normal,
+				},
+				new WindowState()
+				{
+					Window = window2,
+					Rectangle = new Rectangle<int>()
 					{
-						Window = window2,
-						Rectangle = new Rectangle<int>()
-						{
-							X = 50,
-							Y = 0,
-							Width = 50,
-							Height = 100,
-						},
-						WindowSize = WindowSize.Normal,
+						X = 50,
+						Y = 0,
+						Width = 50,
+						Height = 100,
 					},
-				]
-			);
+					WindowSize = WindowSize.Normal,
+				},
+			]);
 	}
 
 	[Theory, AutoSubstituteData<TreeCustomization>]
@@ -114,46 +112,44 @@ public class AddWindowTests
 
 		windowStates
 			.Should()
-			.Equal(
-				[
-					new WindowState()
+			.Equal([
+				new WindowState()
+				{
+					Window = window1,
+					Rectangle = new Rectangle<int>()
 					{
-						Window = window1,
-						Rectangle = new Rectangle<int>()
-						{
-							X = 0,
-							Y = 0,
-							Width = 33,
-							Height = 100,
-						},
-						WindowSize = WindowSize.Normal,
+						X = 0,
+						Y = 0,
+						Width = 33,
+						Height = 100,
 					},
-					new WindowState()
+					WindowSize = WindowSize.Normal,
+				},
+				new WindowState()
+				{
+					Window = window2,
+					Rectangle = new Rectangle<int>()
 					{
-						Window = window2,
-						Rectangle = new Rectangle<int>()
-						{
-							X = 33,
-							Y = 0,
-							Width = 33,
-							Height = 100,
-						},
-						WindowSize = WindowSize.Normal,
+						X = 33,
+						Y = 0,
+						Width = 33,
+						Height = 100,
 					},
-					new WindowState()
+					WindowSize = WindowSize.Normal,
+				},
+				new WindowState()
+				{
+					Window = window3,
+					Rectangle = new Rectangle<int>()
 					{
-						Window = window3,
-						Rectangle = new Rectangle<int>()
-						{
-							X = 67,
-							Y = 0,
-							Width = 33,
-							Height = 100,
-						},
-						WindowSize = WindowSize.Normal,
+						X = 67,
+						Y = 0,
+						Width = 33,
+						Height = 100,
 					},
-				]
-			);
+					WindowSize = WindowSize.Normal,
+				},
+			]);
 	}
 
 	[Theory, AutoSubstituteData<TreeCustomization>]
@@ -187,46 +183,44 @@ public class AddWindowTests
 
 		windowStates
 			.Should()
-			.Equal(
-				[
-					new WindowState()
+			.Equal([
+				new WindowState()
+				{
+					Window = window1,
+					Rectangle = new Rectangle<int>()
 					{
-						Window = window1,
-						Rectangle = new Rectangle<int>()
-						{
-							X = 0,
-							Y = 0,
-							Width = 33,
-							Height = 100,
-						},
-						WindowSize = WindowSize.Normal,
+						X = 0,
+						Y = 0,
+						Width = 33,
+						Height = 100,
 					},
-					new WindowState()
+					WindowSize = WindowSize.Normal,
+				},
+				new WindowState()
+				{
+					Window = window2,
+					Rectangle = new Rectangle<int>()
 					{
-						Window = window2,
-						Rectangle = new Rectangle<int>()
-						{
-							X = 33,
-							Y = 0,
-							Width = 33,
-							Height = 100,
-						},
-						WindowSize = WindowSize.Normal,
+						X = 33,
+						Y = 0,
+						Width = 33,
+						Height = 100,
 					},
-					new WindowState()
+					WindowSize = WindowSize.Normal,
+				},
+				new WindowState()
+				{
+					Window = window3,
+					Rectangle = new Rectangle<int>()
 					{
-						Window = window3,
-						Rectangle = new Rectangle<int>()
-						{
-							X = 67,
-							Y = 0,
-							Width = 33,
-							Height = 100,
-						},
-						WindowSize = WindowSize.Normal,
+						X = 67,
+						Y = 0,
+						Width = 33,
+						Height = 100,
 					},
-				]
-			);
+					WindowSize = WindowSize.Normal,
+				},
+			]);
 	}
 
 	[Theory, AutoSubstituteData<TreeCustomization>]
@@ -259,46 +253,44 @@ public class AddWindowTests
 
 		windowStates
 			.Should()
-			.Equal(
-				[
-					new WindowState()
+			.Equal([
+				new WindowState()
+				{
+					Window = window1,
+					Rectangle = new Rectangle<int>()
 					{
-						Window = window1,
-						Rectangle = new Rectangle<int>()
-						{
-							X = 0,
-							Y = 0,
-							Width = 33,
-							Height = 100,
-						},
-						WindowSize = WindowSize.Normal,
+						X = 0,
+						Y = 0,
+						Width = 33,
+						Height = 100,
 					},
-					new WindowState()
+					WindowSize = WindowSize.Normal,
+				},
+				new WindowState()
+				{
+					Window = window3,
+					Rectangle = new Rectangle<int>()
 					{
-						Window = window3,
-						Rectangle = new Rectangle<int>()
-						{
-							X = 33,
-							Y = 0,
-							Width = 33,
-							Height = 100,
-						},
-						WindowSize = WindowSize.Normal,
+						X = 33,
+						Y = 0,
+						Width = 33,
+						Height = 100,
 					},
-					new WindowState()
+					WindowSize = WindowSize.Normal,
+				},
+				new WindowState()
+				{
+					Window = window2,
+					Rectangle = new Rectangle<int>()
 					{
-						Window = window2,
-						Rectangle = new Rectangle<int>()
-						{
-							X = 67,
-							Y = 0,
-							Width = 33,
-							Height = 100,
-						},
-						WindowSize = WindowSize.Normal,
+						X = 67,
+						Y = 0,
+						Width = 33,
+						Height = 100,
 					},
-				]
-			);
+					WindowSize = WindowSize.Normal,
+				},
+			]);
 	}
 
 	[Theory, AutoSubstituteData<TreeCustomization>]
@@ -329,46 +321,44 @@ public class AddWindowTests
 
 		windowStates
 			.Should()
-			.Equal(
-				[
-					new WindowState()
+			.Equal([
+				new WindowState()
+				{
+					Window = window1,
+					Rectangle = new Rectangle<int>()
 					{
-						Window = window1,
-						Rectangle = new Rectangle<int>()
-						{
-							X = 0,
-							Y = 0,
-							Width = 50,
-							Height = 100,
-						},
-						WindowSize = WindowSize.Normal,
+						X = 0,
+						Y = 0,
+						Width = 50,
+						Height = 100,
 					},
-					new WindowState()
+					WindowSize = WindowSize.Normal,
+				},
+				new WindowState()
+				{
+					Window = window2,
+					Rectangle = new Rectangle<int>()
 					{
-						Window = window2,
-						Rectangle = new Rectangle<int>()
-						{
-							X = 50,
-							Y = 0,
-							Width = 50,
-							Height = 50,
-						},
-						WindowSize = WindowSize.Normal,
+						X = 50,
+						Y = 0,
+						Width = 50,
+						Height = 50,
 					},
-					new WindowState()
+					WindowSize = WindowSize.Normal,
+				},
+				new WindowState()
+				{
+					Window = window3,
+					Rectangle = new Rectangle<int>()
 					{
-						Window = window3,
-						Rectangle = new Rectangle<int>()
-						{
-							X = 50,
-							Y = 50,
-							Width = 50,
-							Height = 50,
-						},
-						WindowSize = WindowSize.Normal,
+						X = 50,
+						Y = 50,
+						Width = 50,
+						Height = 50,
 					},
-				]
-			);
+					WindowSize = WindowSize.Normal,
+				},
+			]);
 	}
 
 	[Theory, AutoSubstituteData<TreeCustomization>]
@@ -397,34 +387,32 @@ public class AddWindowTests
 
 		windowStates
 			.Should()
-			.Equal(
-				[
-					new WindowState()
+			.Equal([
+				new WindowState()
+				{
+					Window = window1,
+					Rectangle = new Rectangle<int>()
 					{
-						Window = window1,
-						Rectangle = new Rectangle<int>()
-						{
-							X = 0,
-							Y = 0,
-							Width = 50,
-							Height = 100,
-						},
-						WindowSize = WindowSize.Normal,
+						X = 0,
+						Y = 0,
+						Width = 50,
+						Height = 100,
 					},
-					new WindowState()
+					WindowSize = WindowSize.Normal,
+				},
+				new WindowState()
+				{
+					Window = window2,
+					Rectangle = new Rectangle<int>()
 					{
-						Window = window2,
-						Rectangle = new Rectangle<int>()
-						{
-							X = 50,
-							Y = 0,
-							Width = 50,
-							Height = 100,
-						},
-						WindowSize = WindowSize.Normal,
+						X = 50,
+						Y = 0,
+						Width = 50,
+						Height = 100,
 					},
-				]
-			);
+					WindowSize = WindowSize.Normal,
+				},
+			]);
 	}
 
 	[Theory, AutoSubstituteData<TreeCustomization>]
@@ -452,21 +440,19 @@ public class AddWindowTests
 
 		windowStates
 			.Should()
-			.Equal(
-				[
-					new WindowState()
+			.Equal([
+				new WindowState()
+				{
+					Window = window,
+					Rectangle = new Rectangle<int>()
 					{
-						Window = window,
-						Rectangle = new Rectangle<int>()
-						{
-							X = 0,
-							Y = 0,
-							Width = 100,
-							Height = 100,
-						},
-						WindowSize = WindowSize.Normal,
+						X = 0,
+						Y = 0,
+						Width = 100,
+						Height = 100,
 					},
-				]
-			);
+					WindowSize = WindowSize.Normal,
+				},
+			]);
 	}
 }
