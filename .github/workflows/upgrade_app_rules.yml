@@ -18,7 +18,7 @@ jobs:
       BRANCH_NAME: auto-app-rules-upgrades
     steps:
       - name: Checkout main branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       # UPGRADE APP-RULES
       - name: Set up python
