@@ -18,6 +18,19 @@ internal record WindowHiddenTransform(IWindow Window) : WindowRemovedTransform(W
 		MutableRootSector mutableRootSector
 	)
 	{
+		// While monitors are being added/removed, Windows can briefly hide a window as part of
+		// the display topology change itself (observed with wezterm, which has no window chrome).
+		// If that hide event lands after the window's workspace has already been remapped back
+		// onto a (possibly different) monitor, the monitor lookup below would wrongly succeed and
+		// we'd treat a transient, OS-driven hide as if the app had genuinely hidden its own window,
+		// permanently removing it from its workspace while the process keeps running, untracked and
+		// invisible. Defer to the layout that runs once the monitor change settles instead.
+		if (mutableRootSector.MonitorSector.MonitorsChangingTasks > 0)
+		{
+			Logger.Debug($"Monitors are changing, ignoring hide event for {Window}");
+			return Unit.Result;
+		}
+
 		if (!ctx.Store.Pick(PickMonitorByWindow(Window.Handle)).IsSuccessful)
 		{
 			Logger.Debug($"Window {Window} is not on a monitor, ignoring event");

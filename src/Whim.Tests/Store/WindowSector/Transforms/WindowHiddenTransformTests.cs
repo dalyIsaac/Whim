@@ -69,4 +69,28 @@ public class WindowHiddenTransformTests
 		Assert.True(result.IsSuccessful);
 		Assert.Equal(window, ev.Arguments.Window);
 	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void Ignored_WhenMonitorsAreChanging(IContext ctx, MutableRootSector rootSector)
+	{
+		// Given the window is inside the window sector and resolves to a monitor (e.g. its
+		// workspace has just been remapped back onto a monitor during a monitor change), but
+		// a monitor change is still settling.
+		IWindow window = CreateWindow((HWND)2);
+		IMonitor monitor = CreateMonitor((HMONITOR)3);
+
+		Workspace workspace = CreateWorkspace();
+		PopulateThreeWayMap(rootSector, monitor, workspace, window);
+
+		rootSector.MonitorSector.MonitorsChangingTasks = 1;
+
+		WindowHiddenTransform sut = new(window);
+
+		// When
+		var result = AssertDoesNotRaise(ctx, rootSector, sut);
+
+		// Then the window is not removed from its workspace, even though it currently
+		// resolves to a monitor.
+		Assert.True(result.IsSuccessful);
+	}
 }
