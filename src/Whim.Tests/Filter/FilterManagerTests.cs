@@ -1,3 +1,5 @@
+using System.IO;
+
 namespace Whim.Tests;
 
 public class FilterManagerTests
@@ -86,6 +88,23 @@ public class FilterManagerTests
 
 		window.WindowClass.Returns("Test");
 
+		Assert.True(filterManager.ShouldBeIgnored(window));
+	}
+
+	[Theory, AutoSubstituteData]
+	public void LoadWindowsIgnoredByWhim_IgnoresOwnProcessWindows(IWindow window)
+	{
+		// Given a window from Whim's own process (e.g. the bar, command palette, focus
+		// indicator, or layout preview windows), regardless of its title - which can be unset
+		// at the point Whim first observes the window.
+		FilterManager filterManager = new();
+		DefaultFilteredWindows.LoadWindowsIgnoredByWhim(filterManager);
+
+		string ownProcessFileName = Path.GetFileName(Environment.ProcessPath!);
+		window.ProcessFileName.Returns(ownProcessFileName);
+		window.Title.Returns(string.Empty);
+
+		// Then the window should be ignored
 		Assert.True(filterManager.ShouldBeIgnored(window));
 	}
 }
